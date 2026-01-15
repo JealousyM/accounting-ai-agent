@@ -1,0 +1,103 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: accounting-postgres-staging
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: accounting_db_staging
+    volumes:
+      - postgres_data_staging:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: accounting-redis-staging
+    ports:
+      - "6380:6379"
+    volumes:
+      - redis_data_staging:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  # API Service
+  api:
+    image: ghcr.io/${GITHUB_REPOSITORY}/api:development
+    container_name: accounting-api-staging
+    environment:
+      - NODE_ENV=staging
+      - PORT=3001
+      - DATABASE_URL=postgresql://postgres:${POSTGRES_PASSWORD:-postgres}@postgres:5432/accounting_db_staging
+      - REDIS_URL=redis://redis:6379
+      - JWT_SECRET=${JWT_SECRET}
+      - REFRESH_TOKEN_SECRET=${REFRESH_TOKEN_SECRET}
+      - FRONTEND_URL=${FRONTEND_URL:-https://staging.your-domain.com}
+      - BACKEND_URL=${BACKEND_URL:-https://api-staging.your-domain.com}
+      - CORS_ORIGIN=${CORS_ORIGIN:-https://staging.your-domain.com}
+    ports:
+      - "3002:3001"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.api-staging.rule=Host(`api-staging.your-domain.com`)"
+      - "traefik.http.routers.api-staging.tls=true"
+      - "traefik.http.routers.api-staging.tls.certresolver=letsencrypt"
+
+  # Web Service
+  web:
+    image: ghcr.io/${GITHUB_REPOSITORY}/web:development
+    container_name: accounting-web-staging
+    environment:
+      - NODE_ENV=staging
+      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-https://api-staging.your-domain.com}
+      - NEXT_PUBLIC_APP_NAME=Accounting AI Agent (Staging)
+    ports:
+      - "3001:3000"
+    depends_on:
+      - api
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.web-staging.rule=Host(`staging.your-domain.com`)"
+      - "traefik.http.routers.web-staging.tls=true"
+      - "traefik.http.routers.web-staging.tls.certresolver=letsencrypt"
+
+volumes:
+  postgres_data_staging:
+    driver: local
+  redis_data_staging:
+    driver: local
+
+networks:
+  default:
+    name: accounting-staging-network
