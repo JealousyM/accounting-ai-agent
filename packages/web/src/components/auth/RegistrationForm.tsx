@@ -59,6 +59,9 @@ export function RegistrationForm() {
 
       const { confirmPassword, agreeToTerms, ...registerData } = data;
 
+      void confirmPassword;
+      void agreeToTerms;
+
       const response = await registerUser(registerData);
       console.log('Registration successful:', response);
       setSuccessMessage(t.successMessage);
