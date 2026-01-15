@@ -9,7 +9,8 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "test:e2e": "playwright test",
-    "lint": "next lint",
+    "lint": "eslint . --ext .ts,.tsx --fix --max-warnings 20",
+    "lint:check": "eslint . --ext .ts,.tsx --max-warnings 20",
     "clean": "rm -rf .next out"
   },
   "dependencies": {
@@ -37,6 +38,8 @@
     "@types/node": "^20.10.5",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
+    "@typescript-eslint/eslint-plugin": "^6.15.0",
+    "@typescript-eslint/parser": "^6.15.0",
     "autoprefixer": "^10.4.16",
     "cross-env": "^10.1.0",
     "eslint": "^8.56.0",
