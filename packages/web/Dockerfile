@@ -29,14 +29,16 @@ FROM node:20-alpine
 
 WORKDIR /app
 
-# Copy node_modules from builder (already has production deps)
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/packages/web/node_modules ./node_modules
+# Copy package files
+COPY --from=builder /app/packages/web/package*.json ./
+
+# Install production dependencies only
+RUN --mount=type=cache,target=/root/.npm \
+    npm install --only=production && npm cache clean --force
 
 # Copy built files
 COPY --from=builder /app/packages/web/.next ./.next
 COPY --from=builder /app/packages/web/public ./public
-COPY --from=builder /app/packages/web/package*.json ./
 COPY --from=builder /app/packages/web/next.config.js ./
 
 # Expose port

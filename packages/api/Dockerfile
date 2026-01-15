@@ -26,13 +26,19 @@ FROM node:20-alpine
 
 WORKDIR /app
 
-# Copy node_modules from builder
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/packages/api/node_modules ./node_modules
+# Copy package files and lock file
+COPY --from=builder /app/packages/api/package*.json ./
+
+# Install production dependencies only
+RUN --mount=type=cache,target=/root/.npm \
+    npm install --only=production && npm cache clean --force
 
 # Copy built files
 COPY --from=builder /app/packages/api/dist ./dist
-COPY --from=builder /app/packages/api/package*.json ./
+
+# Copy Prisma schema and generated client
+COPY --from=builder /app/packages/api/prisma ./prisma
+COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
 
 # Expose port
 EXPOSE 3001
