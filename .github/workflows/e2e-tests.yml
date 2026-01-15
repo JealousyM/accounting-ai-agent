@@ -64,7 +64,7 @@ jobs:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/accounting_db_test
         run: |
           npx prisma generate
-          npx prisma migrate deploy
+          npx prisma db push --force-reset --accept-data-loss
           npx prisma db seed
       
       - name: Build packages
