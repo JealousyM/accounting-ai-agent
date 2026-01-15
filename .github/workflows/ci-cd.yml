@@ -91,7 +91,7 @@ jobs:
           JWT_SECRET: test_jwt_secret_key_min_32_characters_long
           REFRESH_TOKEN_SECRET: test_refresh_secret_key_min_32_characters_long
           NODE_ENV: test
-        run: npm run test
+        run: npm run test:ci
 
   test-web:
     name: Test Web
@@ -111,7 +111,7 @@ jobs:
       
       - name: Run Web tests
         working-directory: packages/web
-        run: npm run test
+        run: npm run test:ci
 
   build:
     name: Build
