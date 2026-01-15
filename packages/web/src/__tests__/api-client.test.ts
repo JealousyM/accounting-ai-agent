@@ -1,4 +1,4 @@
-import { ApiClient, ApiError } from '../api-client';
+import { ApiClient, ApiError } from '../lib/api/api-client';
 
 // Mock fetch
 global.fetch = jest.fn();

@@ -9,7 +9,9 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
     "test:ci": "jest --ci --coverage --watchAll=false",
+    "test:all": "npm run test && npm run test:e2e",
     "lint": "eslint . --ext .ts,.tsx --fix --max-warnings 20",
     "lint:check": "eslint . --ext .ts,.tsx --max-warnings 20",
     "clean": "rm -rf .next out"
