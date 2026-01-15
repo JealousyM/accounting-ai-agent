@@ -1,0 +1,264 @@
+// Prisma Schema для AI Agent Бухгалтерии
+// Database: PostgreSQL
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================
+// USER MANAGEMENT
+// ============================================
+
+model User {
+  id           String   @id @default(uuid()) @db.Uuid
+  email        String   @unique
+  passwordHash String?
+  firstName    String?
+  lastName     String?
+  
+  // OAuth providers
+  googleId     String?  @unique
+  githubId     String?  @unique
+  
+  // User preferences
+  locale       String   @default("en") // User's preferred language (en, pl)
+  
+  // wFirma integration config
+  wfirmaConfig Json?    @db.JsonB
+  
+  // Timestamps
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  deletedAt    DateTime?
+  
+  // Relations
+  invoices        WFirmaInvoice[]
+  customers       WFirmaCustomer[]
+  conversations   AIConversation[]
+  recommendations AIRecommendation[]
+  
+  @@index([email])
+  @@index([googleId])
+  @@index([githubId])
+  @@index([createdAt])
+  @@map("users")
+}
+
+// ============================================
+// WFIRMA INVOICES
+// ============================================
+
+enum InvoiceStatus {
+  DRAFT
+  ISSUED
+  SENT
+  PAID
+  OVERDUE
+  CANCELLED
+  
+  @@map("invoice_status")
+}
+
+model WFirmaInvoice {
+  id               String        @id @default(uuid()) @db.Uuid
+  userId           String        @db.Uuid
+  
+  // wFirma identifiers
+  invoiceNumber    String
+  invoiceIdWFirma  String        @unique
+  
+  // Customer information
+  customerId       String?       @db.Uuid
+  customerName     String
+  customerEmail    String?
+  customerPhone    String?
+  customerNip      String?
+  customerAddress  Json?         @db.JsonB
+  
+  // Financial data
+  amount           Decimal       @db.Decimal(12, 2)
+  vat              Decimal       @db.Decimal(12, 2)
+  total            Decimal       @db.Decimal(12, 2)
+  currency         String        @default("PLN")
+  
+  // Dates
+  issueDate        DateTime
+  dueDate          DateTime
+  paidDate         DateTime?
+  
+  // Status
+  status           InvoiceStatus @default(DRAFT)
+  
+  // Additional data
+  items            Json?         @db.JsonB
+  notes            String?       @db.Text
+  metadata         Json?         @db.JsonB
+  
+  // Timestamps
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+  deletedAt        DateTime?
+  
+  // Relations
+  user             User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  customer         WFirmaCustomer? @relation(fields: [customerId], references: [id], onDelete: SetNull)
+  
+  @@index([userId])
+  @@index([customerId])
+  @@index([status])
+  @@index([issueDate])
+  @@index([dueDate])
+  @@index([invoiceNumber])
+  @@index([userId, status])
+  @@index([userId, issueDate])
+  @@map("wfirma_invoices")
+}
+
+// ============================================
+// WFIRMA CUSTOMERS
+// ============================================
+
+model WFirmaCustomer {
+  id                String   @id @default(uuid()) @db.Uuid
+  userId            String   @db.Uuid
+  
+  // wFirma identifier
+  customerIdWFirma  String   @unique
+  
+  // Customer details
+  name              String
+  email             String?
+  phone             String?
+  nip               String?  @unique
+  
+  // Address
+  address           Json?    @db.JsonB
+  
+  // Statistics
+  totalRevenue      Decimal  @default(0) @db.Decimal(12, 2)
+  totalInvoices     Int      @default(0)
+  
+  // Additional data
+  metadata          Json?    @db.JsonB
+  
+  // Timestamps
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  deletedAt         DateTime?
+  
+  // Relations
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  invoices          WFirmaInvoice[]
+  
+  @@index([userId])
+  @@index([nip])
+  @@index([email])
+  @@index([userId, totalRevenue])
+  @@map("wfirma_customers")
+}
+
+// ============================================
+// AI CONVERSATIONS
+// ============================================
+
+model AIConversation {
+  id          String   @id @default(uuid()) @db.Uuid
+  userId      String   @db.Uuid
+  
+  // Conversation details
+  title       String
+  topic       String?
+  
+  // Messages history
+  messages    Json     @db.JsonB
+  
+  // LangGraph state
+  graphState  Json?    @db.JsonB
+  
+  // Timestamps
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  deletedAt   DateTime?
+  
+  // Relations
+  user            User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  recommendations AIRecommendation[]
+  
+  @@index([userId])
+  @@index([createdAt])
+  @@index([userId, createdAt])
+  @@map("ai_conversations")
+}
+
+// ============================================
+// AI RECOMMENDATIONS
+// ============================================
+
+enum RecommendationStatus {
+  PENDING
+  REVIEWED
+  IMPLEMENTED
+  REJECTED
+  
+  @@map("recommendation_status")
+}
+
+enum RecommendationCategory {
+  TAX_OPTIMIZATION
+  CASH_FLOW
+  EXPENSE_REDUCTION
+  REVENUE_GROWTH
+  COMPLIANCE
+  AUTOMATION
+  REPORTING
+  OTHER
+  
+  @@map("recommendation_category")
+}
+
+model AIRecommendation {
+  id              String                 @id @default(uuid()) @db.Uuid
+  userId          String                 @db.Uuid
+  conversationId  String?                @db.Uuid
+  
+  // Recommendation details
+  category        RecommendationCategory
+  title           String
+  description     String                 @db.Text
+  
+  // Scoring
+  impactScore     Decimal                @db.Decimal(5, 2) // 0-100
+  confidenceScore Decimal                @db.Decimal(5, 2) // 0-100
+  
+  // Status
+  status          RecommendationStatus   @default(PENDING)
+  
+  // Additional data
+  metadata        Json?                  @db.JsonB
+  
+  // Timestamps
+  createdAt       DateTime               @default(now())
+  reviewedAt      DateTime?
+  implementedAt   DateTime?
+  updatedAt       DateTime               @updatedAt
+  deletedAt       DateTime?
+  
+  // Relations
+  user         User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  conversation AIConversation? @relation(fields: [conversationId], references: [id], onDelete: SetNull)
+  
+  @@index([userId])
+  @@index([conversationId])
+  @@index([status])
+  @@index([category])
+  @@index([impactScore])
+  @@index([userId, status])
+  @@index([userId, category])
+  @@index([createdAt])
+  @@map("ai_recommendations")
+}

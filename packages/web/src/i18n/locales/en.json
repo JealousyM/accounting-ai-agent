@@ -1,0 +1,53 @@
+{
+  "auth": {
+    "register": {
+      "title": "Create your account",
+      "subtitle": "Start managing your accounting with AI",
+      "email": "Email address",
+      "emailPlaceholder": "you@example.com",
+      "password": "Password",
+      "passwordPlaceholder": "Enter your password",
+      "confirmPassword": "Confirm password",
+      "confirmPasswordPlaceholder": "Re-enter your password",
+      "firstName": "First name",
+      "firstNamePlaceholder": "John",
+      "lastName": "Last name",
+      "lastNamePlaceholder": "Doe",
+      "companyName": "Company name (optional)",
+      "companyNamePlaceholder": "Acme Corp",
+      "agreeToTerms": "I agree to the Terms of Service and Privacy Policy",
+      "submitButton": "Create account",
+      "submitting": "Creating account...",
+      "successMessage": "Account created successfully! Redirecting to login...",
+      "alreadyHaveAccount": "Already have an account?",
+      "signIn": "Sign in",
+      "orContinueWith": "Or continue with",
+      "googleButton": "Continue with Google",
+      "githubButton": "Continue with GitHub",
+      "passwordRequirements": {
+        "title": "Password requirements:",
+        "length": "At least 8 characters",
+        "uppercase": "One uppercase letter",
+        "lowercase": "One lowercase letter",
+        "number": "One number",
+        "special": "One special character"
+      }
+    },
+    "login": {
+      "title": "Sign in",
+      "subtitle": "Welcome back! Sign in to your account",
+      "email": "Email address",
+      "emailPlaceholder": "you@example.com",
+      "password": "Password",
+      "passwordPlaceholder": "Enter your password",
+      "forgotPassword": "Forgot password?",
+      "submitButton": "Sign in",
+      "submitting": "Signing in...",
+      "noAccount": "Don't have an account?",
+      "signUp": "Sign up",
+      "orContinueWith": "Or continue with",
+      "googleButton": "Continue with Google",
+      "githubButton": "Continue with GitHub"
+    }
+  }
+}

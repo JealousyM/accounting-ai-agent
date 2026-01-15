@@ -1,0 +1,53 @@
+{
+  "auth": {
+    "register": {
+      "title": "Utwórz konto",
+      "subtitle": "Zacznij zarządzać księgowością z AI",
+      "email": "Adres email",
+      "emailPlaceholder": "twoj@email.pl",
+      "password": "Hasło",
+      "passwordPlaceholder": "Wprowadź hasło",
+      "confirmPassword": "Potwierdź hasło",
+      "confirmPasswordPlaceholder": "Wprowadź hasło ponownie",
+      "firstName": "Imię",
+      "firstNamePlaceholder": "Jan",
+      "lastName": "Nazwisko",
+      "lastNamePlaceholder": "Kowalski",
+      "companyName": "Nazwa firmy (opcjonalnie)",
+      "companyNamePlaceholder": "Moja Firma Sp. z o.o.",
+      "agreeToTerms": "Akceptuję Regulamin i Politykę Prywatności",
+      "submitButton": "Utwórz konto",
+      "submitting": "Tworzenie konta...",
+      "successMessage": "Konto utworzone pomyślnie! Przekierowanie do logowania...",
+      "alreadyHaveAccount": "Masz już konto?",
+      "signIn": "Zaloguj się",
+      "orContinueWith": "Lub kontynuuj z",
+      "googleButton": "Kontynuuj z Google",
+      "githubButton": "Kontynuuj z GitHub",
+      "passwordRequirements": {
+        "title": "Wymagania hasła:",
+        "length": "Minimum 8 znaków",
+        "uppercase": "Jedna wielka litera",
+        "lowercase": "Jedna mała litera",
+        "number": "Jedna cyfra",
+        "special": "Jeden znak specjalny"
+      }
+    },
+    "login": {
+      "title": "Zaloguj się",
+      "subtitle": "Witaj ponownie! Zaloguj się do swojego konta",
+      "email": "Adres email",
+      "emailPlaceholder": "twoj@email.pl",
+      "password": "Hasło",
+      "passwordPlaceholder": "Wprowadź hasło",
+      "forgotPassword": "Zapomniałeś hasła?",
+      "submitButton": "Zaloguj się",
+      "submitting": "Logowanie...",
+      "noAccount": "Nie masz konta?",
+      "signUp": "Zarejestruj się",
+      "orContinueWith": "Lub kontynuuj z",
+      "googleButton": "Kontynuuj z Google",
+      "githubButton": "Kontynuuj z GitHub"
+    }
+  }
+}
