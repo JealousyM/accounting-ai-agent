@@ -41,6 +41,9 @@ model User {
   customers       WFirmaCustomer[]
   conversations   AIConversation[]
   recommendations AIRecommendation[]
+  wfirmaCache     WFirmaCache[]
+  uchwaly         Uchwala[]
+  auditLogs       AuditLog[]
   
   @@index([email])
   @@index([googleId])
@@ -261,4 +264,262 @@ model AIRecommendation {
   @@index([userId, category])
   @@index([createdAt])
   @@map("ai_recommendations")
+}
+
+// ============================================
+// WFIRMA CACHE
+// ============================================
+
+model WFirmaCache {
+  id            String   @id @default(uuid()) @db.Uuid
+  userId        String   @db.Uuid
+  
+  // Type of cached data
+  dataType      String   // company, contractor, invoice, financial
+  
+  // ID of object in wFirma
+  wfirmaId      String
+  
+  // Cached data
+  data          Json     @db.JsonB
+  
+  // Cache metadata
+  cachedAt      DateTime @default(now())
+  expiresAt     DateTime
+  isValid       Boolean  @default(true)
+  
+  // Relations
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@unique([userId, dataType, wfirmaId])
+  @@index([userId, dataType])
+  @@index([expiresAt])
+  @@index([isValid])
+  @@map("wfirma_cache")
+}
+
+// ============================================
+// CORPORATE RESOLUTIONS (UCHWAŁY)
+// ============================================
+
+enum UchwalaType {
+  ZARZADU
+  DYWIDENDA
+  RADA_NADZORCZA
+  TANTIEMA
+  
+  @@map("uchwala_type")
+}
+
+enum UchwalaStatus {
+  DRAFT
+  PENDING_SIGNATURE
+  APPROVED
+  REJECTED
+  ARCHIVED
+  
+  @@map("uchwala_status")
+}
+
+model Uchwala {
+  id                  String        @id @default(uuid()) @db.Uuid
+  userId              String        @db.Uuid
+  
+  // Основные данные
+  type                UchwalaType
+  number              String        @unique
+  title               String
+  status              UchwalaStatus @default(DRAFT)
+  
+  // Данные резолюции (JSON) - включает данные из wFirma
+  data                Json          @db.JsonB
+  
+  // Ссылка на компанию в wFirma
+  wfirmaCompanyId     String?
+  
+  // Расчеты налогов
+  taxCalculation      Json?         @db.JsonB
+  
+  // Документы
+  documentUrl         String?
+  signatureRequestId  String?
+  
+  // Версионирование
+  version             Int           @default(1)
+  
+  // Timestamps
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
+  approvedAt          DateTime?
+  deletedAt           DateTime?
+  
+  // Relations
+  user                User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  payments            Payment[]
+  uchwalaInvoices     UchwalaInvoice[]
+  auditLogs           AuditLog[]
+  
+  @@index([userId])
+  @@index([type])
+  @@index([status])
+  @@index([createdAt])
+  @@index([userId, type])
+  @@index([userId, status])
+  @@index([wfirmaCompanyId])
+  @@map("uchwaly")
+}
+
+// ============================================
+// PAYMENTS
+// ============================================
+
+enum PaymentStatus {
+  PENDING
+  SCHEDULED
+  SENT
+  CONFIRMED
+  FAILED
+  
+  @@map("payment_status")
+}
+
+model Payment {
+  id                String        @id @default(uuid()) @db.Uuid
+  uchwalaId         String        @db.Uuid
+  
+  // Получатель (может быть из wFirma contractors)
+  recipientName     String
+  recipientAccount  String
+  recipientNip      String?
+  wfirmaContractorId String?      // Ссылка на контрагента в wFirma
+  
+  // Суммы
+  amountGross       Decimal       @db.Decimal(12, 2)
+  amountNet         Decimal       @db.Decimal(12, 2)
+  taxAmount         Decimal       @db.Decimal(12, 2)
+  zusAmount         Decimal?      @db.Decimal(12, 2)
+  
+  // Статус и даты
+  status            PaymentStatus @default(PENDING)
+  scheduledDate     DateTime
+  processedDate     DateTime?
+  
+  // Банковские данные
+  bankReference     String?
+  transactionId     String?
+  
+  // Timestamps
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+  
+  // Relations
+  uchwala           Uchwala       @relation(fields: [uchwalaId], references: [id], onDelete: Cascade)
+  
+  @@index([uchwalaId])
+  @@index([status])
+  @@index([scheduledDate])
+  @@index([wfirmaContractorId])
+  @@map("payments")
+}
+
+// ============================================
+// UCHWALA INVOICES
+// ============================================
+
+model UchwalaInvoice {
+  id                String        @id @default(uuid()) @db.Uuid
+  uchwalaId         String        @db.Uuid
+  
+  // Ссылка на инвойс в wFirma (основной источник данных)
+  wfirmaInvoiceId   String        @unique
+  
+  // Кэшированные данные для быстрого доступа
+  invoiceNumber     String
+  issueDate         DateTime
+  dueDate           DateTime
+  total             Decimal       @db.Decimal(12, 2)
+  currency          String        @default("PLN")
+  status            String        // Синхронизируется из wFirma
+  
+  // Синхронизация
+  lastSyncedAt      DateTime?
+  syncStatus        String        @default("pending") // pending, synced, error
+  
+  // Timestamps
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+  
+  // Relations
+  uchwala           Uchwala       @relation(fields: [uchwalaId], references: [id], onDelete: Cascade)
+  
+  @@index([uchwalaId])
+  @@index([wfirmaInvoiceId])
+  @@index([status])
+  @@map("uchwala_invoices")
+}
+
+// ============================================
+// AUDIT LOGS
+// ============================================
+
+model AuditLog {
+  id          String   @id @default(uuid()) @db.Uuid
+  uchwalaId   String?  @db.Uuid
+  userId      String   @db.Uuid
+  
+  // Действие
+  action      String
+  entityType  String
+  entityId    String
+  
+  // Данные
+  oldData     Json?    @db.JsonB
+  newData     Json?    @db.JsonB
+  
+  // Метаданные
+  ipAddress   String?
+  userAgent   String?
+  
+  // Timestamp
+  createdAt   DateTime @default(now())
+  
+  // Relations
+  uchwala     Uchwala? @relation(fields: [uchwalaId], references: [id], onDelete: SetNull)
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@index([uchwalaId])
+  @@index([userId])
+  @@index([createdAt])
+  @@index([entityType, entityId])
+  @@map("audit_logs")
+}
+
+// ============================================
+// UCHWALA TEMPLATES
+// ============================================
+
+model UchwalaTemplate {
+  id              String      @id @default(uuid()) @db.Uuid
+  
+  // Тип и язык
+  type            UchwalaType
+  locale          String      @default("pl")
+  
+  // Данные шаблона
+  name            String
+  description     String?
+  content         String      @db.Text
+  requiredFields  String[]
+  
+  // Версионирование
+  version         String
+  isActive        Boolean     @default(true)
+  
+  // Timestamps
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  
+  @@unique([type, locale, version])
+  @@index([type, locale, isActive])
+  @@map("uchwala_templates")
 }
