@@ -4,6 +4,7 @@ import helmet from 'helmet';
 import dotenv from 'dotenv';
 import authRoutes from './routes/auth.routes';
 import userRoutes from './routes/user.routes';
+import aiChatRoutes from './routes/ai-chat.routes';
 import { globalRateLimiter } from './middleware/rate-limiter.middleware';
 import { errorHandler, notFoundHandler } from './middleware/error-handler.middleware';
 import { logger } from './utils/logger';
@@ -37,6 +38,9 @@ app.use('/api/auth', authRoutes);
 
 // User routes
 app.use('/api/users', userRoutes);
+
+// AI Chat routes
+app.use('/api/ai', aiChatRoutes);
 
 // 404 handler
 app.use(notFoundHandler);

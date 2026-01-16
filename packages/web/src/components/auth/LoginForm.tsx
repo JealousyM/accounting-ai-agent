@@ -79,7 +79,7 @@ export function LoginForm() {
       const redirectUrl = sessionStorage.getItem('redirectAfterLogin');
       sessionStorage.removeItem('redirectAfterLogin');
 
-      router.push(redirectUrl || '/dashboard');
+      router.push(redirectUrl || '/chat');
     } catch (error: any) {
       if (error.response?.data) {
         setApiError(error.response.data.message || 'Login failed');

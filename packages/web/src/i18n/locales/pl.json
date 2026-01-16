@@ -49,5 +49,44 @@
       "googleButton": "Kontynuuj z Google",
       "githubButton": "Kontynuuj z GitHub"
     }
+  },
+  "chat": {
+    "sidebar": {
+      "title": "Rozmowy",
+      "noConversations": "Brak rozmów",
+      "startNewChat": "Rozpocznij nowy czat",
+      "deleteConfirm": "Usunąć tę rozmowę?",
+      "yesterday": "Wczoraj",
+      "messages": "wiadomości"
+    },
+    "header": {
+      "defaultTitle": "Asystent Księgowy AI",
+      "subtitle": "Ekspert od polskich podatków i księgowości",
+      "newChat": "Nowy czat"
+    },
+    "messages": {
+      "emptyTitle": "Asystent Księgowy AI",
+      "emptyDescription": "Zapytaj mnie o polskie podatki, księgowość, wFirma, VAT, PIT, CIT, ZUS, faktury i więcej. Mogę też uzyskać dostęp do Twoich danych w wFirma.",
+      "thinking": "Myślę...",
+      "toolsUsed": "Użyto:"
+    },
+    "input": {
+      "placeholder": "Wpisz wiadomość...",
+      "placeholderNew": "Rozpocznij nową rozmowę...",
+      "placeholderDefault": "Zapytaj o księgowość, podatki, wFirma...",
+      "hint": "Enter - wyślij, Shift+Enter - nowa linia"
+    },
+    "tools": {
+      "companyInfo": "Dane firmy",
+      "contractors": "Kontrahenci",
+      "financials": "Finanse",
+      "invoices": "Faktury"
+    },
+    "suggestions": {
+      "vatRates": "Jakie są stawki VAT?",
+      "companyData": "Pokaż dane mojej firmy",
+      "ipBox": "Co to jest IP Box?",
+      "zusPayment": "Kiedy płacić ZUS?"
+    }
   }
 }
