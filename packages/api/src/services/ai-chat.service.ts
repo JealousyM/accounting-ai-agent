@@ -9,7 +9,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { ChatOpenAI } from '@langchain/openai';
 import { ChatAnthropic } from '@langchain/anthropic';
 import { HumanMessage, AIMessage, SystemMessage, BaseMessage } from '@langchain/core/messages';
-import { StructuredToolInterface } from '@langchain/core/tools';
+import { tool, StructuredToolInterface } from '@langchain/core/tools';
 import { StateGraph, MessagesAnnotation, START, END } from '@langchain/langgraph';
 import { ToolNode } from '@langchain/langgraph/prebuilt';
 import { z } from 'zod';
@@ -308,13 +308,14 @@ export class AIChatService {
     // Router function to decide if we should continue to tools or end
     const shouldContinue = (state: typeof MessagesAnnotation.State) => {
       const lastMessage = state.messages[state.messages.length - 1] as AIMessage;
-      if (lastMessage.tool_calls && lastMessage.tool_calls.length > 0) {
+      // Check if it's an AIMessage with tool calls
+      if (lastMessage && lastMessage.tool_calls && lastMessage.tool_calls.length > 0) {
         return 'tools';
       }
       return END;
     };
 
-    // Build the graph
+    // Build the graph with recursion limit
     const workflow = new StateGraph(MessagesAnnotation)
       .addNode('agent', callModel)
       .addNode('tools', toolNode)
@@ -322,6 +323,7 @@ export class AIChatService {
       .addConditionalEdges('agent', shouldContinue, ['tools', END])
       .addEdge('tools', 'agent');
 
+    // Compile with recursion limit to prevent infinite loops
     const graph = workflow.compile();
 
     // Convert existing messages to LangChain format
@@ -335,10 +337,11 @@ export class AIChatService {
       new HumanMessage(userMessage),
     ];
 
-    // Run the graph
-    const result = await graph.invoke({
-      messages: langchainMessages,
-    });
+    // Run the graph with recursion limit
+    const result = await graph.invoke(
+      { messages: langchainMessages },
+      { recursionLimit: 10 } // Limit iterations to prevent infinite loops
+    );
 
     // Extract final response and tools used
     const toolsUsed: string[] = [];
@@ -347,10 +350,25 @@ export class AIChatService {
     for (const message of result.messages) {
       if (message instanceof AIMessage) {
         if (message.tool_calls && message.tool_calls.length > 0) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           toolsUsed.push(...message.tool_calls.map((tc: any) => tc.name));
         }
-        if (message.content && typeof message.content === 'string') {
-          finalResponse = message.content;
+        // Handle both string content and array content (Anthropic format)
+        if (message.content) {
+          if (typeof message.content === 'string') {
+            finalResponse = message.content;
+          } else if (Array.isArray(message.content)) {
+            // Extract text from content blocks
+            const textContent = message.content
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              .filter((block: any) => block.type === 'text')
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              .map((block: any) => block.text)
+              .join('');
+            if (textContent) {
+              finalResponse = textContent;
+            }
+          }
         }
       }
     }
@@ -386,18 +404,17 @@ export class AIChatService {
 
   /**
    * Create LangChain tools for wFirma integration
+   * Note: Using type assertion due to LangChain's deep recursive generics causing TS2589
    */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private createTools(userId: string): StructuredToolInterface[] {
     const wfirmaService = this.wfirmaService;
     const cacheService = this.cacheService;
 
     // Get company info tool
-    const getCompanyInfoTool: StructuredToolInterface = {
-      name: 'get_company_info',
-      description: 'Get company information from wFirma (name, NIP, address, bank accounts). Use when user asks about their company data.',
-      schema: z.object({}),
-      lc_namespace: ['langchain', 'tools'],
-      invoke: async () => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const getCompanyInfoTool: StructuredToolInterface = (tool as any)(
+      async () => {
         try {
           const cached = await cacheService.getCachedData<WFirmaCompany>(
             userId,
@@ -417,26 +434,22 @@ export class AIChatService {
           return 'Error: Failed to fetch company data from wFirma';
         }
       },
-    };
+      {
+        name: 'get_company_info',
+        description: 'Get company information from wFirma (name, NIP, address, bank accounts). Use when user asks about their company data.',
+        schema: z.object({}),
+      }
+    );
 
     // Get contractors tool
-    const contractorsSchema = z.object({
-      search: z.string().optional().describe('Search by contractor name'),
-      nip: z.string().optional().describe('Filter by NIP number'),
-      limit: z.number().optional().describe('Maximum number of results (default 10)'),
-    });
-
-    const getContractorsTool: StructuredToolInterface = {
-      name: 'get_contractors',
-      description: 'Get list of contractors/customers from wFirma. Can filter by name or NIP. Use when user asks about their clients or contractors.',
-      schema: contractorsSchema,
-      lc_namespace: ['langchain', 'tools'],
-      invoke: async (input: z.infer<typeof contractorsSchema>) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const getContractorsTool: StructuredToolInterface = (tool as any)(
+      async ({ search, nip, limit }: { search?: string; nip?: string; limit?: number }) => {
         try {
           const contractors = await wfirmaService.getContractors({
-            search: input.search,
-            nip: input.nip,
-            limit: input.limit || 10,
+            search,
+            nip,
+            limit: limit || 10,
           });
 
           if (contractors.length === 0) {
@@ -452,21 +465,23 @@ export class AIChatService {
           return 'Error: Failed to fetch contractors from wFirma';
         }
       },
-    };
+      {
+        name: 'get_contractors',
+        description: 'Get list of contractors/customers from wFirma. Can filter by name or NIP. Use when user asks about their clients or contractors.',
+        schema: z.object({
+          search: z.string().optional().describe('Search by contractor name'),
+          nip: z.string().optional().describe('Filter by NIP number'),
+          limit: z.number().optional().describe('Maximum number of results (default 10)'),
+        }),
+      }
+    );
 
     // Get financial summary tool
-    const financialSchema = z.object({
-      year: z.number().describe('Fiscal year (e.g., 2024)'),
-    });
-
-    const getFinancialSummaryTool: StructuredToolInterface = {
-      name: 'get_financial_summary',
-      description: 'Get financial summary for a specific year (revenue, expenses, profit). Use when user asks about their income, expenses, or profit.',
-      schema: financialSchema,
-      lc_namespace: ['langchain', 'tools'],
-      invoke: async (input: z.infer<typeof financialSchema>) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const getFinancialSummaryTool: StructuredToolInterface = (tool as any)(
+      async ({ year }: { year: number }) => {
         try {
-          const cacheKey = `financial_${input.year}`;
+          const cacheKey = `financial_${year}`;
           const cached = await cacheService.getCachedData<FinancialData>(
             userId,
             'financial',
@@ -477,7 +492,7 @@ export class AIChatService {
             return formatFinancialData(cached);
           }
 
-          const financialData = await wfirmaService.getFinancialData(input.year);
+          const financialData = await wfirmaService.getFinancialData(year);
           await cacheService.cacheData(userId, 'financial', cacheKey, financialData);
           return formatFinancialData(financialData);
         } catch (error) {
@@ -485,7 +500,14 @@ export class AIChatService {
           return 'Error: Failed to fetch financial data from wFirma';
         }
       },
-    };
+      {
+        name: 'get_financial_summary',
+        description: 'Get financial summary for a specific year (revenue, expenses, profit). Use when user asks about their income, expenses, or profit.',
+        schema: z.object({
+          year: z.number().describe('Fiscal year (e.g., 2024)'),
+        }),
+      }
+    );
 
     return [getCompanyInfoTool, getContractorsTool, getFinancialSummaryTool];
   }
