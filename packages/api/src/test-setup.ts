@@ -3,21 +3,44 @@
  * This file is executed before each test file
  */
 
-// Mock environment variables for tests
-process.env.NODE_ENV = 'test';
-process.env.JWT_SECRET = 'test-jwt-secret-key-min-32-characters-long';
-process.env.REFRESH_TOKEN_SECRET = 'test-refresh-secret-key-min-32-characters-long';
-process.env.DATABASE_URL = 'postgresql://test:test@localhost:5432/test_db';
-process.env.REDIS_URL = 'redis://localhost:6379';
+// Load environment variables from .env file for integration tests
+import * as dotenv from 'dotenv';
+import * as path from 'path';
 
-// Mock console methods to reduce noise in tests
+// Load .env file from the api package root
+// Use override: true to ensure .env values take precedence over system environment variables
+const envPath = path.resolve(__dirname, '../.env');
+console.log('Loading .env from:', envPath);
+const result = dotenv.config({ path: envPath, override: true });
+
+if (result.error) {
+  console.warn('Warning: Could not load .env file:', result.error.message);
+} else {
+  console.log('✓ .env file loaded successfully');
+  console.log('Parsed env vars:', Object.keys(result.parsed || {}).filter(k => k.startsWith('WFIRMA')));
+  console.log('wFirma keys loaded:', {
+    accessKey: !!process.env.WFIRMA_ACCESS_KEY,
+    secretKey: !!process.env.WFIRMA_SECRET_KEY,
+    appKey: !!process.env.WFIRMA_APP_KEY,
+    accessKeyValue: process.env.WFIRMA_ACCESS_KEY?.substring(0, 10),
+  });
+}
+
+// Mock environment variables for tests (only if not already set)
+process.env.NODE_ENV = process.env.NODE_ENV || 'test';
+process.env.JWT_SECRET = process.env.JWT_SECRET || 'test-jwt-secret-key-min-32-characters-long';
+process.env.REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET || 'test-refresh-secret-key-min-32-characters-long';
+process.env.DATABASE_URL = process.env.DATABASE_URL || 'postgresql://test:test@localhost:5432/test_db';
+process.env.REDIS_URL = process.env.REDIS_URL || 'redis://localhost:6379';
+
+// Mock console methods to reduce noise in tests (but allow errors)
 global.console = {
   ...console,
   log: jest.fn(),
   debug: jest.fn(),
   info: jest.fn(),
-  warn: jest.fn(),
-  error: jest.fn(),
+  warn: console.warn, // Keep warnings
+  error: console.error, // Keep errors for debugging
 };
 
 // Mock Prisma client
