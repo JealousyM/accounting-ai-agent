@@ -147,7 +147,7 @@ interface PublicRouteProps {
 export function PublicRoute({
   children,
   redirectIfAuthenticated = false,
-  redirectTo = '/dashboard',
+  redirectTo = '/chat',
 }: PublicRouteProps) {
   const { isLoading, isAuthenticated } = useAuth();
   const router = useRouter();

@@ -44,6 +44,7 @@ model User {
   wfirmaCache     WFirmaCache[]
   uchwaly         Uchwala[]
   auditLogs       AuditLog[]
+  conversationSessions ConversationSession[]
   
   @@index([email])
   @@index([googleId])
@@ -296,6 +297,53 @@ model WFirmaCache {
   @@index([expiresAt])
   @@index([isValid])
   @@map("wfirma_cache")
+}
+
+// ============================================
+// CONVERSATION SESSIONS (for AI Agent)
+// ============================================
+
+enum ConversationStatus {
+  ACTIVE
+  COMPLETED
+  CANCELLED
+  
+  @@map("conversation_status")
+}
+
+model ConversationSession {
+  id              String              @id @default(uuid()) @db.Uuid
+  userId          String              @db.Uuid
+  
+  // Conversation details
+  type            String              // Type of uchwała being created
+  status          ConversationStatus  @default(ACTIVE)
+  
+  // Collected data during conversation
+  collectedData   Json                @db.JsonB
+  
+  // Current step in the conversation flow
+  currentStep     String
+  
+  // Messages history
+  messages        Json                @db.JsonB
+  
+  // wFirma data cached for this conversation
+  companyData     Json?               @db.JsonB
+  
+  // Timestamps
+  createdAt       DateTime            @default(now())
+  updatedAt       DateTime            @updatedAt
+  completedAt     DateTime?
+  
+  // Relations
+  user            User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@index([userId])
+  @@index([status])
+  @@index([createdAt])
+  @@index([userId, status])
+  @@map("conversation_sessions")
 }
 
 // ============================================

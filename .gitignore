@@ -31,3 +31,4 @@ Thumbs.db
 # Turbo
 .turbo/
 .kiro/
+.claude/

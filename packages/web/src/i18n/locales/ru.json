@@ -1,0 +1,92 @@
+{
+  "auth": {
+    "register": {
+      "title": "Создать аккаунт",
+      "subtitle": "Начните управлять бухгалтерией с помощью ИИ",
+      "email": "Email",
+      "emailPlaceholder": "you@example.com",
+      "password": "Пароль",
+      "passwordPlaceholder": "Введите пароль",
+      "confirmPassword": "Подтвердите пароль",
+      "confirmPasswordPlaceholder": "Введите пароль ещё раз",
+      "firstName": "Имя",
+      "firstNamePlaceholder": "Иван",
+      "lastName": "Фамилия",
+      "lastNamePlaceholder": "Иванов",
+      "companyName": "Название компании (необязательно)",
+      "companyNamePlaceholder": "ООО Моя Компания",
+      "agreeToTerms": "Я принимаю Условия использования и Политику конфиденциальности",
+      "submitButton": "Создать аккаунт",
+      "submitting": "Создание аккаунта...",
+      "successMessage": "Аккаунт успешно создан! Перенаправление на вход...",
+      "alreadyHaveAccount": "Уже есть аккаунт?",
+      "signIn": "Войти",
+      "orContinueWith": "Или продолжить с",
+      "googleButton": "Продолжить с Google",
+      "githubButton": "Продолжить с GitHub",
+      "passwordRequirements": {
+        "title": "Требования к паролю:",
+        "length": "Минимум 8 символов",
+        "uppercase": "Одна заглавная буква",
+        "lowercase": "Одна строчная буква",
+        "number": "Одна цифра",
+        "special": "Один специальный символ"
+      }
+    },
+    "login": {
+      "title": "Войти",
+      "subtitle": "С возвращением! Войдите в свой аккаунт",
+      "email": "Email",
+      "emailPlaceholder": "you@example.com",
+      "password": "Пароль",
+      "passwordPlaceholder": "Введите пароль",
+      "forgotPassword": "Забыли пароль?",
+      "submitButton": "Войти",
+      "submitting": "Вход...",
+      "noAccount": "Нет аккаунта?",
+      "signUp": "Зарегистрироваться",
+      "orContinueWith": "Или продолжить с",
+      "googleButton": "Продолжить с Google",
+      "githubButton": "Продолжить с GitHub"
+    }
+  },
+  "chat": {
+    "sidebar": {
+      "title": "Разговоры",
+      "noConversations": "Пока нет разговоров",
+      "startNewChat": "Начните новый чат",
+      "deleteConfirm": "Удалить этот разговор?",
+      "yesterday": "Вчера",
+      "messages": "сообщений"
+    },
+    "header": {
+      "defaultTitle": "ИИ Бухгалтерский ассистент",
+      "subtitle": "Эксперт по польским налогам и бухгалтерии",
+      "newChat": "Новый чат"
+    },
+    "messages": {
+      "emptyTitle": "ИИ Бухгалтерский ассистент",
+      "emptyDescription": "Спросите меня о польских налогах, бухгалтерии, wFirma, НДС, PIT, CIT, ZUS, счетах и многом другом. Я также могу получить доступ к вашим данным в wFirma.",
+      "thinking": "Думаю...",
+      "toolsUsed": "Использовано:"
+    },
+    "input": {
+      "placeholder": "Введите сообщение...",
+      "placeholderNew": "Начните новый разговор...",
+      "placeholderDefault": "Спросите о бухгалтерии, налогах, wFirma...",
+      "hint": "Enter - отправить, Shift+Enter - новая строка"
+    },
+    "tools": {
+      "companyInfo": "Данные компании",
+      "contractors": "Контрагенты",
+      "financials": "Финансы",
+      "invoices": "Счета"
+    },
+    "suggestions": {
+      "vatRates": "Какие ставки НДС?",
+      "companyData": "Покажи данные моей компании",
+      "ipBox": "Что такое IP Box?",
+      "zusPayment": "Когда платить ZUS?"
+    }
+  }
+}

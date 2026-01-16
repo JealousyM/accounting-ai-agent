@@ -49,5 +49,44 @@
       "googleButton": "Continue with Google",
       "githubButton": "Continue with GitHub"
     }
+  },
+  "chat": {
+    "sidebar": {
+      "title": "Conversations",
+      "noConversations": "No conversations yet",
+      "startNewChat": "Start a new chat to begin",
+      "deleteConfirm": "Delete this conversation?",
+      "yesterday": "Yesterday",
+      "messages": "messages"
+    },
+    "header": {
+      "defaultTitle": "AI Accounting Assistant",
+      "subtitle": "Polish tax & accounting expert",
+      "newChat": "New Chat"
+    },
+    "messages": {
+      "emptyTitle": "AI Accounting Assistant",
+      "emptyDescription": "Ask me anything about Polish taxes, accounting, wFirma, VAT, PIT, CIT, ZUS, invoices, and more. I can also access your wFirma data.",
+      "thinking": "Thinking...",
+      "toolsUsed": "Used:"
+    },
+    "input": {
+      "placeholder": "Type your message...",
+      "placeholderNew": "Start a new conversation...",
+      "placeholderDefault": "Ask about Polish accounting, taxes, wFirma...",
+      "hint": "Press Enter to send, Shift+Enter for new line"
+    },
+    "tools": {
+      "companyInfo": "Company Info",
+      "contractors": "Contractors",
+      "financials": "Financials",
+      "invoices": "Invoices"
+    },
+    "suggestions": {
+      "vatRates": "What are VAT rates?",
+      "companyData": "Show my company data",
+      "ipBox": "What is IP Box?",
+      "zusPayment": "When to pay ZUS?"
+    }
   }
 }
