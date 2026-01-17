@@ -89,3 +89,28 @@ Web requires `.env.local` with: NEXT_PUBLIC_API_URL
 
 Detailed docs in `packages/api/docs/` (API.md, ARCHITECTURE.md, AUTH_API.md)
 Service docs: `packages/api/src/services/README.wfirma.md`, `README.cache.md`
+
+## Claude Code Subagents
+
+Specialized subagent configurations for different development tasks are available in `.claude/agents/`:
+
+| Agent | File | Purpose |
+|-------|------|---------|
+| **api-service** | `.claude/agents/api-service.md` | Backend development (Express, TypeScript, Prisma) |
+| **frontend** | `.claude/agents/frontend.md` | Frontend development (Next.js 15, React 19, Tailwind) |
+| **wfirma** | `.claude/agents/wfirma.md` | wFirma API integration specialist |
+| **langgraph** | `.claude/agents/langgraph.md` | LangGraph/LangChain AI agent development |
+| **test-runner** | `.claude/agents/test-runner.md` | Testing (Jest, Vitest, Playwright) |
+| **prisma** | `.claude/agents/prisma.md` | Database operations (Prisma ORM, PostgreSQL) |
+
+### Using Subagents
+
+Reference the agent file when asking Claude Code for specialized help:
+
+```
+@.claude/agents/langgraph.md Create a new agent for expense tracking
+@.claude/agents/wfirma.md Add invoice download functionality
+@.claude/agents/prisma.md Add a new model for recurring transactions
+```
+
+Each agent contains domain-specific context, patterns, and examples to guide development in that area.
