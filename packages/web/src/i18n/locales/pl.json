@@ -80,7 +80,10 @@
       "companyInfo": "Dane firmy",
       "contractors": "Kontrahenci",
       "financials": "Finanse",
-      "invoices": "Faktury"
+      "invoices": "Faktury",
+      "createContractor": "Tworzenie kontrahenta",
+      "updateContractor": "Aktualizacja kontrahenta",
+      "deleteContractor": "Usuwanie kontrahenta"
     },
     "suggestions": {
       "vatRates": "Jakie są stawki VAT?",

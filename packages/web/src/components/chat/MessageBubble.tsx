@@ -9,6 +9,9 @@ interface ToolsTranslations {
   contractors: string;
   financials: string;
   invoices: string;
+  createContractor: string;
+  updateContractor: string;
+  deleteContractor: string;
 }
 
 interface MessageBubbleProps {
@@ -28,6 +31,9 @@ export function MessageBubble({ message, translations, toolsTranslations }: Mess
       get_contractors: toolsTranslations.contractors,
       get_financial_summary: toolsTranslations.financials,
       get_invoices: toolsTranslations.invoices,
+      create_contractor: toolsTranslations.createContractor,
+      update_contractor: toolsTranslations.updateContractor,
+      delete_contractor: toolsTranslations.deleteContractor,
     };
     return nameMap[name] || name;
   };
@@ -74,9 +80,9 @@ export function MessageBubble({ message, translations, toolsTranslations }: Mess
             </div>
           )}
 
-          {/* Message text with markdown-like formatting */}
-          <div className="whitespace-pre-wrap text-sm leading-relaxed">
-            {formatMessageContent(message.content)}
+          {/* Message text with markdown rendering */}
+          <div className="text-sm leading-relaxed">
+            {renderMarkdown(message.content)}
           </div>
         </div>
 
@@ -105,45 +111,165 @@ export function MessageBubble({ message, translations, toolsTranslations }: Mess
 }
 
 /**
- * Format message content with basic markdown support
+ * Custom markdown renderer with support for tables, headers, bold, code, and blockquotes
  */
-function formatMessageContent(content: string): React.ReactNode {
-  // Split by code blocks
-  const parts = content.split(/(```[\s\S]*?```)/g);
+function renderMarkdown(content: string): React.ReactNode {
+  const lines = content.split('\n');
+  const elements: React.ReactNode[] = [];
+  let i = 0;
 
-  return parts.map((part, index) => {
-    if (part.startsWith('```') && part.endsWith('```')) {
-      // Code block
-      const code = part.slice(3, -3).replace(/^\w+\n/, ''); // Remove language identifier
-      return (
-        <pre
-          key={index}
-          className="bg-gray-800 text-gray-100 rounded-lg p-3 my-2 overflow-x-auto text-xs"
-        >
-          <code>{code}</code>
-        </pre>
+  while (i < lines.length) {
+    const line = lines[i];
+
+    // Check for table (lines starting with |)
+    if (line.trim().startsWith('|')) {
+      const tableLines: string[] = [];
+      while (i < lines.length && lines[i].trim().startsWith('|')) {
+        tableLines.push(lines[i]);
+        i++;
+      }
+      elements.push(
+        <div key={`table-${i}`} className="my-2 overflow-x-auto">
+          {renderTable(tableLines)}
+        </div>
       );
+      continue;
     }
 
-    // Regular text with inline formatting
-    return (
-      <span key={index}>
-        {part.split('\n').map((line, lineIndex, arr) => (
-          <React.Fragment key={lineIndex}>
-            {formatInlineMarkdown(line)}
-            {lineIndex < arr.length - 1 && <br />}
-          </React.Fragment>
-        ))}
-      </span>
-    );
-  });
+    // Check for header (## )
+    if (line.startsWith('## ')) {
+      elements.push(
+        <h2 key={`h2-${i}`} className="text-base font-bold mt-3 mb-2">
+          {renderInlineMarkdown(line.slice(3))}
+        </h2>
+      );
+      i++;
+      continue;
+    }
+
+    // Check for blockquote (> )
+    if (line.startsWith('> ')) {
+      elements.push(
+        <blockquote
+          key={`quote-${i}`}
+          className="border-l-4 border-blue-400 pl-3 my-2 text-gray-600 italic text-sm"
+        >
+          {renderInlineMarkdown(line.slice(2))}
+        </blockquote>
+      );
+      i++;
+      continue;
+    }
+
+    // Check for code block (```)
+    if (line.startsWith('```')) {
+      const codeLines: string[] = [];
+      i++; // Skip opening ```
+      while (i < lines.length && !lines[i].startsWith('```')) {
+        codeLines.push(lines[i]);
+        i++;
+      }
+      i++; // Skip closing ```
+      elements.push(
+        <pre
+          key={`code-${i}`}
+          className="bg-gray-800 text-gray-100 rounded-lg p-3 my-2 overflow-x-auto text-xs"
+        >
+          <code>{codeLines.join('\n')}</code>
+        </pre>
+      );
+      continue;
+    }
+
+    // Check for list item (- )
+    if (line.startsWith('- ')) {
+      elements.push(
+        <div key={`li-${i}`} className="flex gap-2 my-1">
+          <span>•</span>
+          <span>{renderInlineMarkdown(line.slice(2))}</span>
+        </div>
+      );
+      i++;
+      continue;
+    }
+
+    // Regular paragraph
+    if (line.trim()) {
+      elements.push(
+        <p key={`p-${i}`} className="my-1">
+          {renderInlineMarkdown(line)}
+        </p>
+      );
+    } else {
+      // Empty line - add spacing
+      elements.push(<div key={`space-${i}`} className="h-2" />);
+    }
+    i++;
+  }
+
+  return elements;
 }
 
 /**
- * Format inline markdown (bold, italic, code)
+ * Render a markdown table
  */
-function formatInlineMarkdown(text: string): React.ReactNode {
-  // Simple bold and inline code formatting
+function renderTable(lines: string[]): React.ReactNode {
+  if (lines.length < 2) return null;
+
+  // Parse header
+  const headerCells = parseTableRow(lines[0]);
+
+  // Skip separator line (|---|---|)
+  const bodyLines = lines.slice(2);
+
+  return (
+    <table className="border-collapse border border-gray-300 text-xs w-full">
+      <thead>
+        <tr className="bg-gray-100">
+          {headerCells.map((cell, idx) => (
+            <th
+              key={idx}
+              className="border border-gray-300 px-3 py-2 text-left font-semibold"
+            >
+              {renderInlineMarkdown(cell)}
+            </th>
+          ))}
+        </tr>
+      </thead>
+      <tbody>
+        {bodyLines.map((line, rowIdx) => {
+          const cells = parseTableRow(line);
+          return (
+            <tr key={rowIdx} className={rowIdx % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+              {cells.map((cell, cellIdx) => (
+                <td key={cellIdx} className="border border-gray-300 px-3 py-2">
+                  {renderInlineMarkdown(cell)}
+                </td>
+              ))}
+            </tr>
+          );
+        })}
+      </tbody>
+    </table>
+  );
+}
+
+/**
+ * Parse a table row into cells
+ */
+function parseTableRow(line: string): string[] {
+  // Remove leading/trailing pipes and split by |
+  const trimmed = line.trim();
+  const withoutEdges = trimmed.startsWith('|') ? trimmed.slice(1) : trimmed;
+  const withoutEnd = withoutEdges.endsWith('|') ? withoutEdges.slice(0, -1) : withoutEdges;
+  return withoutEnd.split('|').map(cell => cell.trim());
+}
+
+/**
+ * Render inline markdown (bold, code, etc)
+ */
+function renderInlineMarkdown(text: string): React.ReactNode {
+  // Split by bold (**text**) and inline code (`text`)
   const parts = text.split(/(\*\*[^*]+\*\*|`[^`]+`)/g);
 
   return parts.map((part, index) => {

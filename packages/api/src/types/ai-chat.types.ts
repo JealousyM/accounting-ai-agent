@@ -19,7 +19,7 @@ export interface LLMConfig {
 export const DEFAULT_LLM_CONFIG: Record<LLMProvider, LLMConfig> = {
   openai: {
     provider: 'openai',
-    model: 'gpt-4-turbo-preview',
+    model: 'gpt-4o',
     maxTokens: 4096,
     temperature: 0.7,
   },

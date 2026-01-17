@@ -69,14 +69,14 @@ export class WFirmaCacheService {
 
       // Upsert cache entry
       await this.prisma.$executeRaw`
-        INSERT INTO wfirma_cache (id, user_id, data_type, wfirma_id, data, cached_at, expires_at, is_valid)
+        INSERT INTO wfirma_cache (id, "userId", "dataType", "wfirmaId", data, "cachedAt", "expiresAt", "isValid")
         VALUES (gen_random_uuid(), ${userId}::uuid, ${dataType}, ${wfirmaId}, ${JSON.stringify(data)}::jsonb, ${now}, ${expiresAt}, true)
-        ON CONFLICT (user_id, data_type, wfirma_id)
+        ON CONFLICT ("userId", "dataType", "wfirmaId")
         DO UPDATE SET
           data = ${JSON.stringify(data)}::jsonb,
-          cached_at = ${now},
-          expires_at = ${expiresAt},
-          is_valid = true
+          "cachedAt" = ${now},
+          "expiresAt" = ${expiresAt},
+          "isValid" = true
       `;
 
       logger.info('Successfully cached wFirma data', {
@@ -141,16 +141,16 @@ export class WFirmaCacheService {
       // Query cache entry
       const result = await this.prisma.$queryRaw<Array<{
         data: any;
-        cached_at: Date;
-        expires_at: Date;
-        is_valid: boolean;
+        cachedAt: Date;
+        expiresAt: Date;
+        isValid: boolean;
       }>>`
-        SELECT data, cached_at, expires_at, is_valid
+        SELECT data, "cachedAt", "expiresAt", "isValid"
         FROM wfirma_cache
-        WHERE user_id = ${userId}::uuid
-          AND data_type = ${dataType}
-          AND wfirma_id = ${wfirmaId}
-          AND is_valid = true
+        WHERE "userId" = ${userId}::uuid
+          AND "dataType" = ${dataType}
+          AND "wfirmaId" = ${wfirmaId}
+          AND "isValid" = true
         LIMIT 1
       `;
 
@@ -167,12 +167,12 @@ export class WFirmaCacheService {
       const now = new Date();
 
       // Check if entry is expired
-      if (entry.expires_at < now) {
+      if (entry.expiresAt < now) {
         logger.debug('Cache miss - entry expired', {
           userId,
           dataType,
           wfirmaId,
-          expiresAt: entry.expires_at,
+          expiresAt: entry.expiresAt,
           now,
         });
 
@@ -185,8 +185,8 @@ export class WFirmaCacheService {
         userId,
         dataType,
         wfirmaId,
-        cachedAt: entry.cached_at,
-        expiresAt: entry.expires_at,
+        cachedAt: entry.cachedAt,
+        expiresAt: entry.expiresAt,
       });
 
       return entry.data as T;
@@ -228,18 +228,18 @@ export class WFirmaCacheService {
         // Invalidate specific entry
         count = await this.prisma.$executeRaw`
           UPDATE wfirma_cache
-          SET is_valid = false
-          WHERE user_id = ${userId}::uuid
-            AND data_type = ${dataType}
-            AND wfirma_id = ${wfirmaId}
+          SET "isValid" = false
+          WHERE "userId" = ${userId}::uuid
+            AND "dataType" = ${dataType}
+            AND "wfirmaId" = ${wfirmaId}
         `;
       } else {
         // Invalidate all entries of this type
         count = await this.prisma.$executeRaw`
           UPDATE wfirma_cache
-          SET is_valid = false
-          WHERE user_id = ${userId}::uuid
-            AND data_type = ${dataType}
+          SET "isValid" = false
+          WHERE "userId" = ${userId}::uuid
+            AND "dataType" = ${dataType}
         `;
       }
 
@@ -274,8 +274,8 @@ export class WFirmaCacheService {
     try {
       const count = await this.prisma.$executeRaw`
         UPDATE wfirma_cache
-        SET is_valid = false
-        WHERE user_id = ${userId}::uuid
+        SET "isValid" = false
+        WHERE "userId" = ${userId}::uuid
       `;
 
       logger.info('Successfully invalidated all cache', {
@@ -295,7 +295,7 @@ export class WFirmaCacheService {
 
   /**
    * Clean up expired cache entries
-   * 
+   *
    * @param userId - Optional user ID to clean up (if not provided, cleans all users)
    * @returns Number of entries deleted
    */
@@ -309,13 +309,13 @@ export class WFirmaCacheService {
       if (userId) {
         count = await this.prisma.$executeRaw`
           DELETE FROM wfirma_cache
-          WHERE user_id = ${userId}::uuid
-            AND (expires_at < ${now} OR is_valid = false)
+          WHERE "userId" = ${userId}::uuid
+            AND ("expiresAt" < ${now} OR "isValid" = false)
         `;
       } else {
         count = await this.prisma.$executeRaw`
           DELETE FROM wfirma_cache
-          WHERE expires_at < ${now} OR is_valid = false
+          WHERE "expiresAt" < ${now} OR "isValid" = false
         `;
       }
 
@@ -336,7 +336,7 @@ export class WFirmaCacheService {
 
   /**
    * Get cache statistics
-   * 
+   *
    * @param userId - User ID
    * @returns Cache statistics
    */
@@ -350,7 +350,7 @@ export class WFirmaCacheService {
       const totalResult = await this.prisma.$queryRaw<Array<{ count: bigint }>>`
         SELECT COUNT(*) as count
         FROM wfirma_cache
-        WHERE user_id = ${userId}::uuid
+        WHERE "userId" = ${userId}::uuid
       `;
       const totalEntries = Number(totalResult[0]?.count || 0);
 
@@ -358,9 +358,9 @@ export class WFirmaCacheService {
       const validResult = await this.prisma.$queryRaw<Array<{ count: bigint }>>`
         SELECT COUNT(*) as count
         FROM wfirma_cache
-        WHERE user_id = ${userId}::uuid
-          AND is_valid = true
-          AND expires_at >= ${now}
+        WHERE "userId" = ${userId}::uuid
+          AND "isValid" = true
+          AND "expiresAt" >= ${now}
       `;
       const validEntries = Number(validResult[0]?.count || 0);
 
@@ -368,22 +368,22 @@ export class WFirmaCacheService {
       const expiredResult = await this.prisma.$queryRaw<Array<{ count: bigint }>>`
         SELECT COUNT(*) as count
         FROM wfirma_cache
-        WHERE user_id = ${userId}::uuid
-          AND (is_valid = false OR expires_at < ${now})
+        WHERE "userId" = ${userId}::uuid
+          AND ("isValid" = false OR "expiresAt" < ${now})
       `;
       const expiredEntries = Number(expiredResult[0]?.count || 0);
 
       // Get counts by type
       const byTypeResult = await this.prisma.$queryRaw<Array<{
-        data_type: CacheDataType;
+        dataType: CacheDataType;
         count: bigint;
       }>>`
-        SELECT data_type, COUNT(*) as count
+        SELECT "dataType", COUNT(*) as count
         FROM wfirma_cache
-        WHERE user_id = ${userId}::uuid
-          AND is_valid = true
-          AND expires_at >= ${now}
-        GROUP BY data_type
+        WHERE "userId" = ${userId}::uuid
+          AND "isValid" = true
+          AND "expiresAt" >= ${now}
+        GROUP BY "dataType"
       `;
 
       const byType: Record<CacheDataType, number> = {
@@ -394,7 +394,10 @@ export class WFirmaCacheService {
       };
 
       byTypeResult.forEach((row) => {
-        byType[row.data_type] = Number(row.count);
+        const dataType = row.dataType as CacheDataType;
+        if (dataType in byType) {
+          byType[dataType] = Number(row.count);
+        }
       });
 
       const stats: CacheStats = {
@@ -438,11 +441,11 @@ export class WFirmaCacheService {
       const result = await this.prisma.$queryRaw<Array<{ count: bigint }>>`
         SELECT COUNT(*) as count
         FROM wfirma_cache
-        WHERE user_id = ${userId}::uuid
-          AND data_type = ${dataType}
-          AND wfirma_id = ${wfirmaId}
-          AND is_valid = true
-          AND expires_at >= ${now}
+        WHERE "userId" = ${userId}::uuid
+          AND "dataType" = ${dataType}
+          AND "wfirmaId" = ${wfirmaId}
+          AND "isValid" = true
+          AND "expiresAt" >= ${now}
       `;
 
       return Number(result[0]?.count || 0) > 0;

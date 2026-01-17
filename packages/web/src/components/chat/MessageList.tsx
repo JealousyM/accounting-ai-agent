@@ -17,6 +17,9 @@ interface ToolsTranslations {
   contractors: string;
   financials: string;
   invoices: string;
+  createContractor: string;
+  updateContractor: string;
+  deleteContractor: string;
 }
 
 interface SuggestionsTranslations {

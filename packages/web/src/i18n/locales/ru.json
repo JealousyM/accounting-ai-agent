@@ -80,7 +80,10 @@
       "companyInfo": "Данные компании",
       "contractors": "Контрагенты",
       "financials": "Финансы",
-      "invoices": "Счета"
+      "invoices": "Счета",
+      "createContractor": "Создание контрагента",
+      "updateContractor": "Обновление контрагента",
+      "deleteContractor": "Удаление контрагента"
     },
     "suggestions": {
       "vatRates": "Какие ставки НДС?",

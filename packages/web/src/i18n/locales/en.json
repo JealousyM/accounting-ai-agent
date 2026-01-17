@@ -80,7 +80,10 @@
       "companyInfo": "Company Info",
       "contractors": "Contractors",
       "financials": "Financials",
-      "invoices": "Invoices"
+      "invoices": "Invoices",
+      "createContractor": "Create Contractor",
+      "updateContractor": "Update Contractor",
+      "deleteContractor": "Delete Contractor"
     },
     "suggestions": {
       "vatRates": "What are VAT rates?",
