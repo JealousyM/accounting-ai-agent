@@ -74,7 +74,7 @@ describe('WFirmaIntegrationService', () => {
         ],
       };
 
-      mockAxiosInstance.get.mockResolvedValue({
+      mockAxiosInstance.request.mockResolvedValue({
         status: 200,
         data: {
           status: { code: 'OK' },
@@ -102,7 +102,7 @@ describe('WFirmaIntegrationService', () => {
     });
 
     it('should throw error when API returns unsuccessful response', async () => {
-      mockAxiosInstance.get.mockResolvedValue({
+      mockAxiosInstance.request.mockResolvedValue({
         status: 200,
         data: {
           status: { code: 'ERROR', message: 'Company not found' },
@@ -113,7 +113,7 @@ describe('WFirmaIntegrationService', () => {
     });
 
     it('should retry on connection error', async () => {
-      mockAxiosInstance.get
+      mockAxiosInstance.request
         .mockRejectedValueOnce(new Error('Network error'))
         .mockResolvedValueOnce({
           status: 200,
@@ -136,7 +136,7 @@ describe('WFirmaIntegrationService', () => {
       const result = await service.getCompanyData();
 
       expect(result.id).toBe('company-123');
-      expect(mockAxiosInstance.get).toHaveBeenCalledTimes(2);
+      expect(mockAxiosInstance.request).toHaveBeenCalledTimes(2);
     });
   });
 
@@ -311,49 +311,49 @@ describe('WFirmaIntegrationService', () => {
 
   describe('syncDataFromWFirma', () => {
     it('should sync all data successfully', async () => {
-      // Mock company data
-      mockAxiosInstance.get.mockResolvedValueOnce({
-        status: 200,
-        data: {
-          status: { code: 'OK' },
-          companies: {
-            company: {
-              id: 'company-123',
-              name: 'Test Company',
-              nip: '1234567890',
-              street: 'Test',
-              city: 'Warsaw',
-              zip: '00-001',
-              country: 'Poland',
-            },
-          },
-        },
-      });
-
-      // Mock contractors
-      mockAxiosInstance.request.mockResolvedValueOnce({
-        status: 200,
-        data: {
-          status: { code: 'OK' },
-          contractors: {
-            '0': {
-              contractor: {
-                id: 'c1',
-                name: 'Contractor 1',
+      // All calls use request() - company, contractors, financial
+      mockAxiosInstance.request
+        // Mock company data
+        .mockResolvedValueOnce({
+          status: 200,
+          data: {
+            status: { code: 'OK' },
+            companies: {
+              company: {
+                id: 'company-123',
+                name: 'Test Company',
+                nip: '1234567890',
+                street: 'Test',
+                city: 'Warsaw',
+                zip: '00-001',
+                country: 'Poland',
               },
             },
           },
-        },
-      });
-
-      // Mock financial data (invoices)
-      mockAxiosInstance.request.mockResolvedValueOnce({
-        status: 200,
-        data: {
-          status: { code: 'OK' },
-          invoices: {},
-        },
-      });
+        })
+        // Mock contractors
+        .mockResolvedValueOnce({
+          status: 200,
+          data: {
+            status: { code: 'OK' },
+            contractors: {
+              '0': {
+                contractor: {
+                  id: 'c1',
+                  name: 'Contractor 1',
+                },
+              },
+            },
+          },
+        })
+        // Mock financial data (invoices)
+        .mockResolvedValueOnce({
+          status: 200,
+          data: {
+            status: { code: 'OK' },
+            invoices: {},
+          },
+        });
 
       const result = await service.syncDataFromWFirma();
 
@@ -363,41 +363,41 @@ describe('WFirmaIntegrationService', () => {
     });
 
     it('should handle partial sync failures', async () => {
-      // Mock company data success
-      mockAxiosInstance.get.mockResolvedValueOnce({
-        status: 200,
-        data: {
-          status: { code: 'OK' },
-          companies: {
-            company: {
-              id: 'company-123',
-              name: 'Test Company',
-              nip: '1234567890',
-              street: 'Test',
-              city: 'Warsaw',
-              zip: '00-001',
-              country: 'Poland',
+      // All calls use request() - company, contractors, financial
+      mockAxiosInstance.request
+        // Mock company data success
+        .mockResolvedValueOnce({
+          status: 200,
+          data: {
+            status: { code: 'OK' },
+            companies: {
+              company: {
+                id: 'company-123',
+                name: 'Test Company',
+                nip: '1234567890',
+                street: 'Test',
+                city: 'Warsaw',
+                zip: '00-001',
+                country: 'Poland',
+              },
             },
           },
-        },
-      });
-
-      // Mock contractors failure - return unsuccessful response
-      mockAxiosInstance.request.mockResolvedValueOnce({
-        status: 200,
-        data: {
-          status: { code: 'ERROR', message: 'Contractors API error' },
-        },
-      });
-
-      // Mock financial data success
-      mockAxiosInstance.request.mockResolvedValueOnce({
-        status: 200,
-        data: {
-          status: { code: 'OK' },
-          invoices: {},
-        },
-      });
+        })
+        // Mock contractors failure - return unsuccessful response
+        .mockResolvedValueOnce({
+          status: 200,
+          data: {
+            status: { code: 'ERROR', message: 'Contractors API error' },
+          },
+        })
+        // Mock financial data success
+        .mockResolvedValueOnce({
+          status: 200,
+          data: {
+            status: { code: 'OK' },
+            invoices: {},
+          },
+        });
 
       const result = await service.syncDataFromWFirma();
 
@@ -410,7 +410,7 @@ describe('WFirmaIntegrationService', () => {
 
   describe('checkConnection', () => {
     it('should return true when connection is successful', async () => {
-      mockAxiosInstance.get.mockResolvedValue({
+      mockAxiosInstance.request.mockResolvedValue({
         status: 200,
         data: {
           status: { code: 'OK' },
@@ -430,7 +430,7 @@ describe('WFirmaIntegrationService', () => {
     });
 
     it('should return false when connection fails', async () => {
-      mockAxiosInstance.get
+      mockAxiosInstance.request
         .mockRejectedValueOnce(new Error('Connection failed'))
         .mockRejectedValueOnce(new Error('Connection failed'))
         .mockRejectedValueOnce(new Error('Connection failed'));
@@ -443,7 +443,7 @@ describe('WFirmaIntegrationService', () => {
 
   describe('Error Handling', () => {
     it('should handle authentication errors', async () => {
-      mockAxiosInstance.get.mockResolvedValue({
+      mockAxiosInstance.request.mockResolvedValue({
         status: 200,
         data: {
           status: { code: 'AUTH', message: 'Invalid API key' },
@@ -460,7 +460,7 @@ describe('WFirmaIntegrationService', () => {
     });
 
     it('should retry on connection errors', async () => {
-      mockAxiosInstance.get
+      mockAxiosInstance.request
         .mockRejectedValueOnce(new Error('Network error'))
         .mockResolvedValueOnce({
           status: 200,
@@ -483,7 +483,7 @@ describe('WFirmaIntegrationService', () => {
       const result = await service.getCompanyData();
 
       expect(result.id).toBe('company-123');
-      expect(mockAxiosInstance.get).toHaveBeenCalledTimes(2);
+      expect(mockAxiosInstance.request).toHaveBeenCalledTimes(2);
     });
   });
 });

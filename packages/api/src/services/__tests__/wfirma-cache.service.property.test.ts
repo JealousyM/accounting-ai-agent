@@ -65,9 +65,9 @@ describe('Feature: corporate-resolutions-manager, Property: Cache Expiration', (
           (mockPrisma.$queryRaw as jest.Mock).mockResolvedValue([
             {
               data,
-              cached_at: new Date(Date.now() - ttl - 2000),
-              expires_at: pastExpiresAt,
-              is_valid: true,
+              cachedAt: new Date(Date.now() - ttl - 2000),
+              expiresAt: pastExpiresAt,
+              isValid: true,
             },
           ]);
 
@@ -110,9 +110,9 @@ describe('Feature: corporate-resolutions-manager, Property: Cache Expiration', (
           (mockPrisma.$queryRaw as jest.Mock).mockResolvedValue([
             {
               data,
-              cached_at: now,
-              expires_at: expiresAt,
-              is_valid: true,
+              cachedAt: now,
+              expiresAt: expiresAt,
+              isValid: true,
             },
           ]);
 
@@ -159,9 +159,9 @@ describe('Feature: corporate-resolutions-manager, Property: Cache Expiration', (
           (mockPrisma.$queryRaw as jest.Mock).mockResolvedValue([
             {
               data,
-              cached_at: new Date(now.getTime() - 1000),
-              expires_at: expiresAt,
-              is_valid: true,
+              cachedAt: new Date(now.getTime() - 1000),
+              expiresAt: expiresAt,
+              isValid: true,
             },
           ]);
           (mockPrisma.$executeRaw as jest.Mock).mockResolvedValue(1);
@@ -199,9 +199,9 @@ describe('Feature: corporate-resolutions-manager, Property: Cache Expiration', (
           (mockPrisma.$queryRaw as jest.Mock).mockResolvedValue([
             {
               data: { test: 'data' },
-              cached_at: now,
-              expires_at: expiresAt,
-              is_valid: true,
+              cachedAt: now,
+              expiresAt: expiresAt,
+              isValid: true,
             },
           ]);
 
