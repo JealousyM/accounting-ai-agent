@@ -25,7 +25,8 @@ import {
   DEFAULT_LLM_CONFIG,
   ConversationGraphState,
 } from '../types/ai-chat.types';
-import { WFirmaCompany, FinancialData } from '../types/wfirma.types';
+import { WFirmaCompany, WFirmaContractor, FinancialData } from '../types/wfirma.types';
+import { getContractorTranslations, Locale } from '../i18n';
 
 // ============================================
 // SYSTEM PROMPT
@@ -57,11 +58,42 @@ const SYSTEM_PROMPT = `You are an expert accountant specializing in Polish tax l
 6. Use proper terminology in the user's language
 7. When showing financial data, format numbers with spaces as thousands separator (e.g., 10 000 PLN)
 
+## Tool Response Formatting (CRITICAL)
+- When a tool returns formatted data (tables, lists with markdown), include that EXACT formatting in your response
+- DO NOT reformat or simplify tool output - preserve markdown tables, headers (##), bold (**text**), and other formatting
+- Tool responses are already formatted for display - just include them as-is and add your commentary around them
+- Example: if tool returns a markdown table of contractors, show that table exactly, then add your helpful comments after it
+
 ## Important Notes
 - Current VAT rates in Poland: 23% (standard), 8% (reduced), 5% (reduced), 0% (export, intra-EU)
 - Minimum wage 2024: 4242 PLN gross (January-June), 4300 PLN (July-December)
 - IP Box rate: 5% for qualified IP income
 - Estonian CIT: no tax on retained earnings, only on distribution`;
+
+// ============================================
+// LANGUAGE DETECTION
+// ============================================
+
+/**
+ * Detect locale from user message text
+ * Uses simple heuristics: Cyrillic = Russian, Polish diacritics = Polish, else English
+ */
+function detectLocale(text: string): Locale {
+  // Check for Cyrillic characters (Russian)
+  const cyrillicPattern = /[\u0400-\u04FF]/;
+  if (cyrillicPattern.test(text)) {
+    return 'ru';
+  }
+
+  // Check for Polish-specific diacritics
+  const polishPattern = /[ąćęłńóśźżĄĆĘŁŃÓŚŹŻ]/;
+  if (polishPattern.test(text)) {
+    return 'pl';
+  }
+
+  // Default to English for Latin text without Polish diacritics
+  return 'en';
+}
 
 // ============================================
 // AI CHAT SERVICE CLASS
@@ -290,8 +322,17 @@ export class AIChatService {
     // Create the LLM based on provider
     const model = this.createModel(provider);
 
-    // Create tools with userId bound
-    const tools = this.createTools(userId);
+    // Detect user's language for localized tool responses
+    const locale = detectLocale(userMessage);
+
+    // Create tools with userId and locale bound
+    const tools = this.createTools(userId, locale);
+
+    logger.info('Created tools for agent', {
+      toolCount: tools.length,
+      toolNames: tools.map(t => t.name),
+      locale,
+    });
 
     // Bind tools to model
     const modelWithTools = model.bindTools(tools);
@@ -302,6 +343,11 @@ export class AIChatService {
     // Define the graph
     const callModel = async (state: typeof MessagesAnnotation.State) => {
       const response = await modelWithTools.invoke(state.messages);
+      logger.debug('Model response', {
+        hasToolCalls: !!(response.tool_calls && response.tool_calls.length > 0),
+        toolCallsCount: response.tool_calls?.length || 0,
+        contentLength: typeof response.content === 'string' ? response.content.length : 0,
+      });
       return { messages: [response] };
     };
 
@@ -407,7 +453,7 @@ export class AIChatService {
    * Note: Using type assertion due to LangChain's deep recursive generics causing TS2589
    */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private createTools(userId: string): StructuredToolInterface[] {
+  private createTools(userId: string, locale: Locale = 'pl'): StructuredToolInterface[] {
     const wfirmaService = this.wfirmaService;
     const cacheService = this.cacheService;
 
@@ -446,23 +492,19 @@ export class AIChatService {
     const getContractorsTool: StructuredToolInterface = (tool as any)(
       async ({ search, nip, limit }: { search?: string; nip?: string; limit?: number }) => {
         try {
+          // Always fetch fresh data from wFirma (bypass cache for accurate list)
           const contractors = await wfirmaService.getContractors({
             search,
             nip,
-            limit: limit || 10,
+            limit: limit || 100, // Increased default limit to show more contractors
           });
 
-          if (contractors.length === 0) {
-            return 'No contractors found.';
-          }
-
-          return `Found ${contractors.length} contractors:\n` +
-            contractors.slice(0, 10).map((c, i) =>
-              `${i + 1}. ${c.name}${c.nip ? ` (NIP: ${c.nip})` : ''}${c.email ? ` - ${c.email}` : ''}`
-            ).join('\n');
+          logger.info('Fetched contractors for AI tool', { count: contractors.length });
+          return formatContractorsList(contractors, locale);
         } catch (error) {
           logger.error('Failed to get contractors', { error });
-          return 'Error: Failed to fetch contractors from wFirma';
+          const t = getContractorT(locale);
+          return `Error: ${t.errorFetch}`;
         }
       },
       {
@@ -471,7 +513,7 @@ export class AIChatService {
         schema: z.object({
           search: z.string().optional().describe('Search by contractor name'),
           nip: z.string().optional().describe('Filter by NIP number'),
-          limit: z.number().optional().describe('Maximum number of results (default 10)'),
+          limit: z.number().optional().describe('Maximum number of results (default 100)'),
         }),
       }
     );
@@ -509,7 +551,261 @@ export class AIChatService {
       }
     );
 
-    return [getCompanyInfoTool, getContractorsTool, getFinancialSummaryTool];
+    // Create contractor tool
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const createContractorTool: StructuredToolInterface = (tool as any)(
+      async ({
+        name,
+        nip,
+        regon,
+        email,
+        phone,
+        street,
+        city,
+        zip,
+        country,
+        bankAccount,
+        notes,
+      }: {
+        name: string;
+        nip?: string;
+        regon?: string;
+        email?: string;
+        phone?: string;
+        street?: string;
+        city?: string;
+        zip?: string;
+        country?: string;
+        bankAccount?: string;
+        notes?: string;
+      }) => {
+        try {
+          // Build address object if any address field is provided
+          const address = (street || city || zip || country)
+            ? {
+                street: street || '',
+                city: city || '',
+                zip: zip || '',
+                country: country || 'PL',
+              }
+            : undefined;
+
+          const contractorData = {
+            name,
+            nip,
+            regon,
+            email,
+            phone,
+            address,
+            bankAccount,
+            notes,
+          };
+
+          const contractor = await wfirmaService.createContractor(contractorData);
+
+          // Invalidate contractors cache after creation
+          await cacheService.invalidateCache(userId, 'contractor');
+
+          return formatContractorCreated(contractor, locale);
+        } catch (error) {
+          logger.error('Failed to create contractor', { error });
+          const t = getContractorT(locale);
+          if (error instanceof Error) {
+            return `## ❌ ${t.errorCreateTitle}
+
+**${t.errorReason}:** ${error.message}
+
+**${t.requiredFields}:**
+- name
+
+**${t.recommendedFields}:**
+- nip (NIP)
+- email
+- city, zip, street
+
+${t.tryAgain}`;
+          }
+          return `Error: ${t.errorCreate}`;
+        }
+      },
+      {
+        name: 'create_contractor',
+        description: 'Create a new contractor/customer in wFirma. Required: name. Recommended: city (city name). Optional: nip, regon, email, phone, street, zip, country (2-letter code like PL, LT), bankAccount, notes.',
+        schema: z.object({
+          name: z.string().describe('Full name or company name of the contractor (required)'),
+          nip: z.string().optional().describe('NIP (Polish tax ID) - 10 digits'),
+          regon: z.string().optional().describe('REGON number'),
+          email: z.string().optional().describe('Email address'),
+          phone: z.string().optional().describe('Phone number'),
+          street: z.string().optional().describe('Street address'),
+          city: z.string().optional().describe('City'),
+          zip: z.string().optional().describe('Postal code (e.g., 00-001)'),
+          country: z.string().optional().describe('Country code (default: PL)'),
+          bankAccount: z.string().optional().describe('Bank account number'),
+          notes: z.string().optional().describe('Additional notes'),
+        }),
+      }
+    );
+
+    // Update contractor tool
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const updateContractorTool: StructuredToolInterface = (tool as any)(
+      async ({
+        contractorName,
+        newName,
+        nip,
+        regon,
+        email,
+        phone,
+        street,
+        city,
+        zip,
+        country,
+        bankAccount,
+        notes,
+      }: {
+        contractorName: string;
+        newName?: string;
+        nip?: string;
+        regon?: string;
+        email?: string;
+        phone?: string;
+        street?: string;
+        city?: string;
+        zip?: string;
+        country?: string;
+        bankAccount?: string;
+        notes?: string;
+      }) => {
+        try {
+          // Search for contractor by name
+          const contractors = await wfirmaService.getContractors({ search: contractorName, limit: 10 });
+
+          // Find exact match
+          const exactMatch = contractors.find(
+            c => c.name.toLowerCase() === contractorName.toLowerCase()
+          );
+
+          if (!exactMatch) {
+            const t = getContractorT(locale);
+            if (contractors.length > 0) {
+              const suggestions = contractors.map(c => `- ${c.name}`).join('\n');
+              return `${t.exactNotFound} "${contractorName}".\n\n${t.similarContractors}:\n${suggestions}\n\n${t.specifyNameUpdate}`;
+            }
+            return `${t.notFoundByName} "${contractorName}" в wFirma.`;
+          }
+
+          // Build address object if any address field is provided
+          const address =
+            street !== undefined || city !== undefined || zip !== undefined || country !== undefined
+              ? { street, city, zip, country }
+              : undefined;
+
+          const updateData: Record<string, unknown> = {};
+          if (newName !== undefined) updateData.name = newName;
+          if (nip !== undefined) updateData.nip = nip;
+          if (regon !== undefined) updateData.regon = regon;
+          if (email !== undefined) updateData.email = email;
+          if (phone !== undefined) updateData.phone = phone;
+          if (address !== undefined) updateData.address = address;
+          if (bankAccount !== undefined) updateData.bankAccount = bankAccount;
+          if (notes !== undefined) updateData.notes = notes;
+
+          if (Object.keys(updateData).length === 0) {
+            return 'Не указаны поля для обновления. Укажите хотя бы одно поле для изменения.';
+          }
+
+          const contractor = await wfirmaService.updateContractor(exactMatch.id, updateData);
+
+          // Invalidate contractors cache after update
+          await cacheService.invalidateCache(userId, 'contractor');
+
+          return formatContractorUpdated(contractor, locale);
+        } catch (error) {
+          logger.error('Failed to update contractor', { error, contractorName });
+          const t = getContractorT(locale);
+          if (error instanceof Error) {
+            return `Error: ${t.errorUpdate} - ${error.message}`;
+          }
+          return `Error: ${t.errorUpdate}`;
+        }
+      },
+      {
+        name: 'update_contractor',
+        description: 'Update an existing contractor/customer in wFirma by name. Searches for contractor by exact name match, then updates specified fields.',
+        schema: z.object({
+          contractorName: z.string().describe('Current name of contractor to update (exact match)'),
+          newName: z.string().optional().describe('New company/contractor name'),
+          nip: z.string().optional().describe('New NIP (Polish tax ID)'),
+          regon: z.string().optional().describe('New REGON number'),
+          email: z.string().optional().describe('New email address'),
+          phone: z.string().optional().describe('New phone number'),
+          street: z.string().optional().describe('New street address'),
+          city: z.string().optional().describe('New city'),
+          zip: z.string().optional().describe('New postal code'),
+          country: z.string().optional().describe('New country code'),
+          bankAccount: z.string().optional().describe('New bank account number'),
+          notes: z.string().optional().describe('New notes'),
+        }),
+      }
+    );
+
+    // Delete contractor tool
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const deleteContractorTool: StructuredToolInterface = (tool as any)(
+      async ({ name }: { name: string }) => {
+        try {
+          // Search for contractor by name
+          const contractors = await wfirmaService.getContractors({ search: name, limit: 10 });
+
+          // Find exact match
+          const exactMatch = contractors.find(
+            c => c.name.toLowerCase() === name.toLowerCase()
+          );
+
+          if (!exactMatch) {
+            const t = getContractorT(locale);
+            // Show partial matches if any
+            if (contractors.length > 0) {
+              const suggestions = contractors.map(c => `- ${c.name}`).join('\n');
+              return `${t.exactNotFound} "${name}".\n\n${t.similarContractors}:\n${suggestions}\n\n${t.specifyNameDelete}`;
+            }
+            return `${t.notFoundByName} "${name}".`;
+          }
+
+          // Perform deletion using the actual wFirma ID
+          await wfirmaService.deleteContractor(exactMatch.id);
+
+          // Invalidate contractors cache after deletion
+          await cacheService.invalidateCache(userId, 'contractor');
+
+          return formatContractorDeleted(exactMatch, locale);
+        } catch (error) {
+          logger.error('Failed to delete contractor', { error, contractorName: name });
+          const t = getContractorT(locale);
+          if (error instanceof Error) {
+            return `Error: ${t.errorDelete} - ${error.message}`;
+          }
+          return `Error: ${t.errorDelete}`;
+        }
+      },
+      {
+        name: 'delete_contractor',
+        description: 'Delete a contractor/customer from wFirma by name. Use when user wants to remove a contractor. Searches by exact name match. WARNING: This action cannot be undone.',
+        schema: z.object({
+          name: z.string().describe('Contractor name to delete (exact match required)'),
+        }),
+      }
+    );
+
+    return [
+      getCompanyInfoTool,
+      getContractorsTool,
+      getFinancialSummaryTool,
+      createContractorTool,
+      updateContractorTool,
+      deleteContractorTool,
+    ];
   }
 
   // ============================================
@@ -575,4 +871,81 @@ function formatFinancialData(data: FinancialData): string {
 ${data.vatPaid !== undefined ? `- VAT Paid: ${formatNumber(data.vatPaid)} PLN` : ''}
 ${data.pitPaid !== undefined ? `- PIT Paid: ${formatNumber(data.pitPaid)} PLN` : ''}
 ${data.zusPaid !== undefined ? `- ZUS Paid: ${formatNumber(data.zusPaid)} PLN` : ''}`;
+}
+
+// ============================================
+// CONTRACTOR FORMATTERS (Markdown) - Localized
+// ============================================
+
+// Alias for backward compatibility
+const getContractorT = getContractorTranslations;
+
+function formatContractorsList(contractors: WFirmaContractor[], locale: Locale = 'pl'): string {
+  const t = getContractorT(locale);
+
+  if (contractors.length === 0) {
+    return t.notFound;
+  }
+
+  let result = `## ${t.contractorsTitle} (${contractors.length})\n\n`;
+  result += t.tableHeaders + '\n';
+  result += '|---|----------|-----|-------|--------|\n';
+
+  contractors.forEach((c, i) => {
+    result += `| ${i + 1} | **${c.name}** | ${c.nip || '-'} | ${c.email || '-'} | ${c.phone || '-'} |\n`;
+  });
+
+  result += `\n> ${t.updateDeleteHint}`;
+
+  return result;
+}
+
+function formatContractorDetails(contractor: WFirmaContractor, locale: Locale = 'pl'): string {
+  const t = getContractorT(locale);
+  const addressStr = contractor.address
+    ? `${contractor.address.street}, ${contractor.address.zip} ${contractor.address.city}`
+    : '-';
+
+  return `## ${t.contractorTitle}: ${contractor.name}
+
+| ${t.field} | ${t.value} |
+|------|----------|
+| **${t.id}** | \`${contractor.id}\` |
+| **${t.name}** | ${contractor.name} |
+| **${t.nip}** | ${contractor.nip || '-'} |
+| **${t.regon}** | ${contractor.regon || '-'} |
+| **${t.email}** | ${contractor.email || '-'} |
+| **${t.phone}** | ${contractor.phone || '-'} |
+| **${t.address}** | ${addressStr} |
+| **${t.bankAccount}** | ${contractor.bankAccount || '-'} |
+| **${t.notes}** | ${contractor.notes || '-'} |`;
+}
+
+function formatContractorCreated(contractor: WFirmaContractor, locale: Locale = 'pl'): string {
+  const t = getContractorT(locale);
+  return `## ✅ ${t.created}
+
+${formatContractorDetails(contractor, locale)}
+
+> ${t.createdHint}`;
+}
+
+function formatContractorUpdated(contractor: WFirmaContractor, locale: Locale = 'pl'): string {
+  const t = getContractorT(locale);
+  return `## ✅ ${t.updated}
+
+${formatContractorDetails(contractor, locale)}
+
+> ${t.updatedHint}`;
+}
+
+function formatContractorDeleted(contractor: WFirmaContractor, locale: Locale = 'pl'): string {
+  const t = getContractorT(locale);
+  return `## ❌ ${t.deleted}
+
+- **${t.id}:** \`${contractor.id}\`
+- **${t.name}:** ${contractor.name}
+- **${t.nip}:** ${contractor.nip || '-'}
+
+> ⚠️ ${t.deletedWarning}`;
 }

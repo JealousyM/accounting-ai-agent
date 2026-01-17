@@ -73,6 +73,30 @@ export interface ContractorData {
   notes?: string;
 }
 
+/**
+ * Data for updating an existing contractor
+ * All fields are optional since partial updates are supported
+ */
+export interface ContractorUpdateData {
+  name?: string;
+  nip?: string;
+  regon?: string;
+  email?: string;
+  phone?: string;
+  address?: Partial<Address>;
+  bankAccount?: string;
+  notes?: string;
+}
+
+/**
+ * Result of a delete operation
+ */
+export interface DeleteResult {
+  success: boolean;
+  id: string;
+  message?: string;
+}
+
 // ============================================
 // FINANCIAL DATA TYPES
 // ============================================
