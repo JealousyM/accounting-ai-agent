@@ -79,9 +79,9 @@ describe('WFirmaCacheService', () => {
       (mockPrisma.$queryRaw as jest.Mock).mockResolvedValue([
         {
           data: cachedData,
-          cached_at: new Date(),
-          expires_at: futureDate,
-          is_valid: true,
+          cachedAt: new Date(),
+          expiresAt: futureDate,
+          isValid: true,
         },
       ]);
 
@@ -113,9 +113,9 @@ describe('WFirmaCacheService', () => {
       (mockPrisma.$queryRaw as jest.Mock).mockResolvedValue([
         {
           data: cachedData,
-          cached_at: new Date(Date.now() - 20000),
-          expires_at: pastDate,
-          is_valid: true,
+          cachedAt: new Date(Date.now() - 20000),
+          expiresAt: pastDate,
+          isValid: true,
         },
       ]);
       (mockPrisma.$executeRaw as jest.Mock).mockResolvedValue(1);
@@ -238,9 +238,9 @@ describe('WFirmaCacheService', () => {
         .mockResolvedValueOnce([{ count: BigInt(7) }])  // valid
         .mockResolvedValueOnce([{ count: BigInt(3) }])  // expired
         .mockResolvedValueOnce([                        // by type
-          { data_type: 'company', count: BigInt(1) },
-          { data_type: 'contractor', count: BigInt(5) },
-          { data_type: 'invoice', count: BigInt(1) },
+          { dataType: 'company', count: BigInt(1) },
+          { dataType: 'contractor', count: BigInt(5) },
+          { dataType: 'invoice', count: BigInt(1) },
         ]);
 
       const stats = await cacheService.getCacheStats(userId);
