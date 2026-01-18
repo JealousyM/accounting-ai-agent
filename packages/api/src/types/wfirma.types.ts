@@ -153,6 +153,7 @@ export type WFirmaInvoiceStatus =
   | 'issued'
   | 'sent'
   | 'paid'
+  | 'unpaid'
   | 'overdue'
   | 'cancelled';
 

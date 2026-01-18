@@ -102,6 +102,7 @@ Specialized subagent configurations for different development tasks are availabl
 | **langgraph** | `.claude/agents/langgraph.md` | LangGraph/LangChain AI agent development |
 | **test-runner** | `.claude/agents/test-runner.md` | Testing (Jest, Vitest, Playwright) |
 | **prisma** | `.claude/agents/prisma.md` | Database operations (Prisma ORM, PostgreSQL) |
+| **code-simplifier** | `.claude/agents/code-simplifier.md` | Code refactoring for clarity and maintainability |
 
 ### Using Subagents
 
