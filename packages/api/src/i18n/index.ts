@@ -44,8 +44,50 @@ export interface ContractorTranslations {
   specifyNameDelete: string;
 }
 
+export interface InvoiceTranslations {
+  invoices: string;
+  invoiceNumber: string;
+  contractor: string;
+  date: string;
+  dueDate: string;
+  grossAmount: string;
+  status: string;
+  total: string;
+  items: string;
+  quantity: string;
+  unit: string;
+  priceNet: string;
+  vatRate: string;
+  netAmount: string;
+  vatAmount: string;
+  notesTitle: string;
+  noteText: string;
+  noteDate: string;
+  paid: string;
+  unpaid: string;
+  overdue: string;
+  draft: string;
+  issued: string;
+  sent: string;
+  cancelled: string;
+  notFound: string;
+  notFoundPeriod: string;
+  noNotes: string;
+  invoiceSent: string;
+  noteAdded: string;
+  noteDeleted: string;
+  overdueWarning: string;
+  errorFetch: string;
+  errorFetchDetails: string;
+  errorSend: string;
+  errorAddNote: string;
+  errorFetchNotes: string;
+  errorDeleteNote: string;
+}
+
 export interface Translations {
   contractor: ContractorTranslations;
+  invoice: InvoiceTranslations;
 }
 
 const translations: Record<Locale, Translations> = {
@@ -60,4 +102,8 @@ export function getTranslations(locale: Locale = 'pl'): Translations {
 
 export function getContractorTranslations(locale: Locale = 'pl'): ContractorTranslations {
   return getTranslations(locale).contractor;
+}
+
+export function getInvoiceTranslations(locale: Locale = 'pl'): InvoiceTranslations {
+  return getTranslations(locale).invoice;
 }

@@ -25,8 +25,8 @@ import {
   DEFAULT_LLM_CONFIG,
   ConversationGraphState,
 } from '../types/ai-chat.types';
-import { WFirmaCompany, WFirmaContractor, FinancialData } from '../types/wfirma.types';
-import { getContractorTranslations, Locale } from '../i18n';
+import { WFirmaCompany, WFirmaContractor, FinancialData, WFirmaInvoice, WFirmaNote } from '../types/wfirma.types';
+import { getContractorTranslations, getInvoiceTranslations, Locale } from '../i18n';
 
 // ============================================
 // SYSTEM PROMPT
@@ -798,6 +798,232 @@ ${t.tryAgain}`;
       }
     );
 
+    // ========================================
+    // INVOICE TOOLS
+    // ========================================
+
+    // Get invoices tool
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const getInvoicesTool: StructuredToolInterface = (tool as any)(
+      async ({ year, month, status }: { year?: number; month?: number; status?: string }) => {
+        try {
+          // Build date filters
+          let dateFrom: Date | undefined;
+          let dateTo: Date | undefined;
+
+          if (year) {
+            dateFrom = new Date(year, month ? month - 1 : 0, 1);
+            dateTo = month
+              ? new Date(year, month, 0)
+              : new Date(year, 11, 31);
+          }
+
+          const invoices = await wfirmaService.findInvoices({
+            dateFrom,
+            dateTo,
+            status: status && status !== 'all' ? status as any : undefined,
+            limit: 100,
+          });
+
+          if (invoices.length === 0) {
+            return getInvoiceTranslations(locale).notFoundPeriod;
+          }
+
+          return formatInvoicesList(invoices, locale);
+        } catch (error) {
+          logger.error('Failed to fetch invoices', { error, userId });
+          return `Error: ${getInvoiceTranslations(locale).errorFetch}`;
+        }
+      },
+      {
+        name: 'get_invoices',
+        description: 'Get list of invoices from wFirma. Can filter by year, month, and payment status (paid, unpaid, overdue, draft, issued, sent).',
+        schema: z.object({
+          year: z.number().optional().describe('Filter by year (e.g., 2024, 2025, 2026)'),
+          month: z.number().min(1).max(12).optional().describe('Filter by month (1-12)'),
+          status: z.enum(['all', 'paid', 'unpaid', 'overdue', 'draft', 'issued', 'sent']).optional().describe('Filter by payment status'),
+        }),
+      }
+    );
+
+    // Get invoice details tool
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const getInvoiceDetailsTool: StructuredToolInterface = (tool as any)(
+      async ({ invoiceNumber }: { invoiceNumber: string }) => {
+        try {
+          const invoices = await wfirmaService.findInvoices({
+            invoiceNumber,
+            limit: 10,
+          });
+
+          if (invoices.length === 0) {
+            return getInvoiceTranslations(locale).notFound;
+          }
+
+          const invoice = await wfirmaService.getInvoiceById(invoices[0].id);
+          if (!invoice) {
+            return getInvoiceTranslations(locale).notFound;
+          }
+
+          return formatInvoiceDetails(invoice, locale);
+        } catch (error) {
+          logger.error('Failed to fetch invoice details', { error, userId, invoiceNumber });
+          return `Error: ${getInvoiceTranslations(locale).errorFetchDetails}`;
+        }
+      },
+      {
+        name: 'get_invoice_details',
+        description: 'Get full details of a specific invoice by invoice number, including all line items.',
+        schema: z.object({
+          invoiceNumber: z.string().describe('Invoice number (e.g., FV 1/2024, FV/01/2024)'),
+        }),
+      }
+    );
+
+    // Send invoice tool
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const sendInvoiceTool: StructuredToolInterface = (tool as any)(
+      async ({ invoiceNumber, email, subject, body }: {
+        invoiceNumber: string;
+        email?: string;
+        subject?: string;
+        body?: string;
+      }) => {
+        try {
+          const invoices = await wfirmaService.findInvoices({
+            invoiceNumber,
+            limit: 10,
+          });
+
+          if (invoices.length === 0) {
+            return getInvoiceTranslations(locale).notFound;
+          }
+
+          const invoice = invoices[0];
+          const result = await wfirmaService.sendInvoice(invoice.id, {
+            email,
+            subject,
+            body,
+          });
+
+          await cacheService.invalidateCache(userId, 'invoice');
+
+          const t = getInvoiceTranslations(locale);
+          return `✅ **${t.invoiceSent}**\n\n- Invoice: ${invoice.invoiceNumber}\n- Contractor: ${invoice.contractorName}\n- Email: ${result.email || 'contractor email'}`;
+        } catch (error) {
+          logger.error('Failed to send invoice', { error, userId, invoiceNumber });
+          return `Error: ${getInvoiceTranslations(locale).errorSend}`;
+        }
+      },
+      {
+        name: 'send_invoice',
+        description: 'Send an invoice via email to the contractor. Uses contractor email if not provided.',
+        schema: z.object({
+          invoiceNumber: z.string().describe('Invoice number to send'),
+          email: z.string().optional().describe('Email address (uses contractor email if not provided)'),
+          subject: z.string().optional().describe('Email subject'),
+          body: z.string().optional().describe('Email body message'),
+        }),
+      }
+    );
+
+    // Add invoice note tool
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const addInvoiceNoteTool: StructuredToolInterface = (tool as any)(
+      async ({ invoiceNumber, text }: { invoiceNumber: string; text: string }) => {
+        try {
+          const invoices = await wfirmaService.findInvoices({
+            invoiceNumber,
+            limit: 10,
+          });
+
+          if (invoices.length === 0) {
+            return getInvoiceTranslations(locale).notFound;
+          }
+
+          const invoice = invoices[0];
+          const note = await wfirmaService.addNote('invoice', invoice.id, text);
+
+          await cacheService.invalidateCache(userId, 'invoice');
+
+          const t = getInvoiceTranslations(locale);
+          return `✅ **${t.noteAdded}**\n\n- Invoice: ${invoice.invoiceNumber}\n- Note: ${note.text}\n- Note ID: ${note.id}`;
+        } catch (error) {
+          logger.error('Failed to add invoice note', { error, userId, invoiceNumber });
+          return `Error: ${getInvoiceTranslations(locale).errorAddNote}`;
+        }
+      },
+      {
+        name: 'add_invoice_note',
+        description: 'Add a note/comment to an invoice.',
+        schema: z.object({
+          invoiceNumber: z.string().describe('Invoice number'),
+          text: z.string().describe('Note text'),
+        }),
+      }
+    );
+
+    // Get invoice notes tool
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const getInvoiceNotesTool: StructuredToolInterface = (tool as any)(
+      async ({ invoiceNumber }: { invoiceNumber: string }) => {
+        try {
+          const invoices = await wfirmaService.findInvoices({
+            invoiceNumber,
+            limit: 10,
+          });
+
+          if (invoices.length === 0) {
+            return getInvoiceTranslations(locale).notFound;
+          }
+
+          const invoice = invoices[0];
+          const notes = await wfirmaService.findNotes('invoice', invoice.id);
+
+          if (notes.length === 0) {
+            return getInvoiceTranslations(locale).noNotes;
+          }
+
+          return formatNotesList(notes, invoice.invoiceNumber, locale);
+        } catch (error) {
+          logger.error('Failed to fetch invoice notes', { error, userId, invoiceNumber });
+          return `Error: ${getInvoiceTranslations(locale).errorFetchNotes}`;
+        }
+      },
+      {
+        name: 'get_invoice_notes',
+        description: 'Get all notes attached to an invoice.',
+        schema: z.object({
+          invoiceNumber: z.string().describe('Invoice number'),
+        }),
+      }
+    );
+
+    // Delete invoice note tool
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const deleteInvoiceNoteTool: StructuredToolInterface = (tool as any)(
+      async ({ noteId }: { noteId: string }) => {
+        try {
+          await wfirmaService.deleteNote(noteId);
+
+          await cacheService.invalidateCache(userId, 'invoice');
+
+          const t = getInvoiceTranslations(locale);
+          return `✅ **${t.noteDeleted}**\n\n- Note ID: ${noteId}`;
+        } catch (error) {
+          logger.error('Failed to delete invoice note', { error, userId, noteId });
+          return `Error: ${getInvoiceTranslations(locale).errorDeleteNote}`;
+        }
+      },
+      {
+        name: 'delete_invoice_note',
+        description: 'Delete a note from an invoice by note ID.',
+        schema: z.object({
+          noteId: z.string().describe('Note ID to delete'),
+        }),
+      }
+    );
+
     return [
       getCompanyInfoTool,
       getContractorsTool,
@@ -805,6 +1031,13 @@ ${t.tryAgain}`;
       createContractorTool,
       updateContractorTool,
       deleteContractorTool,
+      // Invoice tools
+      getInvoicesTool,
+      getInvoiceDetailsTool,
+      sendInvoiceTool,
+      addInvoiceNoteTool,
+      getInvoiceNotesTool,
+      deleteInvoiceNoteTool,
     ];
   }
 
@@ -948,4 +1181,133 @@ function formatContractorDeleted(contractor: WFirmaContractor, locale: Locale = 
 - **${t.nip}:** ${contractor.nip || '-'}
 
 > ⚠️ ${t.deletedWarning}`;
+}
+
+// ============================================
+// INVOICE FORMATTERS
+// ============================================
+
+// Alias for backward compatibility
+const getInvoiceT = getInvoiceTranslations;
+
+function formatNumber(num: number): string {
+  return new Intl.NumberFormat('pl-PL', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(num);
+}
+
+function formatDate(date: Date): string {
+  return new Intl.DateTimeFormat('pl-PL', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+  }).format(date);
+}
+
+function getStatusLabel(status: string, locale: Locale): string {
+  const t = getInvoiceT(locale);
+  const statusMap: Record<string, string> = {
+    draft: t.draft,
+    issued: t.issued,
+    sent: t.sent,
+    paid: t.paid,
+    unpaid: t.unpaid,
+    overdue: t.overdue,
+    cancelled: t.cancelled,
+  };
+  return statusMap[status] || status;
+}
+
+function getStatusIcon(status: string): string {
+  const iconMap: Record<string, string> = {
+    draft: '📝',
+    issued: '📄',
+    sent: '📧',
+    paid: '✅',
+    unpaid: '⏳',
+    overdue: '⚠️',
+    cancelled: '❌',
+  };
+  return iconMap[status] || '📄';
+}
+
+function formatInvoicesList(invoices: WFirmaInvoice[], locale: Locale): string {
+  const t = getInvoiceT(locale);
+
+  let result = `## ${t.invoices} (${invoices.length})\n\n`;
+  result += `| ${t.invoiceNumber} | ${t.contractor} | ${t.date} | ${t.dueDate} | ${t.grossAmount} | ${t.status} |\n`;
+  result += '|------------------|------------|------|------|--------|--------|\n';
+
+  let totalGross = 0;
+  let hasOverdue = false;
+
+  invoices.forEach(inv => {
+    if (inv.status === 'overdue') hasOverdue = true;
+    totalGross += inv.total;
+
+    const statusIcon = getStatusIcon(inv.status);
+    const statusText = getStatusLabel(inv.status, locale);
+
+    result += `| ${inv.invoiceNumber} | ${inv.contractorName} | ${formatDate(inv.issueDate)} | ${formatDate(inv.dueDate)} | ${formatNumber(inv.total)} ${inv.currency} | ${statusIcon} ${statusText} |\n`;
+  });
+
+  result += `\n**${t.total}:** ${formatNumber(totalGross)} PLN`;
+
+  if (hasOverdue) {
+    result += `\n\n> ⚠️ ${t.overdueWarning}`;
+  }
+
+  return result;
+}
+
+function formatInvoiceDetails(invoice: WFirmaInvoice, locale: Locale): string {
+  const t = getInvoiceT(locale);
+
+  let result = `## ${t.invoiceNumber}: ${invoice.invoiceNumber}\n\n`;
+
+  result += `| Field | Value |\n`;
+  result += '|-------|-------|\n';
+  result += `| ${t.invoiceNumber} | ${invoice.invoiceNumber} |\n`;
+  result += `| ${t.contractor} | ${invoice.contractorName} |\n`;
+  if (invoice.contractorNip) {
+    result += `| NIP | ${invoice.contractorNip} |\n`;
+  }
+  result += `| ${t.date} | ${formatDate(invoice.issueDate)} |\n`;
+  result += `| ${t.dueDate} | ${formatDate(invoice.dueDate)} |\n`;
+  result += `| ${t.status} | ${getStatusIcon(invoice.status)} ${getStatusLabel(invoice.status, locale)} |\n`;
+
+  if (invoice.items && invoice.items.length > 0) {
+    result += `\n### ${t.items}\n\n`;
+    result += `| # | Name | ${t.quantity} | ${t.unit} | ${t.priceNet} | ${t.vatRate} | ${t.grossAmount} |\n`;
+    result += '|---|------|---------|------|----------|---------|--------|\n';
+
+    invoice.items.forEach((item, idx) => {
+      result += `| ${idx + 1} | ${item.name} | ${item.quantity} | ${item.unit} | ${formatNumber(item.priceNet)} | ${item.vatRate}% | ${formatNumber(item.totalGross)} |\n`;
+    });
+  }
+
+  result += `\n### ${t.total}\n\n`;
+  result += `| | Value |\n`;
+  result += '|-------|-------|\n';
+  result += `| ${t.netAmount} | ${formatNumber(invoice.totalNet)} ${invoice.currency} |\n`;
+  result += `| ${t.vatAmount} | ${formatNumber(invoice.totalVat)} ${invoice.currency} |\n`;
+  result += `| **${t.grossAmount}** | **${formatNumber(invoice.total)} ${invoice.currency}** |\n`;
+
+  return result;
+}
+
+function formatNotesList(notes: WFirmaNote[], invoiceNumber: string, locale: Locale): string {
+  const t = getInvoiceT(locale);
+
+  let result = `## ${t.notesTitle} - ${invoiceNumber} (${notes.length})\n\n`;
+  result += `| ID | ${t.noteText} | ${t.noteDate} |\n`;
+  result += '|----|---------|------|\n';
+
+  notes.forEach(note => {
+    const text = note.text.length > 50 ? note.text.substring(0, 50) + '...' : note.text;
+    result += `| ${note.id} | ${text} | ${formatDate(note.created)} |\n`;
+  });
+
+  return result;
 }
