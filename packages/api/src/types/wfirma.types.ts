@@ -148,21 +148,60 @@ export interface WFirmaInvoiceItem {
   totalGross: number;
 }
 
-export type WFirmaInvoiceStatus = 
-  | 'draft' 
-  | 'issued' 
-  | 'sent' 
-  | 'paid' 
-  | 'overdue' 
+export type WFirmaInvoiceStatus =
+  | 'draft'
+  | 'issued'
+  | 'sent'
+  | 'paid'
+  | 'overdue'
   | 'cancelled';
+
+export type InvoiceType = 'normal' | 'proforma' | 'correction' | 'vat' | 'purchase';
 
 export interface WFirmaInvoiceFilters {
   dateFrom?: Date;
   dateTo?: Date;
   status?: WFirmaInvoiceStatus;
+  type?: InvoiceType;
   contractorId?: string;
+  invoiceNumber?: string;
   limit?: number;
   offset?: number;
+  sortBy?: 'date' | 'dueDate' | 'total' | 'invoiceNumber';
+  sortOrder?: 'asc' | 'desc';
+}
+
+export interface SendInvoiceOptions {
+  email?: string;
+  subject?: string;
+  body?: string;
+  page?: 'invoice' | 'original' | 'copy';
+  leaflet?: boolean;
+  duplicate?: boolean;
+}
+
+export interface SendInvoiceResult {
+  success: boolean;
+  invoiceId: string;
+  deliveryId?: string;
+  email: string;
+  sentAt: Date;
+  message?: string;
+}
+
+export interface WFirmaNote {
+  id: string;
+  objectName: string;
+  objectId: string;
+  text: string;
+  created: Date;
+  modified: Date;
+}
+
+export interface NoteData {
+  objectName: string;
+  objectId: string;
+  text: string;
 }
 
 export interface WFirmaInvoiceResponse {

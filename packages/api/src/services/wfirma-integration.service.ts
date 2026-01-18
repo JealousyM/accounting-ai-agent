@@ -10,6 +10,12 @@ import {
   FinancialData,
   SyncResult,
   WFirmaConfig,
+  WFirmaInvoice,
+  WFirmaInvoiceFilters,
+  WFirmaInvoiceItem,
+  SendInvoiceOptions,
+  SendInvoiceResult,
+  WFirmaNote,
 } from '../types/wfirma.types';
 
 // ============================================
@@ -896,6 +902,742 @@ export class WFirmaIntegrationService {
   }
 
   /**
+   * Find invoices with filtering, sorting, and pagination
+   */
+  async findInvoices(filters?: WFirmaInvoiceFilters): Promise<WFirmaInvoice[]> {
+    logger.info('Fetching invoices from wFirma', { filters });
+
+    return this.withRetry(async () => {
+      try {
+        // Build conditions array
+        const conditions: any[] = [];
+
+        if (filters?.dateFrom) {
+          const dateFrom = filters.dateFrom instanceof Date
+            ? filters.dateFrom.toISOString().split('T')[0]
+            : filters.dateFrom;
+          conditions.push({
+            field: 'date',
+            operator: 'ge',
+            value: dateFrom,
+          });
+        }
+
+        if (filters?.dateTo) {
+          const dateTo = filters.dateTo instanceof Date
+            ? filters.dateTo.toISOString().split('T')[0]
+            : filters.dateTo;
+          conditions.push({
+            field: 'date',
+            operator: 'le',
+            value: dateTo,
+          });
+        }
+
+        if (filters?.type) {
+          conditions.push({
+            field: 'type',
+            operator: 'eq',
+            value: filters.type,
+          });
+        }
+
+        if (filters?.contractorId) {
+          conditions.push({
+            field: 'contractor',
+            operator: 'eq',
+            value: filters.contractorId,
+          });
+        }
+
+        if (filters?.invoiceNumber) {
+          conditions.push({
+            field: 'fullnumber',
+            operator: 'like',
+            value: `%${filters.invoiceNumber}%`,
+          });
+        }
+
+        // Calculate page from offset and limit
+        const limit = filters?.limit || 100;
+        const page = Math.floor((filters?.offset || 0) / limit) + 1;
+
+        // Build parameters
+        const invoicesParams: any = {
+          parameters: {
+            limit,
+            page,
+          },
+        };
+
+        // Add sorting
+        if (filters?.sortBy) {
+          const sortField = this.mapInvoiceSortField(filters.sortBy);
+          if (filters.sortOrder === 'asc') {
+            invoicesParams.parameters.order = { asc: sortField };
+          } else {
+            invoicesParams.parameters.order = { desc: sortField };
+          }
+        } else {
+          // Default: newest first
+          invoicesParams.parameters.order = { desc: 'Invoice.id' };
+        }
+
+        // Add conditions if any
+        if (conditions.length > 0) {
+          invoicesParams.parameters.conditions = {
+            condition: conditions,
+          };
+        }
+
+        const payload = {
+          api: {
+            invoices: invoicesParams,
+          },
+        };
+
+        logger.debug('wFirma findInvoices payload', { payload });
+
+        const response = await this.apiClient.request({
+          method: 'GET',
+          url: '/invoices/find',
+          params: this.buildQueryParams(),
+          data: payload,
+        });
+
+        const data = response.data;
+
+        // Check status
+        if (data.status?.code !== 'OK') {
+          throw new WFirmaError(
+            'WFIRMA_API_ERROR',
+            'Failed to fetch invoices',
+            data.status
+          );
+        }
+
+        // Extract invoices from response (handle indexed format)
+        let invoicesData = data.invoices?.invoice;
+
+        if (!invoicesData) {
+          const invoicesObj = data.invoices;
+          if (invoicesObj) {
+            invoicesData = [];
+            for (const key in invoicesObj) {
+              if (!isNaN(Number(key)) && invoicesObj[key]?.invoice) {
+                invoicesData.push(invoicesObj[key].invoice);
+              }
+            }
+          }
+        }
+
+        if (!invoicesData || invoicesData.length === 0) {
+          return [];
+        }
+
+        if (!Array.isArray(invoicesData)) {
+          invoicesData = [invoicesData];
+        }
+
+        // Convert to our format and apply status filter if needed
+        let invoices: WFirmaInvoice[] = invoicesData.map((inv: any) => this.mapInvoiceData(inv));
+
+        // Apply status filter (wFirma doesn't have direct status field, we compute it)
+        if (filters?.status) {
+          invoices = invoices.filter(inv => inv.status === filters.status);
+        }
+
+        logger.info('Successfully fetched invoices from wFirma', {
+          count: invoices.length,
+        });
+
+        return invoices;
+      } catch (error) {
+        logger.error('Failed to fetch invoices from wFirma', { error });
+        throw error;
+      }
+    });
+  }
+
+  /**
+   * Get a single invoice by ID from wFirma
+   */
+  async getInvoiceById(id: string): Promise<WFirmaInvoice | null> {
+    logger.info('Fetching invoice by ID from wFirma', { invoiceId: id });
+
+    return this.withRetry(async () => {
+      try {
+        if (!id) {
+          throw new WFirmaValidationError('Invoice ID is required');
+        }
+
+        const response = await this.apiClient.request({
+          method: 'GET',
+          url: `/invoices/get/${id}`,
+          params: this.buildQueryParams(),
+        });
+
+        const data = response.data;
+
+        if (data.status?.code !== 'OK') {
+          if (data.status?.code === 'NOT FOUND' || data.status?.code === 'ACTION NOT FOUND') {
+            return null;
+          }
+          throw new WFirmaError(
+            'WFIRMA_API_ERROR',
+            'Failed to fetch invoice',
+            data.status
+          );
+        }
+
+        // Extract invoice from response
+        let invoiceData = data.invoices?.invoice;
+        if (!invoiceData) {
+          const invoicesObj = data.invoices;
+          if (invoicesObj) {
+            for (const key in invoicesObj) {
+              if (!isNaN(Number(key)) && invoicesObj[key]?.invoice) {
+                invoiceData = invoicesObj[key].invoice;
+                break;
+              }
+            }
+          }
+        }
+
+        if (!invoiceData) {
+          return null;
+        }
+
+        const invoice = this.mapInvoiceData(invoiceData);
+
+        logger.info('Successfully fetched invoice by ID', {
+          invoiceId: invoice.id,
+          invoiceNumber: invoice.invoiceNumber,
+        });
+
+        return invoice;
+      } catch (error) {
+        logger.error('Failed to fetch invoice by ID', { error, invoiceId: id });
+        throw error;
+      }
+    });
+  }
+
+  /**
+   * Send invoice via email
+   */
+  async sendInvoice(invoiceId: string, options: SendInvoiceOptions = {}): Promise<SendInvoiceResult> {
+    logger.info('Sending invoice via email', { invoiceId, options });
+
+    return this.withRetry(async () => {
+      try {
+        if (!invoiceId) {
+          throw new WFirmaValidationError('Invoice ID is required');
+        }
+
+        // Build parameters array for send
+        const parameters: Array<{ name: string; value: string }> = [];
+
+        if (options.email) {
+          parameters.push({ name: 'email', value: options.email });
+        }
+        if (options.subject) {
+          parameters.push({ name: 'subject', value: options.subject });
+        }
+        if (options.body) {
+          parameters.push({ name: 'body', value: options.body });
+        }
+        parameters.push({ name: 'page', value: options.page || 'invoice' });
+        parameters.push({ name: 'leaflet', value: options.leaflet ? '1' : '0' });
+        parameters.push({ name: 'duplicate', value: options.duplicate ? '1' : '0' });
+
+        const payload = {
+          api: {
+            invoices: {
+              parameters: {
+                parameter: parameters,
+              },
+            },
+          },
+        };
+
+        logger.debug('wFirma sendInvoice payload', { payload });
+
+        const response = await this.apiClient.request({
+          method: 'POST',
+          url: `/invoices/send/${invoiceId}`,
+          params: this.buildQueryParams(),
+          data: payload,
+        });
+
+        const data = response.data;
+
+        if (data.status?.code !== 'OK') {
+          throw new WFirmaError(
+            'WFIRMA_API_ERROR',
+            data.status?.message || 'Failed to send invoice',
+            data.status
+          );
+        }
+
+        // Extract delivery info if available
+        let deliveryId: string | undefined;
+        if (data.invoice_deliveries) {
+          const deliveriesObj = data.invoice_deliveries;
+          for (const key in deliveriesObj) {
+            if (!isNaN(Number(key)) && deliveriesObj[key]?.invoice_delivery) {
+              deliveryId = deliveriesObj[key].invoice_delivery.id;
+              break;
+            }
+          }
+        }
+
+        const result: SendInvoiceResult = {
+          success: true,
+          invoiceId,
+          deliveryId,
+          email: options.email || '',
+          sentAt: new Date(),
+          message: 'Invoice sent successfully',
+        };
+
+        logger.info('Successfully sent invoice', { invoiceId, deliveryId });
+
+        return result;
+      } catch (error) {
+        logger.error('Failed to send invoice', { error, invoiceId });
+        throw error;
+      }
+    });
+  }
+
+  /**
+   * Delete an invoice delivery
+   */
+  async deleteInvoiceDelivery(deliveryId: string): Promise<DeleteResult> {
+    logger.info('Deleting invoice delivery', { deliveryId });
+
+    return this.withRetry(async () => {
+      try {
+        if (!deliveryId) {
+          throw new WFirmaValidationError('Delivery ID is required');
+        }
+
+        const response = await this.apiClient.request({
+          method: 'DELETE',
+          url: `/invoice_deliveries/delete/${deliveryId}`,
+          params: this.buildQueryParams(),
+        });
+
+        const data = response.data;
+
+        if (data.status?.code !== 'OK') {
+          if (data.status?.code === 'NOT FOUND' || data.status?.code === 'ACTION NOT FOUND') {
+            throw new WFirmaError(
+              'WFIRMA_NOT_FOUND',
+              `Invoice delivery with ID ${deliveryId} not found`,
+              data.status,
+              404
+            );
+          }
+          throw new WFirmaError(
+            'WFIRMA_API_ERROR',
+            data.status?.message || 'Failed to delete invoice delivery',
+            data.status
+          );
+        }
+
+        logger.info('Successfully deleted invoice delivery', { deliveryId });
+
+        return {
+          success: true,
+          id: deliveryId,
+          message: `Invoice delivery ${deliveryId} deleted successfully`,
+        };
+      } catch (error) {
+        logger.error('Failed to delete invoice delivery', { error, deliveryId });
+        throw error;
+      }
+    });
+  }
+
+  // ============================================
+  // NOTES METHODS
+  // ============================================
+
+  /**
+   * Add a note to an object (invoice, contractor, etc.)
+   */
+  async addNote(objectName: string, objectId: string, text: string): Promise<WFirmaNote> {
+    logger.info('Adding note', { objectName, objectId });
+
+    return this.withRetry(async () => {
+      try {
+        if (!objectName || !objectId || !text) {
+          throw new WFirmaValidationError('Object name, object ID, and text are required');
+        }
+
+        const payload = {
+          api: {
+            notes: {
+              note: {
+                object_name: objectName,
+                object_id: objectId,
+                text,
+              },
+            },
+          },
+        };
+
+        logger.info('wFirma addNote REQUEST', {
+          url: '/notes/add',
+          payload: JSON.stringify(payload, null, 2),
+        });
+
+        const response = await this.apiClient.request({
+          method: 'POST',
+          url: '/notes/add',
+          params: this.buildQueryParams(),
+          data: payload,
+        });
+
+        const data = response.data;
+
+        logger.info('wFirma addNote RESPONSE', {
+          responseData: JSON.stringify(data, null, 2),
+        });
+
+        if (data.status?.code !== 'OK') {
+          throw new WFirmaError(
+            'WFIRMA_API_ERROR',
+            data.status?.message || 'Failed to add note',
+            data.status
+          );
+        }
+
+        // Extract created note
+        let noteData = data.notes?.note;
+        if (!noteData) {
+          const notesObj = data.notes;
+          if (notesObj) {
+            for (const key in notesObj) {
+              if (!isNaN(Number(key)) && notesObj[key]?.note) {
+                noteData = notesObj[key].note;
+                break;
+              }
+            }
+          }
+        }
+
+        if (!noteData) {
+          throw new WFirmaError(
+            'WFIRMA_API_ERROR',
+            'No note data in response',
+            data
+          );
+        }
+
+        const note: WFirmaNote = {
+          id: noteData.id,
+          objectName: noteData.object_name || objectName,
+          objectId: noteData.object_id || objectId,
+          text: noteData.text || text,
+          created: new Date(noteData.created || Date.now()),
+          modified: new Date(noteData.modified || Date.now()),
+        };
+
+        logger.info('Successfully added note', { noteId: note.id });
+
+        return note;
+      } catch (error) {
+        logger.error('Failed to add note', { error, objectName, objectId });
+        throw error;
+      }
+    });
+  }
+
+  /**
+   * Get a note by ID
+   */
+  async getNote(noteId: string): Promise<WFirmaNote | null> {
+    logger.info('Fetching note by ID', { noteId });
+
+    return this.withRetry(async () => {
+      try {
+        if (!noteId) {
+          throw new WFirmaValidationError('Note ID is required');
+        }
+
+        const response = await this.apiClient.request({
+          method: 'GET',
+          url: `/notes/get/${noteId}`,
+          params: this.buildQueryParams(),
+        });
+
+        const data = response.data;
+
+        if (data.status?.code !== 'OK') {
+          if (data.status?.code === 'NOT FOUND' || data.status?.code === 'ACTION NOT FOUND') {
+            return null;
+          }
+          throw new WFirmaError(
+            'WFIRMA_API_ERROR',
+            'Failed to fetch note',
+            data.status
+          );
+        }
+
+        let noteData = data.notes?.note;
+        if (!noteData) {
+          const notesObj = data.notes;
+          if (notesObj) {
+            for (const key in notesObj) {
+              if (!isNaN(Number(key)) && notesObj[key]?.note) {
+                noteData = notesObj[key].note;
+                break;
+              }
+            }
+          }
+        }
+
+        if (!noteData) {
+          return null;
+        }
+
+        return {
+          id: noteData.id,
+          objectName: noteData.object_name,
+          objectId: noteData.object_id,
+          text: noteData.text,
+          created: new Date(noteData.created),
+          modified: new Date(noteData.modified),
+        };
+      } catch (error) {
+        logger.error('Failed to fetch note', { error, noteId });
+        throw error;
+      }
+    });
+  }
+
+  /**
+   * Find notes for an object
+   */
+  async findNotes(objectName: string, objectId: string): Promise<WFirmaNote[]> {
+    logger.info('Fetching notes', { objectName, objectId });
+
+    return this.withRetry(async () => {
+      try {
+        const payload = {
+          api: {
+            notes: {
+              parameters: {
+                conditions: {
+                  condition: [
+                    { field: 'object_name', operator: 'eq', value: objectName },
+                    { field: 'object_id', operator: 'eq', value: objectId },
+                  ],
+                },
+                limit: 100,
+                page: 1,
+              },
+            },
+          },
+        };
+
+        const response = await this.apiClient.request({
+          method: 'GET',
+          url: '/notes/find',
+          params: this.buildQueryParams(),
+          data: payload,
+        });
+
+        const data = response.data;
+
+        if (data.status?.code !== 'OK') {
+          throw new WFirmaError(
+            'WFIRMA_API_ERROR',
+            'Failed to fetch notes',
+            data.status
+          );
+        }
+
+        let notesData = data.notes?.note;
+        if (!notesData) {
+          const notesObj = data.notes;
+          if (notesObj) {
+            notesData = [];
+            for (const key in notesObj) {
+              if (!isNaN(Number(key)) && notesObj[key]?.note) {
+                notesData.push(notesObj[key].note);
+              }
+            }
+          }
+        }
+
+        if (!notesData || notesData.length === 0) {
+          return [];
+        }
+
+        if (!Array.isArray(notesData)) {
+          notesData = [notesData];
+        }
+
+        const notes: WFirmaNote[] = notesData.map((n: any) => ({
+          id: n.id,
+          objectName: n.object_name,
+          objectId: n.object_id,
+          text: n.text,
+          created: new Date(n.created),
+          modified: new Date(n.modified),
+        }));
+
+        logger.info('Successfully fetched notes', { count: notes.length });
+
+        return notes;
+      } catch (error) {
+        logger.error('Failed to fetch notes', { error, objectName, objectId });
+        throw error;
+      }
+    });
+  }
+
+  /**
+   * Edit a note
+   */
+  async editNote(noteId: string, text: string): Promise<WFirmaNote> {
+    logger.info('Editing note', { noteId });
+
+    return this.withRetry(async () => {
+      try {
+        if (!noteId || !text) {
+          throw new WFirmaValidationError('Note ID and text are required');
+        }
+
+        const payload = {
+          api: {
+            notes: {
+              note: {
+                id: noteId,
+                text,
+              },
+            },
+          },
+        };
+
+        const response = await this.apiClient.request({
+          method: 'POST',
+          url: `/notes/edit/${noteId}`,
+          params: this.buildQueryParams(),
+          data: payload,
+        });
+
+        const data = response.data;
+
+        if (data.status?.code !== 'OK') {
+          if (data.status?.code === 'NOT FOUND' || data.status?.code === 'ACTION NOT FOUND') {
+            throw new WFirmaError(
+              'WFIRMA_NOT_FOUND',
+              `Note with ID ${noteId} not found`,
+              data.status,
+              404
+            );
+          }
+          throw new WFirmaError(
+            'WFIRMA_API_ERROR',
+            data.status?.message || 'Failed to edit note',
+            data.status
+          );
+        }
+
+        let noteData = data.notes?.note;
+        if (!noteData) {
+          const notesObj = data.notes;
+          if (notesObj) {
+            for (const key in notesObj) {
+              if (!isNaN(Number(key)) && notesObj[key]?.note) {
+                noteData = notesObj[key].note;
+                break;
+              }
+            }
+          }
+        }
+
+        if (!noteData) {
+          throw new WFirmaError(
+            'WFIRMA_API_ERROR',
+            'No note data in response',
+            data
+          );
+        }
+
+        logger.info('Successfully edited note', { noteId });
+
+        return {
+          id: noteData.id,
+          objectName: noteData.object_name,
+          objectId: noteData.object_id,
+          text: noteData.text,
+          created: new Date(noteData.created),
+          modified: new Date(noteData.modified),
+        };
+      } catch (error) {
+        logger.error('Failed to edit note', { error, noteId });
+        throw error;
+      }
+    });
+  }
+
+  /**
+   * Delete a note
+   */
+  async deleteNote(noteId: string): Promise<DeleteResult> {
+    logger.info('Deleting note', { noteId });
+
+    return this.withRetry(async () => {
+      try {
+        if (!noteId) {
+          throw new WFirmaValidationError('Note ID is required');
+        }
+
+        const response = await this.apiClient.request({
+          method: 'DELETE',
+          url: `/notes/delete/${noteId}`,
+          params: this.buildQueryParams(),
+        });
+
+        const data = response.data;
+
+        if (data.status?.code !== 'OK') {
+          if (data.status?.code === 'NOT FOUND' || data.status?.code === 'ACTION NOT FOUND') {
+            throw new WFirmaError(
+              'WFIRMA_NOT_FOUND',
+              `Note with ID ${noteId} not found`,
+              data.status,
+              404
+            );
+          }
+          throw new WFirmaError(
+            'WFIRMA_API_ERROR',
+            data.status?.message || 'Failed to delete note',
+            data.status
+          );
+        }
+
+        logger.info('Successfully deleted note', { noteId });
+
+        return {
+          success: true,
+          id: noteId,
+          message: `Note ${noteId} deleted successfully`,
+        };
+      } catch (error) {
+        logger.error('Failed to delete note', { error, noteId });
+        throw error;
+      }
+    });
+  }
+
+  /**
    * Sync data from wFirma to local cache
    */
   async syncDataFromWFirma(): Promise<SyncResult> {
@@ -1135,5 +1877,94 @@ export class WFirmaIntegrationService {
    */
   private sleep(ms: number): Promise<void> {
     return new Promise((resolve) => setTimeout(resolve, ms));
+  }
+
+  /**
+   * Map sort field name to wFirma field
+   */
+  private mapInvoiceSortField(sortBy: string): string {
+    const fieldMap: Record<string, string> = {
+      date: 'Invoice.date',
+      dueDate: 'Invoice.paymentdate',
+      total: 'Invoice.total',
+      invoiceNumber: 'Invoice.fullnumber',
+    };
+    return fieldMap[sortBy] || 'Invoice.id';
+  }
+
+  /**
+   * Map wFirma invoice data to our WFirmaInvoice type
+   */
+  private mapInvoiceData(inv: any): WFirmaInvoice {
+    // Parse invoice items
+    const items: WFirmaInvoiceItem[] = [];
+    if (inv.invoicecontents) {
+      let contentsData = inv.invoicecontents.invoicecontent;
+      if (!contentsData) {
+        // Try indexed format
+        const contentsObj = inv.invoicecontents;
+        contentsData = [];
+        for (const key in contentsObj) {
+          if (!isNaN(Number(key)) && contentsObj[key]?.invoicecontent) {
+            contentsData.push(contentsObj[key].invoicecontent);
+          }
+        }
+      }
+      if (contentsData && !Array.isArray(contentsData)) {
+        contentsData = [contentsData];
+      }
+      if (contentsData) {
+        for (const item of contentsData) {
+          items.push({
+            name: item.name || '',
+            quantity: parseFloat(item.count || '1'),
+            unit: item.unit || 'szt.',
+            priceNet: parseFloat(item.price || '0'),
+            vatRate: parseFloat(item.vat || '23'),
+            totalNet: parseFloat(item.netto || '0'),
+            totalVat: parseFloat(item.vat_price || '0'),
+            totalGross: parseFloat(item.brutto || '0'),
+          });
+        }
+      }
+    }
+
+    // Determine status based on payment and dates
+    let status: 'draft' | 'issued' | 'sent' | 'paid' | 'overdue' | 'cancelled' = 'issued';
+    const alreadyPaid = parseFloat(inv.alreadypaid || '0');
+    const total = parseFloat(inv.total || inv.brutto || '0');
+    const paymentDate = inv.paymentdate ? new Date(inv.paymentdate) : null;
+    const now = new Date();
+
+    if (inv.disposaldate_empty === '1' || inv.type === 'proforma') {
+      status = 'draft';
+    } else if (alreadyPaid >= total && total > 0) {
+      status = 'paid';
+    } else if (paymentDate && paymentDate < now && alreadyPaid < total) {
+      status = 'overdue';
+    } else if (inv.sended === '1') {
+      status = 'sent';
+    }
+
+    return {
+      id: inv.id || '',
+      invoiceNumber: inv.fullnumber || inv.number || '',
+      issueDate: new Date(inv.date || Date.now()),
+      dueDate: paymentDate || new Date(inv.date || Date.now()),
+      sellDate: inv.disposaldate ? new Date(inv.disposaldate) : undefined,
+      contractorId: inv.contractor || '',
+      contractorName: inv.contractor_name || inv.contractorDetail?.name || '',
+      contractorNip: inv.contractor_nip || inv.contractorDetail?.nip,
+      items,
+      total: parseFloat(inv.total || inv.brutto || '0'),
+      totalNet: parseFloat(inv.netto || '0'),
+      totalVat: parseFloat(inv.tax || '0'),
+      currency: inv.currency || 'PLN',
+      status,
+      paymentMethod: inv.paymentmethod,
+      notes: inv.notes,
+      createdAt: new Date(inv.created || Date.now()),
+      updatedAt: new Date(inv.modified || Date.now()),
+    };
   }
 }
