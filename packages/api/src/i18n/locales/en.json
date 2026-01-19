@@ -127,5 +127,29 @@
     "errorFetchAccounts": "Error fetching bank accounts",
     "errorFetchAddresses": "Error fetching addresses",
     "errorFetchPack": "Error fetching subscription info"
+  },
+  "user": {
+    "usersTitle": "Users",
+    "userCompaniesTitle": "User-Company Relationships",
+    "noUsers": "No users found.",
+    "noUserCompanies": "No user-company relationships found.",
+    "userCompanyNotFound": "User-company relationship not found.",
+    "errorFetchUsers": "Error fetching users. Please try again.",
+    "errorFetchUserCompanies": "Error fetching user companies. Please try again.",
+    "errorFetchUserCompany": "Error fetching user company details. Please try again.",
+    "name": "Name",
+    "email": "Email",
+    "login": "Login",
+    "role": "Role",
+    "status": "Status",
+    "active": "Active",
+    "inactive": "Inactive",
+    "userId": "User ID",
+    "companyId": "Company ID",
+    "permissions": "Permissions",
+    "detailsTitle": "User-Company Details",
+    "id": "ID",
+    "field": "Field",
+    "value": "Value"
   }
 }

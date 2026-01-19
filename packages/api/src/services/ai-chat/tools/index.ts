@@ -29,6 +29,11 @@ import {
   createGetInvoiceNotesTool,
   createDeleteInvoiceNoteTool,
 } from './invoice.tools';
+import {
+  createGetUsersTool,
+  createGetUserCompaniesTool,
+  createGetUserCompanyByIdTool,
+} from './user.tools';
 
 // Re-export individual tool creators
 export {
@@ -51,6 +56,11 @@ export {
   createGetInvoiceNotesTool,
   createDeleteInvoiceNoteTool,
 } from './invoice.tools';
+export {
+  createGetUsersTool,
+  createGetUserCompaniesTool,
+  createGetUserCompanyByIdTool,
+} from './user.tools';
 
 /**
  * Create all AI chat tools for wFirma integration
@@ -83,5 +93,10 @@ export function createAllTools(
     createAddInvoiceNoteTool(wfirmaService, cacheService, userId, locale),
     createGetInvoiceNotesTool(wfirmaService, userId, locale),
     createDeleteInvoiceNoteTool(wfirmaService, cacheService, userId, locale),
+
+    // User tools
+    createGetUsersTool(wfirmaService, cacheService, userId, locale),
+    createGetUserCompaniesTool(wfirmaService, cacheService, userId, locale),
+    createGetUserCompanyByIdTool(wfirmaService, cacheService, userId, locale),
   ];
 }

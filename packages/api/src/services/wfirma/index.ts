@@ -23,6 +23,9 @@ import {
   SendInvoiceOptions,
   SendInvoiceResult,
   WFirmaNote,
+  WFirmaUser,
+  WFirmaUserCompany,
+  UserCompanyFilters,
 } from '../../types/wfirma.types';
 
 // Import domain services
@@ -33,6 +36,7 @@ import { WFirmaInvoiceService } from './invoice.service';
 import { WFirmaNoteService } from './note.service';
 import { WFirmaFinancialService } from './financial.service';
 import { WFirmaSyncService } from './sync.service';
+import { WFirmaUserService } from './user.service';
 
 // Re-export errors
 export {
@@ -52,6 +56,7 @@ export { WFirmaInvoiceService } from './invoice.service';
 export { WFirmaNoteService } from './note.service';
 export { WFirmaFinancialService } from './financial.service';
 export { WFirmaSyncService } from './sync.service';
+export { WFirmaUserService } from './user.service';
 
 /**
  * Main WFirma Integration Service
@@ -65,6 +70,7 @@ export class WFirmaIntegrationService {
   private readonly noteService: WFirmaNoteService;
   private readonly financialService: WFirmaFinancialService;
   private readonly syncService: WFirmaSyncService;
+  private readonly userService: WFirmaUserService;
 
   constructor(config?: Partial<WFirmaConfig>) {
     // Initialize client
@@ -81,6 +87,7 @@ export class WFirmaIntegrationService {
       this.contractorService,
       this.financialService
     );
+    this.userService = new WFirmaUserService(this.client);
 
     logger.info('WFirmaIntegrationService initialized');
   }
@@ -107,6 +114,22 @@ export class WFirmaIntegrationService {
 
   async getCompanyDetails(): Promise<WFirmaCompanyDetails> {
     return this.companyService.getCompanyDetails();
+  }
+
+  // ============================================
+  // USER METHODS
+  // ============================================
+
+  async getUsers(): Promise<WFirmaUser[]> {
+    return this.userService.getUsers();
+  }
+
+  async findUserCompanies(filters?: UserCompanyFilters): Promise<WFirmaUserCompany[]> {
+    return this.userService.findUserCompanies(filters);
+  }
+
+  async getUserCompanyById(id: string): Promise<WFirmaUserCompany | null> {
+    return this.userService.getUserCompanyById(id);
   }
 
   // ============================================

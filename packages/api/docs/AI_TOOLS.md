@@ -166,6 +166,41 @@ Get financial summary (revenue, expenses, profit).
 
 ---
 
+## User Tools
+
+### `get_users`
+Get list of users with access to the wFirma company account.
+
+| Language | Example Questions |
+|----------|-------------------|
+| **PL** | "Kto ma dostęp do wFirma?", "Pokaż użytkowników", "Lista pracowników z dostępem", "Kto pracuje w firmie?" |
+| **EN** | "Who has access to wFirma?", "Show users", "List employees with access", "Who works in the company?" |
+| **RU** | "Кто имеет доступ к wFirma?", "Покажи пользователей", "Список сотрудников с доступом", "Кто работает в компании?" |
+
+---
+
+### `get_user_companies`
+Get user-company relationships showing access and permissions.
+
+| Language | Example Questions |
+|----------|-------------------|
+| **PL** | "Jakie uprawnienia mają użytkownicy?", "Kto ma dostęp do jakich firm?", "Pokaż powiązania użytkowników" |
+| **EN** | "What permissions do users have?", "Who has access to which companies?", "Show user relationships" |
+| **RU** | "Какие права у пользователей?", "Кто имеет доступ к каким компаниям?", "Покажи связи пользователей" |
+
+---
+
+### `get_user_company_by_id`
+Get specific user-company relationship details by ID.
+
+| Language | Example Questions |
+|----------|-------------------|
+| **PL** | "Pokaż szczegóły powiązania użytkownika 123", "Jakie uprawnienia ma użytkownik w firmie?" |
+| **EN** | "Show user-company relationship details 123", "What permissions does the user have in the company?" |
+| **RU** | "Покажи детали связи пользователя 123", "Какие права у пользователя в компании?" |
+
+---
+
 ## Tools Summary Table
 
 | Tool Name | Category | Description |
@@ -184,7 +219,10 @@ Get financial summary (revenue, expenses, profit).
 | `get_invoice_notes` | Invoices | Get invoice notes |
 | `delete_invoice_note` | Invoices | Delete invoice note |
 | `get_financial_summary` | Financial | Financial summary |
+| `get_users` | Users | List company users |
+| `get_user_companies` | Users | User-company relationships |
+| `get_user_company_by_id` | Users | User-company details by ID |
 
 ---
 
-## Total: 14 Tools
+## Total: 17 Tools

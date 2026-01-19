@@ -23,3 +23,8 @@ export {
   formatInvoiceDetails,
   formatNotesList,
 } from './invoice.formatter';
+export {
+  formatUsers,
+  formatUserCompanies,
+  formatUserCompany,
+} from './user.formatter';
