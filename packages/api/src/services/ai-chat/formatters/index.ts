@@ -3,7 +3,13 @@
  * Re-exports all formatters for easy importing
  */
 
-export { formatCompanyInfo } from './company.formatter';
+export {
+  formatCompanyInfo,
+  formatCompanyAccounts,
+  formatCompanyAddresses,
+  formatCompanyPack,
+  formatCompanyDetails,
+} from './company.formatter';
 export { formatFinancialData } from './financial.formatter';
 export {
   formatContractorsList,

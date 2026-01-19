@@ -107,19 +107,19 @@ export class WFirmaCacheService {
 
   /**
    * Get cached data with expiration checking
-   * 
+   *
    * @param userId - User ID who owns the data
    * @param dataType - Type of data to retrieve
    * @param wfirmaId - ID of the object in wFirma
    * @param options - Cache options
-   * @returns The cached data or null if not found/expired
+   * @returns The cached data, or undefined if not found/expired (NOTE: can return null if null was cached)
    */
   async getCachedData<T = any>(
     userId: string,
     dataType: CacheDataType,
     wfirmaId: string,
     options?: CacheOptions
-  ): Promise<T | null> {
+  ): Promise<T | undefined> {
     logger.debug('Retrieving cached wFirma data', {
       userId,
       dataType,
@@ -135,7 +135,7 @@ export class WFirmaCacheService {
           dataType,
           wfirmaId,
         });
-        return null;
+        return undefined;
       }
 
       // Query cache entry
@@ -160,7 +160,7 @@ export class WFirmaCacheService {
           dataType,
           wfirmaId,
         });
-        return null;
+        return undefined;
       }
 
       const entry = result[0];
@@ -178,7 +178,7 @@ export class WFirmaCacheService {
 
         // Mark as invalid
         await this.invalidateCache(userId, dataType, wfirmaId);
-        return null;
+        return undefined;
       }
 
       logger.info('Cache hit - returning cached data', {
@@ -197,8 +197,8 @@ export class WFirmaCacheService {
         wfirmaId,
         error,
       });
-      // Return null on error to allow fallback to API
-      return null;
+      // Return undefined on error to allow fallback to API
+      return undefined;
     }
   }
 

@@ -77,5 +77,55 @@
     "errorAddNote": "Ошибка добавления заметки",
     "errorFetchNotes": "Ошибка получения заметок",
     "errorDeleteNote": "Ошибка удаления заметки"
+  },
+  "company": {
+    "companyTitle": "Компания",
+    "companyInfo": "Данные компании",
+    "accountsTitle": "Банковские счета",
+    "addressesTitle": "Адреса компании",
+    "subscriptionTitle": "Подписка wFirma",
+
+    "name": "Название",
+    "nip": "ИНН (NIP)",
+    "regon": "REGON",
+    "krs": "KRS",
+    "address": "Адрес",
+    "email": "Email",
+    "phone": "Телефон",
+    "website": "Сайт",
+
+    "accountNumber": "Номер счёта",
+    "bankName": "Название банка",
+    "swift": "SWIFT/BIC",
+    "isDefault": "По умолчанию",
+    "yes": "Да",
+    "no": "Нет",
+
+    "mainAddress": "Основной адрес (регистрации)",
+    "correspondenceAddress": "Адрес для корреспонденции",
+    "street": "Улица",
+    "city": "Город",
+    "zip": "Почтовый индекс",
+    "country": "Страна",
+
+    "packType": "Пакет",
+    "packTrade": "Управление продажами",
+    "packTradeW": "Управление продажами + Склад",
+    "packBook": "Онлайн-бухгалтерия",
+    "packBookW": "Онлайн-бухгалтерия + Склад",
+    "expirationDate": "Действует до",
+    "status": "Статус",
+    "active": "Активна",
+    "inactive": "Неактивна",
+    "months": "Период (месяцы)",
+
+    "noAccounts": "Нет банковских счетов в системе.",
+    "noAddresses": "Нет дополнительных адресов.",
+    "noPack": "Нет информации о подписке.",
+
+    "errorFetch": "Ошибка получения данных компании",
+    "errorFetchAccounts": "Ошибка получения банковских счетов",
+    "errorFetchAddresses": "Ошибка получения адресов",
+    "errorFetchPack": "Ошибка получения информации о подписке"
   }
 }

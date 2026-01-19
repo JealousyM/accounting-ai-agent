@@ -1,0 +1,190 @@
+# AI Chat Tools - wFirma Integration
+
+This document describes all available AI tools and example questions that trigger them.
+
+---
+
+## Company Tools
+
+### `get_company_info`
+Get company basic information (name, NIP, REGON, KRS, address, email, phone).
+
+| Language | Example Questions |
+|----------|-------------------|
+| **PL** | "Pokaż dane mojej firmy", "Jakie są dane firmy?", "Jaki mam NIP?", "Podaj adres firmy" |
+| **EN** | "Show my company data", "What is my company info?", "What is my NIP?", "Show company address" |
+| **RU** | "Покажи данные моей компании", "Какие данные у моей фирмы?", "Какой у меня NIP?", "Покажи адрес компании" |
+
+---
+
+### `get_company_accounts`
+Get company bank accounts (account numbers, bank names, SWIFT codes).
+
+| Language | Example Questions |
+|----------|-------------------|
+| **PL** | "Jakie mam konta bankowe?", "Pokaż numery kont", "Na jakie konto mogę przyjąć przelew?" |
+| **EN** | "What are my bank accounts?", "Show account numbers", "What bank accounts do I have?" |
+| **RU** | "Какие у меня банковские счета?", "Покажи номера счетов", "На какой счёт можно перевести деньги?" |
+
+---
+
+### `get_company_addresses`
+Get company addresses (main registration address, correspondence address).
+
+| Language | Example Questions |
+|----------|-------------------|
+| **PL** | "Pokaż adresy firmy", "Jaki jest adres korespondencyjny?", "Gdzie jest siedziba firmy?" |
+| **EN** | "Show company addresses", "What is the correspondence address?", "Where is the company located?" |
+| **RU** | "Покажи адреса компании", "Какой адрес для корреспонденции?", "Где находится офис компании?" |
+
+---
+
+## Contractor Tools
+
+### `get_contractors`
+Search and list contractors (customers, suppliers).
+
+| Language | Example Questions |
+|----------|-------------------|
+| **PL** | "Pokaż moich kontrahentów", "Znajdź klienta Jan Kowalski", "Lista dostawców", "Szukaj firmy ABC" |
+| **EN** | "Show my contractors", "Find customer John Smith", "List suppliers", "Search for company ABC" |
+| **RU** | "Покажи моих контрагентов", "Найди клиента Иван Иванов", "Список поставщиков", "Найди фирму ABC" |
+
+---
+
+### `create_contractor`
+Create a new contractor in wFirma.
+
+| Language | Example Questions |
+|----------|-------------------|
+| **PL** | "Dodaj nowego kontrahenta", "Utwórz klienta Firma XYZ, NIP 1234567890", "Zarejestruj dostawcę" |
+| **EN** | "Add new contractor", "Create customer Company XYZ, NIP 1234567890", "Register a supplier" |
+| **RU** | "Добавь нового контрагента", "Создай клиента Фирма XYZ, NIP 1234567890", "Зарегистрируй поставщика" |
+
+---
+
+### `update_contractor`
+Update existing contractor information.
+
+| Language | Example Questions |
+|----------|-------------------|
+| **PL** | "Zmień email kontrahenta ABC na nowy@email.pl", "Zaktualizuj adres firmy XYZ", "Popraw dane klienta" |
+| **EN** | "Change contractor ABC email to new@email.com", "Update company XYZ address", "Fix customer data" |
+| **RU** | "Измени email контрагента ABC на new@email.pl", "Обнови адрес фирмы XYZ", "Исправь данные клиента" |
+
+---
+
+### `delete_contractor`
+Delete a contractor from wFirma.
+
+| Language | Example Questions |
+|----------|-------------------|
+| **PL** | "Usuń kontrahenta ABC", "Skasuj klienta o NIP 1234567890", "Usuń dostawcę XYZ" |
+| **EN** | "Delete contractor ABC", "Remove customer with NIP 1234567890", "Delete supplier XYZ" |
+| **RU** | "Удали контрагента ABC", "Удали клиента с NIP 1234567890", "Убери поставщика XYZ" |
+
+---
+
+## Invoice Tools
+
+### `get_invoices`
+List invoices with optional filters (year, month, status).
+
+| Language | Example Questions |
+|----------|-------------------|
+| **PL** | "Pokaż moje faktury", "Faktury z stycznia 2024", "Nieopłacone faktury", "Lista faktur za ten rok" |
+| **EN** | "Show my invoices", "Invoices from January 2024", "Unpaid invoices", "List invoices for this year" |
+| **RU** | "Покажи мои счета", "Счета за январь 2024", "Неоплаченные счета", "Список счетов за этот год" |
+
+---
+
+### `get_invoice_details`
+Get detailed information about a specific invoice.
+
+| Language | Example Questions |
+|----------|-------------------|
+| **PL** | "Pokaż szczegóły faktury FV/2024/001", "Ile wynosi faktura 123?", "Kto jest odbiorcą faktury?" |
+| **EN** | "Show invoice details FV/2024/001", "How much is invoice 123?", "Who is the invoice recipient?" |
+| **RU** | "Покажи детали счёта FV/2024/001", "Сколько составляет счёт 123?", "Кто получатель счёта?" |
+
+---
+
+### `send_invoice`
+Send an invoice by email.
+
+| Language | Example Questions |
+|----------|-------------------|
+| **PL** | "Wyślij fakturę FV/2024/001", "Wyślij fakturę 123 na email klient@firma.pl" |
+| **EN** | "Send invoice FV/2024/001", "Send invoice 123 to email client@company.com" |
+| **RU** | "Отправь счёт FV/2024/001", "Отправь счёт 123 на email client@firma.pl" |
+
+---
+
+### `add_invoice_note`
+Add a note/comment to an invoice.
+
+| Language | Example Questions |
+|----------|-------------------|
+| **PL** | "Dodaj notatkę do faktury 123: Klient prosi o przedłużenie terminu", "Dodaj komentarz do faktury" |
+| **EN** | "Add note to invoice 123: Customer requests extension", "Add comment to invoice" |
+| **RU** | "Добавь заметку к счёту 123: Клиент просит продлить срок", "Добавь комментарий к счёту" |
+
+---
+
+### `get_invoice_notes`
+Get all notes/comments for an invoice.
+
+| Language | Example Questions |
+|----------|-------------------|
+| **PL** | "Pokaż notatki do faktury 123", "Jakie są komentarze do tej faktury?" |
+| **EN** | "Show notes for invoice 123", "What are the comments for this invoice?" |
+| **RU** | "Покажи заметки к счёту 123", "Какие комментарии к этому счёту?" |
+
+---
+
+### `delete_invoice_note`
+Delete a note from an invoice.
+
+| Language | Example Questions |
+|----------|-------------------|
+| **PL** | "Usuń notatkę z faktury 123", "Skasuj komentarz do faktury" |
+| **EN** | "Delete note from invoice 123", "Remove comment from invoice" |
+| **RU** | "Удали заметку со счёта 123", "Убери комментарий к счёту" |
+
+---
+
+## Financial Tools
+
+### `get_financial_summary`
+Get financial summary (revenue, expenses, profit).
+
+| Language | Example Questions |
+|----------|-------------------|
+| **PL** | "Pokaż podsumowanie finansowe", "Ile zarobiłem w tym miesiącu?", "Jaki mam przychód?", "Pokaż wydatki" |
+| **EN** | "Show financial summary", "How much did I earn this month?", "What is my revenue?", "Show expenses" |
+| **RU** | "Покажи финансовое резюме", "Сколько я заработал в этом месяце?", "Какой у меня доход?", "Покажи расходы" |
+
+---
+
+## Tools Summary Table
+
+| Tool Name | Category | Description |
+|-----------|----------|-------------|
+| `get_company_info` | Company | Basic company data |
+| `get_company_accounts` | Company | Bank accounts |
+| `get_company_addresses` | Company | Company addresses |
+| `get_contractors` | Contractors | List/search contractors |
+| `create_contractor` | Contractors | Create new contractor |
+| `update_contractor` | Contractors | Update contractor |
+| `delete_contractor` | Contractors | Delete contractor |
+| `get_invoices` | Invoices | List invoices |
+| `get_invoice_details` | Invoices | Invoice details |
+| `send_invoice` | Invoices | Send invoice by email |
+| `add_invoice_note` | Invoices | Add note to invoice |
+| `get_invoice_notes` | Invoices | Get invoice notes |
+| `delete_invoice_note` | Invoices | Delete invoice note |
+| `get_financial_summary` | Financial | Financial summary |
+
+---
+
+## Total: 14 Tools

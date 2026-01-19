@@ -77,5 +77,55 @@
     "errorAddNote": "Error adding note",
     "errorFetchNotes": "Error fetching notes",
     "errorDeleteNote": "Failed to delete note"
+  },
+  "company": {
+    "companyTitle": "Company",
+    "companyInfo": "Company Information",
+    "accountsTitle": "Bank Accounts",
+    "addressesTitle": "Company Addresses",
+    "subscriptionTitle": "wFirma Subscription",
+
+    "name": "Name",
+    "nip": "Tax ID (NIP)",
+    "regon": "REGON",
+    "krs": "KRS",
+    "address": "Address",
+    "email": "Email",
+    "phone": "Phone",
+    "website": "Website",
+
+    "accountNumber": "Account Number",
+    "bankName": "Bank Name",
+    "swift": "SWIFT/BIC",
+    "isDefault": "Default",
+    "yes": "Yes",
+    "no": "No",
+
+    "mainAddress": "Main (Registration) Address",
+    "correspondenceAddress": "Correspondence Address",
+    "street": "Street",
+    "city": "City",
+    "zip": "Postal Code",
+    "country": "Country",
+
+    "packType": "Plan",
+    "packTrade": "Sales Management",
+    "packTradeW": "Sales Management + Warehouse",
+    "packBook": "Online Accounting",
+    "packBookW": "Online Accounting + Warehouse",
+    "expirationDate": "Valid Until",
+    "status": "Status",
+    "active": "Active",
+    "inactive": "Inactive",
+    "months": "Period (months)",
+
+    "noAccounts": "No bank accounts in the system.",
+    "noAddresses": "No additional addresses.",
+    "noPack": "No subscription information available.",
+
+    "errorFetch": "Error fetching company data",
+    "errorFetchAccounts": "Error fetching bank accounts",
+    "errorFetchAddresses": "Error fetching addresses",
+    "errorFetchPack": "Error fetching subscription info"
   }
 }

@@ -9,7 +9,11 @@ import { WFirmaIntegrationService } from '../../wfirma';
 import { WFirmaCacheService } from '../../wfirma-cache.service';
 
 // Import tool creators
-import { createGetCompanyInfoTool } from './company.tool';
+import {
+  createGetCompanyInfoTool,
+  createGetCompanyAccountsTool,
+  createGetCompanyAddressesTool,
+} from './company.tool';
 import { createGetFinancialSummaryTool } from './financial.tool';
 import {
   createGetContractorsTool,
@@ -27,7 +31,11 @@ import {
 } from './invoice.tools';
 
 // Re-export individual tool creators
-export { createGetCompanyInfoTool } from './company.tool';
+export {
+  createGetCompanyInfoTool,
+  createGetCompanyAccountsTool,
+  createGetCompanyAddressesTool,
+} from './company.tool';
 export { createGetFinancialSummaryTool } from './financial.tool';
 export {
   createGetContractorsTool,
@@ -54,8 +62,10 @@ export function createAllTools(
   locale: Locale
 ): StructuredToolInterface[] {
   return [
-    // Company tool
-    createGetCompanyInfoTool(wfirmaService, cacheService, userId),
+    // Company tools
+    createGetCompanyInfoTool(wfirmaService, cacheService, userId, locale),
+    createGetCompanyAccountsTool(wfirmaService, cacheService, userId, locale),
+    createGetCompanyAddressesTool(wfirmaService, cacheService, userId, locale),
 
     // Financial tool
     createGetFinancialSummaryTool(wfirmaService, cacheService, userId),

@@ -77,5 +77,55 @@
     "errorAddNote": "Błąd dodawania notatki",
     "errorFetchNotes": "Błąd pobierania notatek",
     "errorDeleteNote": "Nie udało się usunąć notatki"
+  },
+  "company": {
+    "companyTitle": "Firma",
+    "companyInfo": "Dane firmy",
+    "accountsTitle": "Konta bankowe",
+    "addressesTitle": "Adresy firmy",
+    "subscriptionTitle": "Subskrypcja wFirma",
+
+    "name": "Nazwa",
+    "nip": "NIP",
+    "regon": "REGON",
+    "krs": "KRS",
+    "address": "Adres",
+    "email": "Email",
+    "phone": "Telefon",
+    "website": "Strona WWW",
+
+    "accountNumber": "Numer konta",
+    "bankName": "Nazwa banku",
+    "swift": "SWIFT/BIC",
+    "isDefault": "Domyślne",
+    "yes": "Tak",
+    "no": "Nie",
+
+    "mainAddress": "Adres główny (rejestrowy)",
+    "correspondenceAddress": "Adres korespondencyjny",
+    "street": "Ulica",
+    "city": "Miasto",
+    "zip": "Kod pocztowy",
+    "country": "Kraj",
+
+    "packType": "Pakiet",
+    "packTrade": "Zarządzanie sprzedażą",
+    "packTradeW": "Zarządzanie sprzedażą + Magazyn",
+    "packBook": "Księgowość online",
+    "packBookW": "Księgowość online + Magazyn",
+    "expirationDate": "Ważny do",
+    "status": "Status",
+    "active": "Aktywna",
+    "inactive": "Nieaktywna",
+    "months": "Okres (miesiące)",
+
+    "noAccounts": "Brak kont bankowych w systemie.",
+    "noAddresses": "Brak dodatkowych adresów.",
+    "noPack": "Brak informacji o subskrypcji.",
+
+    "errorFetch": "Błąd pobierania danych firmy",
+    "errorFetchAccounts": "Błąd pobierania kont bankowych",
+    "errorFetchAddresses": "Błąd pobierania adresów",
+    "errorFetchPack": "Błąd pobierania informacji o subskrypcji"
   }
 }
