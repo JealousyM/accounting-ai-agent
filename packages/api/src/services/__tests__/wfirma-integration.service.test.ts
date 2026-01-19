@@ -1,8 +1,8 @@
 import axios from 'axios';
-import { 
+import {
   WFirmaIntegrationService,
   WFirmaValidationError,
-} from '../wfirma-integration.service';
+} from '../wfirma';
 import { WFirmaCompany, WFirmaContractor } from '../../types/wfirma.types';
 
 // Mock axios

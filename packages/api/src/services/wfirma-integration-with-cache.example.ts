@@ -5,7 +5,7 @@
  * to optimize performance and reduce API calls.
  */
 
-import { WFirmaIntegrationService } from './wfirma-integration.service';
+import { WFirmaIntegrationService } from './wfirma';
 import { WFirmaCacheService } from './wfirma-cache.service';
 import { prisma } from '../lib/prisma';
 import { WFirmaCompany, WFirmaContractor } from '../types/wfirma.types';

@@ -8,7 +8,7 @@ import { z } from 'zod';
 import { BaseAgent, LLMProvider } from './base.agent';
 import { AgentType, AgentContext, Locale } from './types';
 import { WFirmaCacheService } from '../services/wfirma-cache.service';
-import { WFirmaIntegrationService } from '../services/wfirma-integration.service';
+import { WFirmaIntegrationService } from '../services/wfirma';
 import { wfirmaCacheService } from '../services/wfirma-cache.instance';
 import { wfirmaIntegrationService } from '../services/wfirma-integration.instance';
 import { WFirmaInvoice, WFirmaNote } from '../types/wfirma.types';

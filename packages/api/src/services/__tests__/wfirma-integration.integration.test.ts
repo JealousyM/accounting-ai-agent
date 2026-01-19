@@ -17,7 +17,7 @@
  * Requirements: 7.1 - Integration with wFirma API
  */
 
-import { WFirmaIntegrationService } from '../wfirma-integration.service';
+import { WFirmaIntegrationService } from '../wfirma';
 
 // Debug: Check environment variables
 console.log('Environment check:', {

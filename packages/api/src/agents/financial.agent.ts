@@ -7,7 +7,7 @@ import { tool, StructuredToolInterface } from '@langchain/core/tools';
 import { z } from 'zod';
 import { BaseAgent, LLMProvider } from './base.agent';
 import { AgentType, AgentContext, Locale } from './types';
-import { WFirmaIntegrationService } from '../services/wfirma-integration.service';
+import { WFirmaIntegrationService } from '../services/wfirma';
 import { WFirmaCacheService } from '../services/wfirma-cache.service';
 import { wfirmaIntegrationService } from '../services/wfirma-integration.instance';
 import { wfirmaCacheService } from '../services/wfirma-cache.instance';

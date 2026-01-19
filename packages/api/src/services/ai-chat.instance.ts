@@ -6,7 +6,7 @@
 import { prisma } from '../lib/prisma';
 import { wfirmaIntegrationService } from './wfirma-integration.instance';
 import { wfirmaCacheService } from './wfirma-cache.instance';
-import { AIChatService } from './ai-chat.service';
+import { AIChatService } from './ai-chat';
 
 /**
  * Singleton instance of the AI Chat Service
