@@ -85,9 +85,68 @@ export interface InvoiceTranslations {
   errorDeleteNote: string;
 }
 
+export interface CompanyTranslations {
+  // Titles
+  companyTitle: string;
+  companyInfo: string;
+  accountsTitle: string;
+  addressesTitle: string;
+  subscriptionTitle: string;
+
+  // Fields
+  name: string;
+  nip: string;
+  regon: string;
+  krs: string;
+  address: string;
+  email: string;
+  phone: string;
+  website: string;
+
+  // Accounts
+  accountNumber: string;
+  bankName: string;
+  swift: string;
+  isDefault: string;
+  yes: string;
+  no: string;
+
+  // Addresses
+  mainAddress: string;
+  correspondenceAddress: string;
+  street: string;
+  city: string;
+  zip: string;
+  country: string;
+
+  // Subscription/Pack
+  packType: string;
+  packTrade: string;
+  packTradeW: string;
+  packBook: string;
+  packBookW: string;
+  expirationDate: string;
+  status: string;
+  active: string;
+  inactive: string;
+  months: string;
+
+  // Empty states
+  noAccounts: string;
+  noAddresses: string;
+  noPack: string;
+
+  // Errors
+  errorFetch: string;
+  errorFetchAccounts: string;
+  errorFetchAddresses: string;
+  errorFetchPack: string;
+}
+
 export interface Translations {
   contractor: ContractorTranslations;
   invoice: InvoiceTranslations;
+  company: CompanyTranslations;
 }
 
 const translations: Record<Locale, Translations> = {
@@ -106,4 +165,8 @@ export function getContractorTranslations(locale: Locale = 'pl'): ContractorTran
 
 export function getInvoiceTranslations(locale: Locale = 'pl'): InvoiceTranslations {
   return getTranslations(locale).invoice;
+}
+
+export function getCompanyTranslations(locale: Locale = 'pl'): CompanyTranslations {
+  return getTranslations(locale).company;
 }

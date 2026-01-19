@@ -38,6 +38,61 @@ export interface WFirmaCompany {
 }
 
 // ============================================
+// COMPANY ACCOUNTS TYPES
+// ============================================
+
+export interface WFirmaCompanyAccount {
+  id: string;
+  accountNumber: string;
+  bankName?: string;
+  swift?: string;
+  isDefault: boolean;
+  currency?: string;
+}
+
+// ============================================
+// COMPANY ADDRESSES TYPES
+// ============================================
+
+export type CompanyAddressType = 'main' | 'correspondence' | 'other';
+
+export interface WFirmaCompanyAddress {
+  id: string;
+  type: CompanyAddressType;
+  street?: string;
+  city?: string;
+  zip?: string;
+  country?: string;
+  isMain: boolean;
+}
+
+// ============================================
+// COMPANY PACKS (SUBSCRIPTION) TYPES
+// ============================================
+
+export type CompanyPackType = 'pack_trade' | 'pack_tradew' | 'pack_book' | 'pack_bookw';
+
+export interface WFirmaCompanyPack {
+  id: string;
+  pack: CompanyPackType;
+  months: number;
+  expirationDate: Date;
+  status: string;
+  created: Date;
+  modified: Date;
+}
+
+// ============================================
+// COMPANY DETAILS (AGGREGATED)
+// ============================================
+
+export interface WFirmaCompanyDetails extends WFirmaCompany {
+  accounts: WFirmaCompanyAccount[];
+  addresses: WFirmaCompanyAddress[];
+  pack?: WFirmaCompanyPack;
+}
+
+// ============================================
 // CONTRACTOR TYPES
 // ============================================
 

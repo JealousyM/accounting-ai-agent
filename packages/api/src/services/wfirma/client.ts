@@ -54,6 +54,15 @@ export class WFirmaClient {
       logger.warn('wFirma API keys not fully configured (accessKey, secretKey, appKey required)');
     }
 
+    // Log loaded credentials (masked for security)
+    logger.info('WFirmaClient initialized with credentials', {
+      accessKey: this.config.accessKey ? `***${this.config.accessKey.slice(-4)}` : 'NOT SET',
+      secretKey: this.config.secretKey ? `***${this.config.secretKey.slice(-4)}` : 'NOT SET',
+      appKey: this.config.appKey ? `***${this.config.appKey.slice(-4)}` : 'NOT SET',
+      companyId: this.config.companyId || 'NOT SET',
+      apiUrl: this.config.apiUrl,
+    });
+
     // Initialize retry configuration
     this.retryConfig = {
       ...DEFAULT_RETRY_CONFIG,

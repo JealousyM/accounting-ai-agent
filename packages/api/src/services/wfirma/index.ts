@@ -7,6 +7,10 @@ import { logger } from '../../utils/logger';
 import {
   WFirmaConfig,
   WFirmaCompany,
+  WFirmaCompanyAccount,
+  WFirmaCompanyAddress,
+  WFirmaCompanyPack,
+  WFirmaCompanyDetails,
   WFirmaContractor,
   ContractorFilters,
   ContractorData,
@@ -87,6 +91,22 @@ export class WFirmaIntegrationService {
 
   async getCompanyData(): Promise<WFirmaCompany> {
     return this.companyService.getCompanyData();
+  }
+
+  async getCompanyAccounts(): Promise<WFirmaCompanyAccount[]> {
+    return this.companyService.getCompanyAccounts();
+  }
+
+  async getCompanyAddresses(): Promise<WFirmaCompanyAddress[]> {
+    return this.companyService.getCompanyAddresses();
+  }
+
+  async getCompanyPack(): Promise<WFirmaCompanyPack | null> {
+    return this.companyService.getCompanyPack();
+  }
+
+  async getCompanyDetails(): Promise<WFirmaCompanyDetails> {
+    return this.companyService.getCompanyDetails();
   }
 
   // ============================================
