@@ -201,6 +201,63 @@ Get specific user-company relationship details by ID.
 
 ---
 
+## Payment Tools
+
+### `get_payments`
+List payments for invoices and expenses with optional filters.
+
+| Language | Example Questions |
+|----------|-------------------|
+| **PL** | "Pokaż płatności", "Płatności dla faktury FV 1/2026", "Płatności przelewem", "Płatności z stycznia 2026" |
+| **EN** | "Show payments", "Payments for invoice FV 1/2026", "Bank transfer payments", "Payments from January 2026" |
+| **RU** | "Покажи платежи", "Платежи для счёта FV 1/2026", "Платежи переводом", "Платежи за январь 2026" |
+
+---
+
+### `get_payment_details`
+Get detailed information about a specific payment by ID.
+
+| Language | Example Questions |
+|----------|-------------------|
+| **PL** | "Pokaż szczegóły płatności 123", "Jakie są dane płatności?", "Info o płatności" |
+| **EN** | "Show payment details 123", "What are payment details?", "Payment info" |
+| **RU** | "Покажи детали платежа 123", "Какие данные платежа?", "Инфо о платеже" |
+
+---
+
+### `add_payment`
+Add/create/register a new payment to an invoice.
+
+| Language | Example Questions |
+|----------|-------------------|
+| **PL** | "Dodaj płatność 100 EUR dla faktury FV 1/2026", "Zarejestruj wpłatę 500 PLN przelewem", "Utwórz płatność" |
+| **EN** | "Add payment 100 EUR for invoice FV 1/2026", "Register payment 500 PLN by transfer", "Create payment" |
+| **RU** | "Добавь оплату 100 EUR для счёта FV 1/2026", "Зарегистрируй платёж 500 PLN переводом", "Создай платёж" |
+
+---
+
+### `update_payment`
+Update an existing payment (amount, date, or method).
+
+| Language | Example Questions |
+|----------|-------------------|
+| **PL** | "Zmień kwotę płatności 123 na 150", "Zaktualizuj datę płatności", "Popraw metodę płatności na gotówka" |
+| **EN** | "Change payment 123 amount to 150", "Update payment date", "Fix payment method to cash" |
+| **RU** | "Измени сумму платежа 123 на 150", "Обнови дату платежа", "Исправь метод платежа на наличные" |
+
+---
+
+### `delete_payment`
+Delete a payment by ID (WARNING: cannot be undone).
+
+| Language | Example Questions |
+|----------|-------------------|
+| **PL** | "Usuń płatność 123", "Skasuj płatność", "Wymaż wpłatę" |
+| **EN** | "Delete payment 123", "Remove payment", "Erase payment" |
+| **RU** | "Удали платёж 123", "Убери платёж", "Удали оплату" |
+
+---
+
 ## Tools Summary Table
 
 | Tool Name | Category | Description |
@@ -222,7 +279,12 @@ Get specific user-company relationship details by ID.
 | `get_users` | Users | List company users |
 | `get_user_companies` | Users | User-company relationships |
 | `get_user_company_by_id` | Users | User-company details by ID |
+| `get_payments` | Payments | List payments with filters |
+| `get_payment_details` | Payments | Payment details by ID |
+| `add_payment` | Payments | Add new payment to invoice |
+| `update_payment` | Payments | Update existing payment |
+| `delete_payment` | Payments | Delete payment |
 
 ---
 
-## Total: 17 Tools
+## Total: 22 Tools
