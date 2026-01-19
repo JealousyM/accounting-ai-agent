@@ -175,11 +175,66 @@ export interface UserTranslations {
   value: string;
 }
 
+export interface PaymentTranslations {
+  // Titles
+  paymentsTitle: string;
+  paymentDetails: string;
+
+  // Fields
+  id: string;
+  paymentId: string;
+  objectType: string;
+  objectId: string;
+  invoice: string;
+  expense: string;
+  amount: string;
+  amountPln: string;
+  account: string;
+  date: string;
+  method: string;
+  paymentType: string;
+  initial: string;
+  field: string;
+  value: string;
+  total: string;
+
+  // Payment methods
+  methodTransfer: string;
+  methodCash: string;
+  methodCard: string;
+  methodCompensation: string;
+  methodOther: string;
+
+  // Common
+  yes: string;
+  no: string;
+
+  // Messages
+  created: string;
+  createdHint: string;
+  updated: string;
+  updatedHint: string;
+  deleted: string;
+  deletedWarning: string;
+  notFound: string;
+  notFoundById: string;
+  invoiceNotFound: string;
+  noFieldsToUpdate: string;
+
+  // Errors
+  errorFetch: string;
+  errorFetchDetails: string;
+  errorCreate: string;
+  errorUpdate: string;
+  errorDelete: string;
+}
+
 export interface Translations {
   contractor: ContractorTranslations;
   invoice: InvoiceTranslations;
   company: CompanyTranslations;
   user: UserTranslations;
+  payment: PaymentTranslations;
 }
 
 const translations: Record<Locale, Translations> = {
@@ -206,4 +261,8 @@ export function getCompanyTranslations(locale: Locale = 'pl'): CompanyTranslatio
 
 export function getUserTranslations(locale: Locale = 'pl'): UserTranslations {
   return getTranslations(locale).user;
+}
+
+export function getPaymentTranslations(locale: Locale = 'pl'): PaymentTranslations {
+  return getTranslations(locale).payment;
 }

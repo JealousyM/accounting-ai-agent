@@ -26,6 +26,10 @@ import {
   WFirmaUser,
   WFirmaUserCompany,
   UserCompanyFilters,
+  WFirmaPayment,
+  PaymentFilters,
+  PaymentData,
+  PaymentUpdateData,
 } from '../../types/wfirma.types';
 
 // Import domain services
@@ -37,6 +41,7 @@ import { WFirmaNoteService } from './note.service';
 import { WFirmaFinancialService } from './financial.service';
 import { WFirmaSyncService } from './sync.service';
 import { WFirmaUserService } from './user.service';
+import { WFirmaPaymentService } from './payment.service';
 
 // Re-export errors
 export {
@@ -57,6 +62,7 @@ export { WFirmaNoteService } from './note.service';
 export { WFirmaFinancialService } from './financial.service';
 export { WFirmaSyncService } from './sync.service';
 export { WFirmaUserService } from './user.service';
+export { WFirmaPaymentService } from './payment.service';
 
 /**
  * Main WFirma Integration Service
@@ -71,6 +77,7 @@ export class WFirmaIntegrationService {
   private readonly financialService: WFirmaFinancialService;
   private readonly syncService: WFirmaSyncService;
   private readonly userService: WFirmaUserService;
+  private readonly paymentService: WFirmaPaymentService;
 
   constructor(config?: Partial<WFirmaConfig>) {
     // Initialize client
@@ -88,6 +95,7 @@ export class WFirmaIntegrationService {
       this.financialService
     );
     this.userService = new WFirmaUserService(this.client);
+    this.paymentService = new WFirmaPaymentService(this.client);
 
     logger.info('WFirmaIntegrationService initialized');
   }
@@ -218,5 +226,32 @@ export class WFirmaIntegrationService {
 
   async checkConnection(): Promise<boolean> {
     return this.syncService.checkConnection();
+  }
+
+  // ============================================
+  // PAYMENT METHODS
+  // ============================================
+
+  async findPayments(filters?: PaymentFilters): Promise<WFirmaPayment[]> {
+    return this.paymentService.findPayments(filters);
+  }
+
+  async getPayment(id: string): Promise<WFirmaPayment | null> {
+    return this.paymentService.getPayment(id);
+  }
+
+  async createPayment(data: PaymentData): Promise<WFirmaPayment> {
+    return this.paymentService.createPayment(data);
+  }
+
+  async updatePayment(
+    id: string,
+    data: PaymentUpdateData
+  ): Promise<WFirmaPayment> {
+    return this.paymentService.updatePayment(id, data);
+  }
+
+  async deletePayment(id: string): Promise<DeleteResult> {
+    return this.paymentService.deletePayment(id);
   }
 }

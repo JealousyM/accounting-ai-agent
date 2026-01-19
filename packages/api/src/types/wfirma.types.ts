@@ -341,3 +341,63 @@ export interface WFirmaConfig {
   timeout?: number;
   retryAttempts?: number;
 }
+
+// ============================================
+// PAYMENT TYPES
+// ============================================
+
+export type PaymentMethod =
+  | 'transfer'
+  | 'cash'
+  | 'card'
+  | 'compensation'
+  | 'other';
+
+export type PaymentAccount = 'currency' | 'pln';
+
+export interface WFirmaPayment {
+  id: string;
+  objectName: 'invoice' | 'expense';
+  objectId: string;
+  value: number;
+  currency?: string;
+  valuePln?: number;
+  account?: PaymentAccount;
+  date: Date;
+  paymentMethod?: PaymentMethod;
+  paymentType?: string;
+  initial: boolean;
+  type: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface PaymentFilters {
+  objectName?: 'invoice' | 'expense';
+  objectId?: string;
+  dateFrom?: Date;
+  dateTo?: Date;
+  paymentMethod?: PaymentMethod;
+  minAmount?: number;
+  maxAmount?: number;
+  limit?: number;
+  offset?: number;
+}
+
+export interface PaymentData {
+  objectName: 'invoice' | 'expense';
+  objectId: string;
+  value: number;
+  account?: PaymentAccount;
+  valuePln?: number;
+  date: Date;
+  paymentMethod?: PaymentMethod;
+}
+
+export interface PaymentUpdateData {
+  value?: number;
+  account?: PaymentAccount;
+  valuePln?: number;
+  date?: Date;
+  paymentMethod?: PaymentMethod;
+}

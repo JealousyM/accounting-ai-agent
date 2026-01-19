@@ -6,7 +6,7 @@
 // CACHE DATA TYPES
 // ============================================
 
-export type CacheDataType = 'company' | 'contractor' | 'invoice' | 'financial' | 'user' | 'user_company';
+export type CacheDataType = 'company' | 'contractor' | 'invoice' | 'financial' | 'user' | 'user_company' | 'payment';
 
 export interface CacheEntry<T = any> {
   dataType: CacheDataType;
@@ -33,6 +33,7 @@ export const DEFAULT_TTL_CONFIG: Record<CacheDataType, number> = {
   financial: 6 * 60 * 60 * 1000,   // 6 hours
   user: 1 * 60 * 60 * 1000,        // 1 hour
   user_company: 1 * 60 * 60 * 1000, // 1 hour
+  payment: 30 * 60 * 1000,         // 30 minutes (same as invoices)
 };
 
 // ============================================

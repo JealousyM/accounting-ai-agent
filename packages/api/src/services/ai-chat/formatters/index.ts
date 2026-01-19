@@ -28,3 +28,10 @@ export {
   formatUserCompanies,
   formatUserCompany,
 } from './user.formatter';
+export {
+  formatPaymentsList,
+  formatPaymentDetails,
+  formatPaymentCreated,
+  formatPaymentUpdated,
+  formatPaymentDeleted,
+} from './payment.formatter';
