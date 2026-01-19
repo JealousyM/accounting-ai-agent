@@ -127,5 +127,29 @@
     "errorFetchAccounts": "Błąd pobierania kont bankowych",
     "errorFetchAddresses": "Błąd pobierania adresów",
     "errorFetchPack": "Błąd pobierania informacji o subskrypcji"
+  },
+  "user": {
+    "usersTitle": "Użytkownicy",
+    "userCompaniesTitle": "Powiązania użytkownik-firma",
+    "noUsers": "Nie znaleziono użytkowników.",
+    "noUserCompanies": "Nie znaleziono powiązań użytkownik-firma.",
+    "userCompanyNotFound": "Powiązanie użytkownik-firma nie zostało znalezione.",
+    "errorFetchUsers": "Błąd podczas pobierania użytkowników. Spróbuj ponownie.",
+    "errorFetchUserCompanies": "Błąd podczas pobierania powiązań. Spróbuj ponownie.",
+    "errorFetchUserCompany": "Błąd podczas pobierania szczegółów powiązania. Spróbuj ponownie.",
+    "name": "Nazwa",
+    "email": "Email",
+    "login": "Login",
+    "role": "Rola",
+    "status": "Status",
+    "active": "Aktywny",
+    "inactive": "Nieaktywny",
+    "userId": "ID użytkownika",
+    "companyId": "ID firmy",
+    "permissions": "Uprawnienia",
+    "detailsTitle": "Szczegóły powiązania użytkownik-firma",
+    "id": "ID",
+    "field": "Pole",
+    "value": "Wartość"
   }
 }

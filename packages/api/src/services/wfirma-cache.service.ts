@@ -112,14 +112,14 @@ export class WFirmaCacheService {
    * @param dataType - Type of data to retrieve
    * @param wfirmaId - ID of the object in wFirma
    * @param options - Cache options
-   * @returns The cached data, or undefined if not found/expired (NOTE: can return null if null was cached)
+   * @returns The cached data, or null if not found/expired/error
    */
   async getCachedData<T = any>(
     userId: string,
     dataType: CacheDataType,
     wfirmaId: string,
     options?: CacheOptions
-  ): Promise<T | undefined> {
+  ): Promise<T | null> {
     logger.debug('Retrieving cached wFirma data', {
       userId,
       dataType,
@@ -135,7 +135,7 @@ export class WFirmaCacheService {
           dataType,
           wfirmaId,
         });
-        return undefined;
+        return null;
       }
 
       // Query cache entry
@@ -160,14 +160,14 @@ export class WFirmaCacheService {
           dataType,
           wfirmaId,
         });
-        return undefined;
+        return null;
       }
 
       const entry = result[0];
       const now = new Date();
 
       // Check if entry is expired
-      if (entry.expiresAt < now) {
+      if (entry.expiresAt <= now) {
         logger.debug('Cache miss - entry expired', {
           userId,
           dataType,
@@ -178,7 +178,7 @@ export class WFirmaCacheService {
 
         // Mark as invalid
         await this.invalidateCache(userId, dataType, wfirmaId);
-        return undefined;
+        return null;
       }
 
       logger.info('Cache hit - returning cached data', {
@@ -197,8 +197,8 @@ export class WFirmaCacheService {
         wfirmaId,
         error,
       });
-      // Return undefined on error to allow fallback to API
-      return undefined;
+      // Return null on error to allow fallback to API
+      return null;
     }
   }
 
@@ -391,6 +391,8 @@ export class WFirmaCacheService {
         contractor: 0,
         invoice: 0,
         financial: 0,
+        user: 0,
+        user_company: 0,
       };
 
       byTypeResult.forEach((row) => {

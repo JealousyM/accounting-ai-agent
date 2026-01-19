@@ -143,10 +143,43 @@ export interface CompanyTranslations {
   errorFetchPack: string;
 }
 
+export interface UserTranslations {
+  // Titles
+  usersTitle: string;
+  userCompaniesTitle: string;
+  detailsTitle: string;
+
+  // Empty states
+  noUsers: string;
+  noUserCompanies: string;
+  userCompanyNotFound: string;
+
+  // Errors
+  errorFetchUsers: string;
+  errorFetchUserCompanies: string;
+  errorFetchUserCompany: string;
+
+  // Fields
+  id: string;
+  name: string;
+  email: string;
+  login: string;
+  role: string;
+  status: string;
+  active: string;
+  inactive: string;
+  userId: string;
+  companyId: string;
+  permissions: string;
+  field: string;
+  value: string;
+}
+
 export interface Translations {
   contractor: ContractorTranslations;
   invoice: InvoiceTranslations;
   company: CompanyTranslations;
+  user: UserTranslations;
 }
 
 const translations: Record<Locale, Translations> = {
@@ -169,4 +202,8 @@ export function getInvoiceTranslations(locale: Locale = 'pl'): InvoiceTranslatio
 
 export function getCompanyTranslations(locale: Locale = 'pl'): CompanyTranslations {
   return getTranslations(locale).company;
+}
+
+export function getUserTranslations(locale: Locale = 'pl'): UserTranslations {
+  return getTranslations(locale).user;
 }

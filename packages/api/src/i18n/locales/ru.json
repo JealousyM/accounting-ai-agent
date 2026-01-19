@@ -127,5 +127,29 @@
     "errorFetchAccounts": "Ошибка получения банковских счетов",
     "errorFetchAddresses": "Ошибка получения адресов",
     "errorFetchPack": "Ошибка получения информации о подписке"
+  },
+  "user": {
+    "usersTitle": "Пользователи",
+    "userCompaniesTitle": "Связи пользователь-компания",
+    "noUsers": "Пользователи не найдены.",
+    "noUserCompanies": "Связи пользователь-компания не найдены.",
+    "userCompanyNotFound": "Связь пользователь-компания не найдена.",
+    "errorFetchUsers": "Ошибка при получении пользователей. Попробуйте снова.",
+    "errorFetchUserCompanies": "Ошибка при получении связей. Попробуйте снова.",
+    "errorFetchUserCompany": "Ошибка при получении деталей связи. Попробуйте снова.",
+    "name": "Имя",
+    "email": "Email",
+    "login": "Логин",
+    "role": "Роль",
+    "status": "Статус",
+    "active": "Активен",
+    "inactive": "Неактивен",
+    "userId": "ID пользователя",
+    "companyId": "ID компании",
+    "permissions": "Права",
+    "detailsTitle": "Детали связи пользователь-компания",
+    "id": "ID",
+    "field": "Поле",
+    "value": "Значение"
   }
 }

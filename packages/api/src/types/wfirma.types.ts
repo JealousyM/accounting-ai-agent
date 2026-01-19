@@ -93,6 +93,39 @@ export interface WFirmaCompanyDetails extends WFirmaCompany {
 }
 
 // ============================================
+// USER TYPES
+// ============================================
+
+export interface WFirmaUser {
+  id: string;
+  name: string;
+  email?: string;
+  login?: string;
+  role?: string;
+  isActive: boolean;
+}
+
+// ============================================
+// USER COMPANY TYPES
+// ============================================
+
+export interface WFirmaUserCompany {
+  id: string;
+  userId: string;
+  companyId: string;
+  role?: string;
+  permissions?: string;
+  created?: Date;
+  modified?: Date;
+}
+
+export interface UserCompanyFilters {
+  limit?: number;
+  page?: number;
+  conditions?: Record<string, unknown>;
+}
+
+// ============================================
 // CONTRACTOR TYPES
 // ============================================
 
