@@ -393,6 +393,7 @@ export class WFirmaCacheService {
         financial: 0,
         user: 0,
         user_company: 0,
+        payment: 0,
       };
 
       byTypeResult.forEach((row) => {
