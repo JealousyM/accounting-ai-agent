@@ -47,6 +47,9 @@ import {
   JpkVatParams,
   PitParams,
   DeclarationResult,
+  WFirmaDocument,
+  DocumentFilters,
+  DocumentData,
 } from '../../types/wfirma.types';
 
 // Import domain services
@@ -64,6 +67,7 @@ import { WFirmaVehicleService } from './vehicle.service';
 import { WFirmaTermService } from './term.service';
 import { WFirmaTermGroupService } from './term-group.service';
 import { WFirmaDeclarationService } from './declaration.service';
+import { WFirmaDocumentService } from './document.service';
 
 // Re-export errors
 export {
@@ -90,6 +94,7 @@ export { WFirmaVehicleService } from './vehicle.service';
 export { WFirmaTermService } from './term.service';
 export { WFirmaTermGroupService } from './term-group.service';
 export { WFirmaDeclarationService } from './declaration.service';
+export { WFirmaDocumentService } from './document.service';
 
 /**
  * Main WFirma Integration Service
@@ -110,6 +115,7 @@ export class WFirmaIntegrationService {
   private readonly termService: WFirmaTermService;
   private readonly termGroupService: WFirmaTermGroupService;
   private readonly declarationService: WFirmaDeclarationService;
+  private readonly documentService: WFirmaDocumentService;
 
   constructor(config?: Partial<WFirmaConfig>) {
     // Initialize client
@@ -133,6 +139,7 @@ export class WFirmaIntegrationService {
     this.termService = new WFirmaTermService(this.client);
     this.termGroupService = new WFirmaTermGroupService(this.client);
     this.declarationService = new WFirmaDeclarationService(this.client);
+    this.documentService = new WFirmaDocumentService(this.client);
 
     logger.info('WFirmaIntegrationService initialized');
   }
@@ -386,5 +393,31 @@ export class WFirmaIntegrationService {
 
   async getPit(params: PitParams): Promise<DeclarationResult> {
     return this.declarationService.getPit(params);
+  }
+
+  // ============================================
+  // DOCUMENT METHODS
+  // ============================================
+
+  async findDocuments(filters?: DocumentFilters): Promise<WFirmaDocument[]> {
+    return this.documentService.findDocuments(filters);
+  }
+
+  async getDocument(id: string): Promise<WFirmaDocument | null> {
+    return this.documentService.getDocument(id);
+  }
+
+  async downloadDocument(
+    id: string
+  ): Promise<{ content: Buffer; filename: string; mime: string }> {
+    return this.documentService.downloadDocument(id);
+  }
+
+  async createDocument(data: DocumentData): Promise<WFirmaDocument> {
+    return this.documentService.createDocument(data);
+  }
+
+  async deleteDocument(id: string): Promise<DeleteResult> {
+    return this.documentService.deleteDocument(id);
   }
 }

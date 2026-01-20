@@ -546,6 +546,98 @@ Delete a term group from wFirma. **WARNING: Cannot be undone!**
 
 ---
 
+## Declaration Tools
+
+### `get_jpk_vat_declaration`
+Get JPK VAT declaration in XML format for a specific year and month. Returns a downloadable XML file.
+
+| Language | Example Questions |
+|----------|-------------------|
+| **PL** | "Pobierz JPK VAT za styczeń 2026", "Daj mi deklarację VAT za grudzień", "Wygeneruj JPK za 12/2025" |
+| **EN** | "Download JPK VAT for January 2026", "Give me VAT declaration for December", "Generate JPK for 12/2025" |
+| **RU** | "Скачай JPK VAT за январь 2026", "Дай мне декларацию VAT за декабрь", "Сгенерируй JPK за 12/2025" |
+
+**Required fields:**
+- year - Year (2020-2030)
+- month - Month (1-12)
+
+---
+
+### `get_pit_declaration`
+Get PIT declaration in XML format for a specific year and type. Returns a downloadable XML file.
+
+| Language | Example Questions |
+|----------|-------------------|
+| **PL** | "Pobierz PIT-36 za 2025", "Daj mi deklarację PIT-36L", "Wygeneruj PIT-28 za rok 2024" |
+| **EN** | "Download PIT-36 for 2025", "Give me PIT-36L declaration", "Generate PIT-28 for year 2024" |
+| **RU** | "Скачай PIT-36 за 2025", "Дай мне декларацию PIT-36L", "Сгенерируй PIT-28 за 2024 год" |
+
+**Required fields:**
+- year - Year (2020-2030)
+- type - pit36, pit36l, or pit28
+
+---
+
+## Document Tools
+
+### `get_documents`
+List documents from wFirma with optional filters.
+
+| Language | Example Questions |
+|----------|-------------------|
+| **PL** | "Pokaż dokumenty", "Dokumenty z kategorii CRM", "Pliki do faktury", "Szukaj dokument umowa" |
+| **EN** | "Show documents", "Documents from CRM category", "Files for invoice", "Search document contract" |
+| **RU** | "Покажи документы", "Документы из категории CRM", "Файлы к счёту", "Найди документ договор" |
+
+**Filters:**
+- objectName - Related object type (invoice, expense, contractor)
+- objectId - Related object ID
+- type - file, document_template, url
+- set - book (accounting), crm, declaration, staff, warehouse
+- search - Search in document name
+- limit - Max results (default 50)
+
+---
+
+### `get_document_details`
+Get detailed information about a specific document. Can optionally prepare file for download.
+
+| Language | Example Questions |
+|----------|-------------------|
+| **PL** | "Pokaż szczegóły dokumentu 123", "Info o dokumencie", "Dane pliku" |
+| **EN** | "Show document details 123", "Document info", "File data" |
+| **RU** | "Покажи детали документа 123", "Инфо о документе", "Данные файла" |
+
+**Parameters:**
+- documentId - Document ID (required)
+- prepareDownload - Set to true to get download link (optional)
+
+---
+
+### `download_document`
+Download a document file and get a temporary download link.
+
+| Language | Example Questions |
+|----------|-------------------|
+| **PL** | "Pobierz dokument 123", "Скачай plik umowa.pdf", "Daj link do pobrania dokumentu" |
+| **EN** | "Download document 123", "Download file contract.pdf", "Give me download link for document" |
+| **RU** | "Скачай документ 123", "Скачай файл договор.pdf", "Дай ссылку на скачивание документа" |
+
+**Note:** Only works for documents with type=file. Returns a temporary download link (valid for 15 minutes).
+
+---
+
+### `delete_document`
+Delete a document from wFirma. **WARNING: Cannot be undone!**
+
+| Language | Example Questions |
+|----------|-------------------|
+| **PL** | "Usuń dokument 123", "Skasuj plik", "Wymaż dokument" |
+| **EN** | "Delete document 123", "Remove file", "Erase document" |
+| **RU** | "Удали документ 123", "Убери файл", "Удали документ" |
+
+---
+
 ## Tools Summary Table
 
 | Tool Name | Category | Description |
@@ -589,10 +681,16 @@ Delete a term group from wFirma. **WARNING: Cannot be undone!**
 | `add_term_group` | Term Groups | Create new term group |
 | `update_term_group` | Term Groups | Update existing term group |
 | `delete_term_group` | Term Groups | Delete term group |
+| `get_jpk_vat_declaration` | Declarations | JPK VAT declaration (XML download) |
+| `get_pit_declaration` | Declarations | PIT declaration (XML download) |
+| `get_documents` | Documents | List documents with filters |
+| `get_document_details` | Documents | Document details by ID |
+| `download_document` | Documents | Download document file |
+| `delete_document` | Documents | Delete document |
 
 ---
 
-## Total: 39 Tools
+## Total: 45 Tools
 
 ### Breakdown by Category:
 - **Company**: 3 tools
@@ -605,3 +703,5 @@ Delete a term group from wFirma. **WARNING: Cannot be undone!**
 - **Vehicles**: 5 tools (CRUD)
 - **Terms**: 5 tools (CRUD)
 - **Term Groups**: 5 tools (CRUD)
+- **Declarations**: 2 tools (JPK VAT, PIT)
+- **Documents**: 4 tools (list, details, download, delete)

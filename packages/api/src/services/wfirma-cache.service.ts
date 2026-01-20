@@ -398,6 +398,7 @@ export class WFirmaCacheService {
         vehicle: 0,
         term: 0,
         term_group: 0,
+        document: 0,
       };
 
       byTypeResult.forEach((row) => {

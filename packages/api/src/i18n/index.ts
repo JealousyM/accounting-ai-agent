@@ -455,6 +455,61 @@ export interface DeclarationTranslations {
   errorFetchPit: string;
 }
 
+export interface DocumentTranslations {
+  // Titles
+  documentsTitle: string;
+  documentDetails: string;
+
+  // Fields
+  id: string;
+  name: string;
+  type: string;
+  set: string;
+  filename: string;
+  mimeType: string;
+  size: string;
+  description: string;
+  url: string;
+  tags: string;
+  relatedObject: string;
+  created: string;
+  modified: string;
+  field: string;
+  value: string;
+  download: string;
+
+  // Document types
+  typeFile: string;
+  typeTemplate: string;
+  typeUrl: string;
+
+  // Document sets
+  setBook: string;
+  setCrm: string;
+  setDeclaration: string;
+  setStaff: string;
+  setWarehouse: string;
+
+  // Messages
+  notFound: string;
+  notFoundById: string;
+  notDownloadable: string;
+  downloadHint: string;
+  downloadFile: string;
+  clickToDownload: string;
+  openLink: string;
+  fileExpiresIn15Minutes: string;
+  deleted: string;
+  deletedWarning: string;
+
+  // Errors
+  errorFetch: string;
+  errorFetchDetails: string;
+  errorDownload: string;
+  errorDelete: string;
+  errorReason: string;
+}
+
 export interface Translations {
   contractor: ContractorTranslations;
   invoice: InvoiceTranslations;
@@ -465,6 +520,7 @@ export interface Translations {
   vehicle: VehicleTranslations;
   term: TermTranslations;
   declarations: DeclarationTranslations;
+  document: DocumentTranslations;
 }
 
 const translations: Record<Locale, Translations> = {
@@ -511,4 +567,8 @@ export function getTermTranslations(locale: Locale = 'pl'): TermTranslations {
 
 export function getDeclarationTranslations(locale: Locale = 'pl'): DeclarationTranslations {
   return getTranslations(locale).declarations;
+}
+
+export function getDocumentTranslations(locale: Locale = 'pl'): DocumentTranslations {
+  return getTranslations(locale).document;
 }

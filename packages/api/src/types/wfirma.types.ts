@@ -615,3 +615,49 @@ export interface DeclarationResult {
   type: DeclarationType;
   generatedAt: Date;
 }
+
+// ============================================
+// DOCUMENT TYPES
+// ============================================
+
+export type DocumentType = 'file' | 'document_template' | 'url';
+export type DocumentSet = 'book' | 'crm' | 'declaration' | 'staff' | 'warehouse';
+
+export interface WFirmaDocument {
+  id: string;
+  objectName?: string;
+  objectId?: string;
+  name: string;
+  text?: string;
+  url?: string;
+  filename?: string;
+  mime?: string;
+  size?: number;
+  icon?: string;
+  type: DocumentType;
+  set: DocumentSet;
+  tags?: string[];
+  created: Date;
+  modified: Date;
+}
+
+export interface DocumentFilters {
+  objectName?: string;
+  objectId?: string;
+  type?: DocumentType;
+  set?: DocumentSet;
+  search?: string;
+  limit?: number;
+  offset?: number;
+}
+
+export interface DocumentData {
+  objectName?: string;
+  objectId?: string;
+  name: string;
+  text?: string;
+  url?: string;
+  type: DocumentType;
+  set: DocumentSet;
+  tags?: string[];
+}

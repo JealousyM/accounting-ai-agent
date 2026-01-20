@@ -59,3 +59,12 @@ export {
   formatTermGroupDeleted,
 } from './term.formatter';
 export { formatDeclarationResult } from './declaration.formatter';
+export {
+  formatDocumentsList,
+  formatDocumentDetails,
+  formatDocumentWithDownload,
+  formatDocumentDeleted,
+  formatDocumentType,
+  formatDocumentSet,
+  isDownloadable,
+} from './document.formatter';

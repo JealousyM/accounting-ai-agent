@@ -96,8 +96,8 @@ export function createGetUserCompaniesTool(
       name: 'get_user_companies',
       description: 'Get user-company relationships showing which users have access to which companies with their roles and permissions. Use when user asks about user access or permissions.',
       schema: z.object({
-        limit: z.number().optional().describe('Max results to return (default: 100)'),
-        page: z.number().optional().describe('Page number for pagination (default: 1)'),
+        limit: z.number().nullable().optional().describe('Max results to return (default: 100)'),
+        page: z.number().nullable().optional().describe('Page number for pagination (default: 1)'),
       }),
     }
   );
