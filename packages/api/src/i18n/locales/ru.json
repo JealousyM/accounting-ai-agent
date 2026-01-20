@@ -354,5 +354,19 @@
     "tryAgain": "Попробуйте снова с правильными данными.",
     "errorCreateTitle": "Ошибка создания срока",
     "errorReason": "Причина"
+  },
+  "declarations": {
+    "jpkVatTitle": "Декларация JPK VAT",
+    "pitTitle": "Декларация PIT",
+    "field": "Поле",
+    "value": "Значение",
+    "filename": "Имя файла",
+    "generatedAt": "Создано",
+    "fileSize": "Размер файла",
+    "downloadFile": "Скачать файл",
+    "clickToDownload": "Нажмите здесь чтобы скачать XML",
+    "fileExpiresIn15Minutes": "Файл будет доступен 15 минут",
+    "errorFetchJpkVat": "Не удалось получить декларацию JPK VAT",
+    "errorFetchPit": "Не удалось получить декларацию PIT"
   }
 }

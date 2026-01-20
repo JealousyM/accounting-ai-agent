@@ -7,6 +7,7 @@ import helmet from 'helmet';
 import authRoutes from './routes/auth.routes';
 import userRoutes from './routes/user.routes';
 import aiChatRoutes from './routes/ai-chat.routes';
+import fileRoutes from './routes/file.routes';
 import { globalRateLimiter } from './middleware/rate-limiter.middleware';
 import { errorHandler, notFoundHandler } from './middleware/error-handler.middleware';
 import { logger } from './utils/logger';
@@ -41,6 +42,9 @@ app.use('/api/users', userRoutes);
 
 // AI Chat routes
 app.use('/api/ai', aiChatRoutes);
+
+// File download routes
+app.use('/api/files', fileRoutes);
 
 // 404 handler
 app.use(notFoundHandler);

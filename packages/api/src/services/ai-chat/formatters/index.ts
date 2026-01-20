@@ -58,3 +58,4 @@ export {
   formatTermGroupUpdated,
   formatTermGroupDeleted,
 } from './term.formatter';
+export { formatDeclarationResult } from './declaration.formatter';

@@ -354,5 +354,19 @@
     "tryAgain": "Please try again with correct data.",
     "errorCreateTitle": "Error Creating Term",
     "errorReason": "Reason"
+  },
+  "declarations": {
+    "jpkVatTitle": "JPK VAT Declaration",
+    "pitTitle": "PIT Declaration",
+    "field": "Field",
+    "value": "Value",
+    "filename": "Filename",
+    "generatedAt": "Generated at",
+    "fileSize": "File size",
+    "downloadFile": "Download file",
+    "clickToDownload": "Click here to download XML",
+    "fileExpiresIn15Minutes": "File will be available for 15 minutes",
+    "errorFetchJpkVat": "Failed to fetch JPK VAT declaration",
+    "errorFetchPit": "Failed to fetch PIT declaration"
   }
 }
