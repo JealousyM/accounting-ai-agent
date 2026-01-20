@@ -35,3 +35,7 @@ export {
   formatPaymentUpdated,
   formatPaymentDeleted,
 } from './payment.formatter';
+export {
+  formatExpensesList,
+  formatExpenseDetails,
+} from './expense.formatter';

@@ -401,3 +401,81 @@ export interface PaymentUpdateData {
   date?: Date;
   paymentMethod?: PaymentMethod;
 }
+
+// ============================================
+// EXPENSE TYPES
+// ============================================
+
+export type ExpenseType = 'invoice' | 'bill' | 'vat_exempt';
+export type AccountingEffect = 'kpir_and_vat' | 'kpir' | 'vat' | 'nothing';
+export type WarehouseType = 'simple' | 'extended';
+export type TaxEvaluationMethod = 'netto' | 'brutto';
+export type ExpensePartType = 'rates' | 'positions';
+export type ExpenseSchema = 'cost' | 'purchase_trade_goods' | 'vehicle_fuel' | 'vehicle_expense';
+
+export interface WFirmaExpense {
+  id: string;
+  type: ExpenseType;
+  date: Date;
+  taxregisterDate?: Date;
+  paymentDate?: Date;
+  paymentMethod?: PaymentMethod;
+  paid: boolean;
+  alreadypaidInitial: number;
+  currency: string;
+  accountingEffect: AccountingEffect;
+  warehouseType?: WarehouseType;
+  schemaVatCashbox: boolean;
+  wnt: boolean;
+  serviceImport: boolean;
+  serviceImport2: boolean;
+  cargoImport: boolean;
+  splitPayment: boolean;
+  draft: boolean;
+  taxEvaluationMethod: TaxEvaluationMethod;
+
+  // Related objects
+  contractorId?: string;
+  contractorName?: string;
+  contractorNip?: string;
+
+  // Totals
+  total: number;
+  totalNet: number;
+  totalVat: number;
+
+  // Parts/items
+  parts: WFirmaExpensePart[];
+
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface WFirmaExpensePart {
+  id: string;
+  expensePartType: ExpensePartType;
+  schema: ExpenseSchema;
+  goodAction?: string;
+  goodId?: string;
+  name?: string;
+  unit?: string;
+  unitId?: string;
+  count: number;
+  price: number;
+  vatCode: string;
+  totalNet: number;
+  totalVat: number;
+  totalGross: number;
+}
+
+export interface ExpenseFilters {
+  dateFrom?: Date;
+  dateTo?: Date;
+  contractorId?: string;
+  contractorName?: string;
+  paid?: boolean;
+  type?: ExpenseType;
+  accountingEffect?: AccountingEffect;
+  limit?: number;
+  offset?: number;
+}

@@ -30,6 +30,8 @@ import {
   PaymentFilters,
   PaymentData,
   PaymentUpdateData,
+  WFirmaExpense,
+  ExpenseFilters,
 } from '../../types/wfirma.types';
 
 // Import domain services
@@ -42,6 +44,7 @@ import { WFirmaFinancialService } from './financial.service';
 import { WFirmaSyncService } from './sync.service';
 import { WFirmaUserService } from './user.service';
 import { WFirmaPaymentService } from './payment.service';
+import { WFirmaExpenseService } from './expense.service';
 
 // Re-export errors
 export {
@@ -63,6 +66,7 @@ export { WFirmaFinancialService } from './financial.service';
 export { WFirmaSyncService } from './sync.service';
 export { WFirmaUserService } from './user.service';
 export { WFirmaPaymentService } from './payment.service';
+export { WFirmaExpenseService } from './expense.service';
 
 /**
  * Main WFirma Integration Service
@@ -78,6 +82,7 @@ export class WFirmaIntegrationService {
   private readonly syncService: WFirmaSyncService;
   private readonly userService: WFirmaUserService;
   private readonly paymentService: WFirmaPaymentService;
+  private readonly expenseService: WFirmaExpenseService;
 
   constructor(config?: Partial<WFirmaConfig>) {
     // Initialize client
@@ -96,6 +101,7 @@ export class WFirmaIntegrationService {
     );
     this.userService = new WFirmaUserService(this.client);
     this.paymentService = new WFirmaPaymentService(this.client);
+    this.expenseService = new WFirmaExpenseService(this.client);
 
     logger.info('WFirmaIntegrationService initialized');
   }
@@ -253,5 +259,17 @@ export class WFirmaIntegrationService {
 
   async deletePayment(id: string): Promise<DeleteResult> {
     return this.paymentService.deletePayment(id);
+  }
+
+  // ============================================
+  // EXPENSE METHODS
+  // ============================================
+
+  async findExpenses(filters?: ExpenseFilters): Promise<WFirmaExpense[]> {
+    return this.expenseService.findExpenses(filters);
+  }
+
+  async getExpense(id: string): Promise<WFirmaExpense | null> {
+    return this.expenseService.getExpense(id);
   }
 }

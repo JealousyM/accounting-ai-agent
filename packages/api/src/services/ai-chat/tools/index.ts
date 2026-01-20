@@ -41,6 +41,10 @@ import {
   createUpdatePaymentTool,
   createDeletePaymentTool,
 } from './payment.tools';
+import {
+  createGetExpensesTool,
+  createGetExpenseDetailsTool,
+} from './expense.tools';
 
 // Re-export individual tool creators
 export {
@@ -75,6 +79,10 @@ export {
   createUpdatePaymentTool,
   createDeletePaymentTool,
 } from './payment.tools';
+export {
+  createGetExpensesTool,
+  createGetExpenseDetailsTool,
+} from './expense.tools';
 
 /**
  * Create all AI chat tools for wFirma integration
@@ -119,5 +127,9 @@ export function createAllTools(
     createAddPaymentTool(wfirmaService, cacheService, userId, locale),
     createUpdatePaymentTool(wfirmaService, cacheService, userId, locale),
     createDeletePaymentTool(wfirmaService, cacheService, userId, locale),
+
+    // Expense tools
+    createGetExpensesTool(wfirmaService, userId, locale),
+    createGetExpenseDetailsTool(wfirmaService, userId, locale),
   ];
 }

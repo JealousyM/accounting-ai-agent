@@ -258,6 +258,43 @@ Delete a payment by ID (WARNING: cannot be undone).
 
 ---
 
+## Expense Tools
+
+### `get_expenses`
+List expenses (business costs, bills, purchases) with optional filters.
+
+| Language | Example Questions |
+|----------|-------------------|
+| **PL** | "Pokaż wydatki", "Wydatki z stycznia 2026", "Nieopłacone wydatki", "Wydatki od kontrahenta ABC", "Rachunki za energię" |
+| **EN** | "Show expenses", "Expenses from January 2026", "Unpaid expenses", "Expenses from contractor ABC", "Electricity bills" |
+| **RU** | "Покажи расходы", "Расходы за январь 2026", "Неоплаченные расходы", "Расходы от контрагента ABC", "Счета за электричество" |
+
+**Filters:**
+- Date range (from/to)
+- Contractor name
+- Payment status (paid/unpaid)
+- Expense type (invoice/bill/vat_exempt)
+
+---
+
+### `get_expense_details`
+Get detailed information about a specific expense, including all items/parts.
+
+| Language | Example Questions |
+|----------|-------------------|
+| **PL** | "Pokaż szczegóły wydatku 181703896", "Jakie pozycje ma wydatek?", "Info o rachunku", "Co zawiera ten wydatek?" |
+| **EN** | "Show expense details 181703896", "What items does the expense have?", "Bill info", "What does this expense contain?" |
+| **RU** | "Покажи детали расхода 181703896", "Какие позиции в расходе?", "Инфо о счёте", "Что содержит этот расход?" |
+
+**Shows:**
+- Basic information (type, date, contractor, status)
+- Payment information (due date, method, KPiR posting date)
+- Expense items/parts with quantities, prices, VAT rates
+- Totals (net, VAT, gross)
+- Additional flags (WNT, split payment, import types, draft)
+
+---
+
 ## Tools Summary Table
 
 | Tool Name | Category | Description |
@@ -284,7 +321,18 @@ Delete a payment by ID (WARNING: cannot be undone).
 | `add_payment` | Payments | Add new payment to invoice |
 | `update_payment` | Payments | Update existing payment |
 | `delete_payment` | Payments | Delete payment |
+| `get_expenses` | Expenses | List expenses with filters |
+| `get_expense_details` | Expenses | Expense details with items |
 
 ---
 
-## Total: 22 Tools
+## Total: 24 Tools
+
+### Breakdown by Category:
+- **Company**: 3 tools
+- **Contractors**: 4 tools (CRUD)
+- **Invoices**: 6 tools
+- **Financial**: 1 tool
+- **Users**: 3 tools
+- **Payments**: 5 tools (CRUD)
+- **Expenses**: 2 tools (read-only)
