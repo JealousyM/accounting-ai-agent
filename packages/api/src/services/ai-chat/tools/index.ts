@@ -45,6 +45,13 @@ import {
   createGetExpensesTool,
   createGetExpenseDetailsTool,
 } from './expense.tools';
+import {
+  createGetVehiclesTool,
+  createGetVehicleDetailsTool,
+  createAddVehicleTool,
+  createUpdateVehicleTool,
+  createDeleteVehicleTool,
+} from './vehicle.tools';
 
 // Re-export individual tool creators
 export {
@@ -83,6 +90,13 @@ export {
   createGetExpensesTool,
   createGetExpenseDetailsTool,
 } from './expense.tools';
+export {
+  createGetVehiclesTool,
+  createGetVehicleDetailsTool,
+  createAddVehicleTool,
+  createUpdateVehicleTool,
+  createDeleteVehicleTool,
+} from './vehicle.tools';
 
 /**
  * Create all AI chat tools for wFirma integration
@@ -131,5 +145,12 @@ export function createAllTools(
     // Expense tools
     createGetExpensesTool(wfirmaService, userId, locale),
     createGetExpenseDetailsTool(wfirmaService, userId, locale),
+
+    // Vehicle tools
+    createGetVehiclesTool(wfirmaService, locale),
+    createGetVehicleDetailsTool(wfirmaService, locale),
+    createAddVehicleTool(wfirmaService, cacheService, userId, locale),
+    createUpdateVehicleTool(wfirmaService, cacheService, userId, locale),
+    createDeleteVehicleTool(wfirmaService, cacheService, userId, locale),
   ];
 }

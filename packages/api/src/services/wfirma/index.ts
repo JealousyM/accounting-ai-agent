@@ -32,6 +32,10 @@ import {
   PaymentUpdateData,
   WFirmaExpense,
   ExpenseFilters,
+  WFirmaVehicle,
+  VehicleFilters,
+  VehicleData,
+  VehicleUpdateData,
 } from '../../types/wfirma.types';
 
 // Import domain services
@@ -45,6 +49,7 @@ import { WFirmaSyncService } from './sync.service';
 import { WFirmaUserService } from './user.service';
 import { WFirmaPaymentService } from './payment.service';
 import { WFirmaExpenseService } from './expense.service';
+import { WFirmaVehicleService } from './vehicle.service';
 
 // Re-export errors
 export {
@@ -67,6 +72,7 @@ export { WFirmaSyncService } from './sync.service';
 export { WFirmaUserService } from './user.service';
 export { WFirmaPaymentService } from './payment.service';
 export { WFirmaExpenseService } from './expense.service';
+export { WFirmaVehicleService } from './vehicle.service';
 
 /**
  * Main WFirma Integration Service
@@ -83,6 +89,7 @@ export class WFirmaIntegrationService {
   private readonly userService: WFirmaUserService;
   private readonly paymentService: WFirmaPaymentService;
   private readonly expenseService: WFirmaExpenseService;
+  private readonly vehicleService: WFirmaVehicleService;
 
   constructor(config?: Partial<WFirmaConfig>) {
     // Initialize client
@@ -102,6 +109,7 @@ export class WFirmaIntegrationService {
     this.userService = new WFirmaUserService(this.client);
     this.paymentService = new WFirmaPaymentService(this.client);
     this.expenseService = new WFirmaExpenseService(this.client);
+    this.vehicleService = new WFirmaVehicleService(this.client);
 
     logger.info('WFirmaIntegrationService initialized');
   }
@@ -271,5 +279,29 @@ export class WFirmaIntegrationService {
 
   async getExpense(id: string): Promise<WFirmaExpense | null> {
     return this.expenseService.getExpense(id);
+  }
+
+  // ============================================
+  // VEHICLE METHODS
+  // ============================================
+
+  async findVehicles(filters?: VehicleFilters): Promise<WFirmaVehicle[]> {
+    return this.vehicleService.findVehicles(filters);
+  }
+
+  async getVehicle(id: string): Promise<WFirmaVehicle | null> {
+    return this.vehicleService.getVehicle(id);
+  }
+
+  async createVehicle(data: VehicleData): Promise<WFirmaVehicle> {
+    return this.vehicleService.createVehicle(data);
+  }
+
+  async updateVehicle(id: string, data: VehicleUpdateData): Promise<WFirmaVehicle> {
+    return this.vehicleService.updateVehicle(id, data);
+  }
+
+  async deleteVehicle(id: string): Promise<DeleteResult> {
+    return this.vehicleService.deleteVehicle(id);
   }
 }
