@@ -68,6 +68,12 @@ import {
   createGetJpkVatTool,
   createGetPitTool,
 } from './declaration.tools';
+import {
+  createGetDocumentsTool,
+  createGetDocumentDetailsTool,
+  createDownloadDocumentTool,
+  createDeleteDocumentTool,
+} from './document.tools';
 
 // Re-export individual tool creators
 export {
@@ -129,6 +135,12 @@ export {
   createGetJpkVatTool,
   createGetPitTool,
 } from './declaration.tools';
+export {
+  createGetDocumentsTool,
+  createGetDocumentDetailsTool,
+  createDownloadDocumentTool,
+  createDeleteDocumentTool,
+} from './document.tools';
 
 /**
  * Create all AI chat tools for wFirma integration
@@ -202,5 +214,11 @@ export function createAllTools(
     // Declaration tools
     createGetJpkVatTool(wfirmaService, userId, locale),
     createGetPitTool(wfirmaService, userId, locale),
+
+    // Document tools
+    createGetDocumentsTool(wfirmaService, locale),
+    createGetDocumentDetailsTool(wfirmaService, userId, locale),
+    createDownloadDocumentTool(wfirmaService, userId, locale),
+    createDeleteDocumentTool(wfirmaService, cacheService, userId, locale),
   ];
 }

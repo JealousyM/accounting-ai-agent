@@ -78,20 +78,20 @@ export function createGetExpensesTool(
       schema: z.object({
         contractorName: z
           .string()
-          .optional()
+          .nullable().optional()
           .describe('Contractor/vendor name to filter expenses by'),
         dateFrom: z
           .string()
-          .optional()
+          .nullable().optional()
           .describe('Start date (YYYY-MM-DD)'),
-        dateTo: z.string().optional().describe('End date (YYYY-MM-DD)'),
+        dateTo: z.string().nullable().optional().describe('End date (YYYY-MM-DD)'),
         paid: z
           .boolean()
-          .optional()
+          .nullable().optional()
           .describe('Filter by payment status (true = paid, false = unpaid)'),
         expenseType: z
           .enum(['invoice', 'bill', 'vat_exempt'])
-          .optional()
+          .nullable().optional()
           .describe('Filter by expense type'),
       }),
     }

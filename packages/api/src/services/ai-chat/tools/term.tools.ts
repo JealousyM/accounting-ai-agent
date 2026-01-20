@@ -73,15 +73,15 @@ export function createGetTermsTool(
       description:
         'Get list of terms (appointments/deadlines) from wFirma. Can filter by date range, type (normal/cycle_day_of_week/cycle_day_of_month), group ID, or search by description.',
       schema: z.object({
-        dateFrom: z.string().optional().describe('Start date for filtering (YYYY-MM-DD)'),
-        dateTo: z.string().optional().describe('End date for filtering (YYYY-MM-DD)'),
+        dateFrom: z.string().nullable().optional().describe('Start date for filtering (YYYY-MM-DD)'),
+        dateTo: z.string().nullable().optional().describe('End date for filtering (YYYY-MM-DD)'),
         type: z
           .enum(['normal', 'cycle_day_of_week', 'cycle_day_of_month'])
-          .optional()
+          .nullable().optional()
           .describe('Filter by term type'),
-        groupId: z.string().optional().describe('Filter by term group ID'),
-        search: z.string().optional().describe('Search by description'),
-        limit: z.number().optional().describe('Maximum number of results (default 100)'),
+        groupId: z.string().nullable().optional().describe('Filter by term group ID'),
+        search: z.string().nullable().optional().describe('Search by description'),
+        limit: z.number().nullable().optional().describe('Maximum number of results (default 100)'),
       }),
     }
   );
@@ -194,15 +194,15 @@ ${t.tryAgain}`;
         'Create a new term (appointment/deadline) in wFirma. Required: date. Optional: hour, description, termGroupId, type, contractorId, contactId.',
       schema: z.object({
         date: z.string().describe('Term date in YYYY-MM-DD format (required)'),
-        hour: z.string().optional().describe('Term hour in HH:MM:SS format'),
-        description: z.string().optional().describe('Term description/note'),
-        termGroupId: z.string().optional().describe('Term group ID'),
+        hour: z.string().nullable().optional().describe('Term hour in HH:MM:SS format'),
+        description: z.string().nullable().optional().describe('Term description/note'),
+        termGroupId: z.string().nullable().optional().describe('Term group ID'),
         type: z
           .enum(['normal', 'cycle_day_of_week', 'cycle_day_of_month'])
-          .optional()
+          .nullable().optional()
           .describe('Term type (default: normal)'),
-        contractorId: z.string().optional().describe('Associated contractor ID'),
-        contactId: z.string().optional().describe('Associated contact ID'),
+        contractorId: z.string().nullable().optional().describe('Associated contractor ID'),
+        contactId: z.string().nullable().optional().describe('Associated contact ID'),
       }),
     }
   );
@@ -279,16 +279,16 @@ ${t.tryAgain}`;
         'Update an existing term (appointment/deadline) in wFirma. Required: termId. All other fields are optional - only provided fields will be updated.',
       schema: z.object({
         termId: z.string().describe('Term ID to update (required)'),
-        date: z.string().optional().describe('New term date (YYYY-MM-DD)'),
-        hour: z.string().optional().describe('New term hour (HH:MM:SS)'),
-        description: z.string().optional().describe('New description'),
-        termGroupId: z.string().optional().describe('New term group ID'),
+        date: z.string().nullable().optional().describe('New term date (YYYY-MM-DD)'),
+        hour: z.string().nullable().optional().describe('New term hour (HH:MM:SS)'),
+        description: z.string().nullable().optional().describe('New description'),
+        termGroupId: z.string().nullable().optional().describe('New term group ID'),
         type: z
           .enum(['normal', 'cycle_day_of_week', 'cycle_day_of_month'])
-          .optional()
+          .nullable().optional()
           .describe('New term type'),
-        contractorId: z.string().optional().describe('New contractor ID'),
-        contactId: z.string().optional().describe('New contact ID'),
+        contractorId: z.string().nullable().optional().describe('New contractor ID'),
+        contactId: z.string().nullable().optional().describe('New contact ID'),
       }),
     }
   );
@@ -386,8 +386,8 @@ export function createGetTermGroupsTool(
       description:
         'Get list of term groups from wFirma. Can search by name.',
       schema: z.object({
-        search: z.string().optional().describe('Search by group name'),
-        limit: z.number().optional().describe('Maximum number of results (default 100)'),
+        search: z.string().nullable().optional().describe('Search by group name'),
+        limit: z.number().nullable().optional().describe('Maximum number of results (default 100)'),
       }),
     }
   );
@@ -487,7 +487,7 @@ ${t.tryAgain}`;
         name: z.string().describe('Group name (required)'),
         isReadonly: z
           .boolean()
-          .optional()
+          .nullable().optional()
           .describe('If true, group and its terms cannot be modified via wFirma.pl website'),
       }),
     }
@@ -550,8 +550,8 @@ ${t.tryAgain}`;
         'Update an existing term group in wFirma. Required: termGroupId. Optional: name, isReadonly.',
       schema: z.object({
         termGroupId: z.string().describe('Term group ID to update (required)'),
-        name: z.string().optional().describe('New group name'),
-        isReadonly: z.boolean().optional().describe('New read-only setting'),
+        name: z.string().nullable().optional().describe('New group name'),
+        isReadonly: z.boolean().nullable().optional().describe('New read-only setting'),
       }),
     }
   );

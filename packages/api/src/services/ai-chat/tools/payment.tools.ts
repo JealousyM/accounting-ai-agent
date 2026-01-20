@@ -121,20 +121,20 @@ export function createGetPaymentsTool(
       schema: z.object({
         invoiceNumber: z
           .string()
-          .optional()
+          .nullable().optional()
           .describe('Invoice number to get payments for'),
         objectType: z
           .enum(['invoice', 'expense'])
-          .optional()
+          .nullable().optional()
           .describe('Filter by object type'),
         dateFrom: z
           .string()
-          .optional()
+          .nullable().optional()
           .describe('Start date (YYYY-MM-DD)'),
-        dateTo: z.string().optional().describe('End date (YYYY-MM-DD)'),
+        dateTo: z.string().nullable().optional().describe('End date (YYYY-MM-DD)'),
         paymentMethod: z
           .enum(['transfer', 'cash', 'card', 'compensation', 'other'])
-          .optional()
+          .nullable().optional()
           .describe('Payment method'),
       }),
     }
@@ -271,7 +271,7 @@ export function createAddPaymentTool(
         date: z.string().describe('Payment date (YYYY-MM-DD format, e.g., 2026-01-20)'),
         paymentMethod: z
           .enum(['transfer', 'cash', 'card', 'compensation', 'other'])
-          .optional()
+          .nullable().optional()
           .describe('Payment method (default: transfer)'),
       }),
     }
@@ -333,11 +333,11 @@ export function createUpdatePaymentTool(
         'Update an existing payment. Can update amount, date, or payment method.',
       schema: z.object({
         paymentId: z.string().describe('Payment ID to update'),
-        amount: z.number().optional().describe('New payment amount'),
-        date: z.string().optional().describe('New payment date (YYYY-MM-DD)'),
+        amount: z.number().nullable().optional().describe('New payment amount'),
+        date: z.string().nullable().optional().describe('New payment date (YYYY-MM-DD)'),
         paymentMethod: z
           .enum(['transfer', 'cash', 'card', 'compensation', 'other'])
-          .optional()
+          .nullable().optional()
           .describe('New payment method'),
       }),
     }

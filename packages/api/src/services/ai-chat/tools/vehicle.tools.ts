@@ -60,17 +60,17 @@ export function createGetVehiclesTool(
       schema: z.object({
         search: z
           .string()
-          .optional()
+          .nullable().optional()
           .describe('Search by vehicle name or registration number'),
         type: z
           .enum(['truck', 'car', 'motor', 'motor-bike'])
-          .optional()
+          .nullable().optional()
           .describe('Filter by vehicle type'),
         ownership: z
           .enum(['leasing', 'private', 'other'])
-          .optional()
+          .nullable().optional()
           .describe('Filter by ownership form'),
-        limit: z.number().optional().describe('Maximum number of results (default 100)'),
+        limit: z.number().nullable().optional().describe('Maximum number of results (default 100)'),
       }),
     }
   );
@@ -141,10 +141,10 @@ export function createGetVehicleDetailsTool(
       description:
         'Get detailed information about a specific vehicle by ID or registration number. If registration number provided, will search for exact match.',
       schema: z.object({
-        vehicleId: z.string().optional().describe('Vehicle ID from wFirma'),
+        vehicleId: z.string().nullable().optional().describe('Vehicle ID from wFirma'),
         register: z
           .string()
-          .optional()
+          .nullable().optional()
           .describe('Vehicle registration number (e.g., WA12345)'),
       }),
     }
@@ -235,23 +235,23 @@ ${t.tryAgain}`;
           .describe('Ownership form (required)'),
         truckType: z
           .enum(['normal', 'quasi'])
-          .optional()
+          .nullable().optional()
           .describe('Truck type: normal (above 3.5t) or quasi (below 3.5t)'),
         taxPurpose: z
           .enum(['mixed', 'company'])
-          .optional()
+          .nullable().optional()
           .describe('Usage: mixed or company only'),
         vatLeasingBelowLimit: z
           .boolean()
-          .optional()
+          .nullable().optional()
           .describe('Is vehicle value below 150k PLN?'),
         vatLeasingDate: z
           .string()
-          .optional()
+          .nullable().optional()
           .describe('Lease agreement date in YYYY-MM-DD format'),
         vatLeasingValue: z
           .number()
-          .optional()
+          .nullable().optional()
           .describe('Vehicle value (for leasing)'),
       }),
     }
@@ -364,32 +364,32 @@ ${t.tryAgain}`;
       description:
         'Update an existing vehicle in wFirma. Identify vehicle by vehicleId or register. All fields are optional - only provided fields will be updated.',
       schema: z.object({
-        vehicleId: z.string().optional().describe('Vehicle ID (if known)'),
+        vehicleId: z.string().nullable().optional().describe('Vehicle ID (if known)'),
         register: z
           .string()
-          .optional()
+          .nullable().optional()
           .describe('Current registration number (to find vehicle)'),
-        name: z.string().optional().describe('New vehicle name'),
-        newRegister: z.string().optional().describe('New registration number'),
+        name: z.string().nullable().optional().describe('New vehicle name'),
+        newRegister: z.string().nullable().optional().describe('New registration number'),
         type: z
           .enum(['truck', 'car', 'motor', 'motor-bike'])
-          .optional()
+          .nullable().optional()
           .describe('New vehicle type'),
         ownership: z
           .enum(['leasing', 'private', 'other'])
-          .optional()
+          .nullable().optional()
           .describe('New ownership form'),
-        truckType: z.enum(['normal', 'quasi']).optional().describe('New truck type'),
-        taxPurpose: z.enum(['mixed', 'company']).optional().describe('New usage purpose'),
+        truckType: z.enum(['normal', 'quasi']).nullable().optional().describe('New truck type'),
+        taxPurpose: z.enum(['mixed', 'company']).nullable().optional().describe('New usage purpose'),
         vatLeasingBelowLimit: z
           .boolean()
-          .optional()
+          .nullable().optional()
           .describe('Update value below 150k PLN'),
         vatLeasingDate: z
           .string()
-          .optional()
+          .nullable().optional()
           .describe('New lease date (YYYY-MM-DD)'),
-        vatLeasingValue: z.number().optional().describe('New vehicle value'),
+        vatLeasingValue: z.number().nullable().optional().describe('New vehicle value'),
       }),
     }
   );
@@ -466,10 +466,10 @@ export function createDeleteVehicleTool(
       description:
         'Delete a vehicle from wFirma. WARNING: This action cannot be undone. Identify vehicle by vehicleId or register.',
       schema: z.object({
-        vehicleId: z.string().optional().describe('Vehicle ID (if known)'),
+        vehicleId: z.string().nullable().optional().describe('Vehicle ID (if known)'),
         register: z
           .string()
-          .optional()
+          .nullable().optional()
           .describe('Registration number (to find vehicle)'),
       }),
     }

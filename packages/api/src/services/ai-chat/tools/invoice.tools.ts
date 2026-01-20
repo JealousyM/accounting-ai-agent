@@ -51,9 +51,9 @@ export function createGetInvoicesTool(
       name: 'get_invoices',
       description: 'Get list of invoices from wFirma. Can filter by year, month, and payment status (paid, unpaid, overdue, draft, issued, sent).',
       schema: z.object({
-        year: z.number().optional().describe('Filter by year (e.g., 2024, 2025, 2026)'),
-        month: z.number().min(1).max(12).optional().describe('Filter by month (1-12)'),
-        status: z.enum(['all', 'paid', 'unpaid', 'overdue', 'draft', 'issued', 'sent']).optional().describe('Filter by payment status'),
+        year: z.number().nullable().optional().describe('Filter by year (e.g., 2024, 2025, 2026)'),
+        month: z.number().min(1).max(12).nullable().optional().describe('Filter by month (1-12)'),
+        status: z.enum(['all', 'paid', 'unpaid', 'overdue', 'draft', 'issued', 'sent']).nullable().optional().describe('Filter by payment status'),
       }),
     }
   );
@@ -143,9 +143,9 @@ export function createSendInvoiceTool(
       description: 'Send an invoice via email to the contractor. Uses contractor email if not provided.',
       schema: z.object({
         invoiceNumber: z.string().describe('Invoice number to send'),
-        email: z.string().optional().describe('Email address (uses contractor email if not provided)'),
-        subject: z.string().optional().describe('Email subject'),
-        body: z.string().optional().describe('Email body message'),
+        email: z.string().nullable().optional().describe('Email address (uses contractor email if not provided)'),
+        subject: z.string().nullable().optional().describe('Email subject'),
+        body: z.string().nullable().optional().describe('Email body message'),
       }),
     }
   );

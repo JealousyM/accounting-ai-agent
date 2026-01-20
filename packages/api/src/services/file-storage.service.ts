@@ -23,6 +23,7 @@ export interface StoredFile {
   mimeType: string;
   createdAt: Date;
   expiresAt: Date;
+  isBase64?: boolean; // true for binary files stored as base64
 }
 
 export class FileStorageService {
@@ -53,19 +54,28 @@ export class FileStorageService {
   /**
    * Store a file temporarily
    * @param filename - Original filename
-   * @param content - File content (string)
+   * @param content - File content (string or base64-encoded for binary)
    * @param userId - Owner user ID
    * @param mimeType - MIME type (default: application/xml)
+   * @param isBase64 - Set to true if content is base64-encoded binary
    * @returns File ID (UUID)
    */
   async storeFile(
     filename: string,
     content: string,
     userId: string,
-    mimeType: string = 'application/xml'
+    mimeType: string = 'application/xml',
+    isBase64: boolean = false
   ): Promise<string> {
     const fileId = crypto.randomUUID();
     const expiresAt = new Date(Date.now() + this.ttlMs);
+
+    // Auto-detect base64 for binary MIME types
+    const isBinaryMime =
+      !mimeType.startsWith('text/') &&
+      !mimeType.includes('xml') &&
+      !mimeType.includes('json');
+    const shouldMarkAsBase64 = isBase64 || isBinaryMime;
 
     const storedFile: StoredFile = {
       id: fileId,
@@ -75,6 +85,7 @@ export class FileStorageService {
       mimeType,
       createdAt: new Date(),
       expiresAt,
+      isBase64: shouldMarkAsBase64,
     };
 
     // Store in memory map
@@ -82,8 +93,14 @@ export class FileStorageService {
 
     // Write to disk as backup
     try {
-      const filePath = path.join(this.storageDir, `${fileId}.xml`);
-      await fs.writeFile(filePath, content, 'utf-8');
+      const ext = this.getFileExtension(filename, mimeType);
+      const filePath = path.join(this.storageDir, `${fileId}${ext}`);
+      if (shouldMarkAsBase64) {
+        // Write binary content
+        await fs.writeFile(filePath, Buffer.from(content, 'base64'));
+      } else {
+        await fs.writeFile(filePath, content, 'utf-8');
+      }
     } catch (error) {
       logger.error('Failed to write file to disk', { fileId, error });
       // Continue anyway - in-memory storage is primary
@@ -94,6 +111,7 @@ export class FileStorageService {
       filename,
       userId,
       size: content.length,
+      isBase64: shouldMarkAsBase64,
       expiresAt,
     });
 
@@ -101,21 +119,47 @@ export class FileStorageService {
   }
 
   /**
-   * Retrieve a file by ID (with security check)
-   * @param fileId - File UUID
-   * @param userId - Requesting user ID
-   * @returns Stored file or null if not found/expired/unauthorized
+   * Get file extension from filename or MIME type
    */
-  async getFile(fileId: string, userId: string): Promise<StoredFile | null> {
+  private getFileExtension(filename: string, mimeType: string): string {
+    // Try to get extension from filename
+    const match = filename.match(/\.[a-zA-Z0-9]+$/);
+    if (match) {
+      return match[0];
+    }
+
+    // Fallback to MIME type
+    const mimeToExt: Record<string, string> = {
+      'application/pdf': '.pdf',
+      'application/xml': '.xml',
+      'text/xml': '.xml',
+      'application/json': '.json',
+      'image/png': '.png',
+      'image/jpeg': '.jpg',
+      'image/gif': '.gif',
+      'application/octet-stream': '.bin',
+    };
+
+    return mimeToExt[mimeType] || '.bin';
+  }
+
+  /**
+   * Retrieve a file by ID
+   * Security is provided by random UUID + TTL expiration
+   * @param fileId - File UUID
+   * @param userId - Optional: Requesting user ID (for additional security check)
+   * @returns Stored file or null if not found/expired
+   */
+  async getFile(fileId: string, userId?: string): Promise<StoredFile | null> {
     const file = this.fileStore.get(fileId);
 
     if (!file) {
-      logger.warn('File not found', { fileId, userId });
+      logger.warn('File not found', { fileId });
       return null;
     }
 
-    // Security check: only the owner can access
-    if (file.userId !== userId) {
+    // Optional security check: if userId provided, verify ownership
+    if (userId && file.userId !== userId) {
       logger.warn('Unauthorized file access attempt', {
         fileId,
         requestedBy: userId,
