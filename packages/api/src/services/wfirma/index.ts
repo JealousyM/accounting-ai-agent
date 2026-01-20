@@ -44,6 +44,9 @@ import {
   TermGroupFilters,
   TermGroupData,
   TermGroupUpdateData,
+  JpkVatParams,
+  PitParams,
+  DeclarationResult,
 } from '../../types/wfirma.types';
 
 // Import domain services
@@ -60,6 +63,7 @@ import { WFirmaExpenseService } from './expense.service';
 import { WFirmaVehicleService } from './vehicle.service';
 import { WFirmaTermService } from './term.service';
 import { WFirmaTermGroupService } from './term-group.service';
+import { WFirmaDeclarationService } from './declaration.service';
 
 // Re-export errors
 export {
@@ -85,6 +89,7 @@ export { WFirmaExpenseService } from './expense.service';
 export { WFirmaVehicleService } from './vehicle.service';
 export { WFirmaTermService } from './term.service';
 export { WFirmaTermGroupService } from './term-group.service';
+export { WFirmaDeclarationService } from './declaration.service';
 
 /**
  * Main WFirma Integration Service
@@ -104,6 +109,7 @@ export class WFirmaIntegrationService {
   private readonly vehicleService: WFirmaVehicleService;
   private readonly termService: WFirmaTermService;
   private readonly termGroupService: WFirmaTermGroupService;
+  private readonly declarationService: WFirmaDeclarationService;
 
   constructor(config?: Partial<WFirmaConfig>) {
     // Initialize client
@@ -126,6 +132,7 @@ export class WFirmaIntegrationService {
     this.vehicleService = new WFirmaVehicleService(this.client);
     this.termService = new WFirmaTermService(this.client);
     this.termGroupService = new WFirmaTermGroupService(this.client);
+    this.declarationService = new WFirmaDeclarationService(this.client);
 
     logger.info('WFirmaIntegrationService initialized');
   }
@@ -367,5 +374,17 @@ export class WFirmaIntegrationService {
 
   async deleteTermGroup(id: string): Promise<DeleteResult> {
     return this.termGroupService.deleteTermGroup(id);
+  }
+
+  // ============================================
+  // DECLARATION METHODS
+  // ============================================
+
+  async getJpkVat(params: JpkVatParams): Promise<DeclarationResult> {
+    return this.declarationService.getJpkVat(params);
+  }
+
+  async getPit(params: PitParams): Promise<DeclarationResult> {
+    return this.declarationService.getPit(params);
   }
 }

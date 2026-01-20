@@ -592,3 +592,26 @@ export interface TermGroupData {
 }
 
 export interface TermGroupUpdateData extends Partial<TermGroupData> {}
+
+// ============================================
+// DECLARATION TYPES (JPK VAT & PIT)
+// ============================================
+
+export interface JpkVatParams {
+  year: number;
+  month: number;
+}
+
+export interface PitParams {
+  year: number;
+  type: 'pit36' | 'pit36l' | 'pit28';
+}
+
+export type DeclarationType = 'jpk_vat' | 'pit';
+
+export interface DeclarationResult {
+  xml: string;
+  filename: string;
+  type: DeclarationType;
+  generatedAt: Date;
+}

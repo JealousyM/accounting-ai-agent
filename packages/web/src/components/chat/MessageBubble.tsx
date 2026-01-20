@@ -266,13 +266,14 @@ function parseTableRow(line: string): string[] {
 }
 
 /**
- * Render inline markdown (bold, code, etc)
+ * Render inline markdown (bold, code, links)
  */
 function renderInlineMarkdown(text: string): React.ReactNode {
-  // Split by bold (**text**) and inline code (`text`)
-  const parts = text.split(/(\*\*[^*]+\*\*|`[^`]+`)/g);
+  // Split by bold (**text**), inline code (`text`), and links ([text](url))
+  const parts = text.split(/(\*\*[^*]+\*\*|`[^`]+`|\[[^\]]+\]\([^)]+\))/g);
 
   return parts.map((part, index) => {
+    // Bold
     if (part.startsWith('**') && part.endsWith('**')) {
       return (
         <strong key={index} className="font-semibold">
@@ -280,6 +281,8 @@ function renderInlineMarkdown(text: string): React.ReactNode {
         </strong>
       );
     }
+
+    // Inline code
     if (part.startsWith('`') && part.endsWith('`')) {
       return (
         <code
@@ -290,6 +293,30 @@ function renderInlineMarkdown(text: string): React.ReactNode {
         </code>
       );
     }
+
+    // Links (markdown format: [text](url))
+    const linkMatch = part.match(/\[([^\]]+)\]\(([^)]+)\)/);
+    if (linkMatch) {
+      const [, linkText, linkUrl] = linkMatch;
+
+      // Check if it's a file download link
+      const isFileDownload = linkUrl.includes('/api/files/download/');
+
+      return (
+        <a
+          key={index}
+          href={linkUrl}
+          target={isFileDownload ? '_self' : '_blank'}
+          rel={isFileDownload ? undefined : 'noopener noreferrer'}
+          download={isFileDownload}
+          className="text-blue-600 hover:text-blue-800 underline font-medium inline-flex items-center gap-1"
+        >
+          {linkText}
+          {isFileDownload && <span className="text-sm">⬇</span>}
+        </a>
+      );
+    }
+
     return part;
   });
 }

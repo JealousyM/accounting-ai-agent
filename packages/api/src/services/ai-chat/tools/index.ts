@@ -64,6 +64,10 @@ import {
   createUpdateTermGroupTool,
   createDeleteTermGroupTool,
 } from './term.tools';
+import {
+  createGetJpkVatTool,
+  createGetPitTool,
+} from './declaration.tools';
 
 // Re-export individual tool creators
 export {
@@ -121,6 +125,10 @@ export {
   createUpdateTermGroupTool,
   createDeleteTermGroupTool,
 } from './term.tools';
+export {
+  createGetJpkVatTool,
+  createGetPitTool,
+} from './declaration.tools';
 
 /**
  * Create all AI chat tools for wFirma integration
@@ -190,5 +198,9 @@ export function createAllTools(
     createAddTermGroupTool(wfirmaService, cacheService, userId, locale),
     createUpdateTermGroupTool(wfirmaService, cacheService, userId, locale),
     createDeleteTermGroupTool(wfirmaService, cacheService, userId, locale),
+
+    // Declaration tools
+    createGetJpkVatTool(wfirmaService, userId, locale),
+    createGetPitTool(wfirmaService, userId, locale),
   ];
 }

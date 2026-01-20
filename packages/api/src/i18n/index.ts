@@ -440,6 +440,21 @@ export interface TermTranslations {
   errorReason: string;
 }
 
+export interface DeclarationTranslations {
+  jpkVatTitle: string;
+  pitTitle: string;
+  field: string;
+  value: string;
+  filename: string;
+  generatedAt: string;
+  fileSize: string;
+  downloadFile: string;
+  clickToDownload: string;
+  fileExpiresIn15Minutes: string;
+  errorFetchJpkVat: string;
+  errorFetchPit: string;
+}
+
 export interface Translations {
   contractor: ContractorTranslations;
   invoice: InvoiceTranslations;
@@ -449,6 +464,7 @@ export interface Translations {
   expense: ExpenseTranslations;
   vehicle: VehicleTranslations;
   term: TermTranslations;
+  declarations: DeclarationTranslations;
 }
 
 const translations: Record<Locale, Translations> = {
@@ -491,4 +507,8 @@ export function getVehicleTranslations(locale: Locale = 'pl'): VehicleTranslatio
 
 export function getTermTranslations(locale: Locale = 'pl'): TermTranslations {
   return getTranslations(locale).term;
+}
+
+export function getDeclarationTranslations(locale: Locale = 'pl'): DeclarationTranslations {
+  return getTranslations(locale).declarations;
 }
