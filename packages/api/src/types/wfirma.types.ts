@@ -525,3 +525,70 @@ export interface VehicleData {
 }
 
 export interface VehicleUpdateData extends Partial<VehicleData> {}
+
+// ============================================
+// TERM TYPES (Appointments/Deadlines)
+// ============================================
+
+export type TermType = 'normal' | 'cycle_day_of_week' | 'cycle_day_of_month';
+
+export interface WFirmaTerm {
+  id: string;
+  date: Date;
+  hour?: string;
+  description?: string;
+  groupId?: string;
+  type: TermType;
+  contractorId?: string;
+  contactId?: string;
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+
+export interface TermFilters {
+  dateFrom?: Date;
+  dateTo?: Date;
+  type?: TermType;
+  groupId?: string;
+  contractorId?: string;
+  search?: string;
+  limit?: number;
+  offset?: number;
+}
+
+export interface TermData {
+  date: Date;
+  hour?: string;
+  description?: string;
+  termGroupId?: string;
+  type?: TermType;
+  contractorId?: string;
+  contactId?: string;
+}
+
+export interface TermUpdateData extends Partial<TermData> {}
+
+// ============================================
+// TERM GROUP TYPES
+// ============================================
+
+export interface WFirmaTermGroup {
+  id: string;
+  name: string;
+  isReadonly: boolean;
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+
+export interface TermGroupFilters {
+  search?: string;
+  limit?: number;
+  offset?: number;
+}
+
+export interface TermGroupData {
+  name: string;
+  isReadonly?: boolean;
+}
+
+export interface TermGroupUpdateData extends Partial<TermGroupData> {}

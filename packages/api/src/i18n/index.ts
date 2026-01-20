@@ -370,6 +370,76 @@ export interface VehicleTranslations {
   errorReason: string;
 }
 
+export interface TermTranslations {
+  // Titles
+  termsTitle: string;
+  termDetails: string;
+  termGroupsTitle: string;
+  termGroupDetails: string;
+
+  // Fields
+  id: string;
+  date: string;
+  hour: string;
+  description: string;
+  group: string;
+  groupId: string;
+  type: string;
+  contractor: string;
+  contact: string;
+  field: string;
+  value: string;
+  name: string;
+  isReadonly: string;
+
+  // Term types
+  typeNormal: string;
+  typeCycleDayOfWeek: string;
+  typeCycleDayOfMonth: string;
+
+  // Messages - Terms
+  notFound: string;
+  notFoundById: string;
+  created: string;
+  createdHint: string;
+  updated: string;
+  updatedHint: string;
+  deleted: string;
+  deletedWarning: string;
+  updateDeleteHint: string;
+
+  // Messages - Term Groups
+  groupNotFound: string;
+  groupNotFoundById: string;
+  groupCreated: string;
+  groupCreatedHint: string;
+  groupUpdated: string;
+  groupUpdatedHint: string;
+  groupDeleted: string;
+  groupDeletedWarning: string;
+  groupUpdateDeleteHint: string;
+
+  // Common
+  yes: string;
+  no: string;
+
+  // Errors
+  errorFetch: string;
+  errorFetchDetails: string;
+  errorCreate: string;
+  errorUpdate: string;
+  errorDelete: string;
+  errorFetchGroups: string;
+  errorFetchGroupDetails: string;
+  errorCreateGroup: string;
+  errorUpdateGroup: string;
+  errorDeleteGroup: string;
+  requiredFields: string;
+  tryAgain: string;
+  errorCreateTitle: string;
+  errorReason: string;
+}
+
 export interface Translations {
   contractor: ContractorTranslations;
   invoice: InvoiceTranslations;
@@ -378,6 +448,7 @@ export interface Translations {
   payment: PaymentTranslations;
   expense: ExpenseTranslations;
   vehicle: VehicleTranslations;
+  term: TermTranslations;
 }
 
 const translations: Record<Locale, Translations> = {
@@ -416,4 +487,8 @@ export function getExpenseTranslations(locale: Locale = 'pl'): ExpenseTranslatio
 
 export function getVehicleTranslations(locale: Locale = 'pl'): VehicleTranslations {
   return getTranslations(locale).vehicle;
+}
+
+export function getTermTranslations(locale: Locale = 'pl'): TermTranslations {
+  return getTranslations(locale).term;
 }

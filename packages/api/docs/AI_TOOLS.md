@@ -390,6 +390,162 @@ Delete a vehicle from wFirma. **WARNING: Cannot be undone!**
 
 ---
 
+## Term Tools
+
+### `get_terms`
+List terms (appointments/deadlines) with optional filters.
+
+| Language | Example Questions |
+|----------|-------------------|
+| **PL** | "Pokaż terminy", "Terminy na styczeń 2026", "Cykliczne terminy", "Terminy z grupy Spotkania", "Szukaj termin ABC" |
+| **EN** | "Show terms", "Terms for January 2026", "Cyclic terms", "Terms from Meetings group", "Search term ABC" |
+| **RU** | "Покажи сроки", "Сроки на январь 2026", "Циклические сроки", "Сроки из группы Встречи", "Найди срок ABC" |
+
+**Filters:**
+- Date range (from/to in YYYY-MM-DD format)
+- Type (normal/cycle_day_of_week/cycle_day_of_month)
+- Term group ID
+- Search by description
+- Limit results
+
+---
+
+### `get_term_details`
+Get detailed information about a specific term by ID.
+
+| Language | Example Questions |
+|----------|-------------------|
+| **PL** | "Pokaż szczegóły terminu 123", "Info o terminie", "Dane terminu" |
+| **EN** | "Show term details 123", "Term info", "Term data" |
+| **RU** | "Покажи детали срока 123", "Инфо о сроке", "Данные срока" |
+
+**Shows:**
+- ID, date, hour
+- Description
+- Type (normal, cyclic by week day, cyclic by month day)
+- Group ID, Contractor, Contact
+
+---
+
+### `add_term`
+Create a new term (appointment/deadline) in wFirma.
+
+| Language | Example Questions |
+|----------|-------------------|
+| **PL** | "Dodaj termin na 2026-02-15", "Utwórz termin spotkanie z klientem o 14:00", "Zarejestruj termin cykliczny w poniedziałki" |
+| **EN** | "Add term for 2026-02-15", "Create term meeting with client at 14:00", "Register cyclic term on Mondays" |
+| **RU** | "Добавь срок на 2026-02-15", "Создай срок встреча с клиентом в 14:00", "Зарегистрируй циклический срок по понедельникам" |
+
+**Required fields:**
+- date - Term date (YYYY-MM-DD format)
+
+**Optional fields:**
+- hour - Time (HH:MM:SS format)
+- description - Term description/note
+- termGroupId - Term group ID
+- type - normal/cycle_day_of_week/cycle_day_of_month (default: normal)
+- contractorId - Associated contractor ID
+- contactId - Associated contact ID
+
+---
+
+### `update_term`
+Update an existing term in wFirma.
+
+| Language | Example Questions |
+|----------|-------------------|
+| **PL** | "Zmień datę terminu 123 na 2026-03-01", "Zaktualizuj opis terminu", "Przenieś termin na 15:00" |
+| **EN** | "Change term 123 date to 2026-03-01", "Update term description", "Move term to 15:00" |
+| **RU** | "Измени дату срока 123 на 2026-03-01", "Обнови описание срока", "Перенеси срок на 15:00" |
+
+**Required:** termId
+**All other fields are optional** - only provided fields will be updated.
+
+---
+
+### `delete_term`
+Delete a term from wFirma. **WARNING: Cannot be undone!**
+
+| Language | Example Questions |
+|----------|-------------------|
+| **PL** | "Usuń termin 123", "Skasuj termin", "Wymaż termin" |
+| **EN** | "Delete term 123", "Remove term", "Erase term" |
+| **RU** | "Удали срок 123", "Убери срок", "Удали срок" |
+
+---
+
+## Term Group Tools
+
+### `get_term_groups`
+List term groups with optional search.
+
+| Language | Example Questions |
+|----------|-------------------|
+| **PL** | "Pokaż grupy terminów", "Lista grup", "Szukaj grupę Spotkania" |
+| **EN** | "Show term groups", "List groups", "Search group Meetings" |
+| **RU** | "Покажи группы сроков", "Список групп", "Найди группу Встречи" |
+
+**Filters:**
+- Search by name
+- Limit results
+
+---
+
+### `get_term_group_details`
+Get detailed information about a specific term group by ID.
+
+| Language | Example Questions |
+|----------|-------------------|
+| **PL** | "Pokaż szczegóły grupy terminów 13", "Info o grupie", "Dane grupy" |
+| **EN** | "Show term group details 13", "Group info", "Group data" |
+| **RU** | "Покажи детали группы сроков 13", "Инфо о группе", "Данные группы" |
+
+---
+
+### `add_term_group`
+Create a new term group in wFirma.
+
+| Language | Example Questions |
+|----------|-------------------|
+| **PL** | "Dodaj grupę terminów Spotkania", "Utwórz grupę tylko do odczytu", "Zarejestruj grupę Projekty" |
+| **EN** | "Add term group Meetings", "Create read-only group", "Register group Projects" |
+| **RU** | "Добавь группу сроков Встречи", "Создай группу только для чтения", "Зарегистрируй группу Проекты" |
+
+**Required fields:**
+- name - Group name
+
+**Optional fields:**
+- isReadonly - If true, group and its terms cannot be modified via wFirma.pl website
+
+---
+
+### `update_term_group`
+Update an existing term group in wFirma.
+
+| Language | Example Questions |
+|----------|-------------------|
+| **PL** | "Zmień nazwę grupy 13 na Ważne", "Ustaw grupę jako tylko do odczytu", "Zaktualizuj grupę terminów" |
+| **EN** | "Change group 13 name to Important", "Set group as read-only", "Update term group" |
+| **RU** | "Измени название группы 13 на Важные", "Установи группу только для чтения", "Обнови группу сроков" |
+
+**Required:** termGroupId
+**Optional:** name, isReadonly
+
+---
+
+### `delete_term_group`
+Delete a term group from wFirma. **WARNING: Cannot be undone!**
+
+| Language | Example Questions |
+|----------|-------------------|
+| **PL** | "Usuń grupę terminów 13", "Skasuj grupę", "Wymaż grupę Spotkania" |
+| **EN** | "Delete term group 13", "Remove group", "Erase group Meetings" |
+| **RU** | "Удали группу сроков 13", "Убери группу", "Удали группу Встречи" |
+
+**Note:** Make sure to reassign any terms in this group first.
+
+---
+
 ## Tools Summary Table
 
 | Tool Name | Category | Description |
@@ -423,10 +579,20 @@ Delete a vehicle from wFirma. **WARNING: Cannot be undone!**
 | `add_vehicle` | Vehicles | Create new vehicle |
 | `update_vehicle` | Vehicles | Update existing vehicle |
 | `delete_vehicle` | Vehicles | Delete vehicle |
+| `get_terms` | Terms | List terms (appointments/deadlines) with filters |
+| `get_term_details` | Terms | Term details by ID |
+| `add_term` | Terms | Create new term |
+| `update_term` | Terms | Update existing term |
+| `delete_term` | Terms | Delete term |
+| `get_term_groups` | Term Groups | List term groups |
+| `get_term_group_details` | Term Groups | Term group details by ID |
+| `add_term_group` | Term Groups | Create new term group |
+| `update_term_group` | Term Groups | Update existing term group |
+| `delete_term_group` | Term Groups | Delete term group |
 
 ---
 
-## Total: 29 Tools
+## Total: 39 Tools
 
 ### Breakdown by Category:
 - **Company**: 3 tools
@@ -437,3 +603,5 @@ Delete a vehicle from wFirma. **WARNING: Cannot be undone!**
 - **Payments**: 5 tools (CRUD)
 - **Expenses**: 2 tools (read-only)
 - **Vehicles**: 5 tools (CRUD)
+- **Terms**: 5 tools (CRUD)
+- **Term Groups**: 5 tools (CRUD)
