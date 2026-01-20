@@ -229,12 +229,87 @@ export interface PaymentTranslations {
   errorDelete: string;
 }
 
+export interface ExpenseTranslations {
+  // Titles
+  expensesTitle: string;
+  expenseDetails: string;
+  basicInfo: string;
+  paymentInfo: string;
+  expenseParts: string;
+  totals: string;
+  additionalFlags: string;
+
+  // Fields
+  id: string;
+  type: string;
+  date: string;
+  contractor: string;
+  total: string;
+  currency: string;
+  status: string;
+  paid: string;
+  unpaid: string;
+  paymentDate: string;
+  paymentMethod: string;
+  taxregisterDate: string;
+  accountingEffect: string;
+  field: string;
+  value: string;
+  totalSum: string;
+
+  // Expense types
+  typeInvoice: string;
+  typeBill: string;
+  typeVatExempt: string;
+
+  // Accounting effects
+  effectKpirAndVat: string;
+  effectKpir: string;
+  effectVat: string;
+  effectNothing: string;
+
+  // Payment methods
+  methodTransfer: string;
+  methodCash: string;
+  methodCard: string;
+  methodCompensation: string;
+  methodOther: string;
+
+  // Expense parts
+  name: string;
+  quantity: string;
+  unit: string;
+  priceNet: string;
+  vatRate: string;
+  totalNet: string;
+  totalVat: string;
+  totalGross: string;
+
+  // Flags
+  splitPayment: string;
+  wnt: string;
+  serviceImport: string;
+  serviceImport2: string;
+  cargoImport: string;
+  draft: string;
+
+  // Messages
+  notFound: string;
+  notFoundById: string;
+  contractorNotFound: string;
+
+  // Errors
+  errorFetch: string;
+  errorFetchDetails: string;
+}
+
 export interface Translations {
   contractor: ContractorTranslations;
   invoice: InvoiceTranslations;
   company: CompanyTranslations;
   user: UserTranslations;
   payment: PaymentTranslations;
+  expense: ExpenseTranslations;
 }
 
 const translations: Record<Locale, Translations> = {
@@ -265,4 +340,8 @@ export function getUserTranslations(locale: Locale = 'pl'): UserTranslations {
 
 export function getPaymentTranslations(locale: Locale = 'pl'): PaymentTranslations {
   return getTranslations(locale).payment;
+}
+
+export function getExpenseTranslations(locale: Locale = 'pl'): ExpenseTranslations {
+  return getTranslations(locale).expense;
 }
