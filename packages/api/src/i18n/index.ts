@@ -303,6 +303,73 @@ export interface ExpenseTranslations {
   errorFetchDetails: string;
 }
 
+export interface VehicleTranslations {
+  // Titles
+  vehiclesTitle: string;
+  vehicleDetails: string;
+  leasingInfo: string;
+
+  // Fields
+  id: string;
+  name: string;
+  register: string;
+  type: string;
+  ownership: string;
+  truckType: string;
+  taxPurpose: string;
+  vatLeasingBelowLimit: string;
+  vatLeasingDate: string;
+  vatLeasingValue: string;
+  field: string;
+  value: string;
+
+  // Vehicle types
+  typeTruck: string;
+  typeCar: string;
+  typeMotor: string;
+  typeMotorBike: string;
+
+  // Ownership types
+  ownershipLeasing: string;
+  ownershipPrivate: string;
+  ownershipOther: string;
+
+  // Truck types
+  truckTypeNormal: string;
+  truckTypeQuasi: string;
+
+  // Tax purpose
+  taxPurposeMixed: string;
+  taxPurposeCompany: string;
+
+  // Messages
+  notFound: string;
+  notFoundById: string;
+  notFoundByRegister: string;
+  created: string;
+  createdHint: string;
+  updated: string;
+  updatedHint: string;
+  deleted: string;
+  deletedWarning: string;
+  updateDeleteHint: string;
+
+  // Common
+  yes: string;
+  no: string;
+
+  // Errors
+  errorFetch: string;
+  errorFetchDetails: string;
+  errorCreate: string;
+  errorUpdate: string;
+  errorDelete: string;
+  requiredFields: string;
+  tryAgain: string;
+  errorCreateTitle: string;
+  errorReason: string;
+}
+
 export interface Translations {
   contractor: ContractorTranslations;
   invoice: InvoiceTranslations;
@@ -310,6 +377,7 @@ export interface Translations {
   user: UserTranslations;
   payment: PaymentTranslations;
   expense: ExpenseTranslations;
+  vehicle: VehicleTranslations;
 }
 
 const translations: Record<Locale, Translations> = {
@@ -344,4 +412,8 @@ export function getPaymentTranslations(locale: Locale = 'pl'): PaymentTranslatio
 
 export function getExpenseTranslations(locale: Locale = 'pl'): ExpenseTranslations {
   return getTranslations(locale).expense;
+}
+
+export function getVehicleTranslations(locale: Locale = 'pl'): VehicleTranslations {
+  return getTranslations(locale).vehicle;
 }

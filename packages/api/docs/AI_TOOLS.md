@@ -295,6 +295,101 @@ Get detailed information about a specific expense, including all items/parts.
 
 ---
 
+## Vehicle Tools
+
+### `get_vehicles`
+List vehicles (cars, trucks, motorcycles) with optional filters.
+
+| Language | Example Questions |
+|----------|-------------------|
+| **PL** | "Pokaż pojazdy", "Lista samochodów firmowych", "Pojazdy w leasingu", "Samochody osobowe", "Pojazdy z rejestracją WA" |
+| **EN** | "Show vehicles", "List company cars", "Leased vehicles", "Personal cars", "Vehicles with registration WA" |
+| **RU** | "Покажи транспорт", "Список служебных машин", "Транспорт в лизинге", "Легковые автомобили", "Транспорт с регистрацией WA" |
+
+**Filters:**
+- Vehicle type (truck/car/motor/motor-bike)
+- Ownership form (leasing/private/other)
+- Search by name or registration number
+- Limit results
+
+---
+
+### `get_vehicle_details`
+Get detailed information about a specific vehicle by ID or registration number.
+
+| Language | Example Questions |
+|----------|-------------------|
+| **PL** | "Pokaż szczegóły pojazdu DW435457", "Info o samochodzie z rejestracją WA12345", "Dane pojazdu 123", "Czy auto w leasingu?" |
+| **EN** | "Show vehicle details DW435457", "Info about car with registration WA12345", "Vehicle data 123", "Is car leased?" |
+| **RU** | "Покажи детали транспорта DW435457", "Инфо о машине с регистрацией WA12345", "Данные транспорта 123", "Машина в лизинге?" |
+
+**Shows:**
+- Basic info (ID, name, registration number, type, ownership)
+- Truck type (for trucks: normal >3.5t or quasi <3.5t)
+- Tax purpose (mixed use or company only)
+- Leasing information (if applicable):
+  - Value below 150k PLN
+  - Lease agreement date
+  - Vehicle value
+
+---
+
+### `add_vehicle`
+Create a new vehicle in wFirma.
+
+| Language | Example Questions |
+|----------|-------------------|
+| **PL** | "Dodaj pojazd Toyota Corolla, rejestracja WA12345, osobowy, własny", "Utwórz samochód ciężarowy w leasingu", "Zarejestruj motocykl" |
+| **EN** | "Add vehicle Toyota Corolla, registration WA12345, car, private", "Create leased truck", "Register motorcycle" |
+| **RU** | "Добавь транспорт Toyota Corolla, регистрация WA12345, легковой, собственный", "Создай грузовик в лизинге", "Зарегистрируй мотоцикл" |
+
+**Required fields:**
+- name - Vehicle name/description
+- register - Registration number (e.g., WA12345)
+- type - truck/car/motor/motor-bike
+- ownership - leasing/private/other
+
+**Optional fields:**
+- truckType - normal (>3.5t) or quasi (<3.5t) for trucks
+- taxPurpose - mixed or company (usage purpose)
+- vatLeasingBelowLimit - Is value below 150k PLN? (boolean)
+- vatLeasingDate - Lease agreement date (YYYY-MM-DD)
+- vatLeasingValue - Vehicle value (number)
+
+---
+
+### `update_vehicle`
+Update an existing vehicle in wFirma.
+
+| Language | Example Questions |
+|----------|-------------------|
+| **PL** | "Zmień pojazd DW435457 na leasing", "Zaktualizuj wartość samochodu WA12345 na 80000", "Popraw nazwę pojazdu", "Zmień rejestrację na nową" |
+| **EN** | "Change vehicle DW435457 to leasing", "Update car WA12345 value to 80000", "Fix vehicle name", "Change registration to new one" |
+| **RU** | "Измени транспорт DW435457 на лизинг", "Обнови стоимость машины WA12345 на 80000", "Исправь название транспорта", "Измени регистрацию на новую" |
+
+**Identification:**
+- By vehicleId (if known)
+- By registration number (searches and finds exact match)
+
+**All fields are optional** - only provided fields will be updated.
+
+---
+
+### `delete_vehicle`
+Delete a vehicle from wFirma. **WARNING: Cannot be undone!**
+
+| Language | Example Questions |
+|----------|-------------------|
+| **PL** | "Usuń pojazd DW435457", "Skasuj samochód z rejestracją WA12345", "Wymaż pojazd 123" |
+| **EN** | "Delete vehicle DW435457", "Remove car with registration WA12345", "Erase vehicle 123" |
+| **RU** | "Удали транспорт DW435457", "Убери машину с регистрацией WA12345", "Удали транспорт 123" |
+
+**Identification:**
+- By vehicleId (if known)
+- By registration number (searches and finds exact match)
+
+---
+
 ## Tools Summary Table
 
 | Tool Name | Category | Description |
@@ -323,10 +418,15 @@ Get detailed information about a specific expense, including all items/parts.
 | `delete_payment` | Payments | Delete payment |
 | `get_expenses` | Expenses | List expenses with filters |
 | `get_expense_details` | Expenses | Expense details with items |
+| `get_vehicles` | Vehicles | List vehicles with filters |
+| `get_vehicle_details` | Vehicles | Vehicle details by ID or registration |
+| `add_vehicle` | Vehicles | Create new vehicle |
+| `update_vehicle` | Vehicles | Update existing vehicle |
+| `delete_vehicle` | Vehicles | Delete vehicle |
 
 ---
 
-## Total: 24 Tools
+## Total: 29 Tools
 
 ### Breakdown by Category:
 - **Company**: 3 tools
@@ -336,3 +436,4 @@ Get detailed information about a specific expense, including all items/parts.
 - **Users**: 3 tools
 - **Payments**: 5 tools (CRUD)
 - **Expenses**: 2 tools (read-only)
+- **Vehicles**: 5 tools (CRUD)

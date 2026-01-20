@@ -479,3 +479,49 @@ export interface ExpenseFilters {
   limit?: number;
   offset?: number;
 }
+
+// ============================================
+// VEHICLE TYPES
+// ============================================
+
+export type VehicleType = 'truck' | 'car' | 'motor' | 'motor-bike';
+export type VehicleOwnership = 'leasing' | 'private' | 'other';
+export type TruckType = 'normal' | 'quasi';
+export type TaxPurpose = 'mixed' | 'company';
+
+export interface WFirmaVehicle {
+  id: string;
+  name: string;
+  register: string;
+  type: VehicleType;
+  ownership: VehicleOwnership;
+  truckType?: TruckType;
+  taxPurpose?: TaxPurpose;
+  vatLeasingBelowLimit?: boolean;
+  vatLeasingDate?: Date;
+  vatLeasingValue?: number;
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+
+export interface VehicleFilters {
+  search?: string;
+  type?: VehicleType;
+  ownership?: VehicleOwnership;
+  limit?: number;
+  offset?: number;
+}
+
+export interface VehicleData {
+  name: string;
+  register: string;
+  type: VehicleType;
+  ownership: VehicleOwnership;
+  truckType?: TruckType;
+  taxPurpose?: TaxPurpose;
+  vatLeasingBelowLimit?: boolean;
+  vatLeasingDate?: Date;
+  vatLeasingValue?: number;
+}
+
+export interface VehicleUpdateData extends Partial<VehicleData> {}

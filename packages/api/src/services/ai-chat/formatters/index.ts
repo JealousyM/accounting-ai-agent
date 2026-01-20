@@ -39,3 +39,10 @@ export {
   formatExpensesList,
   formatExpenseDetails,
 } from './expense.formatter';
+export {
+  formatVehiclesList,
+  formatVehicleDetails,
+  formatVehicleCreated,
+  formatVehicleUpdated,
+  formatVehicleDeleted,
+} from './vehicle.formatter';
