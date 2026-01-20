@@ -36,6 +36,14 @@ import {
   VehicleFilters,
   VehicleData,
   VehicleUpdateData,
+  WFirmaTerm,
+  TermFilters,
+  TermData,
+  TermUpdateData,
+  WFirmaTermGroup,
+  TermGroupFilters,
+  TermGroupData,
+  TermGroupUpdateData,
 } from '../../types/wfirma.types';
 
 // Import domain services
@@ -50,6 +58,8 @@ import { WFirmaUserService } from './user.service';
 import { WFirmaPaymentService } from './payment.service';
 import { WFirmaExpenseService } from './expense.service';
 import { WFirmaVehicleService } from './vehicle.service';
+import { WFirmaTermService } from './term.service';
+import { WFirmaTermGroupService } from './term-group.service';
 
 // Re-export errors
 export {
@@ -73,6 +83,8 @@ export { WFirmaUserService } from './user.service';
 export { WFirmaPaymentService } from './payment.service';
 export { WFirmaExpenseService } from './expense.service';
 export { WFirmaVehicleService } from './vehicle.service';
+export { WFirmaTermService } from './term.service';
+export { WFirmaTermGroupService } from './term-group.service';
 
 /**
  * Main WFirma Integration Service
@@ -90,6 +102,8 @@ export class WFirmaIntegrationService {
   private readonly paymentService: WFirmaPaymentService;
   private readonly expenseService: WFirmaExpenseService;
   private readonly vehicleService: WFirmaVehicleService;
+  private readonly termService: WFirmaTermService;
+  private readonly termGroupService: WFirmaTermGroupService;
 
   constructor(config?: Partial<WFirmaConfig>) {
     // Initialize client
@@ -110,6 +124,8 @@ export class WFirmaIntegrationService {
     this.paymentService = new WFirmaPaymentService(this.client);
     this.expenseService = new WFirmaExpenseService(this.client);
     this.vehicleService = new WFirmaVehicleService(this.client);
+    this.termService = new WFirmaTermService(this.client);
+    this.termGroupService = new WFirmaTermGroupService(this.client);
 
     logger.info('WFirmaIntegrationService initialized');
   }
@@ -303,5 +319,53 @@ export class WFirmaIntegrationService {
 
   async deleteVehicle(id: string): Promise<DeleteResult> {
     return this.vehicleService.deleteVehicle(id);
+  }
+
+  // ============================================
+  // TERM METHODS
+  // ============================================
+
+  async findTerms(filters?: TermFilters): Promise<WFirmaTerm[]> {
+    return this.termService.findTerms(filters);
+  }
+
+  async getTerm(id: string): Promise<WFirmaTerm | null> {
+    return this.termService.getTerm(id);
+  }
+
+  async createTerm(data: TermData): Promise<WFirmaTerm> {
+    return this.termService.createTerm(data);
+  }
+
+  async updateTerm(id: string, data: TermUpdateData): Promise<WFirmaTerm> {
+    return this.termService.updateTerm(id, data);
+  }
+
+  async deleteTerm(id: string): Promise<DeleteResult> {
+    return this.termService.deleteTerm(id);
+  }
+
+  // ============================================
+  // TERM GROUP METHODS
+  // ============================================
+
+  async findTermGroups(filters?: TermGroupFilters): Promise<WFirmaTermGroup[]> {
+    return this.termGroupService.findTermGroups(filters);
+  }
+
+  async getTermGroup(id: string): Promise<WFirmaTermGroup | null> {
+    return this.termGroupService.getTermGroup(id);
+  }
+
+  async createTermGroup(data: TermGroupData): Promise<WFirmaTermGroup> {
+    return this.termGroupService.createTermGroup(data);
+  }
+
+  async updateTermGroup(id: string, data: TermGroupUpdateData): Promise<WFirmaTermGroup> {
+    return this.termGroupService.updateTermGroup(id, data);
+  }
+
+  async deleteTermGroup(id: string): Promise<DeleteResult> {
+    return this.termGroupService.deleteTermGroup(id);
   }
 }

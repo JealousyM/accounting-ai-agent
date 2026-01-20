@@ -52,6 +52,18 @@ import {
   createUpdateVehicleTool,
   createDeleteVehicleTool,
 } from './vehicle.tools';
+import {
+  createGetTermsTool,
+  createGetTermDetailsTool,
+  createAddTermTool,
+  createUpdateTermTool,
+  createDeleteTermTool,
+  createGetTermGroupsTool,
+  createGetTermGroupDetailsTool,
+  createAddTermGroupTool,
+  createUpdateTermGroupTool,
+  createDeleteTermGroupTool,
+} from './term.tools';
 
 // Re-export individual tool creators
 export {
@@ -97,6 +109,18 @@ export {
   createUpdateVehicleTool,
   createDeleteVehicleTool,
 } from './vehicle.tools';
+export {
+  createGetTermsTool,
+  createGetTermDetailsTool,
+  createAddTermTool,
+  createUpdateTermTool,
+  createDeleteTermTool,
+  createGetTermGroupsTool,
+  createGetTermGroupDetailsTool,
+  createAddTermGroupTool,
+  createUpdateTermGroupTool,
+  createDeleteTermGroupTool,
+} from './term.tools';
 
 /**
  * Create all AI chat tools for wFirma integration
@@ -152,5 +176,19 @@ export function createAllTools(
     createAddVehicleTool(wfirmaService, cacheService, userId, locale),
     createUpdateVehicleTool(wfirmaService, cacheService, userId, locale),
     createDeleteVehicleTool(wfirmaService, cacheService, userId, locale),
+
+    // Term tools
+    createGetTermsTool(wfirmaService, locale),
+    createGetTermDetailsTool(wfirmaService, locale),
+    createAddTermTool(wfirmaService, cacheService, userId, locale),
+    createUpdateTermTool(wfirmaService, cacheService, userId, locale),
+    createDeleteTermTool(wfirmaService, cacheService, userId, locale),
+
+    // Term Group tools
+    createGetTermGroupsTool(wfirmaService, locale),
+    createGetTermGroupDetailsTool(wfirmaService, locale),
+    createAddTermGroupTool(wfirmaService, cacheService, userId, locale),
+    createUpdateTermGroupTool(wfirmaService, cacheService, userId, locale),
+    createDeleteTermGroupTool(wfirmaService, cacheService, userId, locale),
   ];
 }

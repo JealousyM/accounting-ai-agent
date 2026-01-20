@@ -46,3 +46,15 @@ export {
   formatVehicleUpdated,
   formatVehicleDeleted,
 } from './vehicle.formatter';
+export {
+  formatTermsList,
+  formatTermDetails,
+  formatTermCreated,
+  formatTermUpdated,
+  formatTermDeleted,
+  formatTermGroupsList,
+  formatTermGroupDetails,
+  formatTermGroupCreated,
+  formatTermGroupUpdated,
+  formatTermGroupDeleted,
+} from './term.formatter';
