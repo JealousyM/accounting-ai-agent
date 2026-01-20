@@ -77,7 +77,7 @@ export function formatTaxPurpose(purpose: string | undefined, locale: Locale = '
 /**
  * Format date for display
  */
-export function formatDate(date: Date | undefined, locale: Locale = 'pl'): string {
+export function formatDate(date: Date | undefined, _locale: Locale = 'pl'): string {
   if (!date) return '-';
   return date.toISOString().split('T')[0]; // YYYY-MM-DD
 }
