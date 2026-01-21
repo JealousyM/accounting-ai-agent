@@ -9,6 +9,7 @@ import { Eye, EyeOff, X, Github } from 'lucide-react';
 import { z } from 'zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { AppVersion } from '@/components/ui/app-version';
 import { useAuth } from '@/contexts/AuthContext';
 import axios from 'axios';
 import enTranslations from '@/i18n/locales/en.json';
@@ -251,6 +252,11 @@ export function LoginForm() {
           {t.signUp}
         </Link>
       </p>
+
+      {/* App Version */}
+      <div className="mt-8 text-center">
+        <AppVersion />
+      </div>
     </div>
   );
 }

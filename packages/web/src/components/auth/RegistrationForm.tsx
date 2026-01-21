@@ -9,6 +9,7 @@ import { Eye, EyeOff, Check, X, Github, Globe } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
+import { AppVersion } from '@/components/ui/app-version';
 import { registrationSchema, type RegistrationFormData, checkPasswordStrength } from '@/lib/validations/auth';
 import { registerUser, type ErrorResponse } from '@/lib/api/auth';
 import { cn } from '@/lib/utils';
@@ -390,6 +391,11 @@ export function RegistrationForm() {
           {t.signIn}
         </Link>
       </p>
+
+      {/* App Version */}
+      <div className="mt-8 text-center">
+        <AppVersion />
+      </div>
     </div>
   );
 }
