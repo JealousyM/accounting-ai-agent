@@ -97,15 +97,15 @@ export function RegistrationForm() {
     <div className="w-full max-w-md mx-auto">
       {/* Language Selector */}
       <div className="flex justify-end mb-6">
-        <div className="inline-flex items-center gap-2 bg-gray-100 rounded-lg p-1">
+        <div className="inline-flex items-center gap-2 bg-gray-100 dark:bg-gray-800 rounded-lg p-1">
           <button
             type="button"
             onClick={() => handleLocaleChange('en')}
             className={cn(
               'flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-all',
               selectedLocale === 'en'
-                ? 'bg-white text-blue-600 shadow-sm'
-                : 'text-gray-600 hover:text-gray-900'
+                ? 'bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm'
+                : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
             )}
           >
             <Globe className="h-4 w-4" />
@@ -117,8 +117,8 @@ export function RegistrationForm() {
             className={cn(
               'flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-all',
               selectedLocale === 'pl'
-                ? 'bg-white text-blue-600 shadow-sm'
-                : 'text-gray-600 hover:text-gray-900'
+                ? 'bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm'
+                : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
             )}
           >
             <Globe className="h-4 w-4" />
@@ -129,14 +129,14 @@ export function RegistrationForm() {
 
       {/* Header */}
       <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">{t.title}</h1>
-        <p className="text-gray-600">{t.subtitle}</p>
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">{t.title}</h1>
+        <p className="text-gray-600 dark:text-gray-400">{t.subtitle}</p>
       </div>
 
       {/* Success Message */}
       {successMessage && (
-        <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
-          <div className="flex items-center gap-2 text-green-800">
+        <div className="mb-6 p-4 bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-800 rounded-lg">
+          <div className="flex items-center gap-2 text-green-800 dark:text-green-400">
             <Check className="h-5 w-5" />
             <p className="text-sm font-medium">{successMessage}</p>
           </div>
@@ -145,8 +145,8 @@ export function RegistrationForm() {
 
       {/* API Error */}
       {apiError && (
-        <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-          <div className="flex items-center gap-2 text-red-800">
+        <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-lg">
+          <div className="flex items-center gap-2 text-red-800 dark:text-red-400">
             <X className="h-5 w-5" />
             <p className="text-sm font-medium">{apiError}</p>
           </div>
@@ -196,10 +196,10 @@ export function RegistrationForm() {
       {/* Divider */}
       <div className="relative mb-6">
         <div className="absolute inset-0 flex items-center">
-          <div className="w-full border-t border-gray-300" />
+          <div className="w-full border-t border-gray-300 dark:border-gray-600" />
         </div>
         <div className="relative flex justify-center text-sm">
-          <span className="px-4 bg-white text-gray-500">{t.orContinueWith}</span>
+          <span className="px-4 bg-white dark:bg-gray-900 text-gray-500 dark:text-gray-400">{t.orContinueWith}</span>
         </div>
       </div>
 
@@ -207,7 +207,7 @@ export function RegistrationForm() {
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
         {/* Email */}
         <div>
-          <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1.5">
+          <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
             {t.email}
           </label>
           <Input
@@ -218,14 +218,14 @@ export function RegistrationForm() {
             {...register('email')}
           />
           {errors.email && (
-            <p className="mt-1.5 text-sm text-red-600">{errors.email.message}</p>
+            <p className="mt-1.5 text-sm text-red-600 dark:text-red-400">{errors.email.message}</p>
           )}
         </div>
 
         {/* First Name & Last Name */}
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 mb-1.5">
+            <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
               {t.firstName}
             </label>
             <Input
@@ -236,12 +236,12 @@ export function RegistrationForm() {
               {...register('firstName')}
             />
             {errors.firstName && (
-              <p className="mt-1.5 text-sm text-red-600">{errors.firstName.message}</p>
+              <p className="mt-1.5 text-sm text-red-600 dark:text-red-400">{errors.firstName.message}</p>
             )}
           </div>
 
           <div>
-            <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 mb-1.5">
+            <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
               {t.lastName}
             </label>
             <Input
@@ -252,14 +252,14 @@ export function RegistrationForm() {
               {...register('lastName')}
             />
             {errors.lastName && (
-              <p className="mt-1.5 text-sm text-red-600">{errors.lastName.message}</p>
+              <p className="mt-1.5 text-sm text-red-600 dark:text-red-400">{errors.lastName.message}</p>
             )}
           </div>
         </div>
 
         {/* Company Name */}
         <div>
-          <label htmlFor="companyName" className="block text-sm font-medium text-gray-700 mb-1.5">
+          <label htmlFor="companyName" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
             {t.companyName}
           </label>
           <Input
@@ -270,13 +270,13 @@ export function RegistrationForm() {
             {...register('companyName')}
           />
           {errors.companyName && (
-            <p className="mt-1.5 text-sm text-red-600">{errors.companyName.message}</p>
+            <p className="mt-1.5 text-sm text-red-600 dark:text-red-400">{errors.companyName.message}</p>
           )}
         </div>
 
         {/* Password */}
         <div>
-          <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1.5">
+          <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
             {t.password}
           </label>
           <div className="relative">
@@ -290,19 +290,19 @@ export function RegistrationForm() {
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
             >
               {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
             </button>
           </div>
           {errors.password && (
-            <p className="mt-1.5 text-sm text-red-600">{errors.password.message}</p>
+            <p className="mt-1.5 text-sm text-red-600 dark:text-red-400">{errors.password.message}</p>
           )}
 
           {/* Password Requirements */}
           {password && (
-            <div className="mt-3 p-3 bg-gray-50 rounded-lg">
-              <p className="text-xs font-medium text-gray-700 mb-2">
+            <div className="mt-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+              <p className="text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">
                 {t.passwordRequirements.title}
               </p>
               <div className="space-y-1">
@@ -333,7 +333,7 @@ export function RegistrationForm() {
 
         {/* Confirm Password */}
         <div>
-          <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-1.5">
+          <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
             {t.confirmPassword}
           </label>
           <div className="relative">
@@ -347,13 +347,13 @@ export function RegistrationForm() {
             <button
               type="button"
               onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
             >
               {showConfirmPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
             </button>
           </div>
           {errors.confirmPassword && (
-            <p className="mt-1.5 text-sm text-red-600">{errors.confirmPassword.message}</p>
+            <p className="mt-1.5 text-sm text-red-600 dark:text-red-400">{errors.confirmPassword.message}</p>
           )}
         </div>
 
@@ -366,7 +366,7 @@ export function RegistrationForm() {
             {...register('agreeToTerms')}
           />
           {errors.agreeToTerms && (
-            <p className="mt-1.5 text-sm text-red-600">{errors.agreeToTerms.message}</p>
+            <p className="mt-1.5 text-sm text-red-600 dark:text-red-400">{errors.agreeToTerms.message}</p>
           )}
         </div>
 
@@ -382,11 +382,11 @@ export function RegistrationForm() {
       </form>
 
       {/* Sign In Link */}
-      <p className="mt-6 text-center text-sm text-gray-600">
+      <p className="mt-6 text-center text-sm text-gray-600 dark:text-gray-400">
         {t.alreadyHaveAccount}{' '}
         <Link
           href="/login"
-          className="font-medium text-blue-600 hover:text-blue-700 hover:underline"
+          className="font-medium text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 hover:underline"
         >
           {t.signIn}
         </Link>
@@ -407,12 +407,12 @@ function RequirementItem({ met, text }: { met: boolean; text: string }) {
       <div
         className={cn(
           'flex items-center justify-center h-4 w-4 rounded-full',
-          met ? 'bg-green-500' : 'bg-gray-300'
+          met ? 'bg-green-500' : 'bg-gray-300 dark:bg-gray-600'
         )}
       >
         {met && <Check className="h-3 w-3 text-white" />}
       </div>
-      <span className={cn('text-xs', met ? 'text-green-700' : 'text-gray-600')}>
+      <span className={cn('text-xs', met ? 'text-green-700 dark:text-green-400' : 'text-gray-600 dark:text-gray-400')}>
         {text}
       </span>
     </div>

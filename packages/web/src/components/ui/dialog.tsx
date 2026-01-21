@@ -100,6 +100,7 @@ export function DialogContent({
           'fixed left-[50%] top-[50%] z-50 w-full max-w-lg',
           'translate-x-[-50%] translate-y-[-50%]',
           'bg-white rounded-xl shadow-xl border border-gray-200',
+          'dark:bg-gray-800 dark:border-gray-700',
           'animate-in fade-in-0 zoom-in-95 duration-200',
           className
         )}
@@ -114,7 +115,9 @@ export function DialogContent({
               'absolute right-4 top-4 p-1 rounded-md',
               'text-gray-400 hover:text-gray-600',
               'hover:bg-gray-100 transition-colors',
-              'focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2'
+              'focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2',
+              'dark:text-gray-500 dark:hover:text-gray-300 dark:hover:bg-gray-700',
+              'dark:focus:ring-blue-400 dark:focus:ring-offset-gray-800'
             )}
             aria-label="Close"
           >
@@ -147,7 +150,7 @@ interface DialogTitleProps extends React.HTMLAttributes<HTMLHeadingElement> {
 export function DialogTitle({ className, ...props }: DialogTitleProps) {
   return (
     <h2
-      className={cn('text-lg font-semibold text-gray-900', className)}
+      className={cn('text-lg font-semibold text-gray-900 dark:text-gray-100', className)}
       {...props}
     />
   );
@@ -162,7 +165,7 @@ export function DialogDescription({
   className,
   ...props
 }: DialogDescriptionProps) {
-  return <p className={cn('text-sm text-gray-500', className)} {...props} />;
+  return <p className={cn('text-sm text-gray-500 dark:text-gray-400', className)} {...props} />;
 }
 
 interface DialogBodyProps extends React.HTMLAttributes<HTMLDivElement> {

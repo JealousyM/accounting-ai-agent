@@ -33,7 +33,7 @@ export function ConversationList({
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-8">
-        <Loader2 className="w-6 h-6 animate-spin text-gray-400" />
+        <Loader2 className="w-6 h-6 animate-spin text-gray-400 dark:text-gray-500" />
       </div>
     );
   }
@@ -41,9 +41,9 @@ export function ConversationList({
   if (conversations.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-8 px-4 text-center">
-        <MessageSquare className="w-10 h-10 text-gray-300 mb-3" />
-        <p className="text-sm text-gray-500">{translations.noConversations}</p>
-        <p className="text-xs text-gray-400 mt-1">
+        <MessageSquare className="w-10 h-10 text-gray-300 dark:text-gray-600 mb-3" />
+        <p className="text-sm text-gray-500 dark:text-gray-400">{translations.noConversations}</p>
+        <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
           {translations.startNewChat}
         </p>
       </div>
@@ -112,8 +112,8 @@ function ConversationItem({
         group px-3 py-2 mx-2 rounded-lg cursor-pointer
         transition-colors duration-150
         ${isActive
-          ? 'bg-blue-50 border border-blue-200'
-          : 'hover:bg-gray-50 border border-transparent'
+          ? 'bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800'
+          : 'hover:bg-gray-50 dark:hover:bg-gray-700 border border-transparent'
         }
       `}
       onClick={onSelect}
@@ -125,21 +125,21 @@ function ConversationItem({
           <h3
             className={`
               text-sm font-medium truncate
-              ${isActive ? 'text-blue-900' : 'text-gray-900'}
+              ${isActive ? 'text-blue-900 dark:text-blue-300' : 'text-gray-900 dark:text-gray-100'}
             `}
           >
             {conversation.title}
           </h3>
           {conversation.lastMessage && (
-            <p className="text-xs text-gray-500 truncate mt-0.5">
+            <p className="text-xs text-gray-500 dark:text-gray-400 truncate mt-0.5">
               {conversation.lastMessage}
             </p>
           )}
           <div className="flex items-center gap-2 mt-1">
-            <span className="text-xs text-gray-400">
+            <span className="text-xs text-gray-400 dark:text-gray-500">
               {formatDate(conversation.updatedAt)}
             </span>
-            <span className="text-xs text-gray-300">
+            <span className="text-xs text-gray-300 dark:text-gray-600">
               {conversation.messageCount} {translations.messages}
             </span>
           </div>
@@ -153,7 +153,7 @@ function ConversationItem({
             onClick={handleDelete}
             className="
               opacity-0 group-hover:opacity-100
-              p-1 h-auto text-gray-400 hover:text-red-500
+              p-1 h-auto text-gray-400 hover:text-red-500 dark:text-gray-500 dark:hover:text-red-400
               transition-opacity duration-150
             "
           >
