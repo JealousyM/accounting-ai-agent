@@ -132,6 +132,7 @@ export function ChatContainer() {
           onNewChat={handleNewChat}
           isCreatingConversation={isCreatingConversation}
           translations={t.header}
+          profileTranslations={translations[locale].profile}
           locale={locale}
           onLocaleChange={setLocale}
         />
