@@ -399,6 +399,8 @@ export class WFirmaCacheService {
         term: 0,
         term_group: 0,
         document: 0,
+        ledger_accountant_year: 0,
+        ledger_operation_schema: 0,
       };
 
       byTypeResult.forEach((row) => {
