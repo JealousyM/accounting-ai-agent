@@ -7,6 +7,7 @@ import { StructuredToolInterface } from '@langchain/core/tools';
 import { Locale } from '../../../i18n';
 import { WFirmaIntegrationService } from '../../wfirma';
 import { WFirmaCacheService } from '../../wfirma-cache.service';
+import { FileStorageService } from '../../file-storage.service';
 
 // Import tool creators
 import {
@@ -28,6 +29,10 @@ import {
   createAddInvoiceNoteTool,
   createGetInvoiceNotesTool,
   createDeleteInvoiceNoteTool,
+  createDownloadInvoiceTool,
+  createCreateInvoiceTool,
+  createUpdateInvoiceTool,
+  createDeleteInvoiceTool,
 } from './invoice.tools';
 import {
   createGetUsersTool,
@@ -95,6 +100,10 @@ export {
   createAddInvoiceNoteTool,
   createGetInvoiceNotesTool,
   createDeleteInvoiceNoteTool,
+  createDownloadInvoiceTool,
+  createCreateInvoiceTool,
+  createUpdateInvoiceTool,
+  createDeleteInvoiceTool,
 } from './invoice.tools';
 export {
   createGetUsersTool,
@@ -148,6 +157,7 @@ export {
 export function createAllTools(
   wfirmaService: WFirmaIntegrationService,
   cacheService: WFirmaCacheService,
+  fileStorageService: FileStorageService,
   userId: string,
   locale: Locale
 ): StructuredToolInterface[] {
@@ -173,6 +183,10 @@ export function createAllTools(
     createAddInvoiceNoteTool(wfirmaService, cacheService, userId, locale),
     createGetInvoiceNotesTool(wfirmaService, userId, locale),
     createDeleteInvoiceNoteTool(wfirmaService, cacheService, userId, locale),
+    createDownloadInvoiceTool(wfirmaService, fileStorageService, userId, locale),
+    createCreateInvoiceTool(wfirmaService, cacheService, userId, locale),
+    createUpdateInvoiceTool(wfirmaService, cacheService, userId, locale),
+    createDeleteInvoiceTool(wfirmaService, cacheService, userId, locale),
 
     // User tools
     createGetUsersTool(wfirmaService, cacheService, userId, locale),

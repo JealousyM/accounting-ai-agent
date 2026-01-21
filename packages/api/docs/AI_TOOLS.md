@@ -153,6 +153,82 @@ Delete a note from an invoice.
 
 ---
 
+### `download_invoice`
+Download invoice as PDF file. Returns a temporary download link (valid for 15 minutes).
+
+| Language | Example Questions |
+|----------|-------------------|
+| **PL** | "Pobierz fakturę FV/2024/001", "Ściągnij PDF faktury", "Daj link do pobrania faktury" |
+| **EN** | "Download invoice FV/2024/001", "Get invoice PDF", "Give me download link for invoice" |
+| **RU** | "Скачай счёт FV/2024/001", "Скачай PDF счёта", "Дай ссылку на скачивание счёта" |
+
+**Parameters:**
+- invoiceNumber - Invoice number (required)
+- page - PDF content: "all" (original+copy), "invoice" (original only), "invoicecopy" (copy only). Default: invoice
+
+---
+
+### `create_invoice`
+Create a new invoice in wFirma.
+
+| Language | Example Questions |
+|----------|-------------------|
+| **PL** | "Wystaw fakturę dla Firma ABC na 5000 zł", "Utwórz fakturę bez VAT za usługi IT", "Dodaj fakturę pro forma" |
+| **EN** | "Issue invoice for Company ABC for 5000 PLN", "Create non-VAT invoice for IT services", "Add proforma invoice" |
+| **RU** | "Выстави счёт для Фирма ABC на 5000 zł", "Создай счёт без НДС за услуги IT", "Добавь счёт про форма" |
+
+**Required fields:**
+- contractorName or contractorId - Contractor identification
+- items - Array of line items (name, quantity, unit, priceNet)
+
+**Optional fields:**
+- type - Invoice type:
+  - `bill` - Invoice without VAT (bez VAT/без НДС) - **DEFAULT**
+  - `normal` - VAT invoice (requires company to be VAT payer)
+  - `proforma` - Pro-forma invoice
+  - `receipt_normal` - Receipt
+  - `margin` - Margin invoice
+- vatRate - VAT rate per item: 23, 8, 5, 0, zw (default: 23)
+- paymentMethod - transfer/cash/card/compensation
+- issueDate - Invoice issue date (YYYY-MM-DD)
+- dueDate - Payment due date (YYYY-MM-DD)
+- currency - Currency code (default: PLN)
+- description - Invoice notes/description
+
+**Important:** Use `type="bill"` for non-VAT invoices. Use `type="normal"` only if company is registered as VAT payer.
+
+---
+
+### `update_invoice`
+Update an existing invoice (due date, payment method, description, already paid amount).
+
+| Language | Example Questions |
+|----------|-------------------|
+| **PL** | "Zmień termin płatności faktury FV/2024/001 na 2024-03-15", "Zaktualizuj opis faktury", "Oznacz fakturę jako częściowo opłaconą" |
+| **EN** | "Change invoice FV/2024/001 due date to 2024-03-15", "Update invoice description", "Mark invoice as partially paid" |
+| **RU** | "Измени срок оплаты счёта FV/2024/001 на 2024-03-15", "Обнови описание счёта", "Отметь счёт как частично оплаченный" |
+
+**Required:** invoiceNumber
+
+**Optional fields:**
+- dueDate - New due date (YYYY-MM-DD)
+- paymentMethod - transfer/cash/card/compensation
+- description - Invoice notes/description
+- alreadypaid - Amount already paid
+
+---
+
+### `delete_invoice`
+Delete an invoice from wFirma. **WARNING: Cannot be undone!**
+
+| Language | Example Questions |
+|----------|-------------------|
+| **PL** | "Usuń fakturę FV/2024/001", "Skasuj fakturę", "Wymaż fakturę" |
+| **EN** | "Delete invoice FV/2024/001", "Remove invoice", "Erase invoice" |
+| **RU** | "Удали счёт FV/2024/001", "Убери счёт", "Удали счёт" |
+
+---
+
 ## Financial Tools
 
 ### `get_financial_summary`
@@ -655,6 +731,10 @@ Delete a document from wFirma. **WARNING: Cannot be undone!**
 | `add_invoice_note` | Invoices | Add note to invoice |
 | `get_invoice_notes` | Invoices | Get invoice notes |
 | `delete_invoice_note` | Invoices | Delete invoice note |
+| `download_invoice` | Invoices | Download invoice as PDF |
+| `create_invoice` | Invoices | Create new invoice |
+| `update_invoice` | Invoices | Update existing invoice |
+| `delete_invoice` | Invoices | Delete invoice |
 | `get_financial_summary` | Financial | Financial summary |
 | `get_users` | Users | List company users |
 | `get_user_companies` | Users | User-company relationships |
@@ -690,12 +770,12 @@ Delete a document from wFirma. **WARNING: Cannot be undone!**
 
 ---
 
-## Total: 45 Tools
+## Total: 49 Tools
 
 ### Breakdown by Category:
 - **Company**: 3 tools
 - **Contractors**: 4 tools (CRUD)
-- **Invoices**: 6 tools
+- **Invoices**: 10 tools (CRUD + notes + send + download)
 - **Financial**: 1 tool
 - **Users**: 3 tools
 - **Payments**: 5 tools (CRUD)

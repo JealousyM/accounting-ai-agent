@@ -22,6 +22,10 @@ export {
   formatInvoicesList,
   formatInvoiceDetails,
   formatNotesList,
+  formatInvoiceCreated,
+  formatInvoiceUpdated,
+  formatInvoiceDeleted,
+  formatInvoiceDownloadLink,
 } from './invoice.formatter';
 export {
   formatUsers,
