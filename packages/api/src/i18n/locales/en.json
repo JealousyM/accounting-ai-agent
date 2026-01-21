@@ -452,5 +452,29 @@
     "errorDownload": "Error downloading document",
     "errorDelete": "Error deleting document",
     "errorReason": "Reason"
+  },
+  "ledger": {
+    "fiscalYearsTitle": "Fiscal Years",
+    "fiscalYearDetails": "Fiscal Year Details",
+    "fiscalYearNotFound": "No fiscal years found.",
+    "fiscalYearNotFoundById": "Fiscal year not found.",
+    "operationSchemasTitle": "Accounting Schemas",
+    "operationSchemaDetails": "Accounting Schema Details",
+    "operationSchemaNotFound": "No accounting schemas found.",
+    "operationSchemaNotFoundById": "Accounting schema not found.",
+    "id": "ID",
+    "symbol": "Symbol",
+    "name": "Name",
+    "category": "Category",
+    "visibility": "Visibility",
+    "startDate": "Start Date",
+    "endDate": "End Date",
+    "fiscalYear": "Fiscal Year",
+    "field": "Field",
+    "value": "Value",
+    "errorFetchFiscalYears": "Error fetching fiscal years from wFirma",
+    "errorFetchFiscalYearDetails": "Error fetching fiscal year details",
+    "errorFetchSchemas": "Error fetching accounting schemas from wFirma",
+    "errorFetchSchemaDetails": "Error fetching accounting schema details"
   }
 }

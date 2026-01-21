@@ -752,3 +752,39 @@ export interface DocumentData {
   set: DocumentSet;
   tags?: string[];
 }
+
+// ============================================
+// LEDGER ACCOUNTANT YEAR TYPES (Fiscal Years)
+// ============================================
+
+export interface WFirmaLedgerAccountantYear {
+  id: string;
+  symbol: string;
+  start: Date;
+  stop: Date;
+}
+
+export interface LedgerAccountantYearFilters {
+  limit?: number;
+  page?: number;
+}
+
+// ============================================
+// LEDGER OPERATION SCHEMA TYPES (Accounting Schemas)
+// ============================================
+
+export interface WFirmaLedgerOperationSchema {
+  id: string;
+  name: string;
+  category: string;
+  visibility: string;
+  ledgerAccountantYearId?: string;
+  ledgerAccountantYear?: WFirmaLedgerAccountantYear;
+}
+
+export interface LedgerOperationSchemaFilters {
+  ledgerAccountantYearId?: string;
+  category?: string;
+  limit?: number;
+  page?: number;
+}

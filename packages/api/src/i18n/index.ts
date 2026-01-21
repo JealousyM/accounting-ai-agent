@@ -503,6 +503,38 @@ export interface DeclarationTranslations {
   errorFetchPit: string;
 }
 
+export interface LedgerTranslations {
+  // Fiscal Years
+  fiscalYearsTitle: string;
+  fiscalYearDetails: string;
+  fiscalYearNotFound: string;
+  fiscalYearNotFoundById: string;
+
+  // Schemas
+  operationSchemasTitle: string;
+  operationSchemaDetails: string;
+  operationSchemaNotFound: string;
+  operationSchemaNotFoundById: string;
+
+  // Fields
+  id: string;
+  symbol: string;
+  name: string;
+  category: string;
+  visibility: string;
+  startDate: string;
+  endDate: string;
+  fiscalYear: string;
+  field: string;
+  value: string;
+
+  // Errors
+  errorFetchFiscalYears: string;
+  errorFetchFiscalYearDetails: string;
+  errorFetchSchemas: string;
+  errorFetchSchemaDetails: string;
+}
+
 export interface DocumentTranslations {
   // Titles
   documentsTitle: string;
@@ -569,6 +601,7 @@ export interface Translations {
   term: TermTranslations;
   declarations: DeclarationTranslations;
   document: DocumentTranslations;
+  ledger: LedgerTranslations;
 }
 
 const translations: Record<Locale, Translations> = {
@@ -619,4 +652,8 @@ export function getDeclarationTranslations(locale: Locale = 'pl'): DeclarationTr
 
 export function getDocumentTranslations(locale: Locale = 'pl'): DocumentTranslations {
   return getTranslations(locale).document;
+}
+
+export function getLedgerTranslations(locale: Locale = 'pl'): LedgerTranslations {
+  return getTranslations(locale).ledger;
 }

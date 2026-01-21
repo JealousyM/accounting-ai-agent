@@ -714,6 +714,71 @@ Delete a document from wFirma. **WARNING: Cannot be undone!**
 
 ---
 
+## Ledger Tools
+
+### `get_fiscal_years`
+Get list of fiscal years (accounting periods) from wFirma.
+
+| Language | Example Questions |
+|----------|-------------------|
+| **PL** | "Pokaż lata obrachunkowe", "Jakie mam okresy rozliczeniowe?", "Lista lat podatkowych" |
+| **EN** | "Show fiscal years", "What accounting periods do I have?", "List tax years" |
+| **RU** | "Покажи финансовые годы", "Какие у меня учётные периоды?", "Список налоговых годов" |
+
+**Filters:**
+- limit - Max results (default 100)
+- page - Page number for pagination
+
+---
+
+### `get_fiscal_year_details`
+Get detailed information about a specific fiscal year by ID.
+
+| Language | Example Questions |
+|----------|-------------------|
+| **PL** | "Pokaż szczegóły roku obrachunkowego 123", "Info o okresie rozliczeniowym" |
+| **EN** | "Show fiscal year details 123", "Accounting period info" |
+| **RU** | "Покажи детали финансового года 123", "Инфо об учётном периоде" |
+
+**Shows:**
+- ID, Symbol (name)
+- Start date, End date
+
+---
+
+### `get_accounting_schemas`
+Get list of accounting schemas (operation schemas) from wFirma.
+
+| Language | Example Questions |
+|----------|-------------------|
+| **PL** | "Pokaż schematy księgowe", "Jakie mam schematy operacji?", "Lista schematów dla roku 2024" |
+| **EN** | "Show accounting schemas", "What operation schemas do I have?", "List schemas for year 2024" |
+| **RU** | "Покажи схемы учёта", "Какие у меня схемы операций?", "Список схем за 2024 год" |
+
+**Filters:**
+- fiscalYearId - Filter by fiscal year
+- category - Filter by schema category
+- limit - Max results (default 100)
+- page - Page number for pagination
+
+---
+
+### `get_accounting_schema_details`
+Get detailed information about a specific accounting schema by ID.
+
+| Language | Example Questions |
+|----------|-------------------|
+| **PL** | "Pokaż szczegóły schematu księgowego 123", "Info o schemacie operacji" |
+| **EN** | "Show accounting schema details 123", "Operation schema info" |
+| **RU** | "Покажи детали схемы учёта 123", "Инфо о схеме операции" |
+
+**Shows:**
+- ID, Name
+- Category, Visibility
+- Related fiscal year (if available)
+
+---
+
 ## Tools Summary Table
 
 | Tool Name | Category | Description |
@@ -767,10 +832,14 @@ Delete a document from wFirma. **WARNING: Cannot be undone!**
 | `get_document_details` | Documents | Document details by ID |
 | `download_document` | Documents | Download document file |
 | `delete_document` | Documents | Delete document |
+| `get_fiscal_years` | Ledger | List fiscal years |
+| `get_fiscal_year_details` | Ledger | Fiscal year details by ID |
+| `get_accounting_schemas` | Ledger | List accounting schemas |
+| `get_accounting_schema_details` | Ledger | Accounting schema details by ID |
 
 ---
 
-## Total: 49 Tools
+## Total: 53 Tools
 
 ### Breakdown by Category:
 - **Company**: 3 tools
@@ -785,3 +854,4 @@ Delete a document from wFirma. **WARNING: Cannot be undone!**
 - **Term Groups**: 5 tools (CRUD)
 - **Declarations**: 2 tools (JPK VAT, PIT)
 - **Documents**: 4 tools (list, details, download, delete)
+- **Ledger**: 4 tools (fiscal years, accounting schemas - read-only)

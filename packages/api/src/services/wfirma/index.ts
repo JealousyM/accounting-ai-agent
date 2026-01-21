@@ -55,6 +55,10 @@ import {
   WFirmaDocument,
   DocumentFilters,
   DocumentData,
+  WFirmaLedgerAccountantYear,
+  LedgerAccountantYearFilters,
+  WFirmaLedgerOperationSchema,
+  LedgerOperationSchemaFilters,
 } from '../../types/wfirma.types';
 
 // Import domain services
@@ -73,6 +77,7 @@ import { WFirmaTermService } from './term.service';
 import { WFirmaTermGroupService } from './term-group.service';
 import { WFirmaDeclarationService } from './declaration.service';
 import { WFirmaDocumentService } from './document.service';
+import { WFirmaLedgerService } from './ledger.service';
 
 // Re-export errors
 export {
@@ -100,6 +105,7 @@ export { WFirmaTermService } from './term.service';
 export { WFirmaTermGroupService } from './term-group.service';
 export { WFirmaDeclarationService } from './declaration.service';
 export { WFirmaDocumentService } from './document.service';
+export { WFirmaLedgerService } from './ledger.service';
 
 /**
  * Main WFirma Integration Service
@@ -121,6 +127,7 @@ export class WFirmaIntegrationService {
   private readonly termGroupService: WFirmaTermGroupService;
   private readonly declarationService: WFirmaDeclarationService;
   private readonly documentService: WFirmaDocumentService;
+  private readonly ledgerService: WFirmaLedgerService;
 
   constructor(config?: Partial<WFirmaConfig>) {
     // Initialize client
@@ -145,6 +152,7 @@ export class WFirmaIntegrationService {
     this.termGroupService = new WFirmaTermGroupService(this.client);
     this.declarationService = new WFirmaDeclarationService(this.client);
     this.documentService = new WFirmaDocumentService(this.client);
+    this.ledgerService = new WFirmaLedgerService(this.client);
 
     logger.info('WFirmaIntegrationService initialized');
   }
@@ -451,5 +459,37 @@ export class WFirmaIntegrationService {
 
   async deleteDocument(id: string): Promise<DeleteResult> {
     return this.documentService.deleteDocument(id);
+  }
+
+  // ============================================
+  // LEDGER ACCOUNTANT YEAR METHODS (Fiscal Years)
+  // ============================================
+
+  async findLedgerAccountantYears(
+    filters?: LedgerAccountantYearFilters
+  ): Promise<WFirmaLedgerAccountantYear[]> {
+    return this.ledgerService.findLedgerAccountantYears(filters);
+  }
+
+  async getLedgerAccountantYear(
+    id: string
+  ): Promise<WFirmaLedgerAccountantYear | null> {
+    return this.ledgerService.getLedgerAccountantYear(id);
+  }
+
+  // ============================================
+  // LEDGER OPERATION SCHEMA METHODS (Accounting Schemas)
+  // ============================================
+
+  async findLedgerOperationSchemas(
+    filters?: LedgerOperationSchemaFilters
+  ): Promise<WFirmaLedgerOperationSchema[]> {
+    return this.ledgerService.findLedgerOperationSchemas(filters);
+  }
+
+  async getLedgerOperationSchema(
+    id: string
+  ): Promise<WFirmaLedgerOperationSchema | null> {
+    return this.ledgerService.getLedgerOperationSchema(id);
   }
 }
