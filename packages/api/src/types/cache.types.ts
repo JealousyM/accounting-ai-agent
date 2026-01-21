@@ -6,7 +6,7 @@
 // CACHE DATA TYPES
 // ============================================
 
-export type CacheDataType = 'company' | 'contractor' | 'invoice' | 'financial' | 'user' | 'user_company' | 'payment' | 'expense' | 'vehicle' | 'term' | 'term_group' | 'document';
+export type CacheDataType = 'company' | 'contractor' | 'invoice' | 'financial' | 'user' | 'user_company' | 'payment' | 'expense' | 'vehicle' | 'term' | 'term_group' | 'document' | 'ledger_accountant_year' | 'ledger_operation_schema';
 
 export interface CacheEntry<T = any> {
   dataType: CacheDataType;
@@ -39,6 +39,8 @@ export const DEFAULT_TTL_CONFIG: Record<CacheDataType, number> = {
   term: 1 * 60 * 60 * 1000,        // 1 hour
   term_group: 24 * 60 * 60 * 1000, // 24 hours (groups change infrequently)
   document: 30 * 60 * 1000,        // 30 minutes
+  ledger_accountant_year: 24 * 60 * 60 * 1000,  // 24 hours (fiscal years rarely change)
+  ledger_operation_schema: 12 * 60 * 60 * 1000, // 12 hours (schemas change occasionally)
 };
 
 // ============================================

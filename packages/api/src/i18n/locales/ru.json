@@ -452,5 +452,29 @@
     "errorDownload": "Ошибка скачивания документа",
     "errorDelete": "Ошибка удаления документа",
     "errorReason": "Причина"
+  },
+  "ledger": {
+    "fiscalYearsTitle": "Финансовые годы",
+    "fiscalYearDetails": "Детали финансового года",
+    "fiscalYearNotFound": "Финансовые годы не найдены.",
+    "fiscalYearNotFoundById": "Финансовый год не найден.",
+    "operationSchemasTitle": "Схемы учёта",
+    "operationSchemaDetails": "Детали схемы учёта",
+    "operationSchemaNotFound": "Схемы учёта не найдены.",
+    "operationSchemaNotFoundById": "Схема учёта не найдена.",
+    "id": "ID",
+    "symbol": "Символ",
+    "name": "Название",
+    "category": "Категория",
+    "visibility": "Видимость",
+    "startDate": "Дата начала",
+    "endDate": "Дата окончания",
+    "fiscalYear": "Финансовый год",
+    "field": "Поле",
+    "value": "Значение",
+    "errorFetchFiscalYears": "Ошибка загрузки финансовых годов из wFirma",
+    "errorFetchFiscalYearDetails": "Ошибка загрузки деталей финансового года",
+    "errorFetchSchemas": "Ошибка загрузки схем учёта из wFirma",
+    "errorFetchSchemaDetails": "Ошибка загрузки деталей схемы учёта"
   }
 }

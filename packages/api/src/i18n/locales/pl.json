@@ -452,5 +452,29 @@
     "errorDownload": "Blad pobierania pliku dokumentu",
     "errorDelete": "Blad usuwania dokumentu",
     "errorReason": "Przyczyna"
+  },
+  "ledger": {
+    "fiscalYearsTitle": "Lata obrachunkowe",
+    "fiscalYearDetails": "Szczegoly roku obrachunkowego",
+    "fiscalYearNotFound": "Nie znaleziono lat obrachunkowych.",
+    "fiscalYearNotFoundById": "Rok obrachunkowy nie znaleziony.",
+    "operationSchemasTitle": "Schematy ksiegowe",
+    "operationSchemaDetails": "Szczegoly schematu ksiegowego",
+    "operationSchemaNotFound": "Nie znaleziono schematow ksiegowych.",
+    "operationSchemaNotFoundById": "Schemat ksiegowy nie znaleziony.",
+    "id": "ID",
+    "symbol": "Symbol",
+    "name": "Nazwa",
+    "category": "Kategoria",
+    "visibility": "Widocznosc",
+    "startDate": "Data poczatkowa",
+    "endDate": "Data koncowa",
+    "fiscalYear": "Rok obrachunkowy",
+    "field": "Pole",
+    "value": "Wartosc",
+    "errorFetchFiscalYears": "Blad pobierania lat obrachunkowych z wFirma",
+    "errorFetchFiscalYearDetails": "Blad pobierania szczegolow roku obrachunkowego",
+    "errorFetchSchemas": "Blad pobierania schematow ksiegowych z wFirma",
+    "errorFetchSchemaDetails": "Blad pobierania szczegolow schematu ksiegowego"
   }
 }

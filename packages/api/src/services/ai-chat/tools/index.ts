@@ -79,6 +79,12 @@ import {
   createDownloadDocumentTool,
   createDeleteDocumentTool,
 } from './document.tools';
+import {
+  createGetFiscalYearsTool,
+  createGetFiscalYearDetailsTool,
+  createGetAccountingSchemasTool,
+  createGetAccountingSchemaDetailsTool,
+} from './ledger.tools';
 
 // Re-export individual tool creators
 export {
@@ -150,6 +156,12 @@ export {
   createDownloadDocumentTool,
   createDeleteDocumentTool,
 } from './document.tools';
+export {
+  createGetFiscalYearsTool,
+  createGetFiscalYearDetailsTool,
+  createGetAccountingSchemasTool,
+  createGetAccountingSchemaDetailsTool,
+} from './ledger.tools';
 
 /**
  * Create all AI chat tools for wFirma integration
@@ -234,5 +246,11 @@ export function createAllTools(
     createGetDocumentDetailsTool(wfirmaService, userId, locale),
     createDownloadDocumentTool(wfirmaService, userId, locale),
     createDeleteDocumentTool(wfirmaService, cacheService, userId, locale),
+
+    // Ledger tools (Fiscal Years & Accounting Schemas)
+    createGetFiscalYearsTool(wfirmaService, locale),
+    createGetFiscalYearDetailsTool(wfirmaService, locale),
+    createGetAccountingSchemasTool(wfirmaService, locale),
+    createGetAccountingSchemaDetailsTool(wfirmaService, locale),
   ];
 }
