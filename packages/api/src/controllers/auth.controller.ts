@@ -229,6 +229,7 @@ export class AuthController {
           email: true,
           firstName: true,
           lastName: true,
+          locale: true,
           googleId: true,
           githubId: true,
           wfirmaConfig: true,
@@ -254,6 +255,7 @@ export class AuthController {
           email: user.email,
           firstName: user.firstName,
           lastName: user.lastName,
+          locale: user.locale,
           hasGoogleAuth: !!user.googleId,
           hasGithubAuth: !!user.githubId,
           company: user.wfirmaConfig,
@@ -263,6 +265,74 @@ export class AuthController {
       });
     } catch (error) {
       logger.error('Error fetching user profile', { error, userId: req.user?.userId });
+      res.status(500).json({
+        success: false,
+        error: 'Internal Server Error',
+        message: 'An unexpected error occurred',
+      });
+    }
+  }
+
+  /**
+   * PATCH /api/auth/profile
+   * Update user profile
+   */
+  async updateProfile(req: Request, res: Response): Promise<void> {
+    try {
+      const userId = req.user?.userId;
+
+      if (!userId) {
+        res.status(401).json({
+          success: false,
+          error: 'Unauthorized',
+          message: 'User not authenticated',
+        });
+        return;
+      }
+
+      const { firstName, lastName, locale } = req.body;
+
+      const updatedUser = await prisma.user.update({
+        where: { id: userId },
+        data: {
+          ...(firstName !== undefined && { firstName }),
+          ...(lastName !== undefined && { lastName }),
+          ...(locale !== undefined && { locale }),
+        },
+        select: {
+          id: true,
+          email: true,
+          firstName: true,
+          lastName: true,
+          locale: true,
+          googleId: true,
+          githubId: true,
+          wfirmaConfig: true,
+          createdAt: true,
+          updatedAt: true,
+        },
+      });
+
+      logger.info('User profile updated', { userId });
+
+      res.status(200).json({
+        success: true,
+        message: 'Profile updated successfully',
+        data: {
+          id: updatedUser.id,
+          email: updatedUser.email,
+          firstName: updatedUser.firstName,
+          lastName: updatedUser.lastName,
+          locale: updatedUser.locale,
+          hasGoogleAuth: !!updatedUser.googleId,
+          hasGithubAuth: !!updatedUser.githubId,
+          company: updatedUser.wfirmaConfig,
+          createdAt: updatedUser.createdAt,
+          updatedAt: updatedUser.updatedAt,
+        },
+      });
+    } catch (error) {
+      logger.error('Error updating user profile', { error, userId: req.user?.userId });
       res.status(500).json({
         success: false,
         error: 'Internal Server Error',

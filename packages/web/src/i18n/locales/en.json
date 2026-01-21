@@ -93,6 +93,25 @@
     },
     "aiCosts": "AI Costs"
   },
+  "profile": {
+    "title": "Edit Profile",
+    "description": "Update your personal information",
+    "firstName": "First name",
+    "firstNamePlaceholder": "John",
+    "lastName": "Last name",
+    "lastNamePlaceholder": "Doe",
+    "locale": "Language",
+    "localePlaceholder": "Select language",
+    "localeOptions": {
+      "en": "English",
+      "pl": "Polski",
+      "ru": "Русский"
+    },
+    "save": "Save changes",
+    "saving": "Saving...",
+    "cancel": "Cancel",
+    "success": "Profile updated successfully"
+  },
   "costs": {
     "title": "AI Cost Dashboard",
     "backToChat": "Back to Chat",

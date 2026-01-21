@@ -60,7 +60,7 @@ export const registerSchema = z.object({
       .max(100, 'Company name is too long')
       .trim()
       .optional(),
-    locale: z.enum(['en', 'pl']).default('en').optional(),
+    locale: z.enum(['en', 'pl', 'ru']).default('en').optional(),
   }),
 });
 
@@ -129,11 +129,7 @@ export const updateProfileSchema = z.object({
       .max(50, 'Last name is too long')
       .trim()
       .optional(),
-    companyName: z
-      .string()
-      .max(100, 'Company name is too long')
-      .trim()
-      .optional(),
+    locale: z.enum(['en', 'pl', 'ru']).optional(),
   }),
 });
 

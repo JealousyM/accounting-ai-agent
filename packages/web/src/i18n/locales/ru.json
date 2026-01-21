@@ -93,6 +93,25 @@
     },
     "aiCosts": "Затраты ИИ"
   },
+  "profile": {
+    "title": "Редактировать профиль",
+    "description": "Обновите вашу личную информацию",
+    "firstName": "Имя",
+    "firstNamePlaceholder": "Иван",
+    "lastName": "Фамилия",
+    "lastNamePlaceholder": "Иванов",
+    "locale": "Язык",
+    "localePlaceholder": "Выберите язык",
+    "localeOptions": {
+      "en": "English",
+      "pl": "Polski",
+      "ru": "Русский"
+    },
+    "save": "Сохранить изменения",
+    "saving": "Сохранение...",
+    "cancel": "Отмена",
+    "success": "Профиль успешно обновлён"
+  },
   "costs": {
     "title": "Панель затрат ИИ",
     "backToChat": "Назад к чату",

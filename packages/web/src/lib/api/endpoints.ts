@@ -12,6 +12,7 @@ export const API_ENDPOINTS = {
     LOGOUT: '/api/auth/logout',
     REFRESH: '/api/auth/refresh',
     ME: '/api/auth/me',
+    PROFILE: '/api/auth/profile',
     OAUTH_GOOGLE: '/api/auth/oauth/google',
     OAUTH_GITHUB: '/api/auth/oauth/github',
   },

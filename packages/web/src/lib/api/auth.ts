@@ -93,6 +93,41 @@ export const refreshToken = async (refreshToken: string) => {
 };
 
 /**
+ * Update profile data
+ */
+export interface UpdateProfileData {
+  firstName?: string;
+  lastName?: string;
+  locale?: string;
+}
+
+export interface UserProfile {
+  id: string;
+  email: string;
+  firstName: string | null;
+  lastName: string | null;
+  locale: string;
+  hasGoogleAuth: boolean;
+  hasGithubAuth: boolean;
+  company: unknown;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface UpdateProfileResponse {
+  success: boolean;
+  message: string;
+  data: UserProfile;
+}
+
+/**
+ * Update user profile
+ */
+export const updateProfile = async (data: UpdateProfileData): Promise<UpdateProfileResponse> => {
+  return apiClient.patch<UpdateProfileResponse>(API_ENDPOINTS.AUTH.PROFILE, data);
+};
+
+/**
  * Get user locale by email
  */
 export const getUserLocale = async (email: string): Promise<{ locale: string }> => {

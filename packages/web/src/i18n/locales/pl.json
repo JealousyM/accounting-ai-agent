@@ -93,6 +93,25 @@
     },
     "aiCosts": "Koszty AI"
   },
+  "profile": {
+    "title": "Edytuj profil",
+    "description": "Zaktualizuj swoje dane osobowe",
+    "firstName": "Imię",
+    "firstNamePlaceholder": "Jan",
+    "lastName": "Nazwisko",
+    "lastNamePlaceholder": "Kowalski",
+    "locale": "Język",
+    "localePlaceholder": "Wybierz język",
+    "localeOptions": {
+      "en": "English",
+      "pl": "Polski",
+      "ru": "Русский"
+    },
+    "save": "Zapisz zmiany",
+    "saving": "Zapisywanie...",
+    "cancel": "Anuluj",
+    "success": "Profil zaktualizowany pomyślnie"
+  },
   "costs": {
     "title": "Panel Kosztów AI",
     "backToChat": "Powrót do czatu",

@@ -8,6 +8,7 @@ import {
   loginSchema,
   refreshTokenSchema,
   oauthSchema,
+  updateProfileSchema,
 } from '../validators/auth.validators';
 
 const router = Router();
@@ -97,6 +98,17 @@ router.get(
   '/me',
   authenticate,
   authController.me.bind(authController)
+);
+
+/**
+ * PATCH /api/auth/profile
+ * Update user profile
+ */
+router.patch(
+  '/profile',
+  authenticate,
+  validateRequest(updateProfileSchema),
+  authController.updateProfile.bind(authController)
 );
 
 export default router;
