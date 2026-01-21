@@ -1,9 +1,11 @@
 'use client';
 
 import React, { useState } from 'react';
-import { MessageSquarePlus, X } from 'lucide-react';
+import { MessageSquarePlus, X, DollarSign } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import Link from 'next/link';
 import { useChat } from '@/hooks/useChat';
+import { useLocale } from '@/contexts/LocaleContext';
 import { ConversationList } from './ConversationList';
 import { MessageList } from './MessageList';
 import { ChatInput } from './ChatInput';
@@ -11,8 +13,6 @@ import { ChatHeader } from './ChatHeader';
 import enTranslations from '@/i18n/locales/en.json';
 import plTranslations from '@/i18n/locales/pl.json';
 import ruTranslations from '@/i18n/locales/ru.json';
-
-type Locale = 'en' | 'pl' | 'ru';
 
 const translations = {
   en: enTranslations,
@@ -37,7 +37,7 @@ export function ChatContainer() {
   } = useChat();
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [locale, setLocale] = useState<Locale>('en');
+  const { locale, setLocale } = useLocale();
   const t = translations[locale].chat;
 
   const handleSendMessage = async (content: string) => {
@@ -108,6 +108,17 @@ export function ChatContainer() {
               isLoading={isLoadingConversations}
               translations={t.sidebar}
             />
+          </div>
+
+          {/* Sidebar footer with AI Costs link */}
+          <div className="border-t border-gray-200 p-4">
+            <Link
+              href="/dashboard/costs"
+              className="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+            >
+              <DollarSign className="w-4 h-4" />
+              <span>{t.aiCosts}</span>
+            </Link>
           </div>
         </div>
       </div>

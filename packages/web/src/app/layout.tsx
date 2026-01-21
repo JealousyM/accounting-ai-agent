@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import { AuthProvider } from '@/contexts/AuthContext';
+import { LocaleProvider } from '@/contexts/LocaleContext';
 
 export const metadata: Metadata = {
   title: 'Accounting AI Agent',
@@ -16,7 +17,9 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <AuthProvider>
-          {children}
+          <LocaleProvider>
+            {children}
+          </LocaleProvider>
         </AuthProvider>
       </body>
     </html>

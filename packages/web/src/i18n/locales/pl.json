@@ -90,6 +90,62 @@
       "companyData": "Pokaż dane mojej firmy",
       "ipBox": "Co to jest IP Box?",
       "zusPayment": "Kiedy płacić ZUS?"
+    },
+    "aiCosts": "Koszty AI"
+  },
+  "costs": {
+    "title": "Panel Kosztów AI",
+    "backToChat": "Powrót do czatu",
+    "refresh": "Odśwież dane",
+    "timeRange": {
+      "today": "Dziś",
+      "week": "7 dni",
+      "month": "30 dni",
+      "quarter": "3 miesiące",
+      "year": "1 rok"
+    },
+    "summary": {
+      "title": "Podsumowanie",
+      "totalCost": "Całkowity koszt",
+      "totalTokens": "Wszystkie tokeny",
+      "conversations": "Rozmowy",
+      "llmRuns": "Wywołania LLM",
+      "avgLatency": "Śr. opóźnienie"
+    },
+    "charts": {
+      "dailyCost": "Dzienny trend kosztów",
+      "costByModel": "Koszty wg modelu",
+      "noData": "Brak danych dla wybranego okresu"
+    },
+    "conversations": {
+      "title": "Koszty rozmów",
+      "noConversations": "Nie znaleziono rozmów",
+      "table": {
+        "title": "Tytuł",
+        "cost": "Koszt",
+        "tokens": "Tokeny",
+        "messages": "Wiadomości",
+        "runs": "Wywołania",
+        "lastActive": "Ostatnia aktywność"
+      }
+    },
+    "conversationDetail": {
+      "title": "Szczegóły rozmowy",
+      "summary": "Podsumowanie rozmowy",
+      "messages": "wiadomości",
+      "llmCalls": "wywołań LLM"
+    },
+    "runs": {
+      "title": "Pojedyncze wywołania",
+      "noRuns": "Nie znaleziono wywołań dla tej rozmowy",
+      "table": {
+        "name": "Nazwa",
+        "model": "Model",
+        "cost": "Koszt",
+        "tokens": "Tokeny",
+        "latency": "Opóźnienie",
+        "timestamp": "Czas"
+      }
     }
   }
 }

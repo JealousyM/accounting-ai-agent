@@ -7,6 +7,7 @@ import helmet from 'helmet';
 import authRoutes from './routes/auth.routes';
 import userRoutes from './routes/user.routes';
 import aiChatRoutes from './routes/ai-chat.routes';
+import aiCostsRoutes from './routes/ai-costs.routes';
 import fileRoutes from './routes/file.routes';
 import { globalRateLimiter } from './middleware/rate-limiter.middleware';
 import { errorHandler, notFoundHandler } from './middleware/error-handler.middleware';
@@ -42,6 +43,9 @@ app.use('/api/users', userRoutes);
 
 // AI Chat routes
 app.use('/api/ai', aiChatRoutes);
+
+// AI Costs routes
+app.use('/api/ai/costs', aiCostsRoutes);
 
 // File download routes
 app.use('/api/files', fileRoutes);
