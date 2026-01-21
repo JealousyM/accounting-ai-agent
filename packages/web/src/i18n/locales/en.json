@@ -62,7 +62,8 @@
     "header": {
       "defaultTitle": "AI Accounting Assistant",
       "subtitle": "Polish tax & accounting expert",
-      "newChat": "New Chat"
+      "newChat": "New Chat",
+      "logout": "Logout"
     },
     "messages": {
       "emptyTitle": "AI Accounting Assistant",
