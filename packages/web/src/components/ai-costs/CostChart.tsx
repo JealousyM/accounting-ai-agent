@@ -33,10 +33,10 @@ export function CostChart({ data, isLoading, translations = DEFAULT_TRANSLATIONS
 
   if (isLoading) {
     return (
-      <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-6">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700 p-6">
         <div className="animate-pulse">
-          <div className="h-6 bg-gray-200 rounded w-40 mb-4" />
-          <div className="h-64 bg-gray-200 rounded" />
+          <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-40 mb-4" />
+          <div className="h-64 bg-gray-200 dark:bg-gray-700 rounded" />
         </div>
       </div>
     );
@@ -44,9 +44,9 @@ export function CostChart({ data, isLoading, translations = DEFAULT_TRANSLATIONS
 
   if (data.length === 0) {
     return (
-      <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">{t.dailyCost}</h3>
-        <div className="h-64 flex items-center justify-center text-gray-500">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">{t.dailyCost}</h3>
+        <div className="h-64 flex items-center justify-center text-gray-500 dark:text-gray-400">
           {t.noData}
         </div>
       </div>
@@ -63,8 +63,8 @@ export function CostChart({ data, isLoading, translations = DEFAULT_TRANSLATIONS
   }));
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-6">
-      <h3 className="text-lg font-semibold text-gray-900 mb-4">{t.dailyCost}</h3>
+    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+      <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">{t.dailyCost}</h3>
       <div className="h-64">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={formattedData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>

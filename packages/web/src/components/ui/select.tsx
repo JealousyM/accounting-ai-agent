@@ -34,7 +34,8 @@ const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
             'focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent',
             'disabled:cursor-not-allowed disabled:opacity-50',
             'transition-all duration-200',
-            error && 'border-red-500 focus:ring-red-500',
+            'dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:focus:ring-blue-400',
+            error && 'border-red-500 focus:ring-red-500 dark:border-red-500 dark:focus:ring-red-400',
             className
           )}
           ref={ref}
@@ -53,7 +54,7 @@ const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
             </option>
           ))}
         </select>
-        <ChevronDown className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400 pointer-events-none" />
+        <ChevronDown className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400 dark:text-gray-500 pointer-events-none" />
       </div>
     );
   }

@@ -24,7 +24,10 @@ const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
               'peer-checked:bg-blue-600 peer-checked:border-blue-600',
               'peer-focus:ring-2 peer-focus:ring-blue-500 peer-focus:ring-offset-2',
               'group-hover:border-blue-400',
-              error ? 'border-red-500' : 'border-gray-300',
+              'dark:peer-checked:bg-blue-500 dark:peer-checked:border-blue-500',
+              'dark:peer-focus:ring-blue-400 dark:peer-focus:ring-offset-gray-900',
+              'dark:group-hover:border-blue-500',
+              error ? 'border-red-500 dark:border-red-500' : 'border-gray-300 dark:border-gray-600',
               className
             )}
           >
@@ -32,7 +35,7 @@ const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
           </div>
         </div>
         {label && (
-          <span className="text-sm text-gray-700 select-none">{label}</span>
+          <span className="text-sm text-gray-700 dark:text-gray-300 select-none">{label}</span>
         )}
       </label>
     );

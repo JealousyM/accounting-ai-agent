@@ -58,29 +58,29 @@ function AICostsDashboardContent() {
   } = useAICosts();
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Header */}
-      <header className="bg-white shadow-sm">
+      <header className="bg-white dark:bg-gray-800 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <Link
                 href="/chat"
-                className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+                className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
                 title={t.backToChat}
               >
-                <ArrowLeft className="h-5 w-5 text-gray-600" />
+                <ArrowLeft className="h-5 w-5 text-gray-600 dark:text-gray-400" />
               </Link>
-              <h1 className="text-2xl font-bold text-gray-900">{t.title}</h1>
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">{t.title}</h1>
             </div>
             <button
               onClick={() => refetch()}
               disabled={isLoading}
-              className="p-2 rounded-lg hover:bg-gray-100 transition-colors disabled:opacity-50"
+              className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors disabled:opacity-50"
               title={t.refresh}
             >
               <RefreshCw
-                className={`h-5 w-5 text-gray-600 ${isLoading ? 'animate-spin' : ''}`}
+                className={`h-5 w-5 text-gray-600 dark:text-gray-400 ${isLoading ? 'animate-spin' : ''}`}
               />
             </button>
           </div>
@@ -101,7 +101,7 @@ function AICostsDashboardContent() {
 
           {/* Summary Cards */}
           <div>
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">{t.summary.title}</h2>
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">{t.summary.title}</h2>
             <CostSummaryCard summary={summary} isLoading={isLoading} translations={t.summary} />
           </div>
 

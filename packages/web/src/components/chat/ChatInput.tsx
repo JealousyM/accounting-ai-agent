@@ -49,7 +49,7 @@ export function ChatInput({ onSend, disabled, placeholder, translations }: ChatI
   };
 
   return (
-    <div className="border-t border-gray-200 bg-white px-4 py-3">
+    <div className="border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-3">
       <form onSubmit={handleSubmit} className="max-w-3xl mx-auto">
         <div className="flex items-end gap-3">
           <div className="flex-1 relative">
@@ -63,11 +63,11 @@ export function ChatInput({ onSend, disabled, placeholder, translations }: ChatI
               rows={1}
               className="
                 w-full px-4 py-3 pr-12
-                bg-gray-50 border border-gray-200 rounded-2xl
+                bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-2xl
                 resize-none overflow-hidden
-                focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
+                focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent
                 disabled:opacity-50 disabled:cursor-not-allowed
-                text-gray-900 placeholder-gray-400
+                text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500
               "
               style={{ minHeight: '48px', maxHeight: '200px' }}
             />
@@ -78,7 +78,7 @@ export function ChatInput({ onSend, disabled, placeholder, translations }: ChatI
             disabled={!message.trim() || disabled}
             className="
               h-12 w-12 rounded-full
-              bg-blue-600 hover:bg-blue-700
+              bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-400
               disabled:opacity-50 disabled:cursor-not-allowed
               flex items-center justify-center
             "
@@ -91,7 +91,7 @@ export function ChatInput({ onSend, disabled, placeholder, translations }: ChatI
           </Button>
         </div>
 
-        <p className="text-xs text-gray-400 mt-2 text-center">
+        <p className="text-xs text-gray-400 dark:text-gray-500 mt-2 text-center">
           {translations.hint}
         </p>
       </form>

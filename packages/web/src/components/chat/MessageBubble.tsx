@@ -49,13 +49,13 @@ export function MessageBubble({ message, translations, toolsTranslations }: Mess
       <div
         className={`
           w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0
-          ${isUser ? 'bg-blue-600' : 'bg-blue-100'}
+          ${isUser ? 'bg-blue-600' : 'bg-blue-100 dark:bg-blue-900'}
         `}
       >
         {isUser ? (
           <User className="w-5 h-5 text-white" />
         ) : (
-          <Bot className="w-5 h-5 text-blue-600" />
+          <Bot className="w-5 h-5 text-blue-600 dark:text-blue-400" />
         )}
       </div>
 
@@ -66,15 +66,15 @@ export function MessageBubble({ message, translations, toolsTranslations }: Mess
             rounded-2xl px-4 py-3 shadow-sm
             ${isUser
               ? 'bg-blue-600 text-white rounded-tr-none'
-              : 'bg-white text-gray-900 rounded-tl-none border border-gray-100'
+              : 'bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-tl-none border border-gray-100 dark:border-gray-700'
             }
           `}
         >
           {/* Tool calls indicator */}
           {message.toolCalls && message.toolCalls.length > 0 && (
-            <div className="flex items-center gap-2 mb-2 pb-2 border-b border-gray-200">
-              <Wrench className="w-4 h-4 text-blue-500" />
-              <span className="text-xs text-gray-500">
+            <div className="flex items-center gap-2 mb-2 pb-2 border-b border-gray-200 dark:border-gray-600">
+              <Wrench className="w-4 h-4 text-blue-500 dark:text-blue-400" />
+              <span className="text-xs text-gray-500 dark:text-gray-400">
                 {translations.toolsUsed} {message.toolCalls.map(t => formatToolName(t.name)).join(', ')}
               </span>
             </div>
@@ -89,7 +89,7 @@ export function MessageBubble({ message, translations, toolsTranslations }: Mess
         {/* Timestamp and metadata */}
         <div
           className={`
-            flex items-center gap-2 mt-1 text-xs text-gray-400
+            flex items-center gap-2 mt-1 text-xs text-gray-400 dark:text-gray-500
             ${isUser ? 'justify-end' : 'justify-start'}
           `}
         >
@@ -100,7 +100,7 @@ export function MessageBubble({ message, translations, toolsTranslations }: Mess
             })}
           </span>
           {message.metadata?.provider && (
-            <span className="text-gray-300">
+            <span className="text-gray-300 dark:text-gray-600">
               {message.metadata.provider === 'openai' ? 'GPT-4' : 'Claude'}
             </span>
           )}
@@ -152,7 +152,7 @@ function renderMarkdown(content: string): React.ReactNode {
       elements.push(
         <blockquote
           key={`quote-${i}`}
-          className="border-l-4 border-blue-400 pl-3 my-2 text-gray-600 italic text-sm"
+          className="border-l-4 border-blue-400 dark:border-blue-500 pl-3 my-2 text-gray-600 dark:text-gray-400 italic text-sm"
         >
           {renderInlineMarkdown(line.slice(2))}
         </blockquote>
@@ -223,13 +223,13 @@ function renderTable(lines: string[]): React.ReactNode {
   const bodyLines = lines.slice(2);
 
   return (
-    <table className="border-collapse border border-gray-300 text-xs w-full">
+    <table className="border-collapse border border-gray-300 dark:border-gray-600 text-xs w-full">
       <thead>
-        <tr className="bg-gray-100">
+        <tr className="bg-gray-100 dark:bg-gray-700">
           {headerCells.map((cell, idx) => (
             <th
               key={idx}
-              className="border border-gray-300 px-3 py-2 text-left font-semibold"
+              className="border border-gray-300 dark:border-gray-600 px-3 py-2 text-left font-semibold"
             >
               {renderInlineMarkdown(cell)}
             </th>
@@ -240,9 +240,9 @@ function renderTable(lines: string[]): React.ReactNode {
         {bodyLines.map((line, rowIdx) => {
           const cells = parseTableRow(line);
           return (
-            <tr key={rowIdx} className={rowIdx % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+            <tr key={rowIdx} className={rowIdx % 2 === 0 ? 'bg-white dark:bg-gray-800' : 'bg-gray-50 dark:bg-gray-750'}>
               {cells.map((cell, cellIdx) => (
-                <td key={cellIdx} className="border border-gray-300 px-3 py-2">
+                <td key={cellIdx} className="border border-gray-300 dark:border-gray-600 px-3 py-2">
                   {renderInlineMarkdown(cell)}
                 </td>
               ))}
@@ -287,7 +287,7 @@ function renderInlineMarkdown(text: string): React.ReactNode {
       return (
         <code
           key={index}
-          className="bg-gray-100 text-gray-800 px-1 py-0.5 rounded text-xs"
+          className="bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 px-1 py-0.5 rounded text-xs"
         >
           {part.slice(1, -1)}
         </code>
@@ -309,7 +309,7 @@ function renderInlineMarkdown(text: string): React.ReactNode {
           target={isFileDownload ? '_self' : '_blank'}
           rel={isFileDownload ? undefined : 'noopener noreferrer'}
           download={isFileDownload}
-          className="text-blue-600 hover:text-blue-800 underline font-medium inline-flex items-center gap-1"
+          className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 underline font-medium inline-flex items-center gap-1"
         >
           {linkText}
           {isFileDownload && <span className="text-sm">⬇</span>}
