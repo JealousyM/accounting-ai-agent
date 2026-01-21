@@ -90,6 +90,62 @@
       "companyData": "Покажи данные моей компании",
       "ipBox": "Что такое IP Box?",
       "zusPayment": "Когда платить ZUS?"
+    },
+    "aiCosts": "Затраты ИИ"
+  },
+  "costs": {
+    "title": "Панель затрат ИИ",
+    "backToChat": "Назад к чату",
+    "refresh": "Обновить данные",
+    "timeRange": {
+      "today": "Сегодня",
+      "week": "7 дней",
+      "month": "30 дней",
+      "quarter": "3 месяца",
+      "year": "1 год"
+    },
+    "summary": {
+      "title": "Сводка",
+      "totalCost": "Общая стоимость",
+      "totalTokens": "Всего токенов",
+      "conversations": "Разговоры",
+      "llmRuns": "Запросы LLM",
+      "avgLatency": "Ср. задержка"
+    },
+    "charts": {
+      "dailyCost": "Дневной тренд затрат",
+      "costByModel": "Затраты по моделям",
+      "noData": "Нет данных за выбранный период"
+    },
+    "conversations": {
+      "title": "Затраты по разговорам",
+      "noConversations": "Разговоры не найдены",
+      "table": {
+        "title": "Название",
+        "cost": "Стоимость",
+        "tokens": "Токены",
+        "messages": "Сообщения",
+        "runs": "Запросы",
+        "lastActive": "Последняя активность"
+      }
+    },
+    "conversationDetail": {
+      "title": "Детали разговора",
+      "summary": "Сводка разговора",
+      "messages": "сообщений",
+      "llmCalls": "запросов LLM"
+    },
+    "runs": {
+      "title": "Отдельные запросы",
+      "noRuns": "Запросы для этого разговора не найдены",
+      "table": {
+        "name": "Название",
+        "model": "Модель",
+        "cost": "Стоимость",
+        "tokens": "Токены",
+        "latency": "Задержка",
+        "timestamp": "Время"
+      }
     }
   }
 }

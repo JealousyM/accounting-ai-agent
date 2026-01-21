@@ -121,6 +121,7 @@ export class AIChatService {
       existingMessages,
       content,
       userId,
+      conversationId,
       selectedProvider
     );
 
@@ -251,6 +252,7 @@ export class AIChatService {
     existingMessages: ChatMessage[],
     userMessage: string,
     userId: string,
+    conversationId: string,
     provider: LLMProvider
   ): Promise<{ response: string; toolsUsed: string[] }> {
     // Create the LLM based on provider
@@ -317,10 +319,17 @@ export class AIChatService {
       new HumanMessage(userMessage),
     ];
 
-    // Run the graph with recursion limit
+    // Run the graph with recursion limit and LangSmith metadata for cost tracking
     const result = await graph.invoke(
       { messages: langchainMessages },
-      { recursionLimit: 10 }
+      {
+        recursionLimit: 10,
+        metadata: {
+          conversationId,
+          userId,
+        },
+        tags: [`conv:${conversationId}`, `user:${userId}`],
+      }
     );
 
     // Extract final response and tools used

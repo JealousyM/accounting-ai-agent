@@ -49,4 +49,15 @@ export const API_ENDPOINTS = {
     RECOMMENDATIONS: '/api/ai/recommendations',
     ANALYZE: '/api/ai/analyze',
   },
+
+  // AI Costs
+  AI_COSTS: {
+    DASHBOARD: '/api/ai/costs/dashboard',
+    SUMMARY: '/api/ai/costs/summary',
+    DAILY: '/api/ai/costs/daily',
+    BY_MODEL: '/api/ai/costs/by-model',
+    CONVERSATIONS: '/api/ai/costs/conversations',
+    CONVERSATION_DETAIL: (id: string) => `/api/ai/costs/conversations/${id}`,
+    CONVERSATION_RUNS: (id: string) => `/api/ai/costs/conversations/${id}/runs`,
+  },
 } as const;

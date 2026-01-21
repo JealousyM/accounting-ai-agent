@@ -90,6 +90,62 @@
       "companyData": "Show my company data",
       "ipBox": "What is IP Box?",
       "zusPayment": "When to pay ZUS?"
+    },
+    "aiCosts": "AI Costs"
+  },
+  "costs": {
+    "title": "AI Cost Dashboard",
+    "backToChat": "Back to Chat",
+    "refresh": "Refresh data",
+    "timeRange": {
+      "today": "Today",
+      "week": "7 Days",
+      "month": "30 Days",
+      "quarter": "3 Months",
+      "year": "1 Year"
+    },
+    "summary": {
+      "title": "User Summary",
+      "totalCost": "Total Cost",
+      "totalTokens": "Total Tokens",
+      "conversations": "Conversations",
+      "llmRuns": "LLM Runs",
+      "avgLatency": "Avg Latency"
+    },
+    "charts": {
+      "dailyCost": "Daily Cost Trend",
+      "costByModel": "Cost by Model",
+      "noData": "No data available for the selected period"
+    },
+    "conversations": {
+      "title": "Conversation Costs",
+      "noConversations": "No conversations found",
+      "table": {
+        "title": "Title",
+        "cost": "Cost",
+        "tokens": "Tokens",
+        "messages": "Messages",
+        "runs": "Runs",
+        "lastActive": "Last Active"
+      }
+    },
+    "conversationDetail": {
+      "title": "Conversation Detail",
+      "summary": "Conversation Summary",
+      "messages": "messages",
+      "llmCalls": "LLM calls"
+    },
+    "runs": {
+      "title": "Individual Runs",
+      "noRuns": "No runs found for this conversation",
+      "table": {
+        "name": "Name",
+        "model": "Model",
+        "cost": "Cost",
+        "tokens": "Tokens",
+        "latency": "Latency",
+        "timestamp": "Timestamp"
+      }
     }
   }
 }
