@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { MessageSquarePlus, X, DollarSign } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { AppVersion } from '@/components/ui/app-version';
 import Link from 'next/link';
 import { useChat } from '@/hooks/useChat';
 import { useLocale } from '@/contexts/LocaleContext';
@@ -112,13 +113,16 @@ export function ChatContainer() {
 
           {/* Sidebar footer with AI Costs link */}
           <div className="border-t border-gray-200 p-4">
-            <Link
-              href="/dashboard/costs"
-              className="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
-            >
-              <DollarSign className="w-4 h-4" />
-              <span>{t.aiCosts}</span>
-            </Link>
+            <div className="flex items-center justify-between">
+              <Link
+                href="/dashboard/costs"
+                className="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                <DollarSign className="w-4 h-4" />
+                <span>{t.aiCosts}</span>
+              </Link>
+              <AppVersion />
+            </div>
           </div>
         </div>
       </div>
