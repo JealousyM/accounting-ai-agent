@@ -62,7 +62,8 @@
     "header": {
       "defaultTitle": "Asystent Księgowy AI",
       "subtitle": "Ekspert od polskich podatków i księgowości",
-      "newChat": "Nowy czat"
+      "newChat": "Nowy czat",
+      "logout": "Wyloguj"
     },
     "messages": {
       "emptyTitle": "Asystent Księgowy AI",

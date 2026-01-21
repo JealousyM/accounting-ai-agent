@@ -1,11 +1,12 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Menu, MessageSquarePlus, Bot, Globe, User } from 'lucide-react';
+import { Menu, MessageSquarePlus, Bot, Globe, User, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { ProfileEditModal, type ProfileTranslations } from '@/components/profile';
 import { ConversationDetail } from '@/hooks/useChat';
+import { useAuth } from '@/contexts/AuthContext';
 
 type Locale = 'en' | 'pl' | 'ru';
 
@@ -13,6 +14,7 @@ interface HeaderTranslations {
   defaultTitle: string;
   subtitle: string;
   newChat: string;
+  logout: string;
 }
 
 interface ChatHeaderProps {
@@ -43,6 +45,7 @@ export function ChatHeader({
   onLocaleChange,
 }: ChatHeaderProps) {
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+  const { logout } = useAuth();
 
   const cycleLocale = () => {
     const locales: Locale[] = ['en', 'pl', 'ru'];
@@ -116,6 +119,17 @@ export function ChatHeader({
           >
             <MessageSquarePlus className="w-4 h-4" />
             {translations.newChat}
+          </Button>
+
+          {/* Logout button */}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={logout}
+            className="flex items-center gap-1 text-gray-600 hover:text-red-600 dark:text-gray-400 dark:hover:text-red-400"
+            title={translations.logout}
+          >
+            <LogOut className="w-4 h-4" />
           </Button>
         </div>
       </div>
