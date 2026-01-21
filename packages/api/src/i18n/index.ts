@@ -63,6 +63,10 @@ export interface InvoiceTranslations {
   notesTitle: string;
   noteText: string;
   noteDate: string;
+  field: string;
+  value: string;
+  nip: string;
+  currency: string;
   paid: string;
   unpaid: string;
   overdue: string;
@@ -77,12 +81,56 @@ export interface InvoiceTranslations {
   noteAdded: string;
   noteDeleted: string;
   overdueWarning: string;
+  // New invoice operations
+  invoiceCreated: string;
+  invoiceCreatedHint: string;
+  invoiceUpdated: string;
+  invoiceUpdatedHint: string;
+  invoiceDeleted: string;
+  invoiceDeletedWarning: string;
+  // Download
+  downloadInvoice: string;
+  downloadPdf: string;
+  clickToDownload: string;
+  fileExpiresIn15Minutes: string;
+  pdfOriginal: string;
+  pdfCopy: string;
+  pdfBoth: string;
+  // Invoice types
+  typeNormal: string;
+  typeMargin: string;
+  typeProforma: string;
+  typeOffer: string;
+  typeReceiptNormal: string;
+  typeReceiptFiscal: string;
+  typeIncomeNormal: string;
+  typeBill: string;
+  // Fiscalization
+  fiscalized: string;
+  unfiscalized: string;
+  fiscalizedHint: string;
+  unfiscalizedHint: string;
+  // Errors
   errorFetch: string;
   errorFetchDetails: string;
   errorSend: string;
   errorAddNote: string;
   errorFetchNotes: string;
   errorDeleteNote: string;
+  errorCreate: string;
+  errorUpdate: string;
+  errorDelete: string;
+  errorDownload: string;
+  errorFiscalize: string;
+  errorUnfiscalize: string;
+  // Validation
+  contractorRequired: string;
+  itemsRequired: string;
+  requiredFields: string;
+  tryAgain: string;
+  // Error details
+  errorCreateTitle: string;
+  errorReason: string;
 }
 
 export interface CompanyTranslations {

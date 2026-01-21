@@ -22,6 +22,11 @@ import {
   WFirmaInvoiceFilters,
   SendInvoiceOptions,
   SendInvoiceResult,
+  InvoiceDownloadOptions,
+  InvoiceDownloadResult,
+  CreateInvoiceData,
+  UpdateInvoiceData,
+  FiscalizeResult,
   WFirmaNote,
   WFirmaUser,
   WFirmaUserCompany,
@@ -226,6 +231,33 @@ export class WFirmaIntegrationService {
 
   async deleteInvoiceDelivery(deliveryId: string): Promise<DeleteResult> {
     return this.invoiceService.deleteInvoiceDelivery(deliveryId);
+  }
+
+  async downloadInvoice(
+    invoiceId: string,
+    options?: InvoiceDownloadOptions
+  ): Promise<InvoiceDownloadResult> {
+    return this.invoiceService.downloadInvoice(invoiceId, options);
+  }
+
+  async createInvoice(data: CreateInvoiceData): Promise<WFirmaInvoice> {
+    return this.invoiceService.createInvoice(data);
+  }
+
+  async updateInvoice(id: string, data: UpdateInvoiceData): Promise<WFirmaInvoice> {
+    return this.invoiceService.updateInvoice(id, data);
+  }
+
+  async deleteInvoice(id: string): Promise<DeleteResult> {
+    return this.invoiceService.deleteInvoice(id);
+  }
+
+  async fiscalizeInvoice(id: string): Promise<FiscalizeResult> {
+    return this.invoiceService.fiscalizeInvoice(id);
+  }
+
+  async unfiscalizeInvoice(id: string): Promise<FiscalizeResult> {
+    return this.invoiceService.unfiscalizeInvoice(id);
   }
 
   // ============================================

@@ -300,6 +300,97 @@ export interface WFirmaInvoiceResponse {
   downloadUrl: string;
 }
 
+// Invoice type enum (all wFirma document types)
+export type WFirmaInvoiceDocumentType =
+  | 'normal'           // VAT Invoice
+  | 'margin'           // VAT Margin Invoice
+  | 'proforma'         // Pro forma
+  | 'offer'            // Offer
+  | 'receipt_normal'   // Sales Receipt (Non-fiscal)
+  | 'receipt_fiscal_normal' // Fiscal Receipt
+  | 'income_normal'    // Other Income - Sale
+  | 'bill'             // Invoice without VAT
+  | 'proforma_bill'
+  | 'offer_bill'
+  | 'receipt_bill'
+  | 'receipt_fiscal_bill'
+  | 'income_bill';
+
+// Download PDF options
+export interface InvoiceDownloadOptions {
+  page?: 'all' | 'invoice' | 'invoicecopy';
+  address?: boolean;
+  leaflet?: boolean;
+  duplicate?: boolean;
+}
+
+export interface InvoiceDownloadResult {
+  content: Buffer;
+  filename: string;
+  mimeType: string;
+  invoiceId: string;
+  invoiceNumber: string;
+}
+
+// Invoice content item for creation/editing
+export interface InvoiceContentItem {
+  name: string;
+  count: number;
+  unit_count: string;
+  price: number;
+  unit?: string;
+  vat?: string;
+}
+
+// Contractor reference for invoice (inline or by ID)
+export interface InvoiceContractorRef {
+  contractor_id?: string;
+  name?: string;
+  nip?: string;
+  city?: string;
+  zip?: string;
+  street?: string;
+  country?: string;
+}
+
+// Create invoice data
+export interface CreateInvoiceData {
+  contractor: InvoiceContractorRef;
+  type: WFirmaInvoiceDocumentType;
+  invoicecontents: InvoiceContentItem[];
+  date?: string;
+  disposaldate?: string;
+  paymentdate?: string;
+  paymentmethod?: PaymentMethod;
+  currency?: string;
+  description?: string;
+  series?: string;
+  alreadypaid_initial?: number;
+  tags?: string[];
+}
+
+// Update invoice data
+export interface UpdateInvoiceData {
+  contractor?: InvoiceContractorRef;
+  type?: WFirmaInvoiceDocumentType;
+  invoicecontents?: InvoiceContentItem[];
+  date?: string;
+  disposaldate?: string;
+  paymentdate?: string;
+  paymentmethod?: PaymentMethod;
+  currency?: string;
+  description?: string;
+  alreadypaid?: number;
+}
+
+// Fiscalize result
+export interface FiscalizeResult {
+  success: boolean;
+  invoiceId: string;
+  fiscalized: boolean;
+  message?: string;
+}
+
 // ============================================
 // SYNC TYPES
 // ============================================

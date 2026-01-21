@@ -83,6 +83,74 @@ router.get(
 );
 
 /**
+ * GET /api/files/invoice/:invoiceId
+ * Download an invoice PDF directly by its ID (requires authentication)
+ *
+ * Query parameters:
+ * - page: 'all' | 'invoice' | 'invoicecopy' (default: 'invoice')
+ * - address: boolean - include return address envelope
+ * - leaflet: boolean - include leaflet
+ * - duplicate: boolean - mark as duplicate
+ */
+router.get(
+  '/invoice/:invoiceId',
+  authenticate,
+  async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { invoiceId } = req.params;
+      const { page, address, leaflet, duplicate } = req.query;
+
+      if (!invoiceId) {
+        logger.warn('Invoice download request without invoiceId');
+        res.status(400).json({ error: 'Invoice ID is required' });
+        return;
+      }
+
+      // Download invoice from wFirma
+      const result = await wfirmaIntegrationService.downloadInvoice(invoiceId, {
+        page: page as 'all' | 'invoice' | 'invoicecopy' | undefined,
+        address: address === 'true',
+        leaflet: leaflet === 'true',
+        duplicate: duplicate === 'true',
+      });
+
+      // Set headers for download
+      res.setHeader('Content-Type', result.mimeType);
+      res.setHeader(
+        'Content-Disposition',
+        `attachment; filename="${encodeURIComponent(result.filename)}"`
+      );
+      res.setHeader('Content-Length', result.content.length);
+      res.setHeader('Cache-Control', 'private, no-cache, no-store, must-revalidate');
+      res.setHeader('Pragma', 'no-cache');
+      res.setHeader('Expires', '0');
+
+      logger.info('Invoice PDF downloaded successfully from wFirma', {
+        invoiceId,
+        invoiceNumber: result.invoiceNumber,
+        filename: result.filename,
+        size: result.content.length,
+      });
+
+      // Send file content
+      res.send(result.content);
+    } catch (error) {
+      logger.error('Failed to download invoice PDF from wFirma', {
+        error,
+        invoiceId: req.params.invoiceId,
+      });
+
+      if (error instanceof Error && error.message.includes('not found')) {
+        res.status(404).json({ error: 'Invoice not found' });
+        return;
+      }
+
+      res.status(500).json({ error: 'Failed to download invoice' });
+    }
+  }
+);
+
+/**
  * GET /api/files/document/:documentId
  * Download a wFirma document directly by its ID (requires authentication)
  *

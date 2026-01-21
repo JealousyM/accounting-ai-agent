@@ -127,3 +127,61 @@ export function formatNotesList(notes: WFirmaNote[], invoiceNumber: string, loca
 
   return result;
 }
+
+export function formatInvoiceCreated(invoice: WFirmaInvoice, locale: Locale): string {
+  const t = getInvoiceTranslations(locale);
+
+  let result = `## ✅ ${t.invoiceCreated}\n\n`;
+  result += `| ${t.field} | ${t.value} |\n`;
+  result += '|------|------|\n';
+  result += `| **${t.invoiceNumber}** | ${invoice.invoiceNumber} |\n`;
+  result += `| **${t.contractor}** | ${invoice.contractorName} |\n`;
+  result += `| **${t.date}** | ${formatDate(invoice.issueDate)} |\n`;
+  result += `| **${t.dueDate}** | ${formatDate(invoice.dueDate)} |\n`;
+  result += `| **${t.grossAmount}** | ${formatNumber(invoice.total)} ${invoice.currency} |\n`;
+  result += `| **${t.status}** | ${getStatusIcon(invoice.status)} ${getStatusLabel(invoice.status, locale)} |\n`;
+
+  result += `\n> ${t.invoiceCreatedHint}`;
+
+  return result;
+}
+
+export function formatInvoiceUpdated(invoice: WFirmaInvoice, locale: Locale): string {
+  const t = getInvoiceTranslations(locale);
+
+  let result = `## ✅ ${t.invoiceUpdated}\n\n`;
+  result += `- **${t.invoiceNumber}:** ${invoice.invoiceNumber}\n`;
+  result += `- **${t.contractor}:** ${invoice.contractorName}\n`;
+  result += `- **${t.dueDate}:** ${formatDate(invoice.dueDate)}\n`;
+  result += `- **${t.grossAmount}:** ${formatNumber(invoice.total)} ${invoice.currency}\n`;
+
+  result += `\n> ${t.invoiceUpdatedHint}`;
+
+  return result;
+}
+
+export function formatInvoiceDeleted(invoiceNumber: string, locale: Locale): string {
+  const t = getInvoiceTranslations(locale);
+
+  let result = `## ⚠️ ${t.invoiceDeleted}\n\n`;
+  result += `- **${t.invoiceNumber}:** ${invoiceNumber}\n`;
+  result += `\n> ${t.invoiceDeletedWarning}`;
+
+  return result;
+}
+
+export function formatInvoiceDownloadLink(
+  invoice: WFirmaInvoice,
+  downloadUrl: string,
+  locale: Locale
+): string {
+  const t = getInvoiceTranslations(locale);
+
+  let result = formatInvoiceDetails(invoice, locale);
+
+  result += `\n### ${t.downloadInvoice}\n\n`;
+  result += `📄 [${t.clickToDownload}](${downloadUrl})\n\n`;
+  result += `> 💡 ${t.fileExpiresIn15Minutes}\n`;
+
+  return result;
+}

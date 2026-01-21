@@ -14,6 +14,7 @@ import { ToolNode } from '@langchain/langgraph/prebuilt';
 import { logger } from '../../utils/logger';
 import { WFirmaIntegrationService } from '../wfirma';
 import { WFirmaCacheService } from '../wfirma-cache.service';
+import { FileStorageService } from '../file-storage.service';
 import {
   LLMProvider,
   ChatMessage,
@@ -33,16 +34,19 @@ export class AIChatService {
   private readonly prisma: PrismaClient;
   private readonly wfirmaService: WFirmaIntegrationService;
   private readonly cacheService: WFirmaCacheService;
+  private readonly fileStorageService: FileStorageService;
   private readonly defaultProvider: LLMProvider;
 
   constructor(
     prisma: PrismaClient,
     wfirmaService: WFirmaIntegrationService,
-    cacheService: WFirmaCacheService
+    cacheService: WFirmaCacheService,
+    fileStorageService: FileStorageService
   ) {
     this.prisma = prisma;
     this.wfirmaService = wfirmaService;
     this.cacheService = cacheService;
+    this.fileStorageService = fileStorageService;
 
     // Set default provider
     this.defaultProvider = (process.env.DEFAULT_LLM_PROVIDER as LLMProvider) || 'openai';
@@ -256,7 +260,7 @@ export class AIChatService {
     const locale = detectLocale(userMessage);
 
     // Create tools with userId and locale bound
-    const tools = createAllTools(this.wfirmaService, this.cacheService, userId, locale);
+    const tools = createAllTools(this.wfirmaService, this.cacheService, this.fileStorageService, userId, locale);
 
     logger.info('Created tools for agent', {
       toolCount: tools.length,
