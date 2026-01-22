@@ -15,6 +15,8 @@ import { logger } from '../../utils/logger';
 import { WFirmaIntegrationService } from '../wfirma';
 import { WFirmaCacheService } from '../wfirma-cache.service';
 import { FileStorageService } from '../file-storage.service';
+import { WFirmaServiceFactory } from '../wfirma-integration.factory';
+import { CredentialsService } from '../credentials.service';
 import {
   LLMProvider,
   ChatMessage,
@@ -35,18 +37,24 @@ export class AIChatService {
   private readonly wfirmaService: WFirmaIntegrationService;
   private readonly cacheService: WFirmaCacheService;
   private readonly fileStorageService: FileStorageService;
+  private readonly wfirmaFactory: WFirmaServiceFactory;
+  private readonly credentialsService: CredentialsService;
   private readonly defaultProvider: LLMProvider;
 
   constructor(
     prisma: PrismaClient,
     wfirmaService: WFirmaIntegrationService,
     cacheService: WFirmaCacheService,
-    fileStorageService: FileStorageService
+    fileStorageService: FileStorageService,
+    wfirmaFactory?: WFirmaServiceFactory,
+    credentialsService?: CredentialsService
   ) {
     this.prisma = prisma;
     this.wfirmaService = wfirmaService;
     this.cacheService = cacheService;
     this.fileStorageService = fileStorageService;
+    this.wfirmaFactory = wfirmaFactory!;
+    this.credentialsService = credentialsService!;
 
     // Set default provider
     this.defaultProvider = (process.env.DEFAULT_LLM_PROVIDER as LLMProvider) || 'openai';
@@ -255,14 +263,30 @@ export class AIChatService {
     conversationId: string,
     provider: LLMProvider
   ): Promise<{ response: string; toolsUsed: string[] }> {
-    // Create the LLM based on provider
-    const model = this.createModel(provider);
+    // Get user-specific LLM credentials if available
+    let apiKey: string | undefined;
+    if (this.credentialsService) {
+      const userCreds = await this.credentialsService.getLLMCredentials(userId);
+      if (userCreds && userCreds.provider === provider) {
+        apiKey = userCreds.apiKey;
+        logger.debug('Using user-specific LLM credentials', { userId, provider });
+      }
+    }
+
+    // Create the LLM based on provider (with optional user API key)
+    const model = this.createModel(provider, apiKey);
+
+    // Get user-specific wFirma service if available
+    let wfirmaService = this.wfirmaService;
+    if (this.wfirmaFactory) {
+      wfirmaService = await this.wfirmaFactory.getServiceForUser(userId);
+    }
 
     // Detect user's language for localized tool responses
     const locale = detectLocale(userMessage);
 
     // Create tools with userId and locale bound
-    const tools = createAllTools(this.wfirmaService, this.cacheService, this.fileStorageService, userId, locale);
+    const tools = createAllTools(wfirmaService, this.cacheService, this.fileStorageService, userId, locale);
 
     logger.info('Created tools for agent', {
       toolCount: tools.length,
@@ -370,8 +394,10 @@ export class AIChatService {
 
   /**
    * Create the LLM model based on provider
+   * @param provider The LLM provider (openai or anthropic)
+   * @param apiKey Optional user-specific API key (falls back to env var if not provided)
    */
-  private createModel(provider: LLMProvider) {
+  private createModel(provider: LLMProvider, apiKey?: string) {
     const config = DEFAULT_LLM_CONFIG[provider];
 
     if (provider === 'anthropic') {
@@ -379,7 +405,7 @@ export class AIChatService {
         modelName: config.model,
         maxTokens: config.maxTokens,
         temperature: config.temperature,
-        anthropicApiKey: process.env.ANTHROPIC_API_KEY,
+        anthropicApiKey: apiKey || process.env.ANTHROPIC_API_KEY,
       });
     }
 
@@ -387,7 +413,7 @@ export class AIChatService {
       modelName: config.model,
       maxTokens: config.maxTokens,
       temperature: config.temperature,
-      openAIApiKey: process.env.OPENAI_API_KEY,
+      openAIApiKey: apiKey || process.env.OPENAI_API_KEY,
     });
   }
 

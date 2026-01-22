@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Check, X } from 'lucide-react';
+import { Check, X, Key } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select } from '@/components/ui/select';
@@ -40,18 +40,21 @@ export interface ProfileTranslations {
   saving: string;
   cancel: string;
   success: string;
+  apiCredentials?: string;
 }
 
 interface ProfileEditModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   translations: ProfileTranslations;
+  onOpenApiCredentials?: () => void;
 }
 
 export function ProfileEditModal({
   open,
   onOpenChange,
   translations,
+  onOpenApiCredentials,
 }: ProfileEditModalProps) {
   const { user, checkAuth } = useAuth();
   const { setLocale } = useLocale();
@@ -229,6 +232,23 @@ export function ProfileEditModal({
                 </p>
               )}
             </div>
+
+            {/* API Credentials Link */}
+            {onOpenApiCredentials && (
+              <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
+                <button
+                  type="button"
+                  onClick={() => {
+                    onOpenChange(false);
+                    onOpenApiCredentials();
+                  }}
+                  className="flex items-center gap-2 text-sm text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
+                >
+                  <Key className="h-4 w-4" />
+                  {translations.apiCredentials || 'Manage API Credentials'}
+                </button>
+              </div>
+            )}
           </DialogBody>
 
           <DialogFooter>

@@ -9,13 +9,15 @@ import { Eye, EyeOff, Check, X, Github, Globe } from 'lucide-react';
 import axios from 'axios';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Checkbox } from '@/components/ui/checkbox';
 import { AppVersion } from '@/components/ui/app-version';
 import { registrationSchema, type RegistrationFormData, checkPasswordStrength } from '@/lib/validations/auth';
 import { registerUser, type ErrorResponse } from '@/lib/api/auth';
+import { ApiError } from '@/lib/api/api-client';
+import { useAuth } from '@/contexts/AuthContext';
 import { useGoogleAuth } from '@/hooks/useGoogleAuth';
 import { useGithubAuth } from '@/hooks/useGithubAuth';
 import { cn } from '@/lib/utils';
+import { LegalModal } from '@/components/legal/LegalModal';
 import enTranslations from '@/i18n/locales/en.json';
 import plTranslations from '@/i18n/locales/pl.json';
 
@@ -24,12 +26,15 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 export function RegistrationForm() {
   const [selectedLocale, setSelectedLocale] = useState<'en' | 'pl'>('en');
   const router = useRouter();
+  const { login } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [githubVisible, setGithubVisible] = useState(false);
+  const [showTermsModal, setShowTermsModal] = useState(false);
+  const [showPrivacyModal, setShowPrivacyModal] = useState(false);
 
   // OAuth hooks
   const { login: googleLogin, isLoading: googleLoading, error: googleError, clearError: clearGoogleError } = useGoogleAuth();
@@ -79,6 +84,8 @@ export function RegistrationForm() {
   });
 
   const password = watch('password', '');
+  const agreeToTermsValue = watch('agreeToTerms', false);
+  const errorRef = React.useRef<HTMLDivElement>(null);
   const passwordStrength = checkPasswordStrength(password);
 
   // Update locale in form when user changes language
@@ -101,17 +108,47 @@ export function RegistrationForm() {
       console.log('Registration successful:', response);
       setSuccessMessage(t.successMessage);
 
-      // Redirect to login after 2 seconds
-      setTimeout(() => {
-        router.push('/login');
-      }, 2000);
-    } catch (error: any) {
-      if (error.response?.data) {
-        const errorData = error.response.data as ErrorResponse;
-        setApiError(errorData.message || 'Registration failed');
+      // Auto-login using returned tokens (apiClient unwraps response, so tokens are directly on response)
+      if (response.token && response.refreshToken) {
+        await login(response.token, response.refreshToken, selectedLocale);
+
+        // Store flag for welcome modal if wFirma is enabled (check both checkbox and credentials)
+        const wfirmaEnabled = data.useWfirma || (data.wfirmaAccessKey && data.wfirmaSecretKey && data.wfirmaCompanyId);
+        if (wfirmaEnabled) {
+          localStorage.setItem('showWfirmaWelcome', 'true');
+        }
+
+        // Redirect to chat after successful auto-login
+        setTimeout(() => {
+          router.push('/chat');
+        }, 1500);
       } else {
-        setApiError('An unexpected error occurred. Please try again.');
+        // Fallback: redirect to login if tokens not returned
+        setTimeout(() => {
+          router.push('/login');
+        }, 2000);
       }
+    } catch (error: unknown) {
+      // Handle ApiError (from our API client)
+      if (error instanceof ApiError) {
+        // Check for duplicate email error
+        if (error.message.toLowerCase().includes('already registered')) {
+          setApiError(t.emailAlreadyExists || 'This email is already registered. Please use a different email or sign in.');
+        } else {
+          setApiError(error.message);
+        }
+      } else if (error && typeof error === 'object' && 'response' in error) {
+        // Handle axios-style errors
+        const axiosError = error as { response?: { data?: ErrorResponse } };
+        const errorData = axiosError.response?.data;
+        setApiError(errorData?.message || 'Registration failed');
+      } else {
+        setApiError(t.unexpectedError || 'An unexpected error occurred. Please try again.');
+      }
+      // Scroll to error message
+      setTimeout(() => {
+        errorRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 100);
     } finally {
       setIsSubmitting(false);
     }
@@ -128,7 +165,24 @@ export function RegistrationForm() {
   };
 
   return (
-    <div className="w-full max-w-md mx-auto">
+    <div className="w-full max-w-md mx-auto relative">
+      {/* Loading Overlay */}
+      {isSubmitting && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center">
+          <div className="bg-white dark:bg-gray-800 rounded-xl p-8 shadow-2xl flex flex-col items-center gap-4 max-w-sm mx-4">
+            <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
+            <div className="text-center">
+              <p className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                {t.submitting}
+              </p>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                {t.pleaseWait || 'Please wait...'}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Language Selector */}
       <div className="flex justify-end mb-6">
         <div className="inline-flex items-center gap-2 bg-gray-100 dark:bg-gray-800 rounded-lg p-1">
@@ -179,7 +233,7 @@ export function RegistrationForm() {
 
       {/* API Error */}
       {(apiError || oauthError) && (
-        <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-lg">
+        <div ref={errorRef} className="mb-6 p-4 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-lg">
           <div className="flex items-center gap-2 text-red-800 dark:text-red-400">
             <X className="h-5 w-5" />
             <p className="text-sm font-medium">{apiError || oauthError}</p>
@@ -320,6 +374,123 @@ export function RegistrationForm() {
           )}
         </div>
 
+        {/* wFirma Integration Section */}
+        <div className="border-t border-gray-200 dark:border-gray-700 pt-5 mt-5">
+          <div className="flex items-center mb-4">
+            <input
+              id="useWfirma"
+              type="checkbox"
+              className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+              {...register('useWfirma')}
+            />
+            <label htmlFor="useWfirma" className="ml-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
+              {t.useWfirma || 'Do you use wFirma?'}
+            </label>
+          </div>
+
+          {watch('useWfirma') && (
+            <div className="space-y-4 pl-6 border-l-2 border-blue-200 dark:border-blue-800">
+              <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">
+                {t.wfirmaHelp || 'You can find these credentials in your wFirma account settings under API section.'}
+              </p>
+              <div>
+                <label htmlFor="wfirmaAccessKey" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                  {t.wfirmaAccessKey || 'Access Key'}
+                </label>
+                <Input
+                  id="wfirmaAccessKey"
+                  type="password"
+                  placeholder="••••••••"
+                  error={!!errors.wfirmaAccessKey}
+                  {...register('wfirmaAccessKey')}
+                />
+                {errors.wfirmaAccessKey && (
+                  <p className="mt-1.5 text-sm text-red-600 dark:text-red-400">{errors.wfirmaAccessKey.message}</p>
+                )}
+              </div>
+              <div>
+                <label htmlFor="wfirmaSecretKey" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                  {t.wfirmaSecretKey || 'Secret Key'}
+                </label>
+                <Input
+                  id="wfirmaSecretKey"
+                  type="password"
+                  placeholder="••••••••"
+                  error={!!errors.wfirmaSecretKey}
+                  {...register('wfirmaSecretKey')}
+                />
+                {errors.wfirmaSecretKey && (
+                  <p className="mt-1.5 text-sm text-red-600 dark:text-red-400">{errors.wfirmaSecretKey.message}</p>
+                )}
+              </div>
+              <div>
+                <label htmlFor="wfirmaCompanyId" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                  {t.wfirmaCompanyId || 'Company ID'}
+                </label>
+                <Input
+                  id="wfirmaCompanyId"
+                  type="text"
+                  placeholder={t.wfirmaCompanyIdPlaceholder || 'Your wFirma Company ID'}
+                  error={!!errors.wfirmaCompanyId}
+                  {...register('wfirmaCompanyId')}
+                />
+                {errors.wfirmaCompanyId && (
+                  <p className="mt-1.5 text-sm text-red-600 dark:text-red-400">{errors.wfirmaCompanyId.message}</p>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* LLM Provider Section (Required) */}
+        <div className="border-t border-gray-200 dark:border-gray-700 pt-5">
+          <label htmlFor="llmProvider" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+            {t.llmProvider || 'AI Provider'} <span className="text-red-500">*</span>
+          </label>
+          <select
+            id="llmProvider"
+            className={cn(
+              "w-full px-3 py-2 border rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500",
+              errors.llmProvider ? "border-red-500" : "border-gray-300 dark:border-gray-600"
+            )}
+            {...register('llmProvider')}
+          >
+            <option value="">{t.llmProviderSelect || 'Select AI provider...'}</option>
+            <option value="openai">OpenAI (GPT-4)</option>
+            <option value="anthropic">Anthropic (Claude)</option>
+          </select>
+          {errors.llmProvider && (
+            <p className="mt-1.5 text-sm text-red-600 dark:text-red-400">{errors.llmProvider.message}</p>
+          )}
+          <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+            {t.llmProviderHelp || 'Select your AI provider. You will need to provide your own API key.'}
+          </p>
+
+          {watch('llmProvider') && (
+            <div className="mt-4">
+              <label htmlFor="llmApiKey" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                {t.llmApiKey || 'API Key'} <span className="text-red-500">*</span>
+              </label>
+              <Input
+                id="llmApiKey"
+                type="password"
+                placeholder={watch('llmProvider') === 'openai' ? 'sk-...' : 'sk-ant-...'}
+                error={!!errors.llmApiKey}
+                {...register('llmApiKey')}
+              />
+              {errors.llmApiKey && (
+                <p className="mt-1.5 text-sm text-red-600 dark:text-red-400">{errors.llmApiKey.message}</p>
+              )}
+              <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                {watch('llmProvider') === 'openai'
+                  ? (t.llmApiKeyHelpOpenai || 'Get your API key from platform.openai.com')
+                  : (t.llmApiKeyHelpAnthropic || 'Get your API key from console.anthropic.com')
+                }
+              </p>
+            </div>
+          )}
+        </div>
+
         {/* Password */}
         <div>
           <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
@@ -405,12 +576,35 @@ export function RegistrationForm() {
 
         {/* Terms Checkbox */}
         <div>
-          <Checkbox
-            id="agreeToTerms"
-            label={t.agreeToTerms}
-            error={!!errors.agreeToTerms}
-            {...register('agreeToTerms')}
-          />
+          <div className="flex items-start gap-2">
+            <input
+              id="agreeToTerms"
+              type="checkbox"
+              className={cn(
+                "mt-1 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500",
+                errors.agreeToTerms && "border-red-500"
+              )}
+              {...register('agreeToTerms')}
+            />
+            <label htmlFor="agreeToTerms" className="text-sm text-gray-700 dark:text-gray-300">
+              {t.agreeToTermsPrefix || 'I agree to the'}{' '}
+              <button
+                type="button"
+                onClick={() => setShowTermsModal(true)}
+                className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 underline"
+              >
+                {t.termsOfService || 'Terms of Service'}
+              </button>
+              {' '}{t.and || 'and'}{' '}
+              <button
+                type="button"
+                onClick={() => setShowPrivacyModal(true)}
+                className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 underline"
+              >
+                {t.privacyPolicy || 'Privacy Policy'}
+              </button>
+            </label>
+          </div>
           {errors.agreeToTerms && (
             <p className="mt-1.5 text-sm text-red-600 dark:text-red-400">{errors.agreeToTerms.message}</p>
           )}
@@ -421,7 +615,7 @@ export function RegistrationForm() {
           type="submit"
           className="w-full"
           loading={isSubmitting}
-          disabled={isSubmitting}
+          disabled={isSubmitting || !agreeToTermsValue}
         >
           {isSubmitting ? t.submitting : t.submitButton}
         </Button>
@@ -442,6 +636,20 @@ export function RegistrationForm() {
       <div className="mt-8 text-center">
         <AppVersion />
       </div>
+
+      {/* Legal Modals */}
+      <LegalModal
+        open={showTermsModal}
+        onClose={() => setShowTermsModal(false)}
+        type="terms"
+        locale={selectedLocale}
+      />
+      <LegalModal
+        open={showPrivacyModal}
+        onClose={() => setShowPrivacyModal(false)}
+        type="privacy"
+        locale={selectedLocale}
+      />
     </div>
   );
 }

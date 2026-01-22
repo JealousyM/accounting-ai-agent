@@ -1,5 +1,7 @@
 import { Request, Response } from 'express';
 import { authService } from '../services/auth.service';
+import { credentialsService } from '../services/credentials.instance';
+import { emailService } from '../services/email.service';
 import { prisma } from '../lib/prisma';
 import { logger } from '../utils/logger';
 
@@ -76,6 +78,12 @@ export class AuthController {
 
       logger.info('User registered successfully', { userId: user?.id, email: user?.email });
 
+      // Send welcome email (don't await - send in background)
+      if (user?.email && user?.firstName) {
+        emailService.sendWelcomeEmail(user.email, user.firstName, user.locale || 'en')
+          .catch((err) => logger.warn('Failed to send welcome email', { email: user.email, error: err }));
+      }
+
       res.status(201).json({
         success: true,
         message: 'User registered successfully',
@@ -129,16 +137,16 @@ export class AuthController {
     try {
       const tokens = await authService.login(req.body);
 
-      // Get user data
+      // Get user data (full object to access isFirstLogin after migration)
       const user = await prisma.user.findUnique({
         where: { email: req.body.email },
-        select: {
-          id: true,
-          email: true,
-          firstName: true,
-          lastName: true,
-        },
       });
+
+      // Check if user has wFirma enabled
+      const wfirmaEnabled = user ? await credentialsService.hasWFirmaEnabled(user.id) : false;
+
+      // Get isFirstLogin (will be available after migration)
+      const isFirstLogin = (user as any)?.isFirstLogin ?? false;
 
       logger.info('User logged in successfully', { userId: user?.id, email: user?.email });
 
@@ -150,6 +158,8 @@ export class AuthController {
           email: user?.email,
           firstName: user?.firstName,
           lastName: user?.lastName,
+          isFirstLogin,
+          wfirmaEnabled,
           token: tokens.token,
           refreshToken: tokens.refreshToken,
           expiresIn: tokens.expiresIn,
@@ -382,6 +392,43 @@ export class AuthController {
       });
     } catch (error) {
       logger.error('Error updating user profile', { error, userId: req.user?.userId });
+      res.status(500).json({
+        success: false,
+        error: 'Internal Server Error',
+        message: 'An unexpected error occurred',
+      });
+    }
+  }
+
+  /**
+   * POST /api/auth/first-login-complete
+   * Mark first login as complete (hide welcome modal)
+   */
+  async markFirstLoginComplete(req: Request, res: Response): Promise<void> {
+    try {
+      const userId = req.user?.userId;
+      if (!userId) {
+        res.status(401).json({
+          success: false,
+          error: 'Unauthorized',
+          message: 'User not authenticated',
+        });
+        return;
+      }
+
+      await prisma.user.update({
+        where: { id: userId },
+        data: { isFirstLogin: false } as any, // Type will be correct after migration
+      });
+
+      logger.info('First login marked complete', { userId });
+
+      res.status(200).json({
+        success: true,
+        message: 'First login marked complete',
+      });
+    } catch (error) {
+      logger.error('Error marking first login complete', { error, userId: req.user?.userId });
       res.status(500).json({
         success: false,
         error: 'Internal Server Error',

@@ -151,4 +151,14 @@ router.patch(
   authController.updateProfile.bind(authController)
 );
 
+/**
+ * POST /api/auth/first-login-complete
+ * Mark first login as complete (hide welcome modal)
+ */
+router.post(
+  '/first-login-complete',
+  authenticate,
+  authController.markFirstLoginComplete.bind(authController)
+);
+
 export default router;

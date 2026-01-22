@@ -5,6 +5,7 @@ import { z } from 'zod';
 import { prisma } from '../lib/prisma';
 import { redis } from '../lib/redis';
 import { emailService } from './email.service';
+import { credentialsService } from './credentials.instance';
 import { logger } from '../utils/logger';
 
 // ============================================
@@ -60,6 +61,14 @@ export interface RegisterInput {
   firstName: string;
   lastName: string;
   companyName?: string;
+  locale?: string;
+  // Optional API credentials
+  useWfirma?: boolean;
+  wfirmaAccessKey?: string;
+  wfirmaSecretKey?: string;
+  wfirmaCompanyId?: string;
+  llmProvider?: 'openai' | 'anthropic' | 'none';
+  llmApiKey?: string;
 }
 
 export interface LoginInput {
@@ -124,11 +133,43 @@ export class AuthService {
         passwordHash,
         firstName: validated.firstName,
         lastName: validated.lastName,
+        locale: input.locale || 'en',
         wfirmaConfig: validated.companyName
           ? JSON.stringify({ companyName: validated.companyName })
           : undefined,
       },
     });
+
+    // Save API credentials if provided
+    // wFirma credentials - check if all credentials provided (regardless of checkbox)
+    const hasWfirmaCredentials = input.wfirmaAccessKey && input.wfirmaSecretKey && input.wfirmaCompanyId;
+    if (hasWfirmaCredentials) {
+      try {
+        await credentialsService.setWFirmaCredentials(user.id, {
+          accessKey: input.wfirmaAccessKey!,
+          secretKey: input.wfirmaSecretKey!,
+          companyId: input.wfirmaCompanyId!,
+        });
+        logger.info('wFirma credentials saved during registration', { userId: user.id });
+      } catch (error) {
+        // Log error but don't fail registration - user can add credentials later
+        logger.warn('Failed to save wFirma credentials during registration', { userId: user.id, error: (error as Error).message });
+      }
+    }
+
+    // LLM credentials
+    if (input.llmProvider && input.llmProvider !== 'none' && input.llmApiKey) {
+      try {
+        await credentialsService.setLLMCredentials(user.id, {
+          provider: input.llmProvider,
+          apiKey: input.llmApiKey,
+        });
+        logger.info('LLM credentials saved during registration', { userId: user.id, provider: input.llmProvider });
+      } catch (error) {
+        // Log error but don't fail registration - user can add credentials later
+        logger.warn('Failed to save LLM credentials during registration', { userId: user.id, error: (error as Error).message });
+      }
+    }
 
     // Generate tokens
     return this.generateTokenPair(user.id, user.email);

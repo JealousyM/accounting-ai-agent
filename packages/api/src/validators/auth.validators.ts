@@ -61,6 +61,14 @@ export const registerSchema = z.object({
       .trim()
       .optional(),
     locale: z.enum(['en', 'pl', 'ru']).default('en').optional(),
+    // wFirma credentials (optional)
+    useWfirma: z.boolean().optional(),
+    wfirmaAccessKey: z.string().max(200).trim().optional(),
+    wfirmaSecretKey: z.string().max(200).trim().optional(),
+    wfirmaCompanyId: z.string().max(50).trim().optional(),
+    // LLM provider credentials (optional)
+    llmProvider: z.enum(['openai', 'anthropic', 'none']).optional(),
+    llmApiKey: z.string().max(500).trim().optional(),
   }),
 });
 
