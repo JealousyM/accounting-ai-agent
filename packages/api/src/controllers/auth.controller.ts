@@ -3,6 +3,26 @@ import { authService } from '../services/auth.service';
 import { prisma } from '../lib/prisma';
 import { logger } from '../utils/logger';
 
+interface GitHubTokenResponse {
+  access_token?: string;
+  error?: string;
+  error_description?: string;
+}
+
+interface GitHubUserResponse {
+  id: number;
+  email: string | null;
+  name: string | null;
+  login: string;
+  avatar_url: string;
+}
+
+interface GitHubEmail {
+  email: string;
+  primary: boolean;
+  verified: boolean;
+}
+
 export class AuthController {
   /**
    * GET /api/auth/config
@@ -563,7 +583,7 @@ export class AuthController {
         }),
       });
 
-      const tokenData = await tokenResponse.json();
+      const tokenData = (await tokenResponse.json()) as GitHubTokenResponse;
 
       if (tokenData.error) {
         logger.error('GitHub token exchange failed', { error: tokenData.error });
@@ -583,7 +603,7 @@ export class AuthController {
         },
       });
 
-      const userData = await userResponse.json();
+      const userData = (await userResponse.json()) as GitHubUserResponse;
 
       // Fetch user email (may be private)
       let email = userData.email;
@@ -594,9 +614,9 @@ export class AuthController {
             Accept: 'application/vnd.github.v3+json',
           },
         });
-        const emails = await emailsResponse.json();
-        const primaryEmail = emails.find((e: { primary: boolean; verified: boolean; email: string }) => e.primary && e.verified);
-        email = primaryEmail?.email;
+        const emails = (await emailsResponse.json()) as GitHubEmail[];
+        const primaryEmail = emails.find((e) => e.primary && e.verified);
+        email = primaryEmail?.email ?? null;
       }
 
       if (!email) {
