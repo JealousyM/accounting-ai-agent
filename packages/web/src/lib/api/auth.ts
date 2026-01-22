@@ -12,18 +12,20 @@ export interface RegisterData {
   locale?: string;
 }
 
+export interface AuthData {
+  userId: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  token: string;
+  refreshToken: string;
+  expiresIn: number;
+}
+
 export interface AuthResponse {
   success: boolean;
   message: string;
-  data: {
-    userId: string;
-    email: string;
-    firstName: string;
-    lastName: string;
-    token: string;
-    refreshToken: string;
-    expiresIn: number;
-  };
+  data: AuthData;
 }
 
 export interface ErrorResponse {
@@ -138,28 +140,40 @@ export const getUserLocale = async (email: string): Promise<{ locale: string }> 
 
 /**
  * Google OAuth
+ * Note: apiClient unwraps the response, returning data directly
  */
 export const googleOAuth = async (profile: {
   id: string;
   email: string;
   name?: string;
   picture?: string;
-}): Promise<AuthResponse> => {
-  return apiClient.post<AuthResponse>(API_ENDPOINTS.AUTH.OAUTH_GOOGLE, profile, {
+}): Promise<AuthData> => {
+  return apiClient.post<AuthData>(API_ENDPOINTS.AUTH.OAUTH_GOOGLE, profile, {
     skipAuth: true,
   });
 };
 
 /**
  * GitHub OAuth
+ * Note: apiClient unwraps the response, returning data directly
  */
 export const githubOAuth = async (profile: {
   id: string;
   email: string;
   name?: string;
   picture?: string;
-}): Promise<AuthResponse> => {
-  return apiClient.post<AuthResponse>(API_ENDPOINTS.AUTH.OAUTH_GITHUB, profile, {
+}): Promise<AuthData> => {
+  return apiClient.post<AuthData>(API_ENDPOINTS.AUTH.OAUTH_GITHUB, profile, {
+    skipAuth: true,
+  });
+};
+
+/**
+ * GitHub OAuth callback - exchange code for tokens
+ * Note: apiClient unwraps the response, returning data directly
+ */
+export const githubOAuthCallback = async (code: string): Promise<AuthData> => {
+  return apiClient.post<AuthData>(API_ENDPOINTS.AUTH.OAUTH_GITHUB_CALLBACK, { code }, {
     skipAuth: true,
   });
 };

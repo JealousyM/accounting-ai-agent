@@ -3,6 +3,7 @@ import './globals.css';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { LocaleProvider } from '@/contexts/LocaleContext';
 import { ThemeProvider } from '@/contexts/ThemeContext';
+import { GoogleOAuthProvider } from '@/components/providers/GoogleOAuthProvider';
 
 export const metadata: Metadata = {
   title: 'Accounting AI Agent',
@@ -40,11 +41,13 @@ export default function RootLayout({
       </head>
       <body>
         <ThemeProvider>
-          <AuthProvider>
-            <LocaleProvider>
-              {children}
-            </LocaleProvider>
-          </AuthProvider>
+          <GoogleOAuthProvider>
+            <AuthProvider>
+              <LocaleProvider>
+                {children}
+              </LocaleProvider>
+            </AuthProvider>
+          </GoogleOAuthProvider>
         </ThemeProvider>
       </body>
     </html>
