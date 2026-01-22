@@ -3,6 +3,7 @@
 
 generator client {
   provider = "prisma-client-js"
+  output   = "../../../node_modules/.prisma/client"
 }
 
 datasource db {
@@ -27,7 +28,8 @@ model User {
   
   // User preferences
   locale       String   @default("en") // User's preferred language (en, pl)
-  
+  isFirstLogin Boolean  @default(true) // Flag for showing welcome modal on first login
+
   // wFirma integration config
   wfirmaConfig Json?    @db.JsonB
   
@@ -45,12 +47,46 @@ model User {
   uchwaly         Uchwala[]
   auditLogs       AuditLog[]
   conversationSessions ConversationSession[]
+  apiCredentials  UserApiCredentials?
   
   @@index([email])
   @@index([googleId])
   @@index([githubId])
   @@index([createdAt])
   @@map("users")
+}
+
+// ============================================
+// USER API CREDENTIALS
+// ============================================
+
+model UserApiCredentials {
+  id                    String   @id @default(uuid()) @db.Uuid
+  userId                String   @unique @db.Uuid
+
+  // wFirma credentials (encrypted JSON: {ciphertext, iv, tag})
+  wfirmaEnabled         Boolean  @default(false)
+  wfirmaAccessKey       String?  @db.Text
+  wfirmaSecretKey       String?  @db.Text
+  wfirmaCompanyId       String?  @db.Text
+
+  // LLM Provider credentials
+  llmProvider           String?  // 'openai' | 'anthropic' | null (use app default)
+  llmApiKey             String?  @db.Text
+
+  // Metadata
+  wfirmaLastValidated   DateTime?
+  llmLastValidated      DateTime?
+
+  // Timestamps
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  // Relations
+  user                  User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("user_api_credentials")
 }
 
 // ============================================

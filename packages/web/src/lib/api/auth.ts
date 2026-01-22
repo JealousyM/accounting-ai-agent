@@ -10,6 +10,14 @@ export interface RegisterData {
   lastName: string;
   companyName?: string;
   locale?: string;
+  // wFirma credentials (optional)
+  useWfirma?: boolean;
+  wfirmaAccessKey?: string;
+  wfirmaSecretKey?: string;
+  wfirmaCompanyId?: string;
+  // LLM provider credentials (required)
+  llmProvider: 'openai' | 'anthropic';
+  llmApiKey: string;
 }
 
 export interface AuthData {
@@ -20,6 +28,8 @@ export interface AuthData {
   token: string;
   refreshToken: string;
   expiresIn: number;
+  isFirstLogin?: boolean;
+  wfirmaEnabled?: boolean;
 }
 
 export interface AuthResponse {
@@ -37,10 +47,11 @@ export interface ErrorResponse {
 
 /**
  * Register new user
+ * Note: apiClient unwraps the response, returning data directly
  */
-export const registerUser = async (data: RegisterData): Promise<AuthResponse> => {
+export const registerUser = async (data: RegisterData): Promise<AuthData> => {
   try {
-    return await apiClient.post<AuthResponse>(API_ENDPOINTS.AUTH.REGISTER, data, {
+    return await apiClient.post<AuthData>(API_ENDPOINTS.AUTH.REGISTER, data, {
       skipAuth: true,
     });
   } catch (error) {
@@ -127,6 +138,13 @@ export interface UpdateProfileResponse {
  */
 export const updateProfile = async (data: UpdateProfileData): Promise<UpdateProfileResponse> => {
   return apiClient.patch<UpdateProfileResponse>(API_ENDPOINTS.AUTH.PROFILE, data);
+};
+
+/**
+ * Mark first login as complete (hide welcome modal)
+ */
+export const markFirstLoginComplete = async (): Promise<void> => {
+  await apiClient.post('/api/auth/first-login-complete');
 };
 
 /**

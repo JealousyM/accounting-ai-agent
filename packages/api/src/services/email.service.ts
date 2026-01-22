@@ -10,6 +10,179 @@ interface EmailTemplates {
   html: string;
 }
 
+const getWelcomeEmailTemplate = (
+  firstName: string,
+  loginLink: string,
+  locale: string = 'en'
+): EmailTemplates => {
+  const templates: Record<string, EmailTemplates> = {
+    en: {
+      subject: 'Welcome to Accounting AI Agent!',
+      html: `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Welcome</title>
+  <style>
+    body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; }
+    .container { background: #f9f9f9; border-radius: 8px; padding: 30px; }
+    .header { text-align: center; margin-bottom: 30px; }
+    .header h1 { color: #2563eb; margin: 0; }
+    .content { background: #fff; border-radius: 8px; padding: 20px; margin-bottom: 20px; }
+    .button { display: inline-block; background: #2563eb; color: #fff !important; text-decoration: none; padding: 12px 30px; border-radius: 6px; margin: 20px 0; }
+    .button:hover { background: #1d4ed8; }
+    .footer { text-align: center; font-size: 12px; color: #666; margin-top: 30px; }
+    .features { background: #eff6ff; border-radius: 6px; padding: 15px; margin-top: 20px; }
+    .features ul { margin: 10px 0; padding-left: 20px; }
+    .features li { margin: 8px 0; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Welcome to Accounting AI Agent!</h1>
+    </div>
+    <div class="content">
+      <p>Hello ${firstName},</p>
+      <p>Thank you for registering! Your account has been successfully created.</p>
+      <p>You are now logged in and can start using all the features of the platform.</p>
+      <div class="features">
+        <strong>What you can do:</strong>
+        <ul>
+          <li>Chat with AI assistant about accounting and finance</li>
+          <li>Manage invoices and contractors via wFirma integration</li>
+          <li>Generate financial reports and documents</li>
+          <li>Get AI-powered recommendations for your business</li>
+        </ul>
+      </div>
+      <p style="text-align: center;">
+        <a href="${loginLink}" class="button">Go to Dashboard</a>
+      </p>
+    </div>
+    <div class="footer">
+      <p>If you have any questions, feel free to use the chat feature in the application.</p>
+      <p>This is an automated message from Accounting AI Agent.</p>
+    </div>
+  </div>
+</body>
+</html>
+      `,
+    },
+    pl: {
+      subject: 'Witamy w Accounting AI Agent!',
+      html: `
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Witamy</title>
+  <style>
+    body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; }
+    .container { background: #f9f9f9; border-radius: 8px; padding: 30px; }
+    .header { text-align: center; margin-bottom: 30px; }
+    .header h1 { color: #2563eb; margin: 0; }
+    .content { background: #fff; border-radius: 8px; padding: 20px; margin-bottom: 20px; }
+    .button { display: inline-block; background: #2563eb; color: #fff !important; text-decoration: none; padding: 12px 30px; border-radius: 6px; margin: 20px 0; }
+    .button:hover { background: #1d4ed8; }
+    .footer { text-align: center; font-size: 12px; color: #666; margin-top: 30px; }
+    .features { background: #eff6ff; border-radius: 6px; padding: 15px; margin-top: 20px; }
+    .features ul { margin: 10px 0; padding-left: 20px; }
+    .features li { margin: 8px 0; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Witamy w Accounting AI Agent!</h1>
+    </div>
+    <div class="content">
+      <p>Czesc ${firstName},</p>
+      <p>Dziekujemy za rejestracje! Twoje konto zostalo pomyslnie utworzone.</p>
+      <p>Jestes teraz zalogowany i mozesz korzystac ze wszystkich funkcji platformy.</p>
+      <div class="features">
+        <strong>Co mozesz robic:</strong>
+        <ul>
+          <li>Rozmawiac z asystentem AI o ksiegowosci i finansach</li>
+          <li>Zarzadzac fakturami i kontrahentami przez integracje z wFirma</li>
+          <li>Generowac raporty finansowe i dokumenty</li>
+          <li>Otrzymywac rekomendacje AI dla Twojej firmy</li>
+        </ul>
+      </div>
+      <p style="text-align: center;">
+        <a href="${loginLink}" class="button">Przejdz do panelu</a>
+      </p>
+    </div>
+    <div class="footer">
+      <p>Jesli masz pytania, skorzystaj z funkcji czatu w aplikacji.</p>
+      <p>To jest automatyczna wiadomosc z Accounting AI Agent.</p>
+    </div>
+  </div>
+</body>
+</html>
+      `,
+    },
+    ru: {
+      subject: 'Добро пожаловать в Accounting AI Agent!',
+      html: `
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Добро пожаловать</title>
+  <style>
+    body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; }
+    .container { background: #f9f9f9; border-radius: 8px; padding: 30px; }
+    .header { text-align: center; margin-bottom: 30px; }
+    .header h1 { color: #2563eb; margin: 0; }
+    .content { background: #fff; border-radius: 8px; padding: 20px; margin-bottom: 20px; }
+    .button { display: inline-block; background: #2563eb; color: #fff !important; text-decoration: none; padding: 12px 30px; border-radius: 6px; margin: 20px 0; }
+    .button:hover { background: #1d4ed8; }
+    .footer { text-align: center; font-size: 12px; color: #666; margin-top: 30px; }
+    .features { background: #eff6ff; border-radius: 6px; padding: 15px; margin-top: 20px; }
+    .features ul { margin: 10px 0; padding-left: 20px; }
+    .features li { margin: 8px 0; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Добро пожаловать в Accounting AI Agent!</h1>
+    </div>
+    <div class="content">
+      <p>Здравствуйте, ${firstName}!</p>
+      <p>Спасибо за регистрацию! Ваш аккаунт успешно создан.</p>
+      <p>Вы уже вошли в систему и можете использовать все функции платформы.</p>
+      <div class="features">
+        <strong>Что вы можете делать:</strong>
+        <ul>
+          <li>Общаться с AI-ассистентом по вопросам бухгалтерии и финансов</li>
+          <li>Управлять счетами и контрагентами через интеграцию с wFirma</li>
+          <li>Генерировать финансовые отчёты и документы</li>
+          <li>Получать AI-рекомендации для вашего бизнеса</li>
+        </ul>
+      </div>
+      <p style="text-align: center;">
+        <a href="${loginLink}" class="button">Перейти в панель</a>
+      </p>
+    </div>
+    <div class="footer">
+      <p>Если у вас есть вопросы, используйте функцию чата в приложении.</p>
+      <p>Это автоматическое сообщение от Accounting AI Agent.</p>
+    </div>
+  </div>
+</body>
+</html>
+      `,
+    },
+  };
+
+  return templates[locale] || templates['en'];
+};
+
 const getPasswordResetEmailTemplate = (
   resetLink: string,
   locale: string = 'en'
@@ -266,6 +439,47 @@ export class EmailService {
       return true;
     } catch (error) {
       logger.error('Failed to send password reset email', {
+        email,
+        error: error instanceof Error ? error.message : 'Unknown error',
+      });
+      return false;
+    }
+  }
+
+  /**
+   * Send welcome email after successful registration
+   */
+  async sendWelcomeEmail(
+    email: string,
+    firstName: string,
+    locale: string = 'en'
+  ): Promise<boolean> {
+    if (!this.transporter) {
+      logger.warn('Email service not configured. Cannot send welcome email.', { email });
+      return false;
+    }
+
+    try {
+      const loginLink = `${this.frontendUrl}/chat`;
+      const template = getWelcomeEmailTemplate(firstName, loginLink, locale);
+
+      const mailOptions = {
+        from: `"${this.fromName}" <${this.fromEmail}>`,
+        to: email,
+        subject: template.subject,
+        html: template.html,
+      };
+
+      const result = await this.transporter.sendMail(mailOptions);
+
+      logger.info('Welcome email sent successfully', {
+        email,
+        messageId: result.messageId,
+      });
+
+      return true;
+    } catch (error) {
+      logger.error('Failed to send welcome email', {
         email,
         error: error instanceof Error ? error.message : 'Unknown error',
       });

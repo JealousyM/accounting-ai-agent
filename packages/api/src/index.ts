@@ -6,6 +6,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import authRoutes from './routes/auth.routes';
 import userRoutes from './routes/user.routes';
+import credentialsRoutes from './routes/credentials.routes';
 import aiChatRoutes from './routes/ai-chat.routes';
 import aiCostsRoutes from './routes/ai-costs.routes';
 import fileRoutes from './routes/file.routes';
@@ -40,6 +41,9 @@ app.use('/api/auth', authRoutes);
 
 // User routes
 app.use('/api/users', userRoutes);
+
+// Credentials routes
+app.use('/api/credentials', credentialsRoutes);
 
 // AI Chat routes
 app.use('/api/ai', aiChatRoutes);

@@ -16,9 +16,16 @@
       "companyName": "Company name (optional)",
       "companyNamePlaceholder": "Acme Corp",
       "agreeToTerms": "I agree to the Terms of Service and Privacy Policy",
+      "agreeToTermsPrefix": "I agree to the",
+      "termsOfService": "Terms of Service",
+      "and": "and",
+      "privacyPolicy": "Privacy Policy",
       "submitButton": "Create account",
       "submitting": "Creating account...",
-      "successMessage": "Account created successfully! Redirecting to login...",
+      "pleaseWait": "Please wait while we set up your account...",
+      "successMessage": "Account created successfully! Redirecting...",
+      "emailAlreadyExists": "This email is already registered. Please use a different email or sign in.",
+      "unexpectedError": "An unexpected error occurred. Please try again.",
       "alreadyHaveAccount": "Already have an account?",
       "signIn": "Sign in",
       "orContinueWith": "Or continue with",
@@ -31,7 +38,19 @@
         "lowercase": "One lowercase letter",
         "number": "One number",
         "special": "One special character"
-      }
+      },
+      "useWfirma": "Do you use wFirma?",
+      "wfirmaHelp": "You can find these credentials in your wFirma account settings under API section.",
+      "wfirmaAccessKey": "Access Key",
+      "wfirmaSecretKey": "Secret Key",
+      "wfirmaCompanyId": "Company ID",
+      "wfirmaCompanyIdPlaceholder": "Your wFirma Company ID",
+      "llmProvider": "AI Provider",
+      "llmProviderSelect": "Select AI provider...",
+      "llmProviderHelp": "Select your AI provider. You will need to provide your own API key.",
+      "llmApiKey": "API Key",
+      "llmApiKeyHelpOpenai": "Get your API key from platform.openai.com",
+      "llmApiKeyHelpAnthropic": "Get your API key from console.anthropic.com"
     },
     "login": {
       "title": "Sign in",
@@ -150,7 +169,152 @@
     "save": "Save changes",
     "saving": "Saving...",
     "cancel": "Cancel",
-    "success": "Profile updated successfully"
+    "success": "Profile updated successfully",
+    "apiCredentials": "Manage API Credentials"
+  },
+  "apiCredentials": {
+    "title": "API Credentials",
+    "description": "Manage your integration credentials",
+    "wfirmaSection": "wFirma Integration",
+    "wfirmaEnabled": "Configured",
+    "wfirmaDisabled": "Not configured",
+    "wfirmaAccessKey": "Access Key",
+    "wfirmaSecretKey": "Secret Key",
+    "wfirmaCompanyId": "Company ID",
+    "wfirmaCompanyIdPlaceholder": "Your Company ID",
+    "wfirmaLastValidated": "Last validated",
+    "wfirmaConfigure": "Configure wFirma",
+    "wfirmaUpdate": "Update credentials",
+    "llmSection": "AI Provider",
+    "llmProvider": "Provider",
+    "llmApiKey": "API Key",
+    "llmUsingDefault": "Using application default",
+    "llmUsingCustom": "Using your own API key",
+    "llmConfigure": "Use own API key",
+    "llmUpdate": "Update API key",
+    "save": "Save",
+    "saving": "Saving...",
+    "remove": "Remove",
+    "removing": "Removing...",
+    "cancel": "Cancel",
+    "close": "Close",
+    "success": "Credentials saved successfully",
+    "error": "Failed to save credentials",
+    "errorLoad": "Failed to load credentials",
+    "errorSaveWfirma": "Failed to save wFirma credentials",
+    "errorRemoveWfirma": "Failed to remove wFirma credentials",
+    "errorSaveLlm": "Failed to save LLM credentials",
+    "errorRemoveLlm": "Failed to remove LLM credentials"
+  },
+  "onboarding": {
+    "wfirmaWelcome": {
+      "title": "Welcome to wFirma Integration!",
+      "description": "Your wFirma account is connected. Here's what you can do:",
+      "feature1": "View invoices and contractors from wFirma",
+      "feature2": "Analyze financial data with AI assistant",
+      "feature3": "Generate documents and reports automatically",
+      "feature4": "Ask questions about your business in chat",
+      "getStarted": "Got it, let's start!"
+    }
+  },
+  "legal": {
+    "close": "Close",
+    "termsOfService": {
+      "title": "Terms of Service",
+      "lastUpdated": "Last updated: January 2025",
+      "sections": {
+        "acceptance": {
+          "title": "1. Acceptance of Terms",
+          "content": "By accessing and using Accounting AI Agent (\"the Service\"), you agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use the Service."
+        },
+        "services": {
+          "title": "2. Description of Services",
+          "content": "Accounting AI Agent provides AI-powered accounting assistance, including but not limited to: financial data analysis, invoice management through wFirma integration, document generation, and AI chat functionality for accounting queries."
+        },
+        "accounts": {
+          "title": "3. User Accounts",
+          "content": "You are responsible for maintaining the confidentiality of your account credentials. You agree to provide accurate information during registration and to update your information as needed. You are responsible for all activities that occur under your account."
+        },
+        "apiKeys": {
+          "title": "4. API Keys and Third-Party Services",
+          "content": "You may provide your own API keys for AI providers (OpenAI, Anthropic). You are responsible for securing these keys and for any charges incurred through their use. We encrypt stored API keys but cannot guarantee absolute security."
+        },
+        "wfirma": {
+          "title": "5. wFirma Integration",
+          "content": "If you connect your wFirma account, you authorize us to access your wFirma data on your behalf. We will only access data necessary to provide the Service. You are responsible for ensuring you have the right to share this data with us."
+        },
+        "intellectualProperty": {
+          "title": "6. Intellectual Property",
+          "content": "The Service and its original content, features, and functionality are owned by Accounting AI Agent and are protected by international copyright, trademark, and other intellectual property laws."
+        },
+        "limitations": {
+          "title": "7. Limitations of Liability",
+          "content": "The Service is provided \"as is\" without warranties of any kind. We are not liable for any financial decisions made based on AI-generated advice. Always consult with a qualified accountant for important financial matters."
+        },
+        "termination": {
+          "title": "8. Termination",
+          "content": "We may terminate or suspend your account at any time, without prior notice, for conduct that violates these Terms or is harmful to other users or the Service."
+        },
+        "changes": {
+          "title": "9. Changes to Terms",
+          "content": "We reserve the right to modify these terms at any time. We will notify users of significant changes via email or through the Service."
+        },
+        "contact": {
+          "title": "10. Contact Information",
+          "content": "For questions about these Terms, please contact us through the application's chat feature or email support."
+        }
+      }
+    },
+    "privacyPolicy": {
+      "title": "Privacy Policy",
+      "lastUpdated": "Last updated: January 2025",
+      "sections": {
+        "introduction": {
+          "title": "1. Introduction",
+          "content": "This Privacy Policy explains how Accounting AI Agent collects, uses, and protects your personal information when you use our Service."
+        },
+        "dataCollection": {
+          "title": "2. Information We Collect",
+          "content": "We collect: account information (email, name), authentication data, API keys you provide (encrypted), wFirma data you authorize access to, conversation history with AI, and usage analytics."
+        },
+        "dataUse": {
+          "title": "3. How We Use Your Information",
+          "content": "We use your information to: provide and improve the Service, process your requests, communicate with you, ensure security, and comply with legal obligations."
+        },
+        "dataStorage": {
+          "title": "4. Data Storage and Retention",
+          "content": "Your data is stored securely in our databases. API keys are encrypted using AES-256-GCM encryption. We retain your data for as long as your account is active or as needed to provide services."
+        },
+        "thirdParties": {
+          "title": "5. Third-Party Services",
+          "content": "We integrate with third-party services including: AI providers (OpenAI, Anthropic), wFirma accounting system, OAuth providers (Google, GitHub). Each has their own privacy policies."
+        },
+        "cookies": {
+          "title": "6. Cookies and Tracking",
+          "content": "We use essential cookies for authentication and session management. We may use analytics cookies to improve the Service. You can manage cookie preferences in your browser settings."
+        },
+        "userRights": {
+          "title": "7. Your Rights",
+          "content": "You have the right to: access your personal data, correct inaccurate data, request deletion of your data, export your data, and withdraw consent for data processing."
+        },
+        "security": {
+          "title": "8. Security Measures",
+          "content": "We implement industry-standard security measures including: encrypted data transmission (HTTPS), encrypted storage of sensitive data, secure authentication, and regular security audits."
+        },
+        "children": {
+          "title": "9. Children's Privacy",
+          "content": "Our Service is not intended for users under 18 years of age. We do not knowingly collect personal information from children."
+        },
+        "changes": {
+          "title": "10. Changes to This Policy",
+          "content": "We may update this Privacy Policy from time to time. We will notify you of any changes by posting the new policy and updating the \"Last updated\" date."
+        },
+        "contact": {
+          "title": "11. Contact Us",
+          "content": "If you have questions about this Privacy Policy, please contact us through the application's chat feature or email support."
+        }
+      }
+    }
   },
   "costs": {
     "title": "AI Cost Dashboard",

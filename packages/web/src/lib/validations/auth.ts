@@ -45,11 +45,30 @@ export const registrationSchema = z
     agreeToTerms: z.boolean().refine((val) => val === true, {
       message: 'You must agree to the terms and conditions',
     }),
+    // wFirma integration (optional)
+    useWfirma: z.boolean().default(false),
+    wfirmaAccessKey: z.string().max(200).trim().optional(),
+    wfirmaSecretKey: z.string().max(200).trim().optional(),
+    wfirmaCompanyId: z.string().max(50).trim().optional(),
+    // LLM provider (required)
+    llmProvider: z
+      .union([z.literal('openai'), z.literal('anthropic'), z.literal('')])
+      .refine((val): val is 'openai' | 'anthropic' => val === 'openai' || val === 'anthropic', {
+        message: 'Please select an AI provider',
+      }),
+    llmApiKey: z.string().min(1, 'API key is required').max(500).trim(),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: 'Passwords do not match',
     path: ['confirmPassword'],
-  });
+  })
+  .refine(
+    (data) => !data.useWfirma || (data.wfirmaAccessKey && data.wfirmaSecretKey && data.wfirmaCompanyId),
+    {
+      message: 'All wFirma credentials are required when wFirma is enabled',
+      path: ['wfirmaAccessKey'],
+    }
+  );
 
 export type RegistrationFormData = z.infer<typeof registrationSchema>;
 

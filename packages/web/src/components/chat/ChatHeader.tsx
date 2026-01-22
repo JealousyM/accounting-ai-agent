@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { Menu, MessageSquarePlus, Bot, Globe, User, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
-import { ProfileEditModal, type ProfileTranslations } from '@/components/profile';
+import { ProfileEditModal, type ProfileTranslations, ApiCredentialsModal, type ApiCredentialsTranslations } from '@/components/profile';
 import { ConversationDetail } from '@/hooks/useChat';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -24,6 +24,7 @@ interface ChatHeaderProps {
   isCreatingConversation: boolean;
   translations: HeaderTranslations;
   profileTranslations: ProfileTranslations;
+  apiCredentialsTranslations: ApiCredentialsTranslations;
   locale: Locale;
   onLocaleChange: (locale: Locale) => void;
 }
@@ -41,10 +42,12 @@ export function ChatHeader({
   isCreatingConversation,
   translations,
   profileTranslations,
+  apiCredentialsTranslations,
   locale,
   onLocaleChange,
 }: ChatHeaderProps) {
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+  const [isApiCredentialsModalOpen, setIsApiCredentialsModalOpen] = useState(false);
   const { logout } = useAuth();
 
   const cycleLocale = () => {
@@ -139,6 +142,14 @@ export function ChatHeader({
         open={isProfileModalOpen}
         onOpenChange={setIsProfileModalOpen}
         translations={profileTranslations}
+        onOpenApiCredentials={() => setIsApiCredentialsModalOpen(true)}
+      />
+
+      {/* API Credentials Modal */}
+      <ApiCredentialsModal
+        open={isApiCredentialsModalOpen}
+        onOpenChange={setIsApiCredentialsModalOpen}
+        translations={apiCredentialsTranslations}
       />
     </>
   );

@@ -16,9 +16,16 @@
       "companyName": "Nazwa firmy (opcjonalnie)",
       "companyNamePlaceholder": "Moja Firma Sp. z o.o.",
       "agreeToTerms": "Akceptuję Regulamin i Politykę Prywatności",
+      "agreeToTermsPrefix": "Akceptuję",
+      "termsOfService": "Regulamin",
+      "and": "i",
+      "privacyPolicy": "Politykę Prywatności",
       "submitButton": "Utwórz konto",
       "submitting": "Tworzenie konta...",
-      "successMessage": "Konto utworzone pomyślnie! Przekierowanie do logowania...",
+      "pleaseWait": "Proszę czekać, konfigurujemy Twoje konto...",
+      "successMessage": "Konto utworzone pomyślnie! Przekierowanie...",
+      "emailAlreadyExists": "Ten email jest już zarejestrowany. Użyj innego adresu email lub zaloguj się.",
+      "unexpectedError": "Wystąpił nieoczekiwany błąd. Spróbuj ponownie.",
       "alreadyHaveAccount": "Masz już konto?",
       "signIn": "Zaloguj się",
       "orContinueWith": "Lub kontynuuj z",
@@ -31,7 +38,19 @@
         "lowercase": "Jedna mała litera",
         "number": "Jedna cyfra",
         "special": "Jeden znak specjalny"
-      }
+      },
+      "useWfirma": "Czy korzystasz z wFirma?",
+      "wfirmaHelp": "Dane uwierzytelniające znajdziesz w ustawieniach konta wFirma w sekcji API.",
+      "wfirmaAccessKey": "Klucz dostępu",
+      "wfirmaSecretKey": "Klucz tajny",
+      "wfirmaCompanyId": "ID firmy",
+      "wfirmaCompanyIdPlaceholder": "Twoje ID firmy w wFirma",
+      "llmProvider": "Dostawca AI",
+      "llmProviderSelect": "Wybierz dostawcę AI...",
+      "llmProviderHelp": "Wybierz dostawcę AI. Musisz podać własny klucz API.",
+      "llmApiKey": "Klucz API",
+      "llmApiKeyHelpOpenai": "Pobierz klucz API z platform.openai.com",
+      "llmApiKeyHelpAnthropic": "Pobierz klucz API z console.anthropic.com"
     },
     "login": {
       "title": "Zaloguj się",
@@ -150,7 +169,152 @@
     "save": "Zapisz zmiany",
     "saving": "Zapisywanie...",
     "cancel": "Anuluj",
-    "success": "Profil zaktualizowany pomyślnie"
+    "success": "Profil zaktualizowany pomyślnie",
+    "apiCredentials": "Zarządzaj kluczami API"
+  },
+  "apiCredentials": {
+    "title": "Klucze API",
+    "description": "Zarządzaj danymi uwierzytelniającymi integracji",
+    "wfirmaSection": "Integracja wFirma",
+    "wfirmaEnabled": "Skonfigurowano",
+    "wfirmaDisabled": "Nie skonfigurowano",
+    "wfirmaAccessKey": "Klucz dostępu",
+    "wfirmaSecretKey": "Klucz tajny",
+    "wfirmaCompanyId": "ID firmy",
+    "wfirmaCompanyIdPlaceholder": "Twoje ID firmy",
+    "wfirmaLastValidated": "Ostatnia walidacja",
+    "wfirmaConfigure": "Skonfiguruj wFirma",
+    "wfirmaUpdate": "Zaktualizuj dane",
+    "llmSection": "Dostawca AI",
+    "llmProvider": "Dostawca",
+    "llmApiKey": "Klucz API",
+    "llmUsingDefault": "Używam domyślnego",
+    "llmUsingCustom": "Używam własnego klucza API",
+    "llmConfigure": "Użyj własnego klucza API",
+    "llmUpdate": "Zaktualizuj klucz API",
+    "save": "Zapisz",
+    "saving": "Zapisywanie...",
+    "remove": "Usuń",
+    "removing": "Usuwanie...",
+    "cancel": "Anuluj",
+    "close": "Zamknij",
+    "success": "Dane zapisane pomyślnie",
+    "error": "Nie udało się zapisać danych",
+    "errorLoad": "Nie udało się załadować danych",
+    "errorSaveWfirma": "Nie udało się zapisać danych wFirma",
+    "errorRemoveWfirma": "Nie udało się usunąć danych wFirma",
+    "errorSaveLlm": "Nie udało się zapisać klucza LLM",
+    "errorRemoveLlm": "Nie udało się usunąć klucza LLM"
+  },
+  "onboarding": {
+    "wfirmaWelcome": {
+      "title": "Witaj w integracji wFirma!",
+      "description": "Twoje konto wFirma jest połączone. Oto co możesz zrobić:",
+      "feature1": "Przeglądaj faktury i kontrahentów z wFirma",
+      "feature2": "Analizuj dane finansowe z asystentem AI",
+      "feature3": "Automatycznie generuj dokumenty i raporty",
+      "feature4": "Zadawaj pytania o swoją firmę na czacie",
+      "getStarted": "Rozumiem, zacznijmy!"
+    }
+  },
+  "legal": {
+    "close": "Zamknij",
+    "termsOfService": {
+      "title": "Regulamin",
+      "lastUpdated": "Ostatnia aktualizacja: Styczeń 2025",
+      "sections": {
+        "acceptance": {
+          "title": "1. Akceptacja Regulaminu",
+          "content": "Korzystając z Accounting AI Agent (\"Usługa\"), zgadzasz się przestrzegać niniejszego Regulaminu. Jeśli nie zgadzasz się z tymi warunkami, prosimy o niekorzystanie z Usługi."
+        },
+        "services": {
+          "title": "2. Opis Usług",
+          "content": "Accounting AI Agent zapewnia wsparcie księgowe oparte na AI, w tym: analizę danych finansowych, zarządzanie fakturami poprzez integrację z wFirma, generowanie dokumentów i funkcję czatu AI do zapytań księgowych."
+        },
+        "accounts": {
+          "title": "3. Konta Użytkowników",
+          "content": "Jesteś odpowiedzialny za zachowanie poufności danych logowania. Zgadzasz się na podanie dokładnych informacji podczas rejestracji i aktualizację ich w razie potrzeby. Ponosisz odpowiedzialność za wszystkie działania wykonywane na Twoim koncie."
+        },
+        "apiKeys": {
+          "title": "4. Klucze API i Usługi Zewnętrzne",
+          "content": "Możesz podać własne klucze API dla dostawców AI (OpenAI, Anthropic). Jesteś odpowiedzialny za zabezpieczenie tych kluczy i za wszelkie opłaty poniesione w związku z ich użyciem. Przechowujemy klucze API w formie zaszyfrowanej, ale nie możemy zagwarantować całkowitego bezpieczeństwa."
+        },
+        "wfirma": {
+          "title": "5. Integracja z wFirma",
+          "content": "Jeśli połączysz swoje konto wFirma, upoważniasz nas do dostępu do Twoich danych wFirma w Twoim imieniu. Będziemy uzyskiwać dostęp tylko do danych niezbędnych do świadczenia Usługi. Ponosisz odpowiedzialność za upewnienie się, że masz prawo udostępnić nam te dane."
+        },
+        "intellectualProperty": {
+          "title": "6. Własność Intelektualna",
+          "content": "Usługa i jej oryginalna zawartość, funkcje i funkcjonalność są własnością Accounting AI Agent i są chronione międzynarodowymi prawami autorskimi, znakami towarowymi i innymi prawami własności intelektualnej."
+        },
+        "limitations": {
+          "title": "7. Ograniczenie Odpowiedzialności",
+          "content": "Usługa jest świadczona \"tak jak jest\" bez jakichkolwiek gwarancji. Nie ponosimy odpowiedzialności za decyzje finansowe podjęte na podstawie porad generowanych przez AI. W ważnych sprawach finansowych zawsze konsultuj się z wykwalifikowanym księgowym."
+        },
+        "termination": {
+          "title": "8. Wypowiedzenie",
+          "content": "Możemy wypowiedzieć lub zawiesić Twoje konto w dowolnym momencie, bez wcześniejszego powiadomienia, za zachowanie naruszające niniejszy Regulamin lub szkodliwe dla innych użytkowników lub Usługi."
+        },
+        "changes": {
+          "title": "9. Zmiany Regulaminu",
+          "content": "Zastrzegamy sobie prawo do modyfikacji niniejszego regulaminu w dowolnym momencie. Powiadomimy użytkowników o istotnych zmianach drogą mailową lub poprzez Usługę."
+        },
+        "contact": {
+          "title": "10. Dane Kontaktowe",
+          "content": "W przypadku pytań dotyczących niniejszego Regulaminu, prosimy o kontakt poprzez funkcję czatu w aplikacji lub e-mail."
+        }
+      }
+    },
+    "privacyPolicy": {
+      "title": "Polityka Prywatności",
+      "lastUpdated": "Ostatnia aktualizacja: Styczeń 2025",
+      "sections": {
+        "introduction": {
+          "title": "1. Wprowadzenie",
+          "content": "Niniejsza Polityka Prywatności wyjaśnia, w jaki sposób Accounting AI Agent zbiera, wykorzystuje i chroni Twoje dane osobowe podczas korzystania z naszej Usługi."
+        },
+        "dataCollection": {
+          "title": "2. Zbierane Informacje",
+          "content": "Zbieramy: dane konta (e-mail, imię), dane uwierzytelniające, podane przez Ciebie klucze API (zaszyfrowane), dane wFirma, do których udzielisz dostępu, historię rozmów z AI oraz analitykę użytkowania."
+        },
+        "dataUse": {
+          "title": "3. Jak Wykorzystujemy Twoje Informacje",
+          "content": "Wykorzystujemy Twoje informacje do: świadczenia i ulepszania Usługi, przetwarzania Twoich żądań, komunikacji z Tobą, zapewnienia bezpieczeństwa i spełnienia wymogów prawnych."
+        },
+        "dataStorage": {
+          "title": "4. Przechowywanie i Retencja Danych",
+          "content": "Twoje dane są bezpiecznie przechowywane w naszych bazach danych. Klucze API są szyfrowane przy użyciu szyfrowania AES-256-GCM. Przechowujemy Twoje dane tak długo, jak Twoje konto jest aktywne lub jak jest to potrzebne do świadczenia usług."
+        },
+        "thirdParties": {
+          "title": "5. Usługi Zewnętrzne",
+          "content": "Integrujemy się z usługami zewnętrznymi, w tym: dostawcami AI (OpenAI, Anthropic), systemem księgowym wFirma, dostawcami OAuth (Google, GitHub). Każdy z nich ma własną politykę prywatności."
+        },
+        "cookies": {
+          "title": "6. Pliki Cookie i Śledzenie",
+          "content": "Używamy niezbędnych plików cookie do uwierzytelniania i zarządzania sesjami. Możemy używać analitycznych plików cookie do ulepszania Usługi. Możesz zarządzać preferencjami dotyczącymi plików cookie w ustawieniach przeglądarki."
+        },
+        "userRights": {
+          "title": "7. Twoje Prawa",
+          "content": "Masz prawo do: dostępu do swoich danych osobowych, poprawiania niedokładnych danych, żądania usunięcia danych, eksportu danych i wycofania zgody na przetwarzanie danych."
+        },
+        "security": {
+          "title": "8. Środki Bezpieczeństwa",
+          "content": "Wdrażamy standardowe w branży środki bezpieczeństwa, w tym: szyfrowaną transmisję danych (HTTPS), szyfrowane przechowywanie wrażliwych danych, bezpieczne uwierzytelnianie i regularne audyty bezpieczeństwa."
+        },
+        "children": {
+          "title": "9. Prywatność Dzieci",
+          "content": "Nasza Usługa nie jest przeznaczona dla użytkowników poniżej 18 roku życia. Nie zbieramy świadomie danych osobowych od dzieci."
+        },
+        "changes": {
+          "title": "10. Zmiany Polityki",
+          "content": "Możemy od czasu do czasu aktualizować niniejszą Politykę Prywatności. Powiadomimy Cię o wszelkich zmianach, publikując nową politykę i aktualizując datę \"Ostatnia aktualizacja\"."
+        },
+        "contact": {
+          "title": "11. Kontakt",
+          "content": "Jeśli masz pytania dotyczące niniejszej Polityki Prywatności, skontaktuj się z nami poprzez funkcję czatu w aplikacji lub e-mail."
+        }
+      }
+    }
   },
   "costs": {
     "title": "Panel Kosztów AI",

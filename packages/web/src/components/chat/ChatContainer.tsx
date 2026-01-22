@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { MessageSquarePlus, X, DollarSign } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { AppVersion } from '@/components/ui/app-version';
@@ -11,6 +11,8 @@ import { ConversationList } from './ConversationList';
 import { MessageList } from './MessageList';
 import { ChatInput } from './ChatInput';
 import { ChatHeader } from './ChatHeader';
+import { WfirmaWelcomeModal } from '@/components/onboarding/WfirmaWelcomeModal';
+import { markFirstLoginComplete } from '@/lib/api/auth';
 import enTranslations from '@/i18n/locales/en.json';
 import plTranslations from '@/i18n/locales/pl.json';
 import ruTranslations from '@/i18n/locales/ru.json';
@@ -38,8 +40,29 @@ export function ChatContainer() {
   } = useChat();
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [showWfirmaWelcome, setShowWfirmaWelcome] = useState(false);
   const { locale, setLocale } = useLocale();
   const t = translations[locale].chat;
+  const onboardingTranslations = translations[locale].onboarding;
+
+  // Check for wFirma welcome modal flag on mount
+  useEffect(() => {
+    const shouldShowWfirmaWelcome = localStorage.getItem('showWfirmaWelcome');
+    if (shouldShowWfirmaWelcome === 'true') {
+      setShowWfirmaWelcome(true);
+    }
+  }, []);
+
+  const handleWfirmaWelcomeClose = async () => {
+    setShowWfirmaWelcome(false);
+    localStorage.removeItem('showWfirmaWelcome');
+    // Mark first login as complete on the server
+    try {
+      await markFirstLoginComplete();
+    } catch (error) {
+      console.error('Failed to mark first login complete:', error);
+    }
+  };
 
   const handleSendMessage = async (content: string) => {
     await sendMessage(content);
@@ -137,6 +160,7 @@ export function ChatContainer() {
           isCreatingConversation={isCreatingConversation}
           translations={t.header}
           profileTranslations={translations[locale].profile}
+          apiCredentialsTranslations={translations[locale].apiCredentials}
           locale={locale}
           onLocaleChange={setLocale}
         />
@@ -166,6 +190,13 @@ export function ChatContainer() {
           locale={locale}
         />
       </div>
+
+      {/* wFirma Welcome Modal */}
+      <WfirmaWelcomeModal
+        open={showWfirmaWelcome}
+        onClose={handleWfirmaWelcomeClose}
+        translations={onboardingTranslations.wfirmaWelcome}
+      />
     </div>
   );
 }
