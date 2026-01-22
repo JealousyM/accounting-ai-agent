@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import axios from 'axios';
+import { clearQueryCache } from '@/lib/queryClient';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
@@ -212,6 +213,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       }
     }
 
+    clearQueryCache();
     clearTokens();
     setUser(null);
     router.push('/login');

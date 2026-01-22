@@ -1,7 +1,6 @@
 'use client';
 
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useConversationCosts } from '@/hooks/useConversationCosts';
 import { useLocale } from '@/contexts/LocaleContext';
 import { CostSummaryCard, RunsTable, CostChart, ModelBreakdownChart } from '@/components/ai-costs';
@@ -19,21 +18,10 @@ const translations = {
   ru: ruTranslations,
 };
 
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      staleTime: 1000 * 60,
-      retry: 1,
-    },
-  },
-});
-
 export default function ConversationCostDetailPage() {
   return (
     <ProtectedRoute>
-      <QueryClientProvider client={queryClient}>
-        <ConversationCostDetailContent />
-      </QueryClientProvider>
+      <ConversationCostDetailContent />
     </ProtectedRoute>
   );
 }
