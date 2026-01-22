@@ -5,6 +5,7 @@ import { LocaleProvider } from '@/contexts/LocaleContext';
 import { ThemeProvider } from '@/contexts/ThemeContext';
 import { CookieConsentProvider } from '@/contexts/CookieConsentContext';
 import { GoogleOAuthProvider } from '@/components/providers/GoogleOAuthProvider';
+import { QueryProvider } from '@/components/providers/QueryProvider';
 import { CookieConsentBanner, CookiePreferencesModal } from '@/components/cookies';
 
 export const metadata: Metadata = {
@@ -42,19 +43,21 @@ export default function RootLayout({
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
       <body>
-        <ThemeProvider>
-          <CookieConsentProvider>
-            <GoogleOAuthProvider>
-              <AuthProvider>
-                <LocaleProvider>
-                  {children}
-                  <CookieConsentBanner />
-                  <CookiePreferencesModal />
-                </LocaleProvider>
-              </AuthProvider>
-            </GoogleOAuthProvider>
-          </CookieConsentProvider>
-        </ThemeProvider>
+        <QueryProvider>
+          <ThemeProvider>
+            <CookieConsentProvider>
+              <GoogleOAuthProvider>
+                <AuthProvider>
+                  <LocaleProvider>
+                    {children}
+                    <CookieConsentBanner />
+                    <CookiePreferencesModal />
+                  </LocaleProvider>
+                </AuthProvider>
+              </GoogleOAuthProvider>
+            </CookieConsentProvider>
+          </ThemeProvider>
+        </QueryProvider>
       </body>
     </html>
   );
