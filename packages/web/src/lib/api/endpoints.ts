@@ -17,6 +17,8 @@ export const API_ENDPOINTS = {
     OAUTH_GOOGLE: '/api/auth/oauth/google',
     OAUTH_GITHUB: '/api/auth/oauth/github',
     OAUTH_GITHUB_CALLBACK: '/api/auth/oauth/github/callback',
+    FORGOT_PASSWORD: '/api/auth/forgot-password',
+    RESET_PASSWORD: '/api/auth/reset-password',
   },
 
   // Users

@@ -48,6 +48,39 @@
       "orContinueWith": "Или продолжить с",
       "googleButton": "Продолжить с Google",
       "githubButton": "Продолжить с GitHub"
+    },
+    "forgotPassword": {
+      "title": "Забыли пароль",
+      "subtitle": "Введите email и мы отправим ссылку для сброса",
+      "email": "Email",
+      "emailPlaceholder": "you@example.com",
+      "submitButton": "Отправить ссылку",
+      "submitting": "Отправка...",
+      "backToLogin": "Вернуться к входу",
+      "successTitle": "Проверьте почту",
+      "successMessage": "Мы отправили вам ссылку для сброса пароля",
+      "checkEmail": "Проверьте почту и следуйте инструкциям",
+      "errorMessage": "Не удалось отправить ссылку. Попробуйте снова."
+    },
+    "resetPassword": {
+      "title": "Сброс пароля",
+      "subtitle": "Введите новый пароль",
+      "newPassword": "Новый пароль",
+      "newPasswordPlaceholder": "Введите новый пароль",
+      "confirmPassword": "Подтвердите пароль",
+      "confirmPasswordPlaceholder": "Подтвердите новый пароль",
+      "submitButton": "Сбросить пароль",
+      "submitting": "Сброс...",
+      "backToLogin": "Вернуться к входу",
+      "successTitle": "Пароль успешно сброшен",
+      "successMessage": "Ваш пароль был успешно изменён",
+      "redirecting": "Перенаправление на вход...",
+      "goToLogin": "Перейти к входу",
+      "invalidTokenTitle": "Недействительная или просроченная ссылка",
+      "invalidTokenMessage": "Эта ссылка для сброса пароля недействительна или просрочена",
+      "tokenExpired": "Запросите новую ссылку для сброса пароля",
+      "requestNewLink": "Запросить новую ссылку",
+      "errorMessage": "Не удалось сбросить пароль. Попробуйте снова."
     }
   },
   "chat": {

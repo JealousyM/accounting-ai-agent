@@ -1,8 +1,11 @@
 import bcrypt from 'bcrypt';
+import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
 import { z } from 'zod';
 import { prisma } from '../lib/prisma';
 import { redis } from '../lib/redis';
+import { emailService } from './email.service';
+import { logger } from '../utils/logger';
 
 // ============================================
 // VALIDATION SCHEMAS
@@ -83,6 +86,8 @@ export class AuthService {
   private readonly JWT_REFRESH_EXPIRES_IN = '7d';
   private readonly SALT_ROUNDS = 10;
   private readonly REDIS_REFRESH_TOKEN_PREFIX = 'refresh_token:';
+  private readonly RESET_TOKEN_PREFIX = 'password_reset:';
+  private readonly RESET_TOKEN_TTL = 3600; // 1 hour in seconds
 
   constructor() {
     this.JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
@@ -343,6 +348,93 @@ export class AuthService {
    */
   async comparePassword(password: string, hash: string): Promise<boolean> {
     return bcrypt.compare(password, hash);
+  }
+
+  /**
+   * Request password reset - generates token and sends email
+   */
+  async requestPasswordReset(email: string, locale: string = 'en'): Promise<void> {
+    // Find user by email
+    const user = await prisma.user.findUnique({
+      where: { email: email.toLowerCase() },
+    });
+
+    // Always return success to prevent email enumeration
+    if (!user) {
+      logger.info('Password reset requested for non-existent email', { email });
+      return;
+    }
+
+    // Check if user has a password (not OAuth-only)
+    if (!user.passwordHash) {
+      logger.info('Password reset requested for OAuth-only account', { email });
+      return;
+    }
+
+    // Generate secure random token
+    const resetToken = crypto.randomBytes(32).toString('hex');
+    const tokenHash = crypto.createHash('sha256').update(resetToken).digest('hex');
+
+    // Store token in Redis with user ID
+    const redisKey = `${this.RESET_TOKEN_PREFIX}${tokenHash}`;
+    await redis.setEx(redisKey, this.RESET_TOKEN_TTL, user.id);
+
+    logger.info('Password reset token generated', { userId: user.id, email });
+
+    // Send email with reset link
+    const emailSent = await emailService.sendPasswordResetEmail(email, resetToken, locale);
+
+    if (!emailSent && process.env.NODE_ENV === 'production') {
+      logger.error('Failed to send password reset email', { email });
+    }
+  }
+
+  /**
+   * Reset password using token
+   */
+  async resetPassword(token: string, newPassword: string): Promise<void> {
+    // Hash the token to match stored hash
+    const tokenHash = crypto.createHash('sha256').update(token).digest('hex');
+    const redisKey = `${this.RESET_TOKEN_PREFIX}${tokenHash}`;
+
+    // Get user ID from Redis
+    const userId = await redis.get(redisKey);
+
+    if (!userId) {
+      throw new Error('Invalid or expired reset token');
+    }
+
+    // Validate password strength
+    if (!this.validatePassword(newPassword)) {
+      throw new Error('Password does not meet requirements');
+    }
+
+    // Find user
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    // Hash new password
+    const passwordHash = await bcrypt.hash(newPassword, this.SALT_ROUNDS);
+
+    // Update user password
+    await prisma.user.update({
+      where: { id: userId },
+      data: { passwordHash },
+    });
+
+    // Delete used token
+    await redis.del(redisKey);
+
+    // Invalidate all existing refresh tokens for this user
+    const refreshTokenKey = `${this.REDIS_REFRESH_TOKEN_PREFIX}${userId}`;
+    await redis.del(refreshTokenKey);
+
+    logger.info('Password reset successful', { userId });
   }
 }
 

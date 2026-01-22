@@ -48,6 +48,39 @@
       "orContinueWith": "Lub kontynuuj z",
       "googleButton": "Kontynuuj z Google",
       "githubButton": "Kontynuuj z GitHub"
+    },
+    "forgotPassword": {
+      "title": "Zapomniałeś hasła",
+      "subtitle": "Wprowadź email, a wyślemy Ci link do resetowania",
+      "email": "Adres email",
+      "emailPlaceholder": "twoj@email.pl",
+      "submitButton": "Wyślij link",
+      "submitting": "Wysyłanie...",
+      "backToLogin": "Powrót do logowania",
+      "successTitle": "Sprawdź email",
+      "successMessage": "Wysłaliśmy link do resetowania hasła",
+      "checkEmail": "Sprawdź swoją skrzynkę i postępuj zgodnie z instrukcjami",
+      "errorMessage": "Nie udało się wysłać linku. Spróbuj ponownie."
+    },
+    "resetPassword": {
+      "title": "Resetuj hasło",
+      "subtitle": "Wprowadź nowe hasło",
+      "newPassword": "Nowe hasło",
+      "newPasswordPlaceholder": "Wprowadź nowe hasło",
+      "confirmPassword": "Potwierdź hasło",
+      "confirmPasswordPlaceholder": "Potwierdź nowe hasło",
+      "submitButton": "Resetuj hasło",
+      "submitting": "Resetowanie...",
+      "backToLogin": "Powrót do logowania",
+      "successTitle": "Hasło zostało zresetowane",
+      "successMessage": "Twoje hasło zostało pomyślnie zmienione",
+      "redirecting": "Przekierowanie do logowania...",
+      "goToLogin": "Przejdź do logowania",
+      "invalidTokenTitle": "Nieprawidłowy lub wygasły link",
+      "invalidTokenMessage": "Ten link do resetowania hasła jest nieprawidłowy lub wygasł",
+      "tokenExpired": "Poproś o nowy link do resetowania hasła",
+      "requestNewLink": "Poproś o nowy link",
+      "errorMessage": "Nie udało się zresetować hasła. Spróbuj ponownie."
     }
   },
   "chat": {

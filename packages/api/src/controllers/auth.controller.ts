@@ -451,6 +451,88 @@ export class AuthController {
   }
 
   /**
+   * POST /api/auth/forgot-password
+   * Request password reset email
+   */
+  async forgotPassword(req: Request, res: Response): Promise<void> {
+    try {
+      const { email, locale } = req.body;
+
+      await authService.requestPasswordReset(email, locale || 'en');
+
+      // Always return success to prevent email enumeration
+      logger.info('Password reset requested', { email });
+
+      res.status(200).json({
+        success: true,
+        message: 'If an account with that email exists, a password reset link has been sent.',
+      });
+    } catch (error) {
+      logger.error('Error processing password reset request', { error });
+      res.status(500).json({
+        success: false,
+        error: 'Internal Server Error',
+        message: 'An unexpected error occurred',
+      });
+    }
+  }
+
+  /**
+   * POST /api/auth/reset-password
+   * Reset password using token
+   */
+  async resetPassword(req: Request, res: Response): Promise<void> {
+    try {
+      const { token, password } = req.body;
+
+      await authService.resetPassword(token, password);
+
+      logger.info('Password reset successful');
+
+      res.status(200).json({
+        success: true,
+        message: 'Password has been reset successfully. You can now login with your new password.',
+      });
+    } catch (error) {
+      if (error instanceof Error) {
+        logger.warn('Password reset failed', { error: error.message });
+
+        if (error.message.includes('Invalid or expired')) {
+          res.status(400).json({
+            success: false,
+            error: 'Invalid Token',
+            message: 'The password reset link is invalid or has expired. Please request a new one.',
+          });
+          return;
+        }
+
+        if (error.message.includes('does not meet requirements')) {
+          res.status(400).json({
+            success: false,
+            error: 'Validation Error',
+            message: 'Password does not meet the security requirements.',
+          });
+          return;
+        }
+
+        res.status(400).json({
+          success: false,
+          error: 'Reset Failed',
+          message: error.message,
+        });
+        return;
+      }
+
+      logger.error('Unexpected error during password reset', { error });
+      res.status(500).json({
+        success: false,
+        error: 'Internal Server Error',
+        message: 'An unexpected error occurred',
+      });
+    }
+  }
+
+  /**
    * POST /api/auth/oauth/github/callback
    * Exchange GitHub authorization code for access token and authenticate user
    */

@@ -9,6 +9,8 @@ import {
   refreshTokenSchema,
   oauthSchema,
   updateProfileSchema,
+  forgotPasswordSchema,
+  resetPasswordSchema,
 } from '../validators/auth.validators';
 
 const router = Router();
@@ -54,6 +56,28 @@ router.post(
   rateLimiter({ windowMs: 15 * 60 * 1000, max: 20 }), // 20 requests per 15 minutes
   validateRequest(refreshTokenSchema),
   authController.refresh.bind(authController)
+);
+
+/**
+ * POST /api/auth/forgot-password
+ * Request password reset email
+ */
+router.post(
+  '/forgot-password',
+  rateLimiter({ windowMs: 15 * 60 * 1000, max: 3 }), // 3 requests per 15 minutes (strict limit)
+  validateRequest(forgotPasswordSchema),
+  authController.forgotPassword.bind(authController)
+);
+
+/**
+ * POST /api/auth/reset-password
+ * Reset password using token
+ */
+router.post(
+  '/reset-password',
+  rateLimiter({ windowMs: 15 * 60 * 1000, max: 5 }), // 5 requests per 15 minutes
+  validateRequest(resetPasswordSchema),
+  authController.resetPassword.bind(authController)
 );
 
 // ============================================
