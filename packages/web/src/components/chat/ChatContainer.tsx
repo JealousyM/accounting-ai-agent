@@ -111,9 +111,9 @@ export function ChatContainer() {
             />
           </div>
 
-          {/* Sidebar footer with AI Costs link */}
-          <div className="border-t border-gray-200 dark:border-gray-700 p-4">
-            <div className="flex items-center justify-between">
+          {/* Sidebar footer with AI Costs link - same height as ChatInput */}
+          <div className="mt-auto px-4 bg-gray-50 dark:bg-gray-900/50 h-[92px] flex items-center">
+            <div className="flex items-center justify-between w-full">
               <Link
                 href="/dashboard/costs"
                 className="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"

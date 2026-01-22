@@ -3,7 +3,9 @@ import './globals.css';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { LocaleProvider } from '@/contexts/LocaleContext';
 import { ThemeProvider } from '@/contexts/ThemeContext';
+import { CookieConsentProvider } from '@/contexts/CookieConsentContext';
 import { GoogleOAuthProvider } from '@/components/providers/GoogleOAuthProvider';
+import { CookieConsentBanner, CookiePreferencesModal } from '@/components/cookies';
 
 export const metadata: Metadata = {
   title: 'Accounting AI Agent',
@@ -41,13 +43,17 @@ export default function RootLayout({
       </head>
       <body>
         <ThemeProvider>
-          <GoogleOAuthProvider>
-            <AuthProvider>
-              <LocaleProvider>
-                {children}
-              </LocaleProvider>
-            </AuthProvider>
-          </GoogleOAuthProvider>
+          <CookieConsentProvider>
+            <GoogleOAuthProvider>
+              <AuthProvider>
+                <LocaleProvider>
+                  {children}
+                  <CookieConsentBanner />
+                  <CookiePreferencesModal />
+                </LocaleProvider>
+              </AuthProvider>
+            </GoogleOAuthProvider>
+          </CookieConsentProvider>
         </ThemeProvider>
       </body>
     </html>
