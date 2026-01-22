@@ -75,7 +75,13 @@
       "placeholder": "Type your message...",
       "placeholderNew": "Start a new conversation...",
       "placeholderDefault": "Ask about Polish accounting, taxes, wFirma...",
-      "hint": "Press Enter to send, Shift+Enter for new line"
+      "hint": "Press Enter to send, Shift+Enter for new line",
+      "voiceStart": "Start voice input",
+      "voiceStop": "Stop voice input",
+      "voiceListening": "Listening... Click to stop",
+      "voiceNotSupported": "Voice input is not supported in your browser",
+      "voicePermissionDenied": "Microphone access denied",
+      "voiceError": "Voice input error"
     },
     "tools": {
       "companyInfo": "Company Info",

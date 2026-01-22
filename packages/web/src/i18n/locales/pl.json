@@ -75,7 +75,13 @@
       "placeholder": "Wpisz wiadomość...",
       "placeholderNew": "Rozpocznij nową rozmowę...",
       "placeholderDefault": "Zapytaj o księgowość, podatki, wFirma...",
-      "hint": "Enter - wyślij, Shift+Enter - nowa linia"
+      "hint": "Enter - wyślij, Shift+Enter - nowa linia",
+      "voiceStart": "Rozpocznij dyktowanie",
+      "voiceStop": "Zatrzymaj dyktowanie",
+      "voiceListening": "Słucham... Kliknij, aby zatrzymać",
+      "voiceNotSupported": "Dyktowanie głosowe nie jest obsługiwane",
+      "voicePermissionDenied": "Brak dostępu do mikrofonu",
+      "voiceError": "Błąd dyktowania"
     },
     "tools": {
       "companyInfo": "Dane firmy",

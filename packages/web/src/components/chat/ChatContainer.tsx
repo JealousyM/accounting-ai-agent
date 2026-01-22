@@ -163,6 +163,7 @@ export function ChatContainer() {
               : t.input.placeholderDefault
           }
           translations={t.input}
+          locale={locale}
         />
       </div>
     </div>

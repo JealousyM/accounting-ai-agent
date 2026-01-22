@@ -75,7 +75,13 @@
       "placeholder": "Введите сообщение...",
       "placeholderNew": "Начните новый разговор...",
       "placeholderDefault": "Спросите о бухгалтерии, налогах, wFirma...",
-      "hint": "Enter - отправить, Shift+Enter - новая строка"
+      "hint": "Enter - отправить, Shift+Enter - новая строка",
+      "voiceStart": "Начать голосовой ввод",
+      "voiceStop": "Остановить",
+      "voiceListening": "Слушаю... Нажмите, чтобы остановить",
+      "voiceNotSupported": "Голосовой ввод не поддерживается",
+      "voicePermissionDenied": "Доступ к микрофону запрещён",
+      "voiceError": "Ошибка голосового ввода"
     },
     "tools": {
       "companyInfo": "Данные компании",
