@@ -177,3 +177,49 @@ export const githubOAuthCallback = async (code: string): Promise<AuthData> => {
     skipAuth: true,
   });
 };
+
+/**
+ * Forgot password - request password reset email
+ */
+export interface ForgotPasswordResponse {
+  success: boolean;
+  message: string;
+}
+
+export const forgotPassword = async (email: string): Promise<ForgotPasswordResponse> => {
+  try {
+    return await apiClient.post<ForgotPasswordResponse>(
+      API_ENDPOINTS.AUTH.FORGOT_PASSWORD,
+      { email },
+      { skipAuth: true }
+    );
+  } catch (error) {
+    if (error instanceof ApiError) {
+      throw error;
+    }
+    throw new Error('Failed to request password reset');
+  }
+};
+
+/**
+ * Reset password - set new password with token
+ */
+export interface ResetPasswordResponse {
+  success: boolean;
+  message: string;
+}
+
+export const resetPassword = async (token: string, password: string, confirmPassword: string): Promise<ResetPasswordResponse> => {
+  try {
+    return await apiClient.post<ResetPasswordResponse>(
+      API_ENDPOINTS.AUTH.RESET_PASSWORD,
+      { token, password, confirmPassword },
+      { skipAuth: true }
+    );
+  } catch (error) {
+    if (error instanceof ApiError) {
+      throw error;
+    }
+    throw new Error('Failed to reset password');
+  }
+};

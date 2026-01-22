@@ -133,6 +133,33 @@ export const updateProfileSchema = z.object({
   }),
 });
 
+/**
+ * Forgot password validation schema
+ */
+export const forgotPasswordSchema = z.object({
+  body: z.object({
+    email: emailSchema,
+    locale: z.enum(['en', 'pl', 'ru']).default('en').optional(),
+  }),
+});
+
+/**
+ * Reset password validation schema
+ */
+export const resetPasswordSchema = z.object({
+  body: z.object({
+    token: z
+      .string()
+      .min(1, 'Reset token is required')
+      .trim(),
+    password: passwordSchema,
+    confirmPassword: z.string().min(1, 'Password confirmation is required'),
+  }),
+}).refine((data) => data.body.password === data.body.confirmPassword, {
+  message: 'Passwords do not match',
+  path: ['body', 'confirmPassword'],
+});
+
 // ============================================
 // TYPE EXPORTS
 // ============================================
@@ -143,6 +170,8 @@ export type RefreshTokenInput = z.infer<typeof refreshTokenSchema>['body'];
 export type OAuthInput = z.infer<typeof oauthSchema>['body'];
 export type ChangePasswordInput = z.infer<typeof changePasswordSchema>['body'];
 export type UpdateProfileInput = z.infer<typeof updateProfileSchema>['body'];
+export type ForgotPasswordInput = z.infer<typeof forgotPasswordSchema>['body'];
+export type ResetPasswordInput = z.infer<typeof resetPasswordSchema>['body'];
 
 // ============================================
 // INTERFACES

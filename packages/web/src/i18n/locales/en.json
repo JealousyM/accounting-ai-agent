@@ -48,6 +48,39 @@
       "orContinueWith": "Or continue with",
       "googleButton": "Continue with Google",
       "githubButton": "Continue with GitHub"
+    },
+    "forgotPassword": {
+      "title": "Forgot password",
+      "subtitle": "Enter your email and we'll send you a reset link",
+      "email": "Email address",
+      "emailPlaceholder": "you@example.com",
+      "submitButton": "Send reset link",
+      "submitting": "Sending...",
+      "backToLogin": "Back to login",
+      "successTitle": "Check your email",
+      "successMessage": "We've sent you a password reset link",
+      "checkEmail": "Please check your inbox and follow the instructions",
+      "errorMessage": "Failed to send reset link. Please try again."
+    },
+    "resetPassword": {
+      "title": "Reset password",
+      "subtitle": "Enter your new password",
+      "newPassword": "New password",
+      "newPasswordPlaceholder": "Enter new password",
+      "confirmPassword": "Confirm password",
+      "confirmPasswordPlaceholder": "Confirm new password",
+      "submitButton": "Reset password",
+      "submitting": "Resetting...",
+      "backToLogin": "Back to login",
+      "successTitle": "Password reset successful",
+      "successMessage": "Your password has been reset successfully",
+      "redirecting": "Redirecting to login...",
+      "goToLogin": "Go to login",
+      "invalidTokenTitle": "Invalid or expired link",
+      "invalidTokenMessage": "This password reset link is invalid or has expired",
+      "tokenExpired": "Please request a new password reset link",
+      "requestNewLink": "Request new link",
+      "errorMessage": "Failed to reset password. Please try again."
     }
   },
   "chat": {
