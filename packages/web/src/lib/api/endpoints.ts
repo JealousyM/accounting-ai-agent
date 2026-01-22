@@ -7,6 +7,7 @@
 export const API_ENDPOINTS = {
   // Auth
   AUTH: {
+    CONFIG: '/api/auth/config',
     REGISTER: '/api/auth/register',
     LOGIN: '/api/auth/login',
     LOGOUT: '/api/auth/logout',
@@ -15,6 +16,7 @@ export const API_ENDPOINTS = {
     PROFILE: '/api/auth/profile',
     OAUTH_GOOGLE: '/api/auth/oauth/google',
     OAUTH_GITHUB: '/api/auth/oauth/github',
+    OAUTH_GITHUB_CALLBACK: '/api/auth/oauth/github/callback',
   },
 
   // Users

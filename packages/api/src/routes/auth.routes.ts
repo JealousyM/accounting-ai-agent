@@ -18,6 +18,12 @@ const router = Router();
 // ============================================
 
 /**
+ * GET /api/auth/config
+ * Get public auth configuration (OAuth visibility settings)
+ */
+router.get('/config', authController.getConfig.bind(authController));
+
+/**
  * POST /api/auth/register
  * Register a new user
  */
@@ -74,6 +80,16 @@ router.post(
   rateLimiter({ windowMs: 15 * 60 * 1000, max: 10 }),
   validateRequest(oauthSchema),
   authController.githubOAuth.bind(authController)
+);
+
+/**
+ * POST /api/auth/oauth/github/callback
+ * GitHub OAuth callback - exchange code for tokens
+ */
+router.post(
+  '/oauth/github/callback',
+  rateLimiter({ windowMs: 15 * 60 * 1000, max: 10 }),
+  authController.githubOAuthCallback.bind(authController)
 );
 
 // ============================================

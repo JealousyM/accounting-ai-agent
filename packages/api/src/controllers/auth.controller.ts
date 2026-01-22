@@ -5,6 +5,35 @@ import { logger } from '../utils/logger';
 
 export class AuthController {
   /**
+   * GET /api/auth/config
+   * Get public auth configuration (OAuth visibility settings)
+   */
+  async getConfig(_req: Request, res: Response): Promise<void> {
+    try {
+      const config = {
+        github: {
+          visible: process.env.GITHUB_CLIENT_VISIBLE === 'true',
+        },
+        google: {
+          visible: !!process.env.GOOGLE_CLIENT_ID,
+        },
+      };
+
+      res.status(200).json({
+        success: true,
+        data: config,
+      });
+    } catch (error) {
+      logger.error('Error fetching auth config', { error });
+      res.status(500).json({
+        success: false,
+        error: 'Internal Server Error',
+        message: 'An unexpected error occurred',
+      });
+    }
+  }
+
+  /**
    * POST /api/auth/register
    * Register a new user
    */
@@ -413,6 +442,119 @@ export class AuthController {
       }
 
       logger.error('Unexpected error during GitHub OAuth', { error });
+      res.status(500).json({
+        success: false,
+        error: 'Internal Server Error',
+        message: 'An unexpected error occurred',
+      });
+    }
+  }
+
+  /**
+   * POST /api/auth/oauth/github/callback
+   * Exchange GitHub authorization code for access token and authenticate user
+   */
+  async githubOAuthCallback(req: Request, res: Response): Promise<void> {
+    try {
+      const { code } = req.body;
+
+      if (!code) {
+        res.status(400).json({
+          success: false,
+          error: 'Bad Request',
+          message: 'Authorization code is required',
+        });
+        return;
+      }
+
+      // Exchange code for access token
+      const tokenResponse = await fetch('https://github.com/login/oauth/access_token', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        },
+        body: JSON.stringify({
+          client_id: process.env.GITHUB_CLIENT_ID,
+          client_secret: process.env.GITHUB_CLIENT_SECRET,
+          code,
+        }),
+      });
+
+      const tokenData = await tokenResponse.json();
+
+      if (tokenData.error) {
+        logger.error('GitHub token exchange failed', { error: tokenData.error });
+        res.status(400).json({
+          success: false,
+          error: 'OAuth Failed',
+          message: tokenData.error_description || 'Failed to exchange authorization code',
+        });
+        return;
+      }
+
+      // Fetch user profile from GitHub
+      const userResponse = await fetch('https://api.github.com/user', {
+        headers: {
+          Authorization: `Bearer ${tokenData.access_token}`,
+          Accept: 'application/vnd.github.v3+json',
+        },
+      });
+
+      const userData = await userResponse.json();
+
+      // Fetch user email (may be private)
+      let email = userData.email;
+      if (!email) {
+        const emailsResponse = await fetch('https://api.github.com/user/emails', {
+          headers: {
+            Authorization: `Bearer ${tokenData.access_token}`,
+            Accept: 'application/vnd.github.v3+json',
+          },
+        });
+        const emails = await emailsResponse.json();
+        const primaryEmail = emails.find((e: { primary: boolean; verified: boolean; email: string }) => e.primary && e.verified);
+        email = primaryEmail?.email;
+      }
+
+      if (!email) {
+        res.status(400).json({
+          success: false,
+          error: 'OAuth Failed',
+          message: 'Could not retrieve email from GitHub. Please ensure your email is verified.',
+        });
+        return;
+      }
+
+      const profile = {
+        id: String(userData.id),
+        email,
+        name: userData.name || userData.login,
+        picture: userData.avatar_url,
+        provider: 'github' as const,
+      };
+
+      const tokens = await authService.findOrCreateOAuthUser(profile);
+
+      logger.info('GitHub OAuth callback successful', { email: profile.email });
+
+      res.status(200).json({
+        success: true,
+        message: 'OAuth authentication successful',
+        data: tokens,
+      });
+    } catch (error) {
+      if (error instanceof Error) {
+        logger.error('GitHub OAuth callback failed', { error: error.message });
+        res.status(400).json({
+          success: false,
+          error: 'OAuth Failed',
+          message: error.message,
+        });
+        return;
+      }
+
+      logger.error('Unexpected error during GitHub OAuth callback', { error });
       res.status(500).json({
         success: false,
         error: 'Internal Server Error',

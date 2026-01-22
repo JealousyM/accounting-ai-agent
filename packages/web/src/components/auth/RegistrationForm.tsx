@@ -1,20 +1,25 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Eye, EyeOff, Check, X, Github, Globe } from 'lucide-react';
+import axios from 'axios';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
 import { AppVersion } from '@/components/ui/app-version';
 import { registrationSchema, type RegistrationFormData, checkPasswordStrength } from '@/lib/validations/auth';
 import { registerUser, type ErrorResponse } from '@/lib/api/auth';
+import { useGoogleAuth } from '@/hooks/useGoogleAuth';
+import { useGithubAuth } from '@/hooks/useGithubAuth';
 import { cn } from '@/lib/utils';
 import enTranslations from '@/i18n/locales/en.json';
 import plTranslations from '@/i18n/locales/pl.json';
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
 export function RegistrationForm() {
   const [selectedLocale, setSelectedLocale] = useState<'en' | 'pl'>('en');
@@ -24,10 +29,39 @@ export function RegistrationForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [githubVisible, setGithubVisible] = useState(false);
+
+  // OAuth hooks
+  const { login: googleLogin, isLoading: googleLoading, error: googleError, clearError: clearGoogleError } = useGoogleAuth();
+  const { login: githubLogin, isLoading: githubLoading, error: githubError, clearError: clearGithubError } = useGithubAuth();
+
+  // Show OAuth errors
+  const oauthError = googleError || githubError;
+
+  // Fetch auth config to check OAuth visibility
+  useEffect(() => {
+    const fetchAuthConfig = async () => {
+      try {
+        const response = await axios.get(`${API_URL}/api/auth/config`);
+        if (response.data?.data?.github?.visible) {
+          setGithubVisible(true);
+        }
+      } catch (error) {
+        console.log('Could not fetch auth config');
+      }
+    };
+    fetchAuthConfig();
+  }, []);
+
+  // Clear OAuth errors when switching providers
+  useEffect(() => {
+    if (googleError) clearGithubError();
+    if (githubError) clearGoogleError();
+  }, [googleError, githubError, clearGoogleError, clearGithubError]);
 
   // Get translations based on selected locale
-  const t = selectedLocale === 'pl' 
-    ? plTranslations.auth.register 
+  const t = selectedLocale === 'pl'
+    ? plTranslations.auth.register
     : enTranslations.auth.register;
 
   const {
@@ -84,13 +118,13 @@ export function RegistrationForm() {
   };
 
   const handleGoogleOAuth = () => {
-    // Implement Google OAuth flow
-    console.log('Google OAuth');
+    setApiError(null);
+    googleLogin();
   };
 
   const handleGithubOAuth = () => {
-    // Implement GitHub OAuth flow
-    console.log('GitHub OAuth');
+    setApiError(null);
+    githubLogin();
   };
 
   return (
@@ -144,11 +178,11 @@ export function RegistrationForm() {
       )}
 
       {/* API Error */}
-      {apiError && (
+      {(apiError || oauthError) && (
         <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-lg">
           <div className="flex items-center gap-2 text-red-800 dark:text-red-400">
             <X className="h-5 w-5" />
-            <p className="text-sm font-medium">{apiError}</p>
+            <p className="text-sm font-medium">{apiError || oauthError}</p>
           </div>
         </div>
       )}
@@ -160,37 +194,49 @@ export function RegistrationForm() {
           variant="outline"
           className="w-full"
           onClick={handleGoogleOAuth}
+          disabled={googleLoading || githubLoading || isSubmitting}
         >
-          <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
-            <path
-              fill="currentColor"
-              d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-            />
-            <path
-              fill="currentColor"
-              d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-            />
-            <path
-              fill="currentColor"
-              d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-            />
-            <path
-              fill="currentColor"
-              d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-            />
-          </svg>
-          {t.googleButton}
+          {googleLoading ? (
+            <div className="w-5 h-5 mr-2 animate-spin rounded-full border-2 border-gray-300 border-t-gray-600" />
+          ) : (
+            <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
+              <path
+                fill="currentColor"
+                d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+              />
+              <path
+                fill="currentColor"
+                d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+              />
+              <path
+                fill="currentColor"
+                d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+              />
+              <path
+                fill="currentColor"
+                d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+              />
+            </svg>
+          )}
+          {googleLoading ? 'Connecting...' : t.googleButton}
         </Button>
 
-        <Button
-          type="button"
-          variant="outline"
-          className="w-full"
-          onClick={handleGithubOAuth}
-        >
-          <Github className="w-5 h-5 mr-2" />
-          {t.githubButton}
-        </Button>
+        {githubVisible && (
+          <Button
+            type="button"
+            variant="outline"
+            className="w-full"
+            onClick={handleGithubOAuth}
+            disabled={googleLoading || githubLoading || isSubmitting}
+          >
+            {githubLoading ? (
+              <div className="w-5 h-5 mr-2 animate-spin rounded-full border-2 border-gray-300 border-t-gray-600" />
+            ) : (
+              <Github className="w-5 h-5 mr-2" />
+            )}
+            {githubLoading ? 'Connecting...' : t.githubButton}
+          </Button>
+        )}
       </div>
 
       {/* Divider */}
