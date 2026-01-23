@@ -8,6 +8,7 @@ import {
   loginSchema,
   refreshTokenSchema,
   oauthSchema,
+  googleOAuthSchema,
   updateProfileSchema,
   forgotPasswordSchema,
   resetPasswordSchema,
@@ -87,12 +88,12 @@ router.post(
 
 /**
  * POST /api/auth/oauth/google
- * Google OAuth authentication
+ * Google OAuth authentication - accepts access_token for secure server-side verification
  */
 router.post(
   '/oauth/google',
   rateLimiter({ windowMs: 15 * 60 * 1000, max: 10 }),
-  validateRequest(oauthSchema),
+  validateRequest(googleOAuthSchema),
   authController.googleOAuth.bind(authController)
 );
 

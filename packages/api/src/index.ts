@@ -17,11 +17,23 @@ import { logger } from './utils/logger';
 const app: Application = express();
 const PORT = process.env.PORT || 3001;
 
+// CORS configuration - fail-secure in production
+const corsOrigin = process.env.CORS_ORIGIN;
+if (process.env.NODE_ENV === 'production' && !corsOrigin) {
+  throw new Error(
+    'SECURITY ERROR: CORS_ORIGIN must be set in production environment. ' +
+    'Example: CORS_ORIGIN=https://yourdomain.com'
+  );
+}
+
 // Middleware
 app.use(helmet());
-app.use(cors({ origin: process.env.CORS_ORIGIN || 'http://localhost:3000' }));
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(cors({
+  origin: corsOrigin || 'http://localhost:3000',
+  credentials: true, // Allow cookies for future httpOnly token migration
+}));
+app.use(express.json({ limit: '100kb' })); // Prevent large payload attacks
+app.use(express.urlencoded({ extended: true, limit: '100kb' }));
 
 // Global rate limiter
 app.use('/api', globalRateLimiter);

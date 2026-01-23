@@ -95,7 +95,7 @@ export const refreshTokenSchema = z.object({
 });
 
 /**
- * OAuth validation schema
+ * OAuth validation schema (for GitHub which uses profile data)
  */
 export const oauthSchema = z.object({
   body: z.object({
@@ -103,6 +103,15 @@ export const oauthSchema = z.object({
     email: emailSchema,
     name: z.string().max(100, 'Name is too long').optional(),
     picture: z.string().url('Invalid picture URL').optional(),
+  }),
+});
+
+/**
+ * Google OAuth validation schema (uses access_token for secure server-side verification)
+ */
+export const googleOAuthSchema = z.object({
+  body: z.object({
+    access_token: z.string().min(1, 'Access token is required'),
   }),
 });
 

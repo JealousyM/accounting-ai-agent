@@ -69,6 +69,12 @@ export class WFirmaClient {
       maxAttempts: this.config.retryAttempts || 3,
     };
 
+    // SSL verification - enabled by default, can be disabled for development only
+    const rejectUnauthorized = process.env.WFIRMA_SKIP_SSL_VERIFY !== 'true';
+    if (!rejectUnauthorized) {
+      logger.warn('SECURITY WARNING: SSL certificate verification is disabled for wFirma API. This should only be used in development!');
+    }
+
     // Initialize axios client with wFirma API Key authentication
     this.apiClient = axios.create({
       baseURL: this.config.apiUrl,
@@ -81,7 +87,7 @@ export class WFirmaClient {
         'appKey': this.config.appKey,
       },
       httpsAgent: new (require('https').Agent)({
-        rejectUnauthorized: false,
+        rejectUnauthorized, // Default: true (secure), set WFIRMA_SKIP_SSL_VERIFY=true only in development
       }),
     });
 

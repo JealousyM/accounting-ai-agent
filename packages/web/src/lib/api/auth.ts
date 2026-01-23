@@ -158,16 +158,11 @@ export const getUserLocale = async (email: string): Promise<{ locale: string }> 
 };
 
 /**
- * Google OAuth
+ * Google OAuth - sends access token to backend for verification
  * Note: apiClient unwraps the response, returning data directly
  */
-export const googleOAuth = async (profile: {
-  id: string;
-  email: string;
-  name?: string;
-  picture?: string;
-}): Promise<AuthData> => {
-  return apiClient.post<AuthData>(API_ENDPOINTS.AUTH.OAUTH_GOOGLE, profile, {
+export const googleOAuth = async (accessToken: string): Promise<AuthData> => {
+  return apiClient.post<AuthData>(API_ENDPOINTS.AUTH.OAUTH_GOOGLE, { access_token: accessToken }, {
     skipAuth: true,
   });
 };

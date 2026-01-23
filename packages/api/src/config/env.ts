@@ -21,16 +21,10 @@ export const validateEnv = () => {
   const required = ['WFIRMA_ACCESS_KEY', 'WFIRMA_SECRET_KEY', 'WFIRMA_APP_KEY'];
   const missing = required.filter((key) => !process.env[key]);
 
-  if (missing.length > 0) {
-    console.warn(`Missing wFirma environment variables: ${missing.join(', ')}`);
-  }
-
+  // Note: We intentionally don't log which variables are missing
+  // to avoid exposing configuration details
   return missing.length === 0;
 };
 
-// Log which env file was loaded (for debugging)
-if (process.env.NODE_ENV !== 'production') {
-  console.log(`[ENV] Loaded from: ${result.parsed ? envPath : 'default location'}`);
-  console.log(`[ENV] WFIRMA_ACCESS_KEY: ${process.env.WFIRMA_ACCESS_KEY ? '***' + process.env.WFIRMA_ACCESS_KEY.slice(-4) : 'NOT SET'}`);
-  console.log(`[ENV] WFIRMA_COMPANY_ID: ${process.env.WFIRMA_COMPANY_ID || 'NOT SET'}`);
-}
+// Note: Removed credential logging for security - even masked values
+// can leak information about which services are configured
