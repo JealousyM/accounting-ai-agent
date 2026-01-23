@@ -198,11 +198,19 @@ cd packages/web && npm run test:e2e
 
 ## 📝 Documentation
 
-- [API Documentation](./packages/api/docs/API.md)
-- [Architecture](./packages/api/docs/ARCHITECTURE.md)
-- [Middleware](./packages/api/docs/MIDDLEWARE.md)
-- [Database Schema](./packages/api/docs/DATABASE.md)
-- [API Client](./packages/web/src/lib/api/README.md)
+Complete technical documentation is available in the [docs](./docs) folder:
+
+- [Getting Started](./docs/GETTING_STARTED.md) - Setup and installation guide
+- [Architecture](./docs/ARCHITECTURE.md) - System design and structure
+- [API Reference](./docs/API_REFERENCE.md) - REST API endpoints
+- [Authentication](./docs/AUTHENTICATION.md) - JWT and OAuth authentication
+- [Database](./docs/DATABASE.md) - PostgreSQL schema and Prisma ORM
+- [AI Agents](./docs/AI_AGENTS.md) - LangGraph multi-agent system
+- [wFirma Integration](./docs/WFIRMA_INTEGRATION.md) - Polish accounting system integration
+- [Frontend](./docs/FRONTEND.md) - Next.js 15 web application
+- [Deployment](./docs/DEPLOYMENT.md) - Production deployment guide
+
+See [docs/README.md](./docs/README.md) for the full documentation index.
 
 ## 🔧 Troubleshooting
 
