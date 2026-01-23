@@ -100,6 +100,30 @@
       "tokenExpired": "Poproś o nowy link do resetowania hasła",
       "requestNewLink": "Poproś o nowy link",
       "errorMessage": "Nie udało się zresetować hasła. Spróbuj ponownie."
+    },
+    "completeProfile": {
+      "title": "Dokończ konfigurację profilu",
+      "subtitle": "Podaj dane AI, aby korzystać z czatu",
+      "description": "Aby korzystać z asystenta AI, musisz skonfigurować dostawcę AI. Twój klucz API jest przechowywany bezpiecznie i zaszyfrowany.",
+      "llmSection": "Konfiguracja dostawcy AI",
+      "llmProvider": "Dostawca AI",
+      "llmProviderSelect": "Wybierz dostawcę AI...",
+      "llmProviderHelp": "Wybierz dostawcę AI. Musisz podać własny klucz API.",
+      "llmApiKey": "Klucz API",
+      "llmApiKeyPlaceholder": "Wprowadź klucz API",
+      "llmApiKeyHelpOpenai": "Pobierz klucz API z platform.openai.com",
+      "llmApiKeyHelpAnthropic": "Pobierz klucz API z console.anthropic.com",
+      "wfirmaSection": "Integracja wFirma (opcjonalnie)",
+      "useWfirma": "Czy korzystasz z wFirma?",
+      "wfirmaHelp": "Dane uwierzytelniające znajdziesz w ustawieniach konta wFirma w sekcji API.",
+      "wfirmaAccessKey": "Klucz dostępu",
+      "wfirmaSecretKey": "Klucz tajny",
+      "wfirmaCompanyId": "ID firmy",
+      "wfirmaCompanyIdPlaceholder": "Twoje ID firmy w wFirma",
+      "submitButton": "Zakończ konfigurację",
+      "submitting": "Zapisywanie...",
+      "successMessage": "Profil skonfigurowany pomyślnie! Przekierowanie...",
+      "errorMessage": "Nie udało się zapisać danych. Spróbuj ponownie."
     }
   },
   "chat": {

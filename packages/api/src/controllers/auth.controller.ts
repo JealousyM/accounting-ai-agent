@@ -600,6 +600,74 @@ export class AuthController {
   }
 
   /**
+   * POST /api/auth/complete-profile
+   * Complete OAuth user profile with LLM and optional wFirma credentials
+   */
+  async completeProfile(req: Request, res: Response): Promise<void> {
+    try {
+      const userId = req.user?.userId;
+
+      if (!userId) {
+        res.status(401).json({
+          success: false,
+          error: 'Unauthorized',
+          message: 'User not authenticated',
+        });
+        return;
+      }
+
+      const { llmProvider, llmApiKey, useWfirma, wfirmaAccessKey, wfirmaSecretKey, wfirmaCompanyId } = req.body;
+
+      // Save LLM credentials
+      try {
+        await credentialsService.setLLMCredentials(userId, {
+          provider: llmProvider,
+          apiKey: llmApiKey,
+        });
+        logger.info('LLM credentials saved during profile completion', { userId, provider: llmProvider });
+      } catch (error) {
+        logger.error('Failed to save LLM credentials during profile completion', { userId, error: (error as Error).message });
+        res.status(400).json({
+          success: false,
+          error: 'Credentials Error',
+          message: (error as Error).message,
+        });
+        return;
+      }
+
+      // Save wFirma credentials if provided
+      const hasWfirmaCredentials = useWfirma && wfirmaAccessKey && wfirmaSecretKey && wfirmaCompanyId;
+      if (hasWfirmaCredentials) {
+        try {
+          await credentialsService.setWFirmaCredentials(userId, {
+            accessKey: wfirmaAccessKey,
+            secretKey: wfirmaSecretKey,
+            companyId: wfirmaCompanyId,
+          });
+          logger.info('wFirma credentials saved during profile completion', { userId });
+        } catch (error) {
+          // Log warning but don't fail - LLM credentials are already saved
+          logger.warn('Failed to save wFirma credentials during profile completion', { userId, error: (error as Error).message });
+        }
+      }
+
+      logger.info('Profile completed successfully', { userId });
+
+      res.status(200).json({
+        success: true,
+        message: 'Profile completed successfully',
+      });
+    } catch (error) {
+      logger.error('Error completing profile', { error, userId: req.user?.userId });
+      res.status(500).json({
+        success: false,
+        error: 'Internal Server Error',
+        message: 'An unexpected error occurred',
+      });
+    }
+  }
+
+  /**
    * POST /api/auth/oauth/github/callback
    * Exchange GitHub authorization code for access token and authenticate user
    */

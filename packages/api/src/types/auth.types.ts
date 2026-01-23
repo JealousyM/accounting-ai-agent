@@ -23,6 +23,13 @@ export interface TokenPair {
   expiresIn: number;
 }
 
+/**
+ * OAuth token pair with profile completion flag
+ */
+export interface OAuthTokenPair extends TokenPair {
+  needsProfileCompletion: boolean;
+}
+
 // ============================================
 // USER TYPES
 // ============================================

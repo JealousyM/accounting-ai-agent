@@ -93,12 +93,19 @@ export function useGoogleAuth(): UseGoogleAuthResult {
             // apiClient unwraps the response, so authResponse is already the data object
             await authLogin(
               authResponse.token,
-              authResponse.refreshToken
+              authResponse.refreshToken,
+              undefined,
+              authResponse.needsProfileCompletion
             );
 
-            const redirectUrl = sessionStorage.getItem('redirectAfterLogin');
-            sessionStorage.removeItem('redirectAfterLogin');
-            router.push(redirectUrl || '/chat');
+            // Check if profile completion is needed (new OAuth user)
+            if (authResponse.needsProfileCompletion) {
+              router.push('/auth/complete-profile');
+            } else {
+              const redirectUrl = sessionStorage.getItem('redirectAfterLogin');
+              sessionStorage.removeItem('redirectAfterLogin');
+              router.push(redirectUrl || '/chat');
+            }
           } catch (err: unknown) {
             const errorMessage = err instanceof Error
               ? err.message

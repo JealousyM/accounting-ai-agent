@@ -28,10 +28,12 @@ interface AuthContextType {
   user: User | null;
   isLoading: boolean;
   isAuthenticated: boolean;
-  login: (token: string, refreshToken: string, locale?: string) => void;
+  needsProfileCompletion: boolean;
+  login: (token: string, refreshToken: string, locale?: string, needsProfileCompletion?: boolean) => void;
   logout: () => void;
   refreshToken: () => Promise<boolean>;
   checkAuth: () => Promise<void>;
+  clearNeedsProfileCompletion: () => void;
 }
 
 // ============================================
@@ -52,6 +54,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isInitialized, setIsInitialized] = useState(false);
+  const [needsProfileCompletion, setNeedsProfileCompletion] = useState(false);
   const router = useRouter();
 
   /**
@@ -180,15 +183,33 @@ export function AuthProvider({ children }: AuthProviderProps) {
   /**
    * Login - save tokens and fetch user
    */
-  const login = useCallback(async (token: string, refreshToken: string, locale?: string) => {
+  const login = useCallback(async (token: string, refreshToken: string, locale?: string, profileCompletion?: boolean) => {
     saveTokens(token, refreshToken, locale);
-    
+
+    // Set profile completion flag if provided
+    if (profileCompletion !== undefined) {
+      setNeedsProfileCompletion(profileCompletion);
+      if (profileCompletion && typeof window !== 'undefined') {
+        sessionStorage.setItem('needsProfileCompletion', 'true');
+      }
+    }
+
     const userData = await fetchUser(token);
-    
+
     if (userData) {
       setUser(userData);
     }
   }, [saveTokens, fetchUser]);
+
+  /**
+   * Clear needs profile completion flag
+   */
+  const clearNeedsProfileCompletion = useCallback(() => {
+    setNeedsProfileCompletion(false);
+    if (typeof window !== 'undefined') {
+      sessionStorage.removeItem('needsProfileCompletion');
+    }
+  }, []);
 
   /**
    * Logout - clear tokens and redirect
@@ -224,6 +245,13 @@ export function AuthProvider({ children }: AuthProviderProps) {
    */
   useEffect(() => {
     if (!isInitialized) {
+      // Restore needsProfileCompletion from sessionStorage
+      if (typeof window !== 'undefined') {
+        const savedNeedsCompletion = sessionStorage.getItem('needsProfileCompletion');
+        if (savedNeedsCompletion === 'true') {
+          setNeedsProfileCompletion(true);
+        }
+      }
       checkAuth();
       setIsInitialized(true);
     }
@@ -269,10 +297,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
     user,
     isLoading,
     isAuthenticated: !!user,
+    needsProfileCompletion,
     login,
     logout,
     refreshToken,
     checkAuth,
+    clearNeedsProfileCompletion,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

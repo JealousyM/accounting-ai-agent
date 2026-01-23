@@ -168,6 +168,21 @@ export const resetPasswordSchema = z.object({
   path: ['body', 'confirmPassword'],
 });
 
+/**
+ * Complete profile validation schema (for OAuth users)
+ */
+export const completeProfileSchema = z.object({
+  body: z.object({
+    llmProvider: z.enum(['openai', 'anthropic']),
+    llmApiKey: z.string().min(1, 'API key is required').max(500),
+    // wFirma credentials (optional)
+    useWfirma: z.boolean().optional(),
+    wfirmaAccessKey: z.string().max(200).trim().optional(),
+    wfirmaSecretKey: z.string().max(200).trim().optional(),
+    wfirmaCompanyId: z.string().max(50).trim().optional(),
+  }),
+});
+
 // ============================================
 // TYPE EXPORTS
 // ============================================
@@ -180,6 +195,7 @@ export type ChangePasswordInput = z.infer<typeof changePasswordSchema>['body'];
 export type UpdateProfileInput = z.infer<typeof updateProfileSchema>['body'];
 export type ForgotPasswordInput = z.infer<typeof forgotPasswordSchema>['body'];
 export type ResetPasswordInput = z.infer<typeof resetPasswordSchema>['body'];
+export type CompleteProfileInput = z.infer<typeof completeProfileSchema>['body'];
 
 // ============================================
 // INTERFACES

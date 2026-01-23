@@ -55,6 +55,10 @@ export interface TokenPair {
   expiresIn: number;
 }
 
+export interface OAuthTokenPair extends TokenPair {
+  needsProfileCompletion: boolean;
+}
+
 export interface RegisterInput {
   email: string;
   password: string;
@@ -215,17 +219,17 @@ export class AuthService {
   /**
    * Find or create OAuth user
    */
-  async findOrCreateOAuthUser(profile: OAuthProfile): Promise<TokenPair> {
+  async findOrCreateOAuthUser(profile: OAuthProfile): Promise<OAuthTokenPair> {
     // Validate profile
     const validated = oauthProfileSchema.parse(profile);
 
     const oauthIdField = validated.provider === 'google' ? 'googleId' : 'githubId';
 
     // Try to find user by OAuth ID
-    const whereClause = validated.provider === 'google' 
+    const whereClause = validated.provider === 'google'
       ? { googleId: validated.id }
       : { githubId: validated.id };
-    
+
     let user = await prisma.user.findUnique({
       where: whereClause,
     });
@@ -263,8 +267,18 @@ export class AuthService {
       });
     }
 
+    // Check if user has LLM credentials configured
+    const credentials = await prisma.userApiCredentials.findUnique({
+      where: { userId: user.id },
+    });
+    const needsProfileCompletion = !credentials?.llmApiKey;
+
     // Generate tokens
-    return this.generateTokenPair(user.id, user.email);
+    const tokens = await this.generateTokenPair(user.id, user.email);
+    return {
+      ...tokens,
+      needsProfileCompletion,
+    };
   }
 
   /**

@@ -100,6 +100,30 @@
       "tokenExpired": "Please request a new password reset link",
       "requestNewLink": "Request new link",
       "errorMessage": "Failed to reset password. Please try again."
+    },
+    "completeProfile": {
+      "title": "Complete Your Profile",
+      "subtitle": "Please provide your AI credentials to use the chat",
+      "description": "To use the AI assistant, you need to configure your AI provider. Your API key is stored securely and encrypted.",
+      "llmSection": "AI Provider Configuration",
+      "llmProvider": "AI Provider",
+      "llmProviderSelect": "Select AI provider...",
+      "llmProviderHelp": "Select your AI provider. You will need to provide your own API key.",
+      "llmApiKey": "API Key",
+      "llmApiKeyPlaceholder": "Enter your API key",
+      "llmApiKeyHelpOpenai": "Get your API key from platform.openai.com",
+      "llmApiKeyHelpAnthropic": "Get your API key from console.anthropic.com",
+      "wfirmaSection": "wFirma Integration (Optional)",
+      "useWfirma": "Do you use wFirma?",
+      "wfirmaHelp": "You can find these credentials in your wFirma account settings under API section.",
+      "wfirmaAccessKey": "Access Key",
+      "wfirmaSecretKey": "Secret Key",
+      "wfirmaCompanyId": "Company ID",
+      "wfirmaCompanyIdPlaceholder": "Your wFirma Company ID",
+      "submitButton": "Complete Setup",
+      "submitting": "Saving...",
+      "successMessage": "Profile completed successfully! Redirecting...",
+      "errorMessage": "Failed to save credentials. Please try again."
     }
   },
   "chat": {

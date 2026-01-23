@@ -75,7 +75,7 @@ export function ProtectedRoute({
   requireAuth = true,
   redirectTo = '/login',
 }: ProtectedRouteProps) {
-  const { isLoading, isAuthenticated } = useAuth();
+  const { isLoading, isAuthenticated, needsProfileCompletion } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
   const [isChecking, setIsChecking] = useState(true);
@@ -93,19 +93,25 @@ export function ProtectedRoute({
       if (typeof window !== 'undefined') {
         sessionStorage.setItem('redirectAfterLogin', pathname);
       }
-      
+
       router.push(redirectTo);
+      return;
+    }
+
+    // If user needs to complete profile and is not on complete-profile page
+    if (isAuthenticated && needsProfileCompletion && pathname !== '/auth/complete-profile') {
+      router.push('/auth/complete-profile');
       return;
     }
 
     // Auth check complete
     setIsChecking(false);
-    
+
     // Small delay to prevent flash
     setTimeout(() => {
       setShouldRender(true);
     }, 100);
-  }, [isLoading, isAuthenticated, requireAuth, router, redirectTo, pathname]);
+  }, [isLoading, isAuthenticated, needsProfileCompletion, requireAuth, router, redirectTo, pathname]);
 
   // Show loading screen while checking
   if (isLoading || isChecking || !shouldRender) {

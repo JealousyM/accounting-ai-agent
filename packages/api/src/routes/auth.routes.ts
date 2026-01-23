@@ -11,6 +11,7 @@ import {
   updateProfileSchema,
   forgotPasswordSchema,
   resetPasswordSchema,
+  completeProfileSchema,
 } from '../validators/auth.validators';
 
 const router = Router();
@@ -159,6 +160,17 @@ router.post(
   '/first-login-complete',
   authenticate,
   authController.markFirstLoginComplete.bind(authController)
+);
+
+/**
+ * POST /api/auth/complete-profile
+ * Complete OAuth user profile with LLM and optional wFirma credentials
+ */
+router.post(
+  '/complete-profile',
+  authenticate,
+  validateRequest(completeProfileSchema),
+  authController.completeProfile.bind(authController)
 );
 
 export default router;
