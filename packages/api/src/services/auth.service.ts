@@ -103,12 +103,18 @@ export class AuthService {
   private readonly RESET_TOKEN_TTL = 3600; // 1 hour in seconds
 
   constructor() {
-    this.JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
-    this.JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET || 'your-refresh-secret-key';
+    const jwtSecret = process.env.JWT_SECRET;
+    const jwtRefreshSecret = process.env.JWT_REFRESH_SECRET;
 
-    if (!process.env.JWT_SECRET || !process.env.JWT_REFRESH_SECRET) {
-      console.warn('⚠️  JWT secrets not set in environment variables');
+    if (!jwtSecret || !jwtRefreshSecret) {
+      throw new Error(
+        'SECURITY ERROR: JWT_SECRET and JWT_REFRESH_SECRET must be set in environment variables. ' +
+        'Generate secure secrets with: node -e "console.log(require(\'crypto\').randomBytes(64).toString(\'hex\'))"'
+      );
     }
+
+    this.JWT_SECRET = jwtSecret;
+    this.JWT_REFRESH_SECRET = jwtRefreshSecret;
   }
 
   /**

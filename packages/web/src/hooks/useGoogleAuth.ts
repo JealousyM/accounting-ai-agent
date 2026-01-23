@@ -5,13 +5,6 @@ import { useRouter } from 'next/navigation';
 import { googleOAuth } from '@/lib/api/auth';
 import { useAuth } from '@/contexts/AuthContext';
 
-interface GoogleUserInfo {
-  id: string;
-  email: string;
-  name?: string;
-  picture?: string;
-}
-
 interface UseGoogleAuthResult {
   login: () => void;
   isLoading: boolean;
@@ -28,18 +21,6 @@ export function useGoogleAuth(): UseGoogleAuthResult {
   const clearError = useCallback(() => {
     setError(null);
   }, []);
-
-  const fetchGoogleUserInfo = async (accessToken: string): Promise<GoogleUserInfo> => {
-    const response = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
-      headers: { Authorization: `Bearer ${accessToken}` },
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to fetch Google user info');
-    }
-
-    return response.json();
-  };
 
   const login = useCallback(async () => {
     const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
@@ -81,14 +62,9 @@ export function useGoogleAuth(): UseGoogleAuthResult {
           }
 
           try {
-            const userInfo = await fetchGoogleUserInfo(response.access_token);
-
-            const authResponse = await googleOAuth({
-              id: userInfo.id,
-              email: userInfo.email,
-              name: userInfo.name,
-              picture: userInfo.picture,
-            });
+            // Send access token to backend for verification
+            // Backend will verify with Google and fetch user info securely
+            const authResponse = await googleOAuth(response.access_token);
 
             // apiClient unwraps the response, so authResponse is already the data object
             await authLogin(

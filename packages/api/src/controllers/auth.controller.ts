@@ -25,6 +25,14 @@ interface GitHubEmail {
   verified: boolean;
 }
 
+interface GoogleUserInfo {
+  id: string;
+  email: string;
+  verified_email: boolean;
+  name?: string;
+  picture?: string;
+}
+
 export class AuthController {
   /**
    * GET /api/auth/config
@@ -439,12 +447,54 @@ export class AuthController {
 
   /**
    * POST /api/auth/oauth/google
-   * Google OAuth authentication
+   * Google OAuth authentication - verifies access_token with Google and authenticates user
    */
   async googleOAuth(req: Request, res: Response): Promise<void> {
     try {
+      const { access_token } = req.body;
+
+      if (!access_token) {
+        res.status(400).json({
+          success: false,
+          error: 'Bad Request',
+          message: 'Access token is required',
+        });
+        return;
+      }
+
+      // Verify access token with Google and fetch user info
+      const userInfoResponse = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
+        headers: {
+          Authorization: `Bearer ${access_token}`,
+        },
+      });
+
+      if (!userInfoResponse.ok) {
+        logger.error('Google token verification failed', { status: userInfoResponse.status });
+        res.status(401).json({
+          success: false,
+          error: 'OAuth Failed',
+          message: 'Invalid or expired Google access token',
+        });
+        return;
+      }
+
+      const userData = (await userInfoResponse.json()) as GoogleUserInfo;
+
+      if (!userData.email || !userData.verified_email) {
+        res.status(400).json({
+          success: false,
+          error: 'OAuth Failed',
+          message: 'Could not retrieve verified email from Google',
+        });
+        return;
+      }
+
       const profile = {
-        ...req.body,
+        id: userData.id,
+        email: userData.email,
+        name: userData.name,
+        picture: userData.picture,
         provider: 'google' as const,
       };
 
