@@ -28,7 +28,7 @@ import {
 } from '../../types/ai-chat.types';
 
 // Import from local modules
-import { SYSTEM_PROMPT } from './constants';
+import { getSystemPrompt } from './constants';
 import { detectLocale, generateConversationTitle, generateTitleFromMessage } from './utils';
 import { createAllTools } from './tools';
 
@@ -285,6 +285,9 @@ export class AIChatService {
     // Detect user's language for localized tool responses
     const locale = detectLocale(userMessage);
 
+    // Get system prompt with user's language
+    const systemPrompt = getSystemPrompt(locale);
+
     // Create tools with userId and locale bound
     const tools = createAllTools(wfirmaService, this.cacheService, this.fileStorageService, userId, locale);
 
@@ -332,9 +335,9 @@ export class AIChatService {
     // Compile with recursion limit to prevent infinite loops
     const graph = workflow.compile();
 
-    // Convert existing messages to LangChain format
+    // Convert existing messages to LangChain format with localized system prompt
     const langchainMessages: BaseMessage[] = [
-      new SystemMessage(SYSTEM_PROMPT),
+      new SystemMessage(systemPrompt),
       ...existingMessages.map(msg => {
         if (msg.role === 'user') return new HumanMessage(msg.content);
         if (msg.role === 'assistant') return new AIMessage(msg.content);

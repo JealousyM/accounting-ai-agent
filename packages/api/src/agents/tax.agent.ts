@@ -112,80 +112,136 @@ const TRANSLATIONS: Record<Locale, {
 };
 
 const SYSTEM_PROMPTS: Record<Locale, string> = {
-  pl: `Jesteś ekspertem od polskiego prawa podatkowego dla branży IT.
+  pl: `Jesteś ekspertem od polskiego prawa podatkowego dla branży IT specjalizującym się w optymalizacji podatkowej i compliance.
 
 ## Twoje specjalizacje:
-- **VAT**: stawki (23%, 8%, 5%, 0%), JPK_V7, odwrotne obciążenie, OSS
-- **PIT**: skala (12%/32%), liniowy 19%, ryczałt, IP Box 5%
-- **CIT**: estoński CIT, stawki 9%/19%
-- **ZUS**: składki przedsiębiorcy, mały ZUS, ulga na start
+- **VAT**: stawki (23%, 8%, 5%, 0%), JPK_V7, odwrotne obciążenie, OSS, transakcje wewnątrzwspólnotowe
+- **PIT**: skala progresywna (12%/32%), liniowy 19%, ryczałt, IP Box 5% dla IT, optymalizacja podatkowa
+- **CIT**: estoński CIT (0% na zysk zatrzymany), stawki 9%/19%, mali podatnicy
+- **ZUS**: pełne składki, mały ZUS Plus, ulga na start (6 miesięcy), wakacje składkowe
 
-## Kluczowe terminy:
-- VAT-7, JPK_V7: do 25. dnia miesiąca
-- PIT zaliczka: do 20. dnia miesiąca
-- ZUS: do 15. dnia miesiąca (za poprzedni)
-- PIT roczny: do 30 kwietnia
+## Kluczowe terminy płatności (2026):
+- **VAT-7, JPK_V7:** do 25. dnia miesiąca następnego
+- **PIT zaliczka:** do 20. dnia miesiąca następnego
+- **ZUS składki:** do 15. dnia miesiąca następnego (za poprzedni miesiąc)
+- **PIT roczny:** do 30 kwietnia
 
-## Zasady:
-- Podawaj podstawy prawne (ustawa, artykuł)
-- Ostrzegaj o zbliżających się terminach
-- Sugeruj legalne optymalizacje (IP Box dla IT)
-- Używaj tabel markdown do kalkulacji`,
+## Zasady pracy:
+1. **Dane rzeczywiste first:** Zawsze preferuj dane z wFirma nad teoretycznymi kalkulacjami
+2. **Podstawy prawne:** Podawaj artykuły ustaw (np. "Art. 86 ustawy o VAT")
+3. **Proaktywne ostrzeżenia:** Ostrzegaj o zbliżających się terminach (5 dni wcześniej)
+4. **Optymalizacja:** Sugeruj legalne metody optymalizacji (IP Box dla IT, mały ZUS Plus, estoński CIT)
+5. **Tabele markdown:** Zawsze używaj tabel do prezentacji kalkulacji
+6. **Scenariusze porównawcze:** Przy optymalizacji pokazuj porównanie różnych opcji
+7. **Ostrzeżenia compliance:** Informuj o ryzykach podatkowych i karach
 
-  en: `You are a Polish tax law expert for the IT industry.
+## Strategie optymalizacji dla IT:
+- IP Box (5% dla dochodów z własności intelektualnej)
+- Estoński CIT (brak podatku od zysku zatrzymanego)
+- Mały ZUS Plus (składki oparte na dochodzie)
+- Ryczałt ewidencjonowany (uproszczona księgowość)`,
+
+  en: `You are a Polish tax law expert for the IT industry specializing in tax optimization and compliance.
 
 ## Your specializations:
-- **VAT**: rates (23%, 8%, 5%, 0%), JPK_V7, reverse charge, OSS
-- **PIT**: scale (12%/32%), flat 19%, lump sum, IP Box 5%
-- **CIT**: Estonian CIT, rates 9%/19%
-- **ZUS**: entrepreneur contributions, small ZUS, startup relief
+- **VAT**: rates (23%, 8%, 5%, 0%), JPK_V7, reverse charge, OSS, intra-community transactions
+- **PIT**: progressive scale (12%/32%), flat 19%, lump sum, IP Box 5% for IT, tax optimization
+- **CIT**: Estonian CIT (0% on retained earnings), rates 9%/19%, small taxpayers
+- **ZUS**: full contributions, small ZUS Plus, startup relief (6 months), contribution holidays
 
-## Key deadlines:
-- VAT-7, JPK_V7: by 25th of the month
-- PIT advance: by 20th of the month
-- ZUS: by 15th of the month (for previous)
-- Annual PIT: by April 30th
+## Key payment deadlines (2026):
+- **VAT-7, JPK_V7:** by 25th of following month
+- **PIT advance:** by 20th of following month
+- **ZUS contributions:** by 15th of following month (for previous month)
+- **Annual PIT:** by April 30th
 
-## Rules:
-- Cite legal bases (law, article)
-- Warn about approaching deadlines
-- Suggest legal optimizations (IP Box for IT)
-- Use markdown tables for calculations`,
+## Working principles:
+1. **Real data first:** Always prefer wFirma data over theoretical calculations
+2. **Legal bases:** Cite law articles (e.g., "Art. 86 of VAT Act")
+3. **Proactive warnings:** Warn about approaching deadlines (5 days in advance)
+4. **Optimization:** Suggest legal optimization methods (IP Box for IT, small ZUS Plus, Estonian CIT)
+5. **Markdown tables:** Always use tables to present calculations
+6. **Comparative scenarios:** When optimizing, show comparison of different options
+7. **Compliance warnings:** Inform about tax risks and penalties
 
-  ru: `Вы эксперт по польскому налоговому праву для IT-отрасли.
+## Optimization strategies for IT:
+- IP Box (5% for intellectual property income)
+- Estonian CIT (no tax on retained earnings)
+- Small ZUS Plus (income-based contributions)
+- Lump sum taxation (simplified bookkeeping)`,
+
+  ru: `Вы эксперт по польскому налоговому праву для IT-отрасли, специализирующийся на налоговой оптимизации и комплаенсе.
 
 ## Ваши специализации:
-- **НДС**: ставки (23%, 8%, 5%, 0%), JPK_V7, обратное начисление, OSS
-- **ПИТ**: шкала (12%/32%), линейный 19%, рычалт, IP Box 5%
-- **ЦИТ**: эстонский ЦИТ, ставки 9%/19%
-- **ЗУС**: взносы предпринимателя, малый ЗУС, льгота на старт
+- **НДС**: ставки (23%, 8%, 5%, 0%), JPK_V7, обратное начисление, OSS, внутриобщинные операции
+- **ПИТ**: прогрессивная шкала (12%/32%), линейный 19%, рычалт, IP Box 5% для IT, налоговая оптимизация
+- **ЦИТ**: эстонский ЦИТ (0% на нераспределенную прибыль), ставки 9%/19%, малые налогоплательщики
+- **ЗУС**: полные взносы, малый ЗУС Плюс, льгота на старт (6 месяцев), каникулы взносов
 
-## Ключевые сроки:
-- VAT-7, JPK_V7: до 25-го числа месяца
-- ПИТ аванс: до 20-го числа месяца
-- ЗУС: до 15-го числа месяца (за предыдущий)
-- Годовой ПИТ: до 30 апреля
+## Ключевые сроки платежей (2026):
+- **VAT-7, JPK_V7:** до 25-го числа следующего месяца
+- **ПИТ аванс:** до 20-го числа следующего месяца
+- **ЗУС взносы:** до 15-го числа следующего месяца (за предыдущий месяц)
+- **Годовой ПИТ:** до 30 апреля
 
-## Правила:
-- Указывайте правовые основания (закон, статья)
-- Предупреждайте о приближающихся сроках
-- Предлагайте законные оптимизации (IP Box для IT)
-- Используйте markdown таблицы для расчетов`,
+## Принципы работы:
+1. **Реальные данные first:** Всегда предпочитайте данные из wFirma теоретическим расчетам
+2. **Правовые основания:** Указывайте статьи законов (напр., "Ст. 86 закона о НДС")
+3. **Проактивные предупреждения:** Предупреждайте о приближающихся сроках (за 5 дней)
+4. **Оптимизация:** Предлагайте законные методы оптимизации (IP Box для IT, малый ЗУС Плюс, эстонский ЦИТ)
+5. **Markdown таблицы:** Всегда используйте таблицы для представления расчетов
+6. **Сравнительные сценарии:** При оптимизации показывайте сравнение разных вариантов
+7. **Предупреждения о комплаенсе:** Информируйте о налоговых рисках и штрафах
+
+## Стратегии оптимизации для IT:
+- IP Box (5% для доходов от интеллектуальной собственности)
+- Эстонский ЦИТ (без налога на нераспределенную прибыль)
+- Малый ЗУС Плюс (взносы на основе дохода)
+- Рычалт (упрощенный учет)`,
 };
 
-// Polish tax constants for 2024
-const TAX_CONSTANTS = {
-  PIT_THRESHOLD: 120000, // PLN - first bracket limit
-  PIT_RATE_1: 0.12,      // 12% for income up to 120k
-  PIT_RATE_2: 0.32,      // 32% for income over 120k
-  PIT_FLAT_RATE: 0.19,   // 19% flat tax
-  IP_BOX_RATE: 0.05,     // 5% IP Box rate
-  CIT_RATE_SMALL: 0.09,  // 9% for small taxpayers
-  CIT_RATE_STANDARD: 0.19, // 19% standard
-  VAT_STANDARD: 0.23,    // 23% VAT
-  VAT_REDUCED_1: 0.08,   // 8% VAT
-  VAT_REDUCED_2: 0.05,   // 5% VAT
-  ZUS_BASE_2024: 4694.40, // Base for ZUS in 2024
+// Polish tax constants for 2026
+// Source: Polish Ministry of Finance, ZUS, official government announcements
+const TAX_CONSTANTS_2026 = {
+  YEAR: 2026,
+
+  // PIT (Personal Income Tax)
+  PIT_THRESHOLD: 120000,        // PLN - first bracket limit (unchanged)
+  PIT_RATE_1: 0.12,            // 12% for income up to 120,000 PLN
+  PIT_RATE_2: 0.32,            // 32% for income over 120,000 PLN
+  PIT_TAX_FREE_AMOUNT: 30000,  // Tax-free amount
+  PIT_TAX_DEDUCTION: 3600,     // Tax-reducing amount (12% of 30,000)
+  PIT_FLAT_RATE: 0.19,         // 19% flat tax
+  SOLIDARITY_LEVY: 0.04,       // 4% on income over 1,000,000 PLN
+  IP_BOX_RATE: 0.05,           // 5% IP Box rate (unchanged)
+
+  // CIT (Corporate Income Tax)
+  CIT_RATE_SMALL: 0.09,        // 9% for small taxpayers (revenue up to 8,431,000 PLN)
+  CIT_RATE_STANDARD: 0.19,     // 19% standard rate
+  CIT_SMALL_TAXPAYER_LIMIT: 8431000, // PLN limit for 9% rate
+
+  // VAT
+  VAT_STANDARD: 0.23,          // 23% standard rate
+  VAT_REDUCED_1: 0.08,         // 8% reduced rate
+  VAT_REDUCED_2: 0.05,         // 5% reduced rate
+  VAT_EXEMPT_THRESHOLD: 240000, // 240,000 PLN exemption threshold (increased from 200,000)
+
+  // ZUS (Social Insurance) - updated for 2026
+  ZUS_BASE_2026: 5652,         // Minimum contribution base (60% of average salary 9,420 PLN)
+  ZUS_FULL_MONTHLY: 1926.77,   // Full ZUS contributions per month (approx)
+  ZUS_PREFERENTIAL_BASE: 1441.80, // 30% of minimum wage (4,806 PLN)
+  ZUS_PREFERENTIAL_MONTHLY: 456.19, // Preferential ZUS monthly (mały ZUS Plus)
+  ZUS_HEALTH_MIN_BASE: 4806,   // Minimum base for health contributions (100% of min wage)
+  ZUS_HEALTH_MIN_MONTHLY: 432.54, // Minimum health contribution monthly
+
+  // Minimum Wage
+  MINIMUM_WAGE_GROSS: 4806,    // Monthly minimum wage gross (effective Jan 1, 2026)
+  MINIMUM_WAGE_HOURLY: 31.40,  // Hourly minimum wage gross
+  MINIMUM_WAGE_NET: 3531,      // Approximate net amount
+
+  // Miscellaneous
+  AVERAGE_SALARY_FORECAST: 9420, // Forecasted average salary for 2026
+  EUR_EXCHANGE_RATE: 4.2586,   // EUR rate for 2026 tax calculations (Oct 1, 2025)
 };
 
 export class TaxAgent extends BaseAgent {
@@ -336,21 +392,21 @@ export class TaxAgent extends BaseAgent {
 
     switch (taxType) {
       case 'scale':
-        if (taxBase <= TAX_CONSTANTS.PIT_THRESHOLD) {
-          tax = taxBase * TAX_CONSTANTS.PIT_RATE_1;
-          rateDescription = '12%';
+        if (taxBase <= TAX_CONSTANTS_2026.PIT_THRESHOLD) {
+          tax = Math.max(0, taxBase * TAX_CONSTANTS_2026.PIT_RATE_1 - TAX_CONSTANTS_2026.PIT_TAX_DEDUCTION);
+          rateDescription = '12% (minus 3,600 PLN)';
         } else {
-          tax = TAX_CONSTANTS.PIT_THRESHOLD * TAX_CONSTANTS.PIT_RATE_1 +
-                (taxBase - TAX_CONSTANTS.PIT_THRESHOLD) * TAX_CONSTANTS.PIT_RATE_2;
+          tax = TAX_CONSTANTS_2026.PIT_THRESHOLD * TAX_CONSTANTS_2026.PIT_RATE_1 - TAX_CONSTANTS_2026.PIT_TAX_DEDUCTION +
+                (taxBase - TAX_CONSTANTS_2026.PIT_THRESHOLD) * TAX_CONSTANTS_2026.PIT_RATE_2;
           rateDescription = '12% / 32%';
         }
         break;
       case 'flat':
-        tax = taxBase * TAX_CONSTANTS.PIT_FLAT_RATE;
+        tax = taxBase * TAX_CONSTANTS_2026.PIT_FLAT_RATE;
         rateDescription = '19%';
         break;
       case 'ip_box':
-        tax = taxBase * TAX_CONSTANTS.IP_BOX_RATE;
+        tax = taxBase * TAX_CONSTANTS_2026.IP_BOX_RATE;
         rateDescription = '5% (IP Box)';
         break;
     }
@@ -391,12 +447,12 @@ export class TaxAgent extends BaseAgent {
     const regularIncome = totalIncome - qualifiedIpIncome;
 
     // Tax with IP Box
-    const ipBoxTax = qualifiedIpIncome * TAX_CONSTANTS.IP_BOX_RATE;
-    const regularTax = regularIncome * TAX_CONSTANTS.PIT_FLAT_RATE;
+    const ipBoxTax = qualifiedIpIncome * TAX_CONSTANTS_2026.IP_BOX_RATE;
+    const regularTax = regularIncome * TAX_CONSTANTS_2026.PIT_FLAT_RATE;
     const totalWithIpBox = ipBoxTax + regularTax;
 
     // Tax without IP Box (all at 19%)
-    const taxWithout = totalIncome * TAX_CONSTANTS.PIT_FLAT_RATE;
+    const taxWithout = totalIncome * TAX_CONSTANTS_2026.PIT_FLAT_RATE;
 
     // Savings
     const savings = taxWithout - totalWithIpBox;
@@ -470,26 +526,62 @@ export class TaxAgent extends BaseAgent {
   private calculateZUS(type: string, locale: Locale): string {
     const t = TRANSLATIONS[locale] || TRANSLATIONS.pl;
 
-    // ZUS rates for 2024 (simplified)
-    const contributions: Record<string, { monthly: number; desc: string }> = {
-      full: { monthly: 1600.27, desc: 'Full contributions (standard)' },
-      preferential: { monthly: 402.65, desc: 'Preferential (first 24 months)' },
-      small_zus: { monthly: 800.00, desc: 'Small ZUS (income-based, avg)' },
-      ulga_na_start: { monthly: 0, desc: 'Startup relief (first 6 months)' },
+    // ZUS rates for 2026 (updated with official data)
+    const contributions: Record<string, { monthly: number; healthMin: number; desc: string }> = {
+      full: {
+        monthly: TAX_CONSTANTS_2026.ZUS_FULL_MONTHLY,
+        healthMin: TAX_CONSTANTS_2026.ZUS_HEALTH_MIN_MONTHLY,
+        desc: locale === 'pl' ? 'Pełne składki (duży ZUS)' :
+              locale === 'ru' ? 'Полные взносы (большой ЗУС)' :
+              'Full contributions (regular ZUS)',
+      },
+      preferential: {
+        monthly: TAX_CONSTANTS_2026.ZUS_PREFERENTIAL_MONTHLY,
+        healthMin: TAX_CONSTANTS_2026.ZUS_HEALTH_MIN_MONTHLY,
+        desc: locale === 'pl' ? 'Preferencyjne (pierwsze 24 miesiące)' :
+              locale === 'ru' ? 'Льготные (первые 24 месяца)' :
+              'Preferential (first 24 months)',
+      },
+      small_zus: {
+        monthly: TAX_CONSTANTS_2026.ZUS_PREFERENTIAL_MONTHLY,
+        healthMin: TAX_CONSTANTS_2026.ZUS_HEALTH_MIN_MONTHLY,
+        desc: locale === 'pl' ? 'Mały ZUS Plus (na podstawie dochodu)' :
+              locale === 'ru' ? 'Малый ЗУС Плюс (на основе дохода)' :
+              'Small ZUS Plus (income-based)',
+      },
+      ulga_na_start: {
+        monthly: 0,
+        healthMin: 0,
+        desc: locale === 'pl' ? 'Ulga na start (pierwsze 6 miesięcy)' :
+              locale === 'ru' ? 'Льгота на старт (первые 6 месяцев)' :
+              'Startup relief (first 6 months)',
+      },
     };
 
     const c = contributions[type] || contributions.full;
-    const annual = c.monthly * 12;
+    const totalMonthly = c.monthly + c.healthMin;
+    const annual = totalMonthly * 12;
 
-    let result = `## ${t.zusTitle}\n\n`;
+    let result = `## ${t.zusTitle} (2026)\n\n`;
     result += `**${c.desc}**\n\n`;
-    result += `| Period | Amount |\n`;
+    result += `| ${t.type} | ${locale === 'pl' ? 'Kwota' : locale === 'ru' ? 'Сумма' : 'Amount'} |\n`;
     result += '|--------|--------|\n';
-    result += `| Monthly | ${this.formatNumber(c.monthly)} PLN |\n`;
-    result += `| Annual | ${this.formatNumber(annual)} PLN |\n`;
+    result += `| ${locale === 'pl' ? 'Składki społeczne' : locale === 'ru' ? 'Соц. взносы' : 'Social contributions'} | ${this.formatNumber(c.monthly)} PLN |\n`;
+    result += `| ${locale === 'pl' ? 'Składka zdrowotna (min)' : locale === 'ru' ? 'Мед. взнос (мин)' : 'Health contribution (min)'} | ${this.formatNumber(c.healthMin)} PLN |\n`;
+    result += `| **${locale === 'pl' ? 'Razem miesięcznie' : locale === 'ru' ? 'Итого в месяц' : 'Total monthly'}** | **${this.formatNumber(totalMonthly)} PLN** |\n`;
+    result += `| ${locale === 'pl' ? 'Rocznie' : locale === 'ru' ? 'В год' : 'Annually'} | ${this.formatNumber(annual)} PLN |\n`;
 
     if (type === 'ulga_na_start') {
-      result += `\n> 💡 After 6 months, you switch to preferential rate (${this.formatNumber(contributions.preferential.monthly)} PLN/month)`;
+      const afterStartupMonthly = contributions.preferential.monthly + contributions.preferential.healthMin;
+      result += `\n> 💡 ${locale === 'pl' ? 'Po 6 miesiącach przechodzisz na stawkę preferencyjną' :
+                        locale === 'ru' ? 'После 6 месяцев переход на льготную ставку' :
+                        'After 6 months, you switch to preferential rate'} (${this.formatNumber(afterStartupMonthly)} PLN/${locale === 'pl' ? 'mies.' : locale === 'ru' ? 'мес.' : 'mo'})`;
+    }
+
+    if (type === 'full') {
+      result += `\n\n> ℹ️ ${locale === 'pl' ? 'Podstawa: 5 652 PLN (60% prognozowanego przeciętnego wynagrodzenia)' :
+                        locale === 'ru' ? 'База: 5 652 PLN (60% прогнозируемой средней зарплаты)' :
+                        'Base: 5,652 PLN (60% of forecasted average salary)'}`;
     }
 
     return result;
