@@ -43,12 +43,19 @@ function GitHubCallbackContent() {
         // apiClient unwraps the response, so response is already the data object
         await login(
           response.token,
-          response.refreshToken
+          response.refreshToken,
+          undefined,
+          response.needsProfileCompletion
         );
 
-        const redirectUrl = sessionStorage.getItem('redirectAfterLogin');
-        sessionStorage.removeItem('redirectAfterLogin');
-        router.push(redirectUrl || '/chat');
+        // Check if profile completion is needed (new OAuth user)
+        if (response.needsProfileCompletion) {
+          router.push('/auth/complete-profile');
+        } else {
+          const redirectUrl = sessionStorage.getItem('redirectAfterLogin');
+          sessionStorage.removeItem('redirectAfterLogin');
+          router.push(redirectUrl || '/chat');
+        }
       } catch (err: unknown) {
         const errorMessage = err instanceof Error
           ? err.message

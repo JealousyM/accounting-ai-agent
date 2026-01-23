@@ -30,6 +30,7 @@ export interface AuthData {
   expiresIn: number;
   isFirstLogin?: boolean;
   wfirmaEnabled?: boolean;
+  needsProfileCompletion?: boolean;
 }
 
 export interface AuthResponse {
@@ -239,5 +240,39 @@ export const resetPassword = async (token: string, password: string, confirmPass
       throw error;
     }
     throw new Error('Failed to reset password');
+  }
+};
+
+/**
+ * Complete profile - for OAuth users who need to add LLM credentials
+ */
+export interface CompleteProfileData {
+  llmProvider: 'openai' | 'anthropic';
+  llmApiKey: string;
+  useWfirma?: boolean;
+  wfirmaAccessKey?: string;
+  wfirmaSecretKey?: string;
+  wfirmaCompanyId?: string;
+}
+
+export interface CompleteProfileResponse {
+  success: boolean;
+  message: string;
+  data: {
+    user: UserProfile;
+  };
+}
+
+export const completeProfile = async (data: CompleteProfileData): Promise<CompleteProfileResponse> => {
+  try {
+    return await apiClient.post<CompleteProfileResponse>(
+      API_ENDPOINTS.AUTH.COMPLETE_PROFILE,
+      data
+    );
+  } catch (error) {
+    if (error instanceof ApiError) {
+      throw error;
+    }
+    throw new Error('Failed to complete profile');
   }
 };

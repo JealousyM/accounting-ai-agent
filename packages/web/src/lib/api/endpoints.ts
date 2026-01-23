@@ -19,6 +19,7 @@ export const API_ENDPOINTS = {
     OAUTH_GITHUB_CALLBACK: '/api/auth/oauth/github/callback',
     FORGOT_PASSWORD: '/api/auth/forgot-password',
     RESET_PASSWORD: '/api/auth/reset-password',
+    COMPLETE_PROFILE: '/api/auth/complete-profile',
   },
 
   // Users

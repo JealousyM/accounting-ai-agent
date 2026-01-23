@@ -100,6 +100,30 @@
       "tokenExpired": "Запросите новую ссылку для сброса пароля",
       "requestNewLink": "Запросить новую ссылку",
       "errorMessage": "Не удалось сбросить пароль. Попробуйте снова."
+    },
+    "completeProfile": {
+      "title": "Завершите настройку профиля",
+      "subtitle": "Укажите данные ИИ для использования чата",
+      "description": "Для использования ИИ-ассистента необходимо настроить провайдера ИИ. Ваш API-ключ хранится безопасно и зашифрован.",
+      "llmSection": "Настройка провайдера ИИ",
+      "llmProvider": "Провайдер ИИ",
+      "llmProviderSelect": "Выберите провайдера ИИ...",
+      "llmProviderHelp": "Выберите провайдера ИИ. Вам нужно будет предоставить свой API-ключ.",
+      "llmApiKey": "API-ключ",
+      "llmApiKeyPlaceholder": "Введите API-ключ",
+      "llmApiKeyHelpOpenai": "Получите API-ключ на platform.openai.com",
+      "llmApiKeyHelpAnthropic": "Получите API-ключ на console.anthropic.com",
+      "wfirmaSection": "Интеграция wFirma (необязательно)",
+      "useWfirma": "Вы используете wFirma?",
+      "wfirmaHelp": "Учетные данные можно найти в настройках аккаунта wFirma в разделе API.",
+      "wfirmaAccessKey": "Ключ доступа",
+      "wfirmaSecretKey": "Секретный ключ",
+      "wfirmaCompanyId": "ID компании",
+      "wfirmaCompanyIdPlaceholder": "Ваш ID компании в wFirma",
+      "submitButton": "Завершить настройку",
+      "submitting": "Сохранение...",
+      "successMessage": "Профиль настроен успешно! Перенаправление...",
+      "errorMessage": "Не удалось сохранить данные. Попробуйте снова."
     }
   },
   "chat": {
