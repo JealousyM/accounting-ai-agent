@@ -225,7 +225,7 @@ export class AuthService {
   /**
    * Find or create OAuth user
    */
-  async findOrCreateOAuthUser(profile: OAuthProfile): Promise<OAuthTokenPair> {
+  async findOrCreateOAuthUser(profile: OAuthProfile, locale?: string): Promise<OAuthTokenPair> {
     // Validate profile
     const validated = oauthProfileSchema.parse(profile);
 
@@ -268,6 +268,7 @@ export class AuthService {
           githubId: validated.provider === 'github' ? validated.id : undefined,
           firstName,
           lastName,
+          locale: locale || 'en',
           wfirmaConfig: validated.picture ? JSON.stringify({ picture: validated.picture }) : undefined,
         },
       });

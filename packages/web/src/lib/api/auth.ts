@@ -161,8 +161,8 @@ export const getUserLocale = async (email: string): Promise<{ locale: string }> 
  * Google OAuth - sends access token to backend for verification
  * Note: apiClient unwraps the response, returning data directly
  */
-export const googleOAuth = async (accessToken: string): Promise<AuthData> => {
-  return apiClient.post<AuthData>(API_ENDPOINTS.AUTH.OAUTH_GOOGLE, { access_token: accessToken }, {
+export const googleOAuth = async (accessToken: string, locale?: string): Promise<AuthData> => {
+  return apiClient.post<AuthData>(API_ENDPOINTS.AUTH.OAUTH_GOOGLE, { access_token: accessToken, locale }, {
     skipAuth: true,
   });
 };
@@ -186,8 +186,8 @@ export const githubOAuth = async (profile: {
  * GitHub OAuth callback - exchange code for tokens
  * Note: apiClient unwraps the response, returning data directly
  */
-export const githubOAuthCallback = async (code: string): Promise<AuthData> => {
-  return apiClient.post<AuthData>(API_ENDPOINTS.AUTH.OAUTH_GITHUB_CALLBACK, { code }, {
+export const githubOAuthCallback = async (code: string, locale?: string): Promise<AuthData> => {
+  return apiClient.post<AuthData>(API_ENDPOINTS.AUTH.OAUTH_GITHUB_CALLBACK, { code, locale }, {
     skipAuth: true,
   });
 };

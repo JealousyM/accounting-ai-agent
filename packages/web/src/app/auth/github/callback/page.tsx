@@ -21,6 +21,10 @@ function GitHubCallbackContent() {
     const savedState = sessionStorage.getItem('github_oauth_state');
     sessionStorage.removeItem('github_oauth_state');
 
+    // Retrieve locale stored before redirect
+    const savedLocale = sessionStorage.getItem('github_oauth_locale');
+    sessionStorage.removeItem('github_oauth_locale');
+
     if (errorParam) {
       setError(errorDescription || 'GitHub authentication was cancelled');
       return;
@@ -38,13 +42,13 @@ function GitHubCallbackContent() {
 
     const authenticate = async () => {
       try {
-        const response = await githubOAuthCallback(code);
+        const response = await githubOAuthCallback(code, savedLocale || undefined);
 
         // apiClient unwraps the response, so response is already the data object
         await login(
           response.token,
           response.refreshToken,
-          undefined,
+          savedLocale || undefined,
           response.needsProfileCompletion
         );
 

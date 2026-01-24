@@ -16,7 +16,7 @@ import { errorHandler, notFoundHandler } from './middleware/error-handler.middle
 import { logger } from './utils/logger';
 
 const app: Application = express();
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 3011;
 
 // CORS configuration - fail-secure in production
 const corsOrigin = process.env.CORS_ORIGIN;
@@ -30,7 +30,7 @@ if (process.env.NODE_ENV === 'production' && !corsOrigin) {
 // Middleware
 app.use(helmet());
 app.use(cors({
-  origin: corsOrigin || 'http://localhost:3000',
+  origin: corsOrigin || 'http://localhost:3010',
   credentials: true, // Allow cookies for future httpOnly token migration
 }));
 app.use(express.json({ limit: '100kb' })); // Prevent large payload attacks

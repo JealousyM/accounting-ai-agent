@@ -4,8 +4,7 @@ import React, { createContext, useContext, useState, useEffect, useCallback } fr
 import { useRouter } from 'next/navigation';
 import axios from 'axios';
 import { clearQueryCache } from '@/lib/queryClient';
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+import { API_URL } from '@/lib/config';
 
 // ============================================
 // TYPES
@@ -266,6 +265,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
       async (error) => {
         const originalRequest = error.config;
 
+        // Skip interceptor for auth endpoints (they handle 401 themselves)
+        const isAuthEndpoint = originalRequest?.url?.includes('/api/auth/');
+        if (isAuthEndpoint) {
+          return Promise.reject(error);
+        }
+
         // If 401 and not already retried
         if (error.response?.status === 401 && !originalRequest._retry) {
           originalRequest._retry = true;
@@ -280,8 +285,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
             }
           }
 
-          // Refresh failed - logout
-          logout();
+          // Refresh failed - logout only if user was authenticated
+          if (user) {
+            logout();
+          }
         }
 
         return Promise.reject(error);
@@ -291,7 +298,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     return () => {
       axios.interceptors.response.eject(interceptor);
     };
-  }, [refreshToken, getToken, logout]);
+  }, [refreshToken, getToken, logout, user]);
 
   const value: AuthContextType = {
     user,

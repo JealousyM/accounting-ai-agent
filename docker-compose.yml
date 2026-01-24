@@ -39,12 +39,12 @@ services:
     container_name: accounting-api
     environment:
       NODE_ENV: development
-      PORT: 3001
+      PORT: 3011
       DATABASE_URL: postgresql://postgres:postgres@postgres:5432/accounting_db
       REDIS_URL: redis://redis:6379
       JWT_SECRET: dev-secret-key-change-in-production
     ports:
-      - "3001:3001"
+      - "3011:3011"
     volumes:
       - ./packages/api:/app/packages/api
       - /app/packages/api/node_modules
@@ -63,9 +63,9 @@ services:
     container_name: accounting-web
     environment:
       NODE_ENV: development
-      NEXT_PUBLIC_API_URL: http://localhost:3001
+      NEXT_PUBLIC_API_URL: http://localhost:3011
     ports:
-      - "3000:3000"
+      - "3010:3010"
     volumes:
       - ./packages/web:/app/packages/web
       - /app/packages/web/node_modules

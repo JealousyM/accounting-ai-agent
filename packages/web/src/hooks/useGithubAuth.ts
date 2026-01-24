@@ -3,7 +3,7 @@
 import { useState, useCallback } from 'react';
 
 interface UseGithubAuthResult {
-  login: () => void;
+  login: (locale?: string) => void;
   isLoading: boolean;
   error: string | null;
   clearError: () => void;
@@ -17,7 +17,7 @@ export function useGithubAuth(): UseGithubAuthResult {
     setError(null);
   }, []);
 
-  const login = useCallback(() => {
+  const login = useCallback((locale?: string) => {
     setError(null);
     setIsLoading(true);
 
@@ -43,6 +43,11 @@ export function useGithubAuth(): UseGithubAuthResult {
 
     // Store state for CSRF verification
     sessionStorage.setItem('github_oauth_state', state);
+
+    // Store locale for use after callback
+    if (locale) {
+      sessionStorage.setItem('github_oauth_locale', locale);
+    }
 
     // Redirect to GitHub
     window.location.href = `https://github.com/login/oauth/authorize?${params.toString()}`;
