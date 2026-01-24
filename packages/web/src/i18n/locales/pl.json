@@ -66,7 +66,13 @@
       "signUp": "Zarejestruj się",
       "orContinueWith": "Lub kontynuuj z",
       "googleButton": "Kontynuuj z Google",
-      "githubButton": "Kontynuuj z GitHub"
+      "githubButton": "Kontynuuj z GitHub",
+      "errors": {
+        "invalidCredentials": "Nieprawidłowy email lub hasło",
+        "oauthRequired": "Zaloguj się przez OAuth",
+        "loginFailed": "Logowanie nie powiodło się. Spróbuj ponownie.",
+        "unexpectedError": "Wystąpił nieoczekiwany błąd. Spróbuj ponownie."
+      }
     },
     "forgotPassword": {
       "title": "Zapomniałeś hasła",
