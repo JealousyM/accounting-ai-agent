@@ -423,5 +423,10 @@
         "timestamp": "Timestamp"
       }
     }
+  },
+  "common": {
+    "loading": "Loading...",
+    "redirecting": "Redirecting...",
+    "pleaseWait": "Please wait"
   }
 }

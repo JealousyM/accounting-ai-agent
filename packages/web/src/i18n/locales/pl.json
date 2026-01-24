@@ -423,5 +423,10 @@
         "timestamp": "Czas"
       }
     }
+  },
+  "common": {
+    "loading": "Ładowanie...",
+    "redirecting": "Przekierowanie...",
+    "pleaseWait": "Proszę czekać"
   }
 }
