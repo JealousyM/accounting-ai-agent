@@ -340,6 +340,29 @@
       }
     }
   },
+  "help": {
+    "title": "Pomoc",
+    "searchPlaceholder": "Szukaj w pomocy...",
+    "loading": "Ładowanie...",
+    "noResults": "Nie znaleziono wyników",
+    "noTopics": "Brak dostępnych tematów",
+    "tryDifferent": "Spróbuj wybrać inną kategorię lub zmień wyszukiwanie.",
+    "categories": {
+      "gettingStarted": "Pierwsze kroki",
+      "aiChat": "Czat AI",
+      "invoices": "Faktury",
+      "contractors": "Kontrahenci",
+      "taxes": "Podatki",
+      "wfirma": "wFirma",
+      "settings": "Ustawienia",
+      "faq": "FAQ"
+    },
+    "searchMatch": {
+      "inTitle": "W tytule",
+      "inContent": "W treści",
+      "keywords": "Słowa kluczowe"
+    }
+  },
   "costs": {
     "title": "Panel Kosztów AI",
     "backToChat": "Powrót do czatu",

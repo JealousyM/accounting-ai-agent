@@ -161,6 +161,7 @@ export function ChatContainer() {
           translations={t.header}
           profileTranslations={translations[locale].profile}
           apiCredentialsTranslations={translations[locale].apiCredentials}
+          helpTranslations={translations[locale].help}
           locale={locale}
           onLocaleChange={setLocale}
         />

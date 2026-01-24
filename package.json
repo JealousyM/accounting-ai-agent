@@ -20,6 +20,8 @@
     "docker:build": "docker-compose build",
     "prisma:generate": "cd packages/api && npx prisma generate",
     "prisma:migrate": "cd packages/api && npx prisma migrate deploy",
+    "prisma:migrate:dev": "cd packages/api && npx prisma migrate dev",
+    "prisma:seed": "cd packages/api && npx prisma db seed",
     "prisma:studio": "cd packages/api && npx prisma studio"
   },
   "devDependencies": {

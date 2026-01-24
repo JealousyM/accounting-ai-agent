@@ -340,6 +340,29 @@
       }
     }
   },
+  "help": {
+    "title": "Справка",
+    "searchPlaceholder": "Поиск по справке...",
+    "loading": "Загрузка...",
+    "noResults": "Ничего не найдено",
+    "noTopics": "Нет доступных тем",
+    "tryDifferent": "Попробуйте выбрать другую категорию или изменить поиск.",
+    "categories": {
+      "gettingStarted": "Начало работы",
+      "aiChat": "AI Чат",
+      "invoices": "Счета",
+      "contractors": "Контрагенты",
+      "taxes": "Налоги",
+      "wfirma": "wFirma",
+      "settings": "Настройки",
+      "faq": "FAQ"
+    },
+    "searchMatch": {
+      "inTitle": "В заголовке",
+      "inContent": "В тексте",
+      "keywords": "Ключевые слова"
+    }
+  },
   "costs": {
     "title": "Панель затрат ИИ",
     "backToChat": "Назад к чату",
