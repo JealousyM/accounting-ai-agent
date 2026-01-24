@@ -11,6 +11,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { apiClient } from '@/lib/api/api-client';
+import { MarkdownRenderer } from '@/components/ui/markdown';
 import type { HelpTopic } from './types';
 
 export interface HelpPanelTranslations {
@@ -179,12 +180,11 @@ export function HelpPanel({ open, onClose, initialCategory, translations }: Help
                     </div>
                   )}
 
-                  <div
-                    className="prose prose-sm max-w-none dark:prose-invert text-muted-foreground leading-relaxed"
-                    style={{ whiteSpace: 'pre-wrap' }}
-                  >
-                    {topic.content}
-                  </div>
+                  <MarkdownRenderer
+                    content={topic.content}
+                    variant="help"
+                    className="text-muted-foreground"
+                  />
                 </div>
               ))}
             </div>
