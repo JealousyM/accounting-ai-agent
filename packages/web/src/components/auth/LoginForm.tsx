@@ -10,6 +10,7 @@ import { z } from 'zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { AppVersion } from '@/components/ui/app-version';
+import { LoadingScreen } from '@/components/ui/loading-screen';
 import { useAuth } from '@/contexts/AuthContext';
 import { useGoogleAuth } from '@/hooks/useGoogleAuth';
 import { useGithubAuth } from '@/hooks/useGithubAuth';
@@ -32,6 +33,7 @@ export function LoginForm() {
   const { login } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isRedirecting, setIsRedirecting] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
   const [userLocale, setUserLocale] = useState<'en' | 'pl' | 'ru'>('en');
   const [githubVisible, setGithubVisible] = useState(false);
@@ -70,6 +72,12 @@ export function LoginForm() {
     : userLocale === 'ru'
     ? ruTranslations.auth.login
     : enTranslations.auth.login;
+
+  const tCommon = userLocale === 'pl'
+    ? plTranslations.common
+    : userLocale === 'ru'
+    ? ruTranslations.common
+    : enTranslations.common;
 
   // Map API error messages to localized translations
   const getLocalizedError = (apiMessage: string): string => {
@@ -122,6 +130,8 @@ export function LoginForm() {
         userLocale
       );
 
+      setIsRedirecting(true);
+
       const redirectUrl = sessionStorage.getItem('redirectAfterLogin');
       sessionStorage.removeItem('redirectAfterLogin');
 
@@ -132,7 +142,6 @@ export function LoginForm() {
       } else {
         setApiError(t.errors?.unexpectedError || 'An unexpected error occurred. Please try again.');
       }
-    } finally {
       setIsSubmitting(false);
     }
   };
@@ -146,6 +155,11 @@ export function LoginForm() {
     setApiError(null);
     githubLogin();
   };
+
+  // Show loading screen during redirect
+  if (isRedirecting) {
+    return <LoadingScreen message={tCommon.redirecting} />;
+  }
 
   return (
     <div className="w-full max-w-md mx-auto">
