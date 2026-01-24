@@ -340,6 +340,29 @@
       }
     }
   },
+  "help": {
+    "title": "Help",
+    "searchPlaceholder": "Search help topics...",
+    "loading": "Loading...",
+    "noResults": "No results found",
+    "noTopics": "No topics available",
+    "tryDifferent": "Try selecting a different category or adjusting your search.",
+    "categories": {
+      "gettingStarted": "Getting Started",
+      "aiChat": "AI Chat",
+      "invoices": "Invoices",
+      "contractors": "Contractors",
+      "taxes": "Taxes",
+      "wfirma": "wFirma",
+      "settings": "Settings",
+      "faq": "FAQ"
+    },
+    "searchMatch": {
+      "inTitle": "In title",
+      "inContent": "In content",
+      "keywords": "Keywords"
+    }
+  },
   "costs": {
     "title": "AI Cost Dashboard",
     "backToChat": "Back to Chat",

@@ -5,6 +5,7 @@ import { Menu, MessageSquarePlus, Bot, Globe, User, LogOut } from 'lucide-react'
 import { Button } from '@/components/ui/button';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { ProfileEditModal, type ProfileTranslations, ApiCredentialsModal, type ApiCredentialsTranslations } from '@/components/profile';
+import { HelpButton, HelpPanel, type HelpPanelTranslations } from '@/components/help';
 import { ConversationDetail } from '@/hooks/useChat';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -25,6 +26,7 @@ interface ChatHeaderProps {
   translations: HeaderTranslations;
   profileTranslations: ProfileTranslations;
   apiCredentialsTranslations: ApiCredentialsTranslations;
+  helpTranslations: HelpPanelTranslations;
   locale: Locale;
   onLocaleChange: (locale: Locale) => void;
 }
@@ -43,11 +45,13 @@ export function ChatHeader({
   translations,
   profileTranslations,
   apiCredentialsTranslations,
+  helpTranslations,
   locale,
   onLocaleChange,
 }: ChatHeaderProps) {
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [isApiCredentialsModalOpen, setIsApiCredentialsModalOpen] = useState(false);
+  const [isHelpPanelOpen, setIsHelpPanelOpen] = useState(false);
   const { logout } = useAuth();
 
   const cycleLocale = () => {
@@ -88,6 +92,9 @@ export function ChatHeader({
         </div>
 
         <div className="flex items-center gap-2">
+          {/* Help button */}
+          <HelpButton onClick={() => setIsHelpPanelOpen(true)} />
+
           {/* Theme toggle */}
           <ThemeToggle />
 
@@ -150,6 +157,14 @@ export function ChatHeader({
         open={isApiCredentialsModalOpen}
         onOpenChange={setIsApiCredentialsModalOpen}
         translations={apiCredentialsTranslations}
+      />
+
+      {/* Help Panel */}
+      <HelpPanel
+        open={isHelpPanelOpen}
+        onClose={() => setIsHelpPanelOpen(false)}
+        initialCategory="aiChat"
+        translations={helpTranslations}
       />
     </>
   );

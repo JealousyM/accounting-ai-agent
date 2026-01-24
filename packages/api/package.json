@@ -21,7 +21,7 @@
     "prisma:reset": "prisma migrate reset"
   },
   "prisma": {
-    "seed": "tsx prisma/seed.ts"
+    "seed": "npx tsx prisma/seed.ts"
   },
   "dependencies": {
     "@langchain/anthropic": "^0.3.0",

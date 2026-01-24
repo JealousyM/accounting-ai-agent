@@ -3,7 +3,6 @@
 
 generator client {
   provider = "prisma-client-js"
-  output   = "../../../node_modules/.prisma/client"
 }
 
 datasource db {
@@ -145,4 +144,41 @@ model WFirmaCache {
   @@index([expiresAt])
   @@index([isValid])
   @@map("wfirma_cache")
+}
+
+// ============================================
+// HELP TOPICS (Multilingual Documentation)
+// ============================================
+
+model HelpTopic {
+  id          String   @id @default(cuid())
+  slug        String   @unique // e.g., "getting-started-welcome"
+  category    String   // e.g., "gettingStarted", "aiChat", "invoices"
+
+  // Multilingual content
+  titlePl     String
+  titleEn     String
+  titleRu     String
+  contentPl   String   @db.Text
+  contentEn   String   @db.Text
+  contentRu   String   @db.Text
+
+  // Search optimization
+  searchKeywordsPl String[] // For better search results
+  searchKeywordsEn String[]
+  searchKeywordsRu String[]
+
+  // Organization
+  order       Int      @default(0) // Display order within category
+  isFeatured  Boolean  @default(false)
+  isPublished Boolean  @default(true)
+
+  // Metadata
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([category])
+  @@index([isPublished])
+  @@index([slug])
+  @@map("help_topics")
 }
