@@ -16,6 +16,7 @@ import { useGithubAuth } from '@/hooks/useGithubAuth';
 import axios from 'axios';
 import enTranslations from '@/i18n/locales/en.json';
 import plTranslations from '@/i18n/locales/pl.json';
+import ruTranslations from '@/i18n/locales/ru.json';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
@@ -33,7 +34,7 @@ export function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
-  const [userLocale, setUserLocale] = useState<'en' | 'pl'>('en');
+  const [userLocale, setUserLocale] = useState<'en' | 'pl' | 'ru'>('en');
   const [githubVisible, setGithubVisible] = useState(false);
 
   // OAuth hooks
@@ -65,9 +66,23 @@ export function LoginForm() {
   }, [googleError, githubError, clearGoogleError, clearGithubError]);
 
   // Get translations based on user's saved locale
-  const t = userLocale === 'pl' 
-    ? plTranslations.auth.login 
+  const t = userLocale === 'pl'
+    ? plTranslations.auth.login
+    : userLocale === 'ru'
+    ? ruTranslations.auth.login
     : enTranslations.auth.login;
+
+  // Map API error messages to localized translations
+  const getLocalizedError = (apiMessage: string): string => {
+    const msg = apiMessage?.toLowerCase() || '';
+    if (msg.includes('invalid email or password')) {
+      return t.errors?.invalidCredentials || 'Invalid email or password';
+    }
+    if (msg.includes('oauth')) {
+      return t.errors?.oauthRequired || 'Please login with OAuth provider';
+    }
+    return t.errors?.loginFailed || 'Login failed. Please try again.';
+  };
 
   const {
     register,
@@ -113,10 +128,10 @@ export function LoginForm() {
 
       router.push(redirectUrl || '/chat');
     } catch (error: any) {
-      if (error.response?.data) {
-        setApiError(error.response.data.message || 'Login failed');
+      if (error.response?.data?.message) {
+        setApiError(getLocalizedError(error.response.data.message));
       } else {
-        setApiError('An unexpected error occurred. Please try again.');
+        setApiError(t.errors?.unexpectedError || 'An unexpected error occurred. Please try again.');
       }
     } finally {
       setIsSubmitting(false);
