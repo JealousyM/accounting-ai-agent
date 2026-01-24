@@ -6,7 +6,7 @@ import { googleOAuth } from '@/lib/api/auth';
 import { useAuth } from '@/contexts/AuthContext';
 
 interface UseGoogleAuthResult {
-  login: () => void;
+  login: (locale?: string) => void;
   isLoading: boolean;
   error: string | null;
   clearError: () => void;
@@ -22,7 +22,7 @@ export function useGoogleAuth(): UseGoogleAuthResult {
     setError(null);
   }, []);
 
-  const login = useCallback(async () => {
+  const login = useCallback(async (locale?: string) => {
     const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
 
     if (!clientId) {
@@ -64,13 +64,13 @@ export function useGoogleAuth(): UseGoogleAuthResult {
           try {
             // Send access token to backend for verification
             // Backend will verify with Google and fetch user info securely
-            const authResponse = await googleOAuth(response.access_token);
+            const authResponse = await googleOAuth(response.access_token, locale);
 
             // apiClient unwraps the response, so authResponse is already the data object
             await authLogin(
               authResponse.token,
               authResponse.refreshToken,
-              undefined,
+              locale,
               authResponse.needsProfileCompletion
             );
 

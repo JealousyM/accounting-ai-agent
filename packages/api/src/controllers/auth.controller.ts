@@ -451,7 +451,7 @@ export class AuthController {
    */
   async googleOAuth(req: Request, res: Response): Promise<void> {
     try {
-      const { access_token } = req.body;
+      const { access_token, locale } = req.body;
 
       if (!access_token) {
         res.status(400).json({
@@ -498,7 +498,7 @@ export class AuthController {
         provider: 'google' as const,
       };
 
-      const tokens = await authService.findOrCreateOAuthUser(profile);
+      const tokens = await authService.findOrCreateOAuthUser(profile, locale);
 
       logger.info('Google OAuth successful', { email: profile.email });
 
@@ -723,7 +723,7 @@ export class AuthController {
    */
   async githubOAuthCallback(req: Request, res: Response): Promise<void> {
     try {
-      const { code } = req.body;
+      const { code, locale } = req.body;
 
       if (!code) {
         res.status(400).json({
@@ -801,7 +801,7 @@ export class AuthController {
         provider: 'github' as const,
       };
 
-      const tokens = await authService.findOrCreateOAuthUser(profile);
+      const tokens = await authService.findOrCreateOAuthUser(profile, locale);
 
       logger.info('GitHub OAuth callback successful', { email: profile.email });
 

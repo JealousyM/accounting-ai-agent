@@ -20,8 +20,7 @@ import { cn } from '@/lib/utils';
 import { LegalModal } from '@/components/legal/LegalModal';
 import enTranslations from '@/i18n/locales/en.json';
 import plTranslations from '@/i18n/locales/pl.json';
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+import { API_URL } from '@/lib/config';
 
 export function RegistrationForm() {
   const [selectedLocale, setSelectedLocale] = useState<'en' | 'pl'>('en');
@@ -156,12 +155,12 @@ export function RegistrationForm() {
 
   const handleGoogleOAuth = () => {
     setApiError(null);
-    googleLogin();
+    googleLogin(selectedLocale);
   };
 
   const handleGithubOAuth = () => {
     setApiError(null);
-    githubLogin();
+    githubLogin(selectedLocale);
   };
 
   return (

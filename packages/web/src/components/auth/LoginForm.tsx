@@ -17,8 +17,7 @@ import axios from 'axios';
 import enTranslations from '@/i18n/locales/en.json';
 import plTranslations from '@/i18n/locales/pl.json';
 import ruTranslations from '@/i18n/locales/ru.json';
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+import { API_URL } from '@/lib/config';
 
 // Login schema
 const loginSchema = z.object({

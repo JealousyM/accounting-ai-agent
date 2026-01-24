@@ -13,7 +13,11 @@ const nextConfig = {
     cpus: 1,
   },
   async rewrites() {
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+    if (!apiUrl) {
+      console.warn('Warning: NEXT_PUBLIC_API_URL is not set. API rewrites will not work.');
+      return [];
+    }
     return [
       {
         source: '/api/:path*',
