@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Menu, MessageSquarePlus, Bot, Globe, User, LogOut } from 'lucide-react';
+import { Menu, MessageSquarePlus, Bot, Globe, User, LogOut, Shield } from 'lucide-react';
+import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { ProfileEditModal, type ProfileTranslations, ApiCredentialsModal, type ApiCredentialsTranslations } from '@/components/profile';
@@ -52,7 +53,7 @@ export function ChatHeader({
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [isApiCredentialsModalOpen, setIsApiCredentialsModalOpen] = useState(false);
   const [isHelpPanelOpen, setIsHelpPanelOpen] = useState(false);
-  const { logout } = useAuth();
+  const { logout, isAdmin } = useAuth();
 
   const cycleLocale = () => {
     const locales: Locale[] = ['en', 'pl', 'ru'];
@@ -107,6 +108,20 @@ export function ChatHeader({
           >
             <User className="w-4 h-4" />
           </Button>
+
+          {/* Admin button (only for admins) */}
+          {isAdmin && (
+            <Link href="/admin">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="flex items-center gap-1 text-purple-600 hover:text-purple-800 dark:text-purple-400 dark:hover:text-purple-300"
+                title="Admin"
+              >
+                <Shield className="w-4 h-4" />
+              </Button>
+            </Link>
+          )}
 
           {/* Language switcher */}
           <Button

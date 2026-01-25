@@ -428,5 +428,47 @@
     "loading": "Загрузка...",
     "redirecting": "Перенаправление...",
     "pleaseWait": "Пожалуйста, подождите"
+  },
+  "admin": {
+    "title": "Панель администратора",
+    "backToChat": "Вернуться к чату",
+    "refresh": "Обновить данные",
+    "stats": {
+      "totalUsers": "Всего пользователей",
+      "totalAdmins": "Администраторы",
+      "totalCost": "Общая стоимость AI",
+      "totalTokens": "Всего токенов",
+      "totalConversations": "Всего разговоров"
+    },
+    "users": {
+      "title": "Пользователи",
+      "search": "Поиск пользователей...",
+      "table": {
+        "email": "Email",
+        "name": "Имя",
+        "role": "Роль",
+        "aiCost": "Стоимость AI",
+        "tokens": "Токены",
+        "conversations": "Разговоры",
+        "registered": "Зарегистрирован"
+      },
+      "roles": {
+        "user": "Пользователь",
+        "admin": "Администратор"
+      },
+      "actions": {
+        "viewDetails": "Подробнее",
+        "makeAdmin": "Сделать администратором",
+        "removeAdmin": "Убрать права администратора"
+      }
+    },
+    "userDetail": {
+      "title": "Информация о пользователе",
+      "profile": "Профиль",
+      "costSummary": "Сводка расходов",
+      "recentConversations": "Последние разговоры",
+      "changeRole": "Изменить роль",
+      "confirmRoleChange": "Вы уверены, что хотите изменить роль этого пользователя?"
+    }
   }
 }

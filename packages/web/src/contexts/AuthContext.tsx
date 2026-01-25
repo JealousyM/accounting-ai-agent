@@ -10,12 +10,15 @@ import { API_URL } from '@/lib/config';
 // TYPES
 // ============================================
 
+export type UserRole = 'user' | 'admin';
+
 export interface User {
   id: string;
   email: string;
   firstName: string | null;
   lastName: string | null;
   locale: string;
+  role: UserRole;
   hasGoogleAuth: boolean;
   hasGithubAuth: boolean;
   company: any;
@@ -27,6 +30,7 @@ interface AuthContextType {
   user: User | null;
   isLoading: boolean;
   isAuthenticated: boolean;
+  isAdmin: boolean;
   needsProfileCompletion: boolean;
   login: (token: string, refreshToken: string, locale?: string, needsProfileCompletion?: boolean) => void;
   logout: () => void;
@@ -300,10 +304,13 @@ export function AuthProvider({ children }: AuthProviderProps) {
     };
   }, [refreshToken, getToken, logout, user]);
 
+  const isAdmin = user?.role === 'admin';
+
   const value: AuthContextType = {
     user,
     isLoading,
     isAuthenticated: !!user,
+    isAdmin,
     needsProfileCompletion,
     login,
     logout,

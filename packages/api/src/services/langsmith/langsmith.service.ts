@@ -20,10 +20,18 @@ import {
   MODEL_PRICING,
 } from '../../types/langsmith.types';
 
+interface CacheEntry<T> {
+  data: T;
+  expiresAt: number;
+}
+
 export class LangSmithService {
   private client: Client;
   private prisma: PrismaClient;
   private projectName: string;
+  private apiLock: Promise<void> = Promise.resolve();
+  private runsCache: Map<string, CacheEntry<LangSmithRunMetrics[]>> = new Map();
+  private readonly CACHE_TTL_MS = 30000; // 30 seconds
 
   constructor(prisma: PrismaClient) {
     this.prisma = prisma;
@@ -39,6 +47,30 @@ export class LangSmithService {
       projectName: this.projectName,
       hasApiKey: !!process.env.LANGCHAIN_API_KEY,
     });
+  }
+
+  /**
+   * Execute a function with exclusive access to LangSmith API
+   * Prevents concurrent API calls that cause issues
+   * Includes a small delay between calls to avoid rate limiting
+   */
+  private async withApiLock<T>(fn: () => Promise<T>): Promise<T> {
+    const previousLock = this.apiLock;
+    let releaseLock: () => void;
+    this.apiLock = new Promise<void>((resolve) => {
+      releaseLock = resolve;
+    });
+
+    await previousLock;
+
+    // Small delay to prevent API rate limiting
+    await new Promise((r) => setTimeout(r, 500));
+
+    try {
+      return await fn();
+    } finally {
+      releaseLock!();
+    }
   }
 
   // ============================================
@@ -227,87 +259,104 @@ export class LangSmithService {
   // ============================================
 
   /**
-   * Fetch all LLM runs for a user from LangSmith
+   * Generate cache key for user runs
+   */
+  private getCacheKey(params: CostQueryParams): string {
+    return `${params.userId}:${params.timeRange || 'month'}`;
+  }
+
+  /**
+   * Fetch all LLM runs for a user from LangSmith (with caching)
    */
   private async fetchUserRuns(params: CostQueryParams): Promise<LangSmithRunMetrics[]> {
-    const { start, end } = this.getDateRange(params);
-    const metrics: LangSmithRunMetrics[] = [];
+    const cacheKey = this.getCacheKey(params);
+    const now = Date.now();
 
-    logger.info('=== LangSmith fetchUserRuns START === ', {
-      userId: params.userId,
-      start: start.toISOString(),
-      end: end.toISOString(),
-      projectName: this.projectName,
-      filter: `has(tags, "user:${params.userId}")`,
-    });
-
-    try {
-      // First, try to fetch ALL runs without filter to see what's available
-      logger.info('Fetching ALL LLM runs (no filter) to debug...');
-      const allRuns = this.client.listRuns({
-        projectName: this.projectName,
-        startTime: start,
-        runType: 'llm',
+    // Check cache first
+    const cached = this.runsCache.get(cacheKey);
+    if (cached && cached.expiresAt > now) {
+      logger.info('=== LangSmith fetchUserRuns CACHE HIT ===', {
+        userId: params.userId,
+        timeRange: params.timeRange,
+        metricsCount: cached.data.length,
       });
+      return cached.data;
+    }
 
-      let allRunsCount = 0;
-      const allRunsSample: Array<{ id: string; name: string; tags: string[] | null | undefined }> = [];
-      for await (const run of allRuns) {
-        allRunsCount++;
-        if (allRunsSample.length < 5) {
-          allRunsSample.push({
-            id: run.id,
-            name: run.name,
-            tags: run.tags,
-          });
-        }
+    // Use lock to prevent concurrent API calls
+    return this.withApiLock(async () => {
+      // Double-check cache after acquiring lock (another request might have filled it)
+      const cachedAfterLock = this.runsCache.get(cacheKey);
+      if (cachedAfterLock && cachedAfterLock.expiresAt > Date.now()) {
+        logger.info('=== LangSmith fetchUserRuns CACHE HIT (after lock) ===', {
+          userId: params.userId,
+          timeRange: params.timeRange,
+          metricsCount: cachedAfterLock.data.length,
+        });
+        return cachedAfterLock.data;
       }
 
-      logger.info('ALL LLM runs found (without user filter)', {
-        count: allRunsCount,
-        sampleRuns: allRunsSample,
-      });
+      const { start, end } = this.getDateRange(params);
+      const metrics: LangSmithRunMetrics[] = [];
 
-      // Now fetch with user filter
-      const runs = this.client.listRuns({
+      logger.info('=== LangSmith fetchUserRuns START === ', {
+        userId: params.userId,
+        start: start.toISOString(),
+        end: end.toISOString(),
         projectName: this.projectName,
-        startTime: start,
-        runType: 'llm',
         filter: `has(tags, "user:${params.userId}")`,
       });
 
-      for await (const run of runs) {
-        logger.debug('Processing run from LangSmith', {
-          runId: run.id,
-          name: run.name,
-          runType: run.run_type,
-          tags: run.tags,
-          promptTokens: run.prompt_tokens,
-          completionTokens: run.completion_tokens,
-          totalTokens: run.total_tokens,
+      try {
+        // Fetch runs with user filter
+        const runs = this.client.listRuns({
+          projectName: this.projectName,
+          runType: 'llm',
+          filter: `has(tags, "user:${params.userId}")`,
         });
 
-        const metric = this.convertRunToMetrics(run);
-        if (metric) {
-          metrics.push(metric);
+        let rawRunCount = 0;
+        let skippedByDate = 0;
+
+        for await (const run of runs) {
+          rawRunCount++;
+
+          // Manual date filtering
+          const runStartTime = run.start_time ? new Date(run.start_time) : null;
+          if (runStartTime && (runStartTime < start || runStartTime > end)) {
+            skippedByDate++;
+            continue;
+          }
+
+          const metric = this.convertRunToMetrics(run);
+          if (metric) {
+            metrics.push(metric);
+          }
         }
+
+        logger.info('=== LangSmith fetchUserRuns END ===', {
+          userId: params.userId,
+          rawRunCount,
+          skippedByDate,
+          metricsCount: metrics.length,
+        });
+
+        // Store in cache
+        this.runsCache.set(cacheKey, {
+          data: metrics,
+          expiresAt: Date.now() + this.CACHE_TTL_MS,
+        });
+
+        return metrics;
+      } catch (error) {
+        logger.error('Failed to fetch LangSmith runs', {
+          error: error instanceof Error ? error.message : error,
+          stack: error instanceof Error ? error.stack : undefined,
+          userId: params.userId
+        });
+        return [];
       }
-
-      logger.info('=== LangSmith fetchUserRuns END ===', {
-        userId: params.userId,
-        metricsCount: metrics.length,
-      });
-
-      return metrics;
-    } catch (error) {
-      logger.error('Failed to fetch LangSmith runs', {
-        error: error instanceof Error ? error.message : error,
-        stack: error instanceof Error ? error.stack : undefined,
-        userId: params.userId
-      });
-      // Return empty array on error instead of throwing
-      return [];
-    }
+    });
   }
 
   /**
@@ -348,6 +397,151 @@ export class LangSmithService {
       });
       return [];
     }
+  }
+
+  /**
+   * Fetch ALL runs from LangSmith (for admin aggregation)
+   * Uses cache with longer TTL for admin data
+   */
+  private async fetchAllRuns(timeRange: string = 'year'): Promise<LangSmithRunMetrics[]> {
+    const cacheKey = `all:${timeRange}`;
+    const now = Date.now();
+
+    // Check cache first (use longer TTL for all runs - 60 seconds)
+    const cached = this.runsCache.get(cacheKey);
+    if (cached && cached.expiresAt > now) {
+      logger.info('=== LangSmith fetchAllRuns CACHE HIT ===', {
+        timeRange,
+        metricsCount: cached.data.length,
+      });
+      return cached.data;
+    }
+
+    return this.withApiLock(async () => {
+      // Double-check cache after acquiring lock
+      const cachedAfterLock = this.runsCache.get(cacheKey);
+      if (cachedAfterLock && cachedAfterLock.expiresAt > Date.now()) {
+        return cachedAfterLock.data;
+      }
+
+      const { start, end } = this.getDateRange({ timeRange: timeRange as any, userId: '' });
+      const metrics: LangSmithRunMetrics[] = [];
+
+      logger.info('=== LangSmith fetchAllRuns START ===', {
+        start: start.toISOString(),
+        end: end.toISOString(),
+        projectName: this.projectName,
+      });
+
+      try {
+        // Fetch ALL LLM runs without user filter
+        const runs = this.client.listRuns({
+          projectName: this.projectName,
+          runType: 'llm',
+        });
+
+        let rawRunCount = 0;
+        let skippedByDate = 0;
+
+        for await (const run of runs) {
+          rawRunCount++;
+
+          const runStartTime = run.start_time ? new Date(run.start_time) : null;
+          if (runStartTime && (runStartTime < start || runStartTime > end)) {
+            skippedByDate++;
+            continue;
+          }
+
+          const metric = this.convertRunToMetrics(run);
+          if (metric) {
+            metrics.push(metric);
+          }
+        }
+
+        logger.info('=== LangSmith fetchAllRuns END ===', {
+          rawRunCount,
+          skippedByDate,
+          metricsCount: metrics.length,
+        });
+
+        // Cache for 60 seconds
+        this.runsCache.set(cacheKey, {
+          data: metrics,
+          expiresAt: Date.now() + 60000,
+        });
+
+        return metrics;
+      } catch (error) {
+        logger.error('Failed to fetch all LangSmith runs', {
+          error: error instanceof Error ? error.message : error,
+          stack: error instanceof Error ? error.stack : undefined,
+        });
+        return [];
+      }
+    });
+  }
+
+  /**
+   * Get aggregated stats for ALL users (single API call)
+   * Returns a map of userId -> UserCostSummary
+   */
+  async getAllUserStats(timeRange: string = 'year'): Promise<Map<string, UserCostSummary>> {
+    const allRuns = await this.fetchAllRuns(timeRange);
+
+    // Group runs by userId
+    const runsByUser = new Map<string, LangSmithRunMetrics[]>();
+    for (const run of allRuns) {
+      if (!run.userId) continue;
+
+      const userRuns = runsByUser.get(run.userId) || [];
+      userRuns.push(run);
+      runsByUser.set(run.userId, userRuns);
+    }
+
+    // Calculate summary for each user
+    const userStats = new Map<string, UserCostSummary>();
+    for (const [userId, runs] of runsByUser) {
+      userStats.set(userId, this.calculateUserSummary(runs, userId));
+    }
+
+    logger.info('getAllUserStats completed', {
+      totalRuns: allRuns.length,
+      uniqueUsers: userStats.size,
+      userIds: Array.from(userStats.keys()),
+    });
+
+    return userStats;
+  }
+
+  /**
+   * Get admin dashboard aggregated totals (single API call)
+   */
+  async getAdminTotals(timeRange: string = 'year'): Promise<{
+    totalCost: number;
+    totalTokens: number;
+    totalConversations: number;
+    totalRuns: number;
+  }> {
+    const allRuns = await this.fetchAllRuns(timeRange);
+
+    let totalCost = 0;
+    let totalTokens = 0;
+    const conversationIds = new Set<string>();
+
+    for (const run of allRuns) {
+      totalCost += run.totalCost;
+      totalTokens += run.totalTokens;
+      if (run.conversationId) {
+        conversationIds.add(run.conversationId);
+      }
+    }
+
+    return {
+      totalCost,
+      totalTokens,
+      totalConversations: conversationIds.size,
+      totalRuns: allRuns.length,
+    };
   }
 
   /**
@@ -627,40 +821,40 @@ export class LangSmithService {
    * Calculate date range based on TimeRange
    */
   private getDateRange(params: CostQueryParams): { start: Date; end: Date } {
-    const end = new Date();
+    // Use timestamp arithmetic for reliable date calculations
+    const DAY_MS = 24 * 60 * 60 * 1000;
+    const now = Date.now();
+    const end = new Date(now);
     let start: Date;
 
     switch (params.timeRange) {
       case 'day':
-        start = new Date(end);
-        start.setDate(start.getDate() - 1);
+        start = new Date(now - DAY_MS);
         break;
       case 'week':
-        start = new Date(end);
-        start.setDate(start.getDate() - 7);
+        start = new Date(now - 7 * DAY_MS);
         break;
       case 'month':
-        start = new Date(end);
-        start.setMonth(start.getMonth() - 1);
+        start = new Date(now - 30 * DAY_MS);
         break;
       case 'quarter':
-        start = new Date(end);
-        start.setMonth(start.getMonth() - 3);
+        start = new Date(now - 90 * DAY_MS);
         break;
       case 'year':
-        start = new Date(end);
-        start.setFullYear(start.getFullYear() - 1);
+        start = new Date(now - 365 * DAY_MS);
         break;
       case 'custom':
-        start = params.startDate ? new Date(params.startDate) : new Date(end);
-        start.setMonth(start.getMonth() - 1);
+        if (params.startDate) {
+          start = new Date(params.startDate);
+        } else {
+          start = new Date(now - 30 * DAY_MS);
+        }
         if (params.endDate) {
           return { start, end: new Date(params.endDate) };
         }
         break;
       default:
-        start = new Date(end);
-        start.setMonth(start.getMonth() - 1);
+        start = new Date(now - 30 * DAY_MS);
     }
 
     return { start, end };

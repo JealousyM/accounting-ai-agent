@@ -428,5 +428,47 @@
     "loading": "Loading...",
     "redirecting": "Redirecting...",
     "pleaseWait": "Please wait"
+  },
+  "admin": {
+    "title": "Admin Dashboard",
+    "backToChat": "Back to Chat",
+    "refresh": "Refresh data",
+    "stats": {
+      "totalUsers": "Total Users",
+      "totalAdmins": "Admins",
+      "totalCost": "Total AI Cost",
+      "totalTokens": "Total Tokens",
+      "totalConversations": "Total Conversations"
+    },
+    "users": {
+      "title": "Users",
+      "search": "Search users...",
+      "table": {
+        "email": "Email",
+        "name": "Name",
+        "role": "Role",
+        "aiCost": "AI Cost",
+        "tokens": "Tokens",
+        "conversations": "Conversations",
+        "registered": "Registered"
+      },
+      "roles": {
+        "user": "User",
+        "admin": "Admin"
+      },
+      "actions": {
+        "viewDetails": "View Details",
+        "makeAdmin": "Make Admin",
+        "removeAdmin": "Remove Admin"
+      }
+    },
+    "userDetail": {
+      "title": "User Details",
+      "profile": "Profile",
+      "costSummary": "Cost Summary",
+      "recentConversations": "Recent Conversations",
+      "changeRole": "Change Role",
+      "confirmRoleChange": "Are you sure you want to change this user's role?"
+    }
   }
 }

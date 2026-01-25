@@ -10,6 +10,7 @@ import { Request } from 'express';
 export interface JwtPayload {
   userId: string;
   email: string;
+  role: 'user' | 'admin';
   iat?: number;
   exp?: number;
 }
@@ -42,6 +43,7 @@ export interface AuthUser {
   email: string;
   firstName: string | null;
   lastName: string | null;
+  role: 'user' | 'admin';
 }
 
 /**

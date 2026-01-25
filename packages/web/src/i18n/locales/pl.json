@@ -428,5 +428,47 @@
     "loading": "Ładowanie...",
     "redirecting": "Przekierowanie...",
     "pleaseWait": "Proszę czekać"
+  },
+  "admin": {
+    "title": "Panel Administratora",
+    "backToChat": "Powrót do czatu",
+    "refresh": "Odśwież dane",
+    "stats": {
+      "totalUsers": "Wszyscy użytkownicy",
+      "totalAdmins": "Administratorzy",
+      "totalCost": "Całkowity koszt AI",
+      "totalTokens": "Wszystkie tokeny",
+      "totalConversations": "Wszystkie rozmowy"
+    },
+    "users": {
+      "title": "Użytkownicy",
+      "search": "Szukaj użytkowników...",
+      "table": {
+        "email": "Email",
+        "name": "Imię",
+        "role": "Rola",
+        "aiCost": "Koszt AI",
+        "tokens": "Tokeny",
+        "conversations": "Rozmowy",
+        "registered": "Zarejestrowany"
+      },
+      "roles": {
+        "user": "Użytkownik",
+        "admin": "Administrator"
+      },
+      "actions": {
+        "viewDetails": "Zobacz szczegóły",
+        "makeAdmin": "Nadaj uprawnienia administratora",
+        "removeAdmin": "Usuń uprawnienia administratora"
+      }
+    },
+    "userDetail": {
+      "title": "Szczegóły użytkownika",
+      "profile": "Profil",
+      "costSummary": "Podsumowanie kosztów",
+      "recentConversations": "Ostatnie rozmowy",
+      "changeRole": "Zmień rolę",
+      "confirmRoleChange": "Czy na pewno chcesz zmienić rolę tego użytkownika?"
+    }
   }
 }

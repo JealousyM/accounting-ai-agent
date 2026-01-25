@@ -13,6 +13,7 @@ import { prisma } from '../lib/prisma';
 export interface JwtPayload {
   userId: string;
   email: string;
+  role: 'user' | 'admin';
   iat?: number;
   exp?: number;
 }
@@ -25,6 +26,7 @@ export interface AuthUser {
   email: string;
   firstName: string | null;
   lastName: string | null;
+  role: 'user' | 'admin';
 }
 
 /**
@@ -110,11 +112,12 @@ export const authenticateToken = async (
           email: true,
           firstName: true,
           lastName: true,
+          role: true,
         },
       });
 
       if (user) {
-        req.authUser = user;
+        req.authUser = user as AuthUser;
       }
     } catch (dbError) {
       // Log but don't fail if DB lookup fails
@@ -183,11 +186,12 @@ export const optionalAuth = async (
             email: true,
             firstName: true,
             lastName: true,
+            role: true,
           },
         });
 
         if (user) {
-          req.authUser = user;
+          req.authUser = user as AuthUser;
         }
       } catch (dbError) {
         logger.error('Failed to fetch user in optional auth', {
@@ -246,6 +250,50 @@ export const requireUserId = (userIdParam: string = 'userId') => {
     next();
   };
 };
+
+/**
+ * Require specific role(s) for route access
+ * Use after authenticateToken middleware
+ * Falls back to database role if JWT token doesn't have role field (backward compatibility)
+ */
+export const requireRole = (...allowedRoles: Array<'user' | 'admin'>) => {
+  return (req: Request, res: Response, next: NextFunction): void => {
+    // Try JWT role first, fall back to database user role
+    const userRole = req.user?.role || req.authUser?.role;
+
+    if (!userRole) {
+      res.status(401).json({
+        success: false,
+        error: 'Unauthorized',
+        message: 'Authentication required',
+      });
+      return;
+    }
+
+    if (!allowedRoles.includes(userRole)) {
+      logger.warn('User attempted to access restricted resource', {
+        userId: req.user?.userId,
+        userRole,
+        requiredRoles: allowedRoles,
+        path: req.path,
+      });
+
+      res.status(403).json({
+        success: false,
+        error: 'Forbidden',
+        message: 'You do not have permission to access this resource',
+      });
+      return;
+    }
+
+    next();
+  };
+};
+
+/**
+ * Admin-only middleware (convenience wrapper)
+ */
+export const requireAdmin = requireRole('admin');
 
 /**
  * Alias for authenticateToken (for backward compatibility)
