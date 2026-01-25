@@ -45,6 +45,7 @@ const oauthProfileSchema = z.object({
 export interface JwtPayload {
   userId: string;
   email: string;
+  role: 'user' | 'admin';
   iat?: number;
   exp?: number;
 }
@@ -182,7 +183,7 @@ export class AuthService {
     }
 
     // Generate tokens
-    return this.generateTokenPair(user.id, user.email);
+    return this.generateTokenPair(user.id, user.email, user.role);
   }
 
   /**
@@ -219,7 +220,7 @@ export class AuthService {
     });
 
     // Generate tokens
-    return this.generateTokenPair(user.id, user.email);
+    return this.generateTokenPair(user.id, user.email, user.role);
   }
 
   /**
@@ -281,7 +282,7 @@ export class AuthService {
     const needsProfileCompletion = !credentials?.llmApiKey;
 
     // Generate tokens
-    const tokens = await this.generateTokenPair(user.id, user.email);
+    const tokens = await this.generateTokenPair(user.id, user.email, user.role);
     return {
       ...tokens,
       needsProfileCompletion,
@@ -314,7 +315,7 @@ export class AuthService {
       }
 
       // Generate new token pair
-      return this.generateTokenPair(user.id, user.email);
+      return this.generateTokenPair(user.id, user.email, user.role);
     } catch (error) {
       if (error instanceof jwt.JsonWebTokenError) {
         throw new Error('Invalid refresh token');
@@ -356,10 +357,11 @@ export class AuthService {
    * Generate JWT token pair
    * @private
    */
-  private async generateTokenPair(userId: string, email: string): Promise<TokenPair> {
+  private async generateTokenPair(userId: string, email: string, role: 'user' | 'admin' = 'user'): Promise<TokenPair> {
     const payload: JwtPayload = {
       userId,
       email,
+      role,
     };
 
     // Generate access token (15 minutes)

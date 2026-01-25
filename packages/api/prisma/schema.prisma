@@ -11,6 +11,15 @@ datasource db {
 }
 
 // ============================================
+// ENUMS
+// ============================================
+
+enum UserRole {
+  user
+  admin
+}
+
+// ============================================
 // USER MANAGEMENT
 // ============================================
 
@@ -27,6 +36,7 @@ model User {
 
   // User preferences
   locale       String   @default("en") // User's preferred language (en, pl)
+  role         UserRole @default(user) // User role for access control
   isFirstLogin Boolean  @default(true) // Flag for showing welcome modal on first login
 
   // wFirma integration config

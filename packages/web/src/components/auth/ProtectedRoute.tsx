@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth, UserRole } from '@/contexts/AuthContext';
 import { LoadingScreen } from '@/components/ui/loading-screen';
 
 // ============================================
@@ -156,8 +156,9 @@ export function PublicRoute({
 
 interface RoleBasedRouteProps {
   children: React.ReactNode;
-  allowedRoles?: string[];
+  allowedRoles: UserRole[];
   fallback?: React.ReactNode;
+  redirectTo?: string;
 }
 
 /**
@@ -174,22 +175,80 @@ interface RoleBasedRouteProps {
  */
 export function RoleBasedRoute({
   children,
+  allowedRoles,
+  fallback,
+  redirectTo = '/chat',
 }: RoleBasedRouteProps) {
-  const { user, isLoading } = useAuth();
+  const { user, isLoading, isAuthenticated } = useAuth();
+  const router = useRouter();
+  const [shouldRender, setShouldRender] = useState(false);
 
-  if (isLoading) {
+  useEffect(() => {
+    if (isLoading) {
+      return;
+    }
+
+    if (!isAuthenticated || !user) {
+      router.push('/login');
+      return;
+    }
+
+    if (!allowedRoles.includes(user.role)) {
+      if (redirectTo) {
+        router.push(redirectTo);
+      }
+      return;
+    }
+
+    setShouldRender(true);
+  }, [isLoading, isAuthenticated, user, allowedRoles, router, redirectTo]);
+
+  if (isLoading || !shouldRender) {
     return <LoadingScreen />;
   }
 
-  if (!user) {
+  if (!isAuthenticated || !user) {
     return null;
   }
 
-  // Check if user has required role
-  // Note: You'll need to add role field to User type
-  // const hasRequiredRole = allowedRoles.some(role => user.roles?.includes(role));
+  if (!allowedRoles.includes(user.role)) {
+    return fallback || null;
+  }
 
-  // For now, just render children
-  // Implement role checking based on your user model
   return <>{children}</>;
+}
+
+// ============================================
+// ADMIN ROUTE COMPONENT
+// ============================================
+
+interface AdminRouteProps {
+  children: React.ReactNode;
+  fallback?: React.ReactNode;
+}
+
+/**
+ * AdminRoute Component
+ *
+ * Convenience wrapper for admin-only pages
+ * Combines ProtectedRoute + RoleBasedRoute
+ *
+ * @example
+ * ```tsx
+ * <AdminRoute>
+ *   <AdminDashboard />
+ * </AdminRoute>
+ * ```
+ */
+export function AdminRoute({
+  children,
+  fallback,
+}: AdminRouteProps) {
+  return (
+    <ProtectedRoute>
+      <RoleBasedRoute allowedRoles={['admin']} fallback={fallback}>
+        {children}
+      </RoleBasedRoute>
+    </ProtectedRoute>
+  );
 }

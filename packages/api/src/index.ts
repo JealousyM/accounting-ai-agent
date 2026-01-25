@@ -11,6 +11,7 @@ import aiChatRoutes from './routes/ai-chat.routes';
 import aiCostsRoutes from './routes/ai-costs.routes';
 import fileRoutes from './routes/file.routes';
 import helpRoutes from './routes/help.routes';
+import adminRoutes from './routes/admin.routes';
 import { globalRateLimiter } from './middleware/rate-limiter.middleware';
 import { errorHandler, notFoundHandler } from './middleware/error-handler.middleware';
 import { logger } from './utils/logger';
@@ -69,6 +70,9 @@ app.use('/api/files', fileRoutes);
 
 // Help routes (public - no authentication required)
 app.use('/api/help', helpRoutes);
+
+// Admin routes (admin role required)
+app.use('/api/admin', adminRoutes);
 
 // 404 handler
 app.use(notFoundHandler);
