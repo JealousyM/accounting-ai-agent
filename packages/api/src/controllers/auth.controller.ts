@@ -670,15 +670,16 @@ export class AuthController {
         return;
       }
 
-      const { llmProvider, llmApiKey, useWfirma, wfirmaAccessKey, wfirmaSecretKey, wfirmaCompanyId } = req.body;
+      const { llmProvider, llmApiKey, llmModel, useWfirma, wfirmaAccessKey, wfirmaSecretKey, wfirmaCompanyId } = req.body;
 
       // Save LLM credentials
       try {
         await credentialsService.setLLMCredentials(userId, {
           provider: llmProvider,
           apiKey: llmApiKey,
+          model: llmModel,
         });
-        logger.info('LLM credentials saved during profile completion', { userId, provider: llmProvider });
+        logger.info('LLM credentials saved during profile completion', { userId, provider: llmProvider, model: llmModel });
       } catch (error) {
         logger.error('Failed to save LLM credentials during profile completion', { userId, error: (error as Error).message });
         res.status(400).json({
@@ -717,6 +718,51 @@ export class AuthController {
         success: false,
         error: 'Internal Server Error',
         message: 'An unexpected error occurred',
+      });
+    }
+  }
+
+  /**
+   * GET /api/auth/llm-models
+   * Fetch available LLM models for registration (public endpoint)
+   */
+  async getPublicLLMModels(req: Request, res: Response): Promise<void> {
+    try {
+      const { provider, apiKey } = req.query;
+
+      if (!provider || !apiKey) {
+        res.status(400).json({
+          success: false,
+          error: 'Bad Request',
+          message: 'Provider and apiKey are required',
+        });
+        return;
+      }
+
+      if (provider !== 'openai' && provider !== 'google') {
+        res.status(400).json({
+          success: false,
+          error: 'Bad Request',
+          message: 'Invalid provider. Must be "openai" or "google"',
+        });
+        return;
+      }
+
+      const models = await credentialsService.getAvailableModels(
+        provider as 'openai' | 'google',
+        apiKey as string
+      );
+
+      res.status(200).json({
+        success: true,
+        data: { models },
+      });
+    } catch (error) {
+      logger.error('Error fetching LLM models', { error });
+      res.status(500).json({
+        success: false,
+        error: 'Internal Server Error',
+        message: 'Failed to fetch models from provider',
       });
     }
   }

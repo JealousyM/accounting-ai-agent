@@ -1,6 +1,11 @@
 import { apiClient, ApiError } from './api-client';
 import { API_ENDPOINTS } from './endpoints';
 
+export interface LLMModelInfo {
+  id: string;
+  name: string;
+}
+
 //const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
 export interface RegisterData {
@@ -16,8 +21,9 @@ export interface RegisterData {
   wfirmaSecretKey?: string;
   wfirmaCompanyId?: string;
   // LLM provider credentials (optional for Pro subscribers)
-  llmProvider?: 'openai' | 'anthropic';
+  llmProvider?: 'openai' | 'google';
   llmApiKey?: string;
+  llmModel?: string;
   // Subscription option
   subscribeToPro?: boolean;
   billingPeriod?: 'monthly' | 'yearly';
@@ -245,8 +251,9 @@ export const resetPassword = async (token: string, password: string, confirmPass
  * Complete profile - for OAuth users who need to add LLM credentials
  */
 export interface CompleteProfileData {
-  llmProvider: 'openai' | 'anthropic';
+  llmProvider: 'openai' | 'google';
   llmApiKey: string;
+  llmModel?: string;
   useWfirma?: boolean;
   wfirmaAccessKey?: string;
   wfirmaSecretKey?: string;
@@ -272,5 +279,23 @@ export const completeProfile = async (data: CompleteProfileData): Promise<Comple
       throw error;
     }
     throw new Error('Failed to complete profile');
+  }
+};
+
+/**
+ * Get available LLM models (public endpoint for registration)
+ */
+export const getPublicLLMModels = async (
+  provider: 'openai' | 'google',
+  apiKey: string
+): Promise<LLMModelInfo[]> => {
+  try {
+    const response = await apiClient.get<{ models: LLMModelInfo[] }>(
+      `/api/auth/llm-models?provider=${encodeURIComponent(provider)}&apiKey=${encodeURIComponent(apiKey)}`,
+      { skipAuth: true }
+    );
+    return response.models;
+  } catch {
+    return [];
   }
 };

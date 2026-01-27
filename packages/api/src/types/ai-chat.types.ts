@@ -7,7 +7,7 @@
 // LLM PROVIDER TYPES
 // ============================================
 
-export type LLMProvider = 'openai' | 'anthropic';
+export type LLMProvider = 'openai' | 'google';
 
 export interface LLMConfig {
   provider: LLMProvider;
@@ -23,9 +23,9 @@ export const DEFAULT_LLM_CONFIG: Record<LLMProvider, LLMConfig> = {
     maxTokens: 4096,
     temperature: 0.7,
   },
-  anthropic: {
-    provider: 'anthropic',
-    model: 'claude-3-5-sonnet-20241022',
+  google: {
+    provider: 'google',
+    model: 'gemini-2.5-flash',
     maxTokens: 4096,
     temperature: 0.7,
   },
@@ -174,8 +174,7 @@ export interface GetInvoicesArgs {
 
 export interface AIChatServiceConfig {
   defaultProvider: LLMProvider;
-  openaiApiKey?: string;
-  anthropicApiKey?: string;
+  // Removed: API keys now stored only in database (user_api_credentials)
 }
 
 export interface ProcessMessageResult {

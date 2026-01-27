@@ -67,8 +67,9 @@ export const registerSchema = z.object({
     wfirmaSecretKey: z.string().max(200).trim().optional(),
     wfirmaCompanyId: z.string().max(50).trim().optional(),
     // LLM provider credentials (optional)
-    llmProvider: z.enum(['openai', 'anthropic', 'none']).optional(),
+    llmProvider: z.enum(['openai', 'google', 'none']).optional(),
     llmApiKey: z.string().max(500).trim().optional(),
+    llmModel: z.string().max(100).trim().optional(),
   }),
 });
 
@@ -182,8 +183,9 @@ export const resetPasswordSchema = z.object({
  */
 export const completeProfileSchema = z.object({
   body: z.object({
-    llmProvider: z.enum(['openai', 'anthropic']),
+    llmProvider: z.enum(['openai', 'google']),
     llmApiKey: z.string().min(1, 'API key is required').max(500),
+    llmModel: z.string().max(100).trim().optional(),
     // wFirma credentials (optional)
     useWfirma: z.boolean().optional(),
     wfirmaAccessKey: z.string().max(200).trim().optional(),

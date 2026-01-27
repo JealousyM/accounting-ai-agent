@@ -21,7 +21,10 @@ import {
   deleteWFirmaCredentials,
   setLLMCredentials,
   deleteLLMCredentials,
+  getAvailableModels,
+  getModelsWithStoredCredentials,
   type CredentialsSummary,
+  type LLMModelInfo,
 } from '@/lib/api/credentials';
 
 // ============================================
@@ -35,8 +38,9 @@ const wfirmaSchema = z.object({
 });
 
 const llmSchema = z.object({
-  provider: z.enum(['openai', 'anthropic']),
+  provider: z.enum(['openai', 'google']),
   apiKey: z.string().min(1, 'API key is required'),
+  model: z.string().optional(),
 });
 
 type WFirmaFormData = z.infer<typeof wfirmaSchema>;
@@ -62,6 +66,9 @@ export interface ApiCredentialsTranslations {
   llmSection: string;
   llmProvider: string;
   llmApiKey: string;
+  llmModel: string;
+  llmModelDefault: string;
+  llmLoadingModels: string;
   llmUsingDefault: string;
   llmUsingCustom: string;
   llmConfigure: string;
@@ -110,6 +117,8 @@ export function ApiCredentialsModal({
   const [showLlmForm, setShowLlmForm] = useState(false);
   const [isLlmSubmitting, setIsLlmSubmitting] = useState(false);
   const [isLlmDeleting, setIsLlmDeleting] = useState(false);
+  const [availableModels, setAvailableModels] = useState<LLMModelInfo[]>([]);
+  const [isLoadingModels, setIsLoadingModels] = useState(false);
 
   const wfirmaForm = useForm<WFirmaFormData>({
     resolver: zodResolver(wfirmaSchema),
@@ -118,8 +127,41 @@ export function ApiCredentialsModal({
 
   const llmForm = useForm<LLMFormData>({
     resolver: zodResolver(llmSchema),
-    defaultValues: { provider: 'openai', apiKey: '' },
+    defaultValues: { provider: 'openai', apiKey: '', model: '' },
   });
+
+  // Fetch available models when API key is entered
+  const fetchModels = async (provider: 'openai' | 'google', apiKey: string) => {
+    if (!apiKey || apiKey.length < 10) {
+      setAvailableModels([]);
+      return;
+    }
+
+    setIsLoadingModels(true);
+    try {
+      const models = await getAvailableModels(provider, apiKey);
+      setAvailableModels(models);
+    } catch {
+      setAvailableModels([]);
+    } finally {
+      setIsLoadingModels(false);
+    }
+  };
+
+  // Watch provider and apiKey changes to fetch models
+  const watchedProvider = llmForm.watch('provider');
+  const watchedApiKey = llmForm.watch('apiKey');
+
+  useEffect(() => {
+    if (watchedProvider && watchedApiKey && watchedApiKey.length >= 10) {
+      const timer = setTimeout(() => {
+        fetchModels(watchedProvider, watchedApiKey);
+      }, 500); // Debounce
+      return () => clearTimeout(timer);
+    }
+    setAvailableModels([]);
+    return undefined;
+  }, [watchedProvider, watchedApiKey]);
 
   // Load credentials when modal opens
   useEffect(() => {
@@ -169,6 +211,28 @@ export function ApiCredentialsModal({
       setError((err as Error).message || t.errorRemoveWfirma);
     } finally {
       setIsWfirmaDeleting(false);
+    }
+  };
+
+  // Open LLM form and load models if credentials exist
+  const handleOpenLlmForm = async () => {
+    setShowLlmForm(true);
+
+    // If user has existing credentials, pre-fill provider and fetch models
+    if (credentials?.llm.hasCustomKey && credentials.llm.provider) {
+      llmForm.setValue('provider', credentials.llm.provider);
+      llmForm.setValue('model', credentials.llm.model || '');
+
+      // Fetch models using stored credentials
+      setIsLoadingModels(true);
+      try {
+        const models = await getModelsWithStoredCredentials();
+        setAvailableModels(models);
+      } catch {
+        setAvailableModels([]);
+      } finally {
+        setIsLoadingModels(false);
+      }
     }
   };
 
@@ -349,10 +413,15 @@ export function ApiCredentialsModal({
                     <div className="flex items-center justify-between">
                       <div>
                         <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400">
-                          {credentials.llm.provider === 'openai' ? 'OpenAI' : 'Anthropic'}
+                          {credentials.llm.provider === 'openai'
+                            ? 'OpenAI'
+                            : credentials.llm.provider === 'google'
+                            ? 'Google Gemini'
+                            : 'Unknown'}
                         </span>
                         <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
                           {t.llmUsingCustom}
+                          {credentials.llm.model && ` (${credentials.llm.model})`}
                         </p>
                       </div>
                       <Button
@@ -369,7 +438,7 @@ export function ApiCredentialsModal({
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => setShowLlmForm(!showLlmForm)}
+                      onClick={handleOpenLlmForm}
                     >
                       {t.llmUpdate}
                     </Button>
@@ -382,7 +451,7 @@ export function ApiCredentialsModal({
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => setShowLlmForm(!showLlmForm)}
+                      onClick={() => setShowLlmForm(true)}
                     >
                       {t.llmConfigure}
                     </Button>
@@ -400,7 +469,7 @@ export function ApiCredentialsModal({
                         {...llmForm.register('provider')}
                       >
                         <option value="openai">OpenAI</option>
-                        <option value="anthropic">Anthropic</option>
+                        <option value="google">Google Gemini</option>
                       </select>
                     </div>
                     <div>
@@ -414,6 +483,29 @@ export function ApiCredentialsModal({
                         {...llmForm.register('apiKey')}
                       />
                     </div>
+                    {isLoadingModels && (
+                      <p className="text-sm text-gray-500 dark:text-gray-400">
+                        {t.llmLoadingModels}
+                      </p>
+                    )}
+                    {availableModels.length > 0 && (
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                          {t.llmModel}
+                        </label>
+                        <select
+                          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+                          {...llmForm.register('model')}
+                        >
+                          <option value="">{t.llmModelDefault}</option>
+                          {availableModels.map((model) => (
+                            <option key={model.id} value={model.id}>
+                              {model.name}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    )}
                     <div className="flex gap-2">
                       <Button type="submit" size="sm" loading={isLlmSubmitting}>
                         {isLlmSubmitting ? t.saving : t.save}

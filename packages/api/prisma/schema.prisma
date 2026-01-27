@@ -109,8 +109,9 @@ model UserApiCredentials {
   wfirmaCompanyId       String?  @db.Text
 
   // LLM Provider credentials
-  llmProvider           String?  // 'openai' | 'anthropic' | null (use app default)
+  llmProvider           String?  // 'openai' | 'google' | null (use app default)
   llmApiKey             String?  @db.Text
+  llmModel              String?  // e.g., 'gpt-4o', 'gemini-2.5-flash'
 
   // Metadata
   wfirmaLastValidated   DateTime?

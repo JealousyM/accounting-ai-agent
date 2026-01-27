@@ -11,7 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { AppVersion } from '@/components/ui/app-version';
 import { registrationSchema, type RegistrationFormData, checkPasswordStrength } from '@/lib/validations/auth';
-import { registerUser, type ErrorResponse } from '@/lib/api/auth';
+import { registerUser, type ErrorResponse, getPublicLLMModels, type LLMModelInfo } from '@/lib/api/auth';
 import { ApiError } from '@/lib/api/api-client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useGoogleAuth } from '@/hooks/useGoogleAuth';
@@ -39,6 +39,8 @@ export function RegistrationForm() {
   const [githubVisible, setGithubVisible] = useState(false);
   const [showTermsModal, setShowTermsModal] = useState(false);
   const [showPrivacyModal, setShowPrivacyModal] = useState(false);
+  const [availableModels, setAvailableModels] = useState<LLMModelInfo[]>([]);
+  const [isLoadingModels, setIsLoadingModels] = useState(false);
 
   // OAuth hooks
   const { login: googleLogin, isLoading: googleLoading, error: googleError, clearError: clearGoogleError } = useGoogleAuth();
@@ -98,21 +100,49 @@ export function RegistrationForm() {
     setValue('locale', locale);
   };
 
+  // Watch LLM provider and API key for model fetching
+  const watchedLlmProvider = watch('llmProvider');
+  const watchedLlmApiKey = watch('llmApiKey');
+
+  // Fetch available models when API key is entered
+  useEffect(() => {
+    const fetchModels = async () => {
+      if (!watchedLlmProvider || !watchedLlmApiKey || watchedLlmApiKey.length < 10) {
+        setAvailableModels([]);
+        return;
+      }
+
+      setIsLoadingModels(true);
+      try {
+        const models = await getPublicLLMModels(watchedLlmProvider as 'openai' | 'google', watchedLlmApiKey);
+        setAvailableModels(models);
+      } catch {
+        setAvailableModels([]);
+      } finally {
+        setIsLoadingModels(false);
+      }
+    };
+
+    const timer = setTimeout(fetchModels, 500); // Debounce
+    return () => clearTimeout(timer);
+  }, [watchedLlmProvider, watchedLlmApiKey]);
+
   const onSubmit = async (data: RegistrationFormData) => {
     try {
       setIsSubmitting(true);
       setApiError(null);
 
-      const { confirmPassword, agreeToTerms, llmProvider, ...restData } = data;
+      const { confirmPassword, agreeToTerms, llmProvider, llmModel, ...restData } = data;
 
       void confirmPassword;
       void agreeToTerms;
 
       // Clean up llmProvider - only pass valid values
-      const validProvider = llmProvider === 'openai' || llmProvider === 'anthropic' ? llmProvider : undefined;
+      const validProvider = llmProvider === 'openai' || llmProvider === 'google' ? llmProvider : undefined;
       const registerData = {
         ...restData,
         llmProvider: validProvider,
+        llmModel: validProvider ? llmModel : undefined,
       };
 
       const response = await registerUser(registerData);
@@ -593,7 +623,7 @@ export function RegistrationForm() {
           >
             <option value="">{t.llmProviderSelect || 'Select AI provider...'}</option>
             <option value="openai">OpenAI (GPT-4)</option>
-            <option value="anthropic">Anthropic (Claude)</option>
+            <option value="google">Google (Gemini)</option>
           </select>
           {errors.llmProvider && (
             <p className="mt-1.5 text-sm text-red-600 dark:text-red-400">{errors.llmProvider.message}</p>
@@ -603,26 +633,56 @@ export function RegistrationForm() {
           </p>
 
           {watch('llmProvider') && (
-            <div className="mt-4">
-              <label htmlFor="llmApiKey" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                {t.llmApiKey || 'API Key'} <span className="text-red-500">*</span>
-              </label>
-              <Input
-                id="llmApiKey"
-                type="password"
-                placeholder={watch('llmProvider') === 'openai' ? 'sk-...' : 'sk-ant-...'}
-                error={!!errors.llmApiKey}
-                {...register('llmApiKey')}
-              />
-              {errors.llmApiKey && (
-                <p className="mt-1.5 text-sm text-red-600 dark:text-red-400">{errors.llmApiKey.message}</p>
+            <div className="mt-4 space-y-4">
+              <div>
+                <label htmlFor="llmApiKey" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                  {t.llmApiKey || 'API Key'} <span className="text-red-500">*</span>
+                </label>
+                <Input
+                  id="llmApiKey"
+                  type="password"
+                  placeholder={watch('llmProvider') === 'openai' ? 'sk-...' : 'AIza...'}
+                  error={!!errors.llmApiKey}
+                  {...register('llmApiKey')}
+                />
+                {errors.llmApiKey && (
+                  <p className="mt-1.5 text-sm text-red-600 dark:text-red-400">{errors.llmApiKey.message}</p>
+                )}
+                <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                  {watch('llmProvider') === 'openai'
+                    ? (t.llmApiKeyHelpOpenai || 'Get your API key from platform.openai.com')
+                    : 'Get your API key from ai.google.dev'
+                  }
+                </p>
+              </div>
+
+              {/* Model loading indicator */}
+              {isLoadingModels && (
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  Loading available models...
+                </p>
               )}
-              <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                {watch('llmProvider') === 'openai'
-                  ? (t.llmApiKeyHelpOpenai || 'Get your API key from platform.openai.com')
-                  : (t.llmApiKeyHelpAnthropic || 'Get your API key from console.anthropic.com')
-                }
-              </p>
+
+              {/* Model selection dropdown */}
+              {availableModels.length > 0 && (
+                <div>
+                  <label htmlFor="llmModel" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                    Model
+                  </label>
+                  <select
+                    id="llmModel"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    {...register('llmModel')}
+                  >
+                    <option value="">Default model</option>
+                    {availableModels.map((model) => (
+                      <option key={model.id} value={model.id}>
+                        {model.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
             </div>
           )}
           </div>

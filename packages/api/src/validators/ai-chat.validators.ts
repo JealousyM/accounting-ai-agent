@@ -17,7 +17,7 @@ const uuidParam = z.string().uuid('Invalid conversation ID format');
 /**
  * LLM Provider validation
  */
-const llmProvider = z.enum(['openai', 'anthropic']).optional();
+const llmProvider = z.enum(['openai', 'google']).optional();
 
 // ============================================
 // REQUEST SCHEMAS
