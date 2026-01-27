@@ -55,9 +55,10 @@ export const registrationSchema = z
     billingPeriod: z.enum(['monthly', 'yearly']).default('monthly'),
     // LLM provider (required for Free plan, optional for Pro)
     llmProvider: z
-      .union([z.literal('openai'), z.literal('anthropic'), z.literal('')])
+      .union([z.literal('openai'), z.literal('google'), z.literal('')])
       .optional(),
     llmApiKey: z.string().max(500).trim().optional(),
+    llmModel: z.string().max(100).trim().optional(),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: 'Passwords do not match',
@@ -74,7 +75,7 @@ export const registrationSchema = z
     (data) => {
       // LLM provider and API key are required ONLY if NOT subscribing to Pro
       if (!data.subscribeToPro) {
-        return data.llmProvider && (data.llmProvider === 'openai' || data.llmProvider === 'anthropic') && data.llmApiKey;
+        return data.llmProvider && (data.llmProvider === 'openai' || data.llmProvider === 'google') && data.llmApiKey;
       }
       return true;
     },

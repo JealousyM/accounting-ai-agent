@@ -7,7 +7,7 @@
 import { PrismaClient, AIConversation } from '@prisma/client';
 import { v4 as uuidv4 } from 'uuid';
 import { ChatOpenAI } from '@langchain/openai';
-import { ChatAnthropic } from '@langchain/anthropic';
+import { ChatGoogleGenerativeAI } from '@langchain/google-genai';
 import { HumanMessage, AIMessage, SystemMessage, BaseMessage } from '@langchain/core/messages';
 import { StateGraph, MessagesAnnotation, START, END } from '@langchain/langgraph';
 import { ToolNode } from '@langchain/langgraph/prebuilt';
@@ -56,8 +56,8 @@ export class AIChatService {
     this.wfirmaFactory = wfirmaFactory!;
     this.credentialsService = credentialsService!;
 
-    // Set default provider
-    this.defaultProvider = (process.env.DEFAULT_LLM_PROVIDER as LLMProvider) || 'openai';
+    // Set default provider (used only as fallback, credentials come from DB)
+    this.defaultProvider = 'openai';
 
     // Check for LangSmith tracing
     if (process.env.LANGCHAIN_TRACING_V2 === 'true') {
@@ -66,8 +66,7 @@ export class AIChatService {
 
     logger.info('AIChatService initialized with LangGraph', {
       defaultProvider: this.defaultProvider,
-      hasOpenAI: !!process.env.OPENAI_API_KEY,
-      hasAnthropic: !!process.env.ANTHROPIC_API_KEY,
+      databaseStorageOnly: true,
     });
   }
 
@@ -125,7 +124,7 @@ export class AIChatService {
     };
 
     // Build LangGraph agent and run
-    const { response, toolsUsed } = await this.runAgent(
+    const { response, toolsUsed, actualProvider, actualModel } = await this.runAgent(
       existingMessages,
       content,
       userId,
@@ -140,8 +139,8 @@ export class AIChatService {
       content: response,
       timestamp: new Date(),
       metadata: {
-        provider: selectedProvider,
-        model: DEFAULT_LLM_CONFIG[selectedProvider].model,
+        provider: actualProvider,
+        model: actualModel,
       },
     };
 
@@ -261,20 +260,40 @@ export class AIChatService {
     userMessage: string,
     userId: string,
     conversationId: string,
-    provider: LLMProvider
-  ): Promise<{ response: string; toolsUsed: string[] }> {
-    // Get user-specific LLM credentials if available
-    let apiKey: string | undefined;
-    if (this.credentialsService) {
-      const userCreds = await this.credentialsService.getLLMCredentials(userId);
-      if (userCreds && userCreds.provider === provider) {
-        apiKey = userCreds.apiKey;
-        logger.debug('Using user-specific LLM credentials', { userId, provider });
-      }
+    _provider: LLMProvider
+  ): Promise<{ response: string; toolsUsed: string[]; actualProvider: LLMProvider; actualModel: string }> {
+    // Get user's LLM credentials from database (REQUIRED)
+    if (!this.credentialsService) {
+      throw new Error('Credentials service not available');
     }
 
-    // Create the LLM based on provider (with optional user API key)
-    const model = this.createModel(provider, apiKey);
+    const userCreds = await this.credentialsService.getLLMCredentials(userId);
+
+    if (!userCreds || !userCreds.apiKey) {
+      throw new Error('No LLM API key configured. Please add your API key in Settings → API Credentials.');
+    }
+
+    // Use the provider from user's credentials (ignore the provider parameter if different)
+    const selectedProvider = userCreds.provider;
+    const apiKey = userCreds.apiKey;
+    const selectedModel = userCreds.model;
+
+    logger.debug('Using user-specific LLM credentials from database', {
+      userId,
+      provider: selectedProvider,
+      model: selectedModel,
+    });
+
+    // Check if using newer OpenAI model (gpt-5, o1, o3) which have different behavior
+    const modelToUse = selectedModel || DEFAULT_LLM_CONFIG[selectedProvider].model;
+    const isNewerModel = selectedProvider === 'openai' && (
+      modelToUse.startsWith('gpt-5') ||
+      modelToUse.startsWith('o1') ||
+      modelToUse.startsWith('o3')
+    );
+
+    // Create the LLM based on provider (with REQUIRED user API key)
+    const model = this.createModel(selectedProvider, apiKey, selectedModel);
 
     // Get user-specific wFirma service if available
     let wfirmaService = this.wfirmaService;
@@ -300,7 +319,7 @@ export class AIChatService {
     // Bind tools to model
     const modelWithTools = model.bindTools(tools);
 
-    // Create tool node
+    // Create tool node - use the same tools that were bound to the model
     const toolNode = new ToolNode(tools);
 
     // Define the graph
@@ -347,10 +366,13 @@ export class AIChatService {
     ];
 
     // Run the graph with recursion limit and LangSmith metadata for cost tracking
+    // Lower recursion limit for newer models that can be more persistent
+    const recursionLimit = isNewerModel ? 6 : 10;
+
     const result = await graph.invoke(
       { messages: langchainMessages },
       {
-        recursionLimit: 10,
+        recursionLimit,
         metadata: {
           conversationId,
           userId,
@@ -369,7 +391,7 @@ export class AIChatService {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           toolsUsed.push(...message.tool_calls.map((tc: any) => tc.name));
         }
-        // Handle both string content and array content (Anthropic format)
+        // Handle both string content and array content
         if (message.content) {
           if (typeof message.content === 'string') {
             finalResponse = message.content;
@@ -389,34 +411,61 @@ export class AIChatService {
       }
     }
 
+    // Determine the actual model used (either user's selected model or config default)
+    const actualModel = selectedModel || DEFAULT_LLM_CONFIG[selectedProvider].model;
+
     return {
       response: finalResponse,
       toolsUsed: [...new Set(toolsUsed)],
+      actualProvider: selectedProvider,
+      actualModel,
     };
   }
 
   /**
    * Create the LLM model based on provider
-   * @param provider The LLM provider (openai or anthropic)
-   * @param apiKey Optional user-specific API key (falls back to env var if not provided)
+   * @param provider The LLM provider (openai or google)
+   * @param apiKey User's API key from database (REQUIRED)
+   * @param model Optional model name (uses default from config if not provided)
    */
-  private createModel(provider: LLMProvider, apiKey?: string) {
+  private createModel(provider: LLMProvider, apiKey: string, model?: string) {
     const config = DEFAULT_LLM_CONFIG[provider];
+    const modelToUse = model || config.model;
 
-    if (provider === 'anthropic') {
-      return new ChatAnthropic({
-        modelName: config.model,
-        maxTokens: config.maxTokens,
+    if (!apiKey) {
+      throw new Error(`No API key provided for provider: ${provider}`);
+    }
+
+    if (provider === 'google') {
+      return new ChatGoogleGenerativeAI({
+        model: modelToUse,
+        maxOutputTokens: config.maxTokens,
         temperature: config.temperature,
-        anthropicApiKey: apiKey || process.env.ANTHROPIC_API_KEY,
+        apiKey: apiKey,
+      });
+    }
+
+    // Default: OpenAI
+    // Note: Newer models (gpt-5, o1, o3) have restrictions:
+    // - Use max_completion_tokens instead of max_tokens
+    // - Only support temperature=1 (default)
+    const isNewerModel = modelToUse.startsWith('gpt-5') ||
+      modelToUse.startsWith('o1') ||
+      modelToUse.startsWith('o3');
+
+    if (isNewerModel) {
+      // For newer models, don't set maxTokens or temperature - use defaults
+      return new ChatOpenAI({
+        modelName: modelToUse,
+        openAIApiKey: apiKey,
       });
     }
 
     return new ChatOpenAI({
-      modelName: config.model,
+      modelName: modelToUse,
       maxTokens: config.maxTokens,
       temperature: config.temperature,
-      openAIApiKey: apiKey || process.env.OPENAI_API_KEY,
+      openAIApiKey: apiKey,
     });
   }
 

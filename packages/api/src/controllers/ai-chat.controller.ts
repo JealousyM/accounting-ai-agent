@@ -241,7 +241,11 @@ export class AIChatController {
       }
 
       logger.error('Failed to send message', {
-        error,
+        error: error instanceof Error ? {
+          message: error.message,
+          stack: error.stack,
+          name: error.name
+        } : error,
         conversationId: req.params.id,
         userId: req.user?.userId,
       });

@@ -15,8 +15,9 @@ export interface WFirmaCredentialsInput {
 }
 
 export interface LLMCredentialsInput {
-  provider: 'openai' | 'anthropic';
+  provider: 'openai' | 'google';
   apiKey: string;
+  model?: string;
 }
 
 export interface WFirmaCredentials extends WFirmaCredentialsInput {
@@ -24,8 +25,9 @@ export interface WFirmaCredentials extends WFirmaCredentialsInput {
 }
 
 export interface LLMCredentials {
-  provider: 'openai' | 'anthropic';
+  provider: 'openai' | 'google';
   apiKey: string;
+  model?: string;
 }
 
 export interface CredentialsSummary {
@@ -35,10 +37,16 @@ export interface CredentialsSummary {
     lastValidated?: string;
   };
   llm: {
-    provider: 'openai' | 'anthropic' | null;
+    provider: 'openai' | 'google' | null;
+    model?: string;
     hasCustomKey: boolean;
     lastValidated?: string;
   };
+}
+
+export interface LLMModelInfo {
+  id: string;
+  name: string;
 }
 
 // ============================================
@@ -216,8 +224,10 @@ export class CredentialsService {
     try {
       const apiKey = this.cryptoService.decryptFromString(creds.llmApiKey);
       return {
-        provider: creds.llmProvider as 'openai' | 'anthropic',
+        provider: creds.llmProvider as 'openai' | 'google',
         apiKey,
+        // Note: llmModel added via migration, cast needed until IDE reloads Prisma types
+        model: (creds as Record<string, unknown>).llmModel as string | undefined,
       };
     } catch (error) {
       logger.error('Failed to decrypt LLM credentials', { userId, error });
@@ -242,25 +252,29 @@ export class CredentialsService {
     // Encrypt API key
     const encryptedApiKey = this.cryptoService.encryptToString(credentials.apiKey);
 
-    // Upsert credentials
+    // Upsert credentials (with model)
+    // Note: llmModel added via migration, cast needed until IDE reloads Prisma types
     await this.prisma.userApiCredentials.upsert({
       where: { userId },
       create: {
         userId,
         llmProvider: credentials.provider,
         llmApiKey: encryptedApiKey,
+        llmModel: credentials.model || null,
         llmLastValidated: new Date(),
-      },
+      } as Parameters<typeof this.prisma.userApiCredentials.upsert>[0]['create'],
       update: {
         llmProvider: credentials.provider,
         llmApiKey: encryptedApiKey,
+        llmModel: credentials.model || null,
         llmLastValidated: new Date(),
-      },
+      } as Parameters<typeof this.prisma.userApiCredentials.upsert>[0]['update'],
     });
 
     logger.info('LLM credentials saved', {
       userId,
       provider: credentials.provider,
+      model: credentials.model,
     });
   }
 
@@ -268,6 +282,7 @@ export class CredentialsService {
    * Remove LLM credentials for a user
    */
   async removeLLMCredentials(userId: string): Promise<void> {
+    // Note: llmModel added via migration, cast needed until IDE reloads Prisma types
     await this.prisma.userApiCredentials.upsert({
       where: { userId },
       create: {
@@ -276,8 +291,9 @@ export class CredentialsService {
       update: {
         llmProvider: null,
         llmApiKey: null,
+        llmModel: null,
         llmLastValidated: null,
-      },
+      } as Parameters<typeof this.prisma.userApiCredentials.upsert>[0]['update'],
     });
 
     logger.info('LLM credentials removed', { userId });
@@ -296,19 +312,12 @@ export class CredentialsService {
           timeout: 10000,
         });
         return response.status === 200;
-      } else if (credentials.provider === 'anthropic') {
-        // Anthropic doesn't have a simple models endpoint, so we make a minimal message request
-        const response = await axios.post(
-          'https://api.anthropic.com/v1/messages',
-          {
-            model: 'claude-3-haiku-20240307',
-            max_tokens: 1,
-            messages: [{ role: 'user', content: 'test' }],
-          },
+      } else if (credentials.provider === 'google') {
+        // Google Gemini API test - use models list endpoint
+        const response = await axios.get(
+          `https://generativelanguage.googleapis.com/v1beta/models?key=${credentials.apiKey}`,
           {
             headers: {
-              'x-api-key': credentials.apiKey,
-              'anthropic-version': '2023-06-01',
               'Content-Type': 'application/json',
             },
             timeout: 10000,
@@ -340,6 +349,67 @@ export class CredentialsService {
         status: axiosError.response?.status,
       });
       return false;
+    }
+  }
+
+  /**
+   * Get available models for a provider (only models that support function calling)
+   */
+  async getAvailableModels(
+    provider: 'openai' | 'google',
+    apiKey: string
+  ): Promise<LLMModelInfo[]> {
+    try {
+      if (provider === 'openai') {
+        const response = await axios.get('https://api.openai.com/v1/models', {
+          headers: { Authorization: `Bearer ${apiKey}` },
+          timeout: 10000,
+        });
+
+        const chatModels = response.data.data
+          .map((m: any) => ({ id: m.id, name: m.id }))
+          .sort((a: any, b: any) => a.name.localeCompare(b.name));
+
+        return chatModels;
+      }
+
+      if (provider === 'google') {
+        const response = await axios.get(
+          `https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`,
+          { timeout: 10000 }
+        );
+
+        // Filter to models that support both content generation and function calling
+        const generativeModels = response.data.models
+          .filter((m: any) => {
+            const methods = m.supportedGenerationMethods || [];
+            // Must support generateContent AND have function calling capability
+            // Function calling is indicated by supportedGenerationMethods containing specific methods
+            // or by checking model name patterns (gemini-pro, gemini-1.5-*, gemini-2.*)
+            const supportsGeneration = methods.includes('generateContent');
+            const supportsFunctionCalling =
+              methods.includes('generateContent') &&
+              (m.name.includes('gemini-pro') ||
+                m.name.includes('gemini-1.5') ||
+                m.name.includes('gemini-2'));
+            return supportsGeneration && supportsFunctionCalling;
+          })
+          .map((m: any) => ({
+            id: m.name.replace('models/', ''),
+            name: m.displayName || m.name.replace('models/', ''),
+          }));
+
+        return generativeModels;
+      }
+
+      return [];
+    } catch (error) {
+      const axiosError = error as any;
+      if (axiosError.response?.status === 401 || axiosError.response?.status === 403) {
+        throw new Error('Invalid API key - authentication failed');
+      }
+      logger.error('Failed to fetch models', { provider, error });
+      throw new Error('Failed to fetch available models');
     }
   }
 
@@ -379,7 +449,9 @@ export class CredentialsService {
         lastValidated: creds.wfirmaLastValidated?.toISOString(),
       },
       llm: {
-        provider: creds.llmProvider as 'openai' | 'anthropic' | null,
+        provider: creds.llmProvider as 'openai' | 'google' | null,
+        // Note: llmModel added via migration, cast needed until IDE reloads Prisma types
+        model: (creds as Record<string, unknown>).llmModel as string | undefined,
         hasCustomKey: !!creds.llmApiKey,
         lastValidated: creds.llmLastValidated?.toISOString(),
       },

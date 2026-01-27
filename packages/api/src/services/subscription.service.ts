@@ -369,12 +369,65 @@ export class SubscriptionService {
       },
     });
 
+    // Auto-provision default LLM credentials for PRO users
+    await this.provisionDefaultLLMCredentials(userId);
+
     logger.info('[Subscription] Successfully synced subscription to database', {
       userId,
       subscriptionId: subscription.id,
       newPlan: 'pro',
       status,
     });
+  }
+
+  /**
+   * Provision default LLM credentials for PRO users
+   * Called automatically when user upgrades to PRO plan
+   */
+  private async provisionDefaultLLMCredentials(userId: string): Promise<void> {
+    try {
+      // Check if user already has LLM credentials
+      const existingCreds = await this.credentialsService.getLLMCredentials(userId);
+
+      if (existingCreds?.apiKey) {
+        logger.debug('[Subscription] User already has LLM credentials, skipping provisioning', { userId });
+        return;
+      }
+
+      // Get default provider, key, and model from environment
+      const defaultProvider = process.env.DEFAULT_LLM_PROVIDER as 'openai' | 'google';
+      const defaultApiKey = process.env.DEFAULT_LLM_API_KEY;
+      const defaultModel = process.env.DEFAULT_LLM_MODEL;
+
+      if (!defaultProvider || !defaultApiKey) {
+        logger.warn('[Subscription] DEFAULT_LLM_PROVIDER or DEFAULT_LLM_API_KEY not configured, skipping auto-provisioning', { userId });
+        return;
+      }
+
+      // Validate provider
+      if (!['openai', 'google'].includes(defaultProvider)) {
+        logger.error('[Subscription] Invalid DEFAULT_LLM_PROVIDER value', { provider: defaultProvider, userId });
+        return;
+      }
+
+      // Save default credentials to user's database record
+      await this.credentialsService.setLLMCredentials(userId, {
+        provider: defaultProvider,
+        apiKey: defaultApiKey,
+        model: defaultModel,
+      });
+
+      logger.info('[Subscription] Auto-provisioned default LLM credentials for PRO user', {
+        userId,
+        provider: defaultProvider
+      });
+    } catch (error) {
+      logger.error('[Subscription] Failed to provision default LLM credentials', {
+        userId,
+        error: (error as Error).message
+      });
+      // Don't throw - subscription sync should succeed even if credential provisioning fails
+    }
   }
 
   private mapStripeStatus(status: Stripe.Subscription.Status): SubscriptionStatus {

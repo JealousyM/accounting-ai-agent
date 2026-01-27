@@ -56,6 +56,28 @@ router.delete(
 // ============================================
 
 /**
+ * GET /api/credentials/llm/models
+ * Fetch available models for a provider
+ */
+router.get(
+  '/llm/models',
+  authenticate,
+  rateLimiter({ windowMs: 60 * 1000, max: 10 }), // 10 requests per minute
+  credentialsController.getAvailableModels.bind(credentialsController)
+);
+
+/**
+ * GET /api/credentials/llm/my-models
+ * Fetch available models using user's stored credentials
+ */
+router.get(
+  '/llm/my-models',
+  authenticate,
+  rateLimiter({ windowMs: 60 * 1000, max: 10 }),
+  credentialsController.getModelsWithStoredCredentials.bind(credentialsController)
+);
+
+/**
  * PUT /api/credentials/llm
  * Set or update LLM credentials
  */

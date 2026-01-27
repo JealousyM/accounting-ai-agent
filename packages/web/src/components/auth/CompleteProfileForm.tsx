@@ -1,14 +1,14 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
 import { z } from 'zod';
-import { Check, X } from 'lucide-react';
+import { Check, X, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { completeProfile, type CompleteProfileData } from '@/lib/api/auth';
+import { completeProfile, type CompleteProfileData, getPublicLLMModels, type LLMModelInfo } from '@/lib/api/auth';
 import { ApiError } from '@/lib/api/api-client';
 import { useAuth } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
@@ -17,10 +17,11 @@ import plTranslations from '@/i18n/locales/pl.json';
 
 // Validation schema for complete profile form
 const completeProfileSchema = z.object({
-  llmProvider: z.enum(['openai', 'anthropic'], {
+  llmProvider: z.enum(['openai', 'google'], {
     required_error: 'Please select an AI provider',
   }),
   llmApiKey: z.string().min(1, 'API key is required'),
+  llmModel: z.string().optional(),
   useWfirma: z.boolean().optional(),
   wfirmaAccessKey: z.string().optional(),
   wfirmaSecretKey: z.string().optional(),
@@ -44,6 +45,8 @@ export function CompleteProfileForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [availableModels, setAvailableModels] = useState<LLMModelInfo[]>([]);
+  const [isLoadingModels, setIsLoadingModels] = useState(false);
 
   // Determine locale from user or default to 'en'
   const userLocale = user?.locale || 'en';
@@ -89,6 +92,33 @@ export function CompleteProfileForm() {
     },
   });
 
+  const watchedLlmProvider = watch('llmProvider');
+  const watchedLlmApiKey = watch('llmApiKey');
+
+  // Fetch available models when provider and API key are set
+  useEffect(() => {
+    const fetchModels = async () => {
+      if (!watchedLlmProvider || !watchedLlmApiKey || watchedLlmApiKey.length < 10) {
+        setAvailableModels([]);
+        return;
+      }
+
+      setIsLoadingModels(true);
+      try {
+        const models = await getPublicLLMModels(watchedLlmProvider, watchedLlmApiKey);
+        setAvailableModels(models);
+      } catch {
+        setAvailableModels([]);
+      } finally {
+        setIsLoadingModels(false);
+      }
+    };
+
+    // Debounce the API call
+    const timer = setTimeout(fetchModels, 500);
+    return () => clearTimeout(timer);
+  }, [watchedLlmProvider, watchedLlmApiKey]);
+
   const errorRef = React.useRef<HTMLDivElement>(null);
 
   const onSubmit = async (data: CompleteProfileFormData) => {
@@ -99,6 +129,7 @@ export function CompleteProfileForm() {
       const profileData: CompleteProfileData = {
         llmProvider: data.llmProvider,
         llmApiKey: data.llmApiKey,
+        llmModel: data.llmModel,
         useWfirma: data.useWfirma,
         wfirmaAccessKey: data.wfirmaAccessKey,
         wfirmaSecretKey: data.wfirmaSecretKey,
@@ -195,7 +226,7 @@ export function CompleteProfileForm() {
           >
             <option value="">{translations.llmProviderSelect}</option>
             <option value="openai">OpenAI (GPT-4)</option>
-            <option value="anthropic">Anthropic (Claude)</option>
+            <option value="google">Google (Gemini)</option>
           </select>
           {errors.llmProvider && (
             <p className="mt-1.5 text-sm text-red-600 dark:text-red-400">{errors.llmProvider.message}</p>
@@ -205,26 +236,55 @@ export function CompleteProfileForm() {
           </p>
 
           {watch('llmProvider') && (
-            <div className="mt-4">
-              <label htmlFor="llmApiKey" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                {translations.llmApiKey} <span className="text-red-500">*</span>
-              </label>
-              <Input
-                id="llmApiKey"
-                type="password"
-                placeholder={watch('llmProvider') === 'openai' ? 'sk-...' : 'sk-ant-...'}
-                error={!!errors.llmApiKey}
-                {...register('llmApiKey')}
-              />
-              {errors.llmApiKey && (
-                <p className="mt-1.5 text-sm text-red-600 dark:text-red-400">{errors.llmApiKey.message}</p>
+            <div className="mt-4 space-y-4">
+              <div>
+                <label htmlFor="llmApiKey" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                  {translations.llmApiKey} <span className="text-red-500">*</span>
+                </label>
+                <Input
+                  id="llmApiKey"
+                  type="password"
+                  placeholder={watch('llmProvider') === 'openai' ? 'sk-...' : 'AIza...'}
+                  error={!!errors.llmApiKey}
+                  {...register('llmApiKey')}
+                />
+                {errors.llmApiKey && (
+                  <p className="mt-1.5 text-sm text-red-600 dark:text-red-400">{errors.llmApiKey.message}</p>
+                )}
+                <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                  {watch('llmProvider') === 'openai'
+                    ? translations.llmApiKeyHelpOpenai
+                    : 'Get your API key from aistudio.google.com'
+                  }
+                </p>
+              </div>
+
+              {/* Model Selection */}
+              {isLoadingModels && (
+                <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  <span>Loading available models...</span>
+                </div>
               )}
-              <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                {watch('llmProvider') === 'openai'
-                  ? translations.llmApiKeyHelpOpenai
-                  : translations.llmApiKeyHelpAnthropic
-                }
-              </p>
+              {availableModels.length > 0 && (
+                <div>
+                  <label htmlFor="llmModel" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                    Model
+                  </label>
+                  <select
+                    id="llmModel"
+                    className="w-full px-3 py-2 border rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 border-gray-300 dark:border-gray-600"
+                    {...register('llmModel')}
+                  >
+                    <option value="">Default model</option>
+                    {availableModels.map((model) => (
+                      <option key={model.id} value={model.id}>
+                        {model.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
             </div>
           )}
         </div>

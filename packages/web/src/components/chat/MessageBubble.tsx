@@ -105,9 +105,9 @@ export function MessageBubble({ message, translations, toolsTranslations }: Mess
               minute: '2-digit',
             })}
           </span>
-          {message.metadata?.provider && (
+          {message.metadata?.model && (
             <span className="text-gray-300 dark:text-gray-600">
-              {message.metadata.provider === 'openai' ? 'GPT-4' : 'Claude'}
+              {message.metadata.model}
             </span>
           )}
         </div>

@@ -86,7 +86,7 @@ const createConversation = async (title?: string): Promise<{ id: string; title: 
 const sendMessage = async (
   conversationId: string,
   content: string,
-  provider?: 'openai' | 'anthropic'
+  provider?: 'openai' | 'google'
 ): Promise<{
   userMessage: ChatMessage;
   assistantMessage: ChatMessage;
@@ -153,7 +153,7 @@ export function useChat() {
     }: {
       conversationId: string;
       content: string;
-      provider?: 'openai' | 'anthropic';
+      provider?: 'openai' | 'google';
     }) => sendMessage(conversationId, content, provider),
     onMutate: async ({ content }) => {
       // Optimistic update: show user message immediately
@@ -190,7 +190,7 @@ export function useChat() {
 
   // Send message handler
   const handleSendMessage = useCallback(
-    async (content: string, provider?: 'openai' | 'anthropic') => {
+    async (content: string, provider?: 'openai' | 'google') => {
       if (!content.trim()) return;
 
       // If no conversation, create one first

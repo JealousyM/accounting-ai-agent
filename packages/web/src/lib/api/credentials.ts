@@ -11,7 +11,8 @@ export interface CredentialsSummary {
     lastValidated?: string;
   };
   llm: {
-    provider: 'openai' | 'anthropic' | null;
+    provider: 'openai' | 'google' | null;
+    model?: string;
     hasCustomKey: boolean;
     lastValidated?: string;
   };
@@ -24,8 +25,14 @@ export interface WFirmaCredentialsInput {
 }
 
 export interface LLMCredentialsInput {
-  provider: 'openai' | 'anthropic';
+  provider: 'openai' | 'google';
   apiKey: string;
+  model?: string;
+}
+
+export interface LLMModelInfo {
+  id: string;
+  name: string;
 }
 
 // ============================================
@@ -66,4 +73,31 @@ export const setLLMCredentials = async (credentials: LLMCredentialsInput): Promi
  */
 export const deleteLLMCredentials = async (): Promise<void> => {
   await apiClient.delete('/api/credentials/llm');
+};
+
+/**
+ * Get available models for a provider
+ */
+export const getAvailableModels = async (
+  provider: 'openai' | 'google',
+  apiKey: string
+): Promise<LLMModelInfo[]> => {
+  const response = await apiClient.get<{ models: LLMModelInfo[] }>(
+    `/api/credentials/llm/models?provider=${encodeURIComponent(provider)}&apiKey=${encodeURIComponent(apiKey)}`
+  );
+  return response.models;
+};
+
+/**
+ * Get available models using stored credentials
+ */
+export const getModelsWithStoredCredentials = async (): Promise<LLMModelInfo[]> => {
+  try {
+    const response = await apiClient.get<{ models: LLMModelInfo[] }>(
+      '/api/credentials/llm/my-models'
+    );
+    return response.models;
+  } catch {
+    return [];
+  }
 };

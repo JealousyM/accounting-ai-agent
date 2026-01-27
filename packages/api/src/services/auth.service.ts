@@ -72,8 +72,9 @@ export interface RegisterInput {
   wfirmaAccessKey?: string;
   wfirmaSecretKey?: string;
   wfirmaCompanyId?: string;
-  llmProvider?: 'openai' | 'anthropic' | 'none';
+  llmProvider?: 'openai' | 'google' | 'none';
   llmApiKey?: string;
+  llmModel?: string;
 }
 
 export interface LoginInput {
@@ -174,8 +175,9 @@ export class AuthService {
         await credentialsService.setLLMCredentials(user.id, {
           provider: input.llmProvider,
           apiKey: input.llmApiKey,
+          model: input.llmModel,
         });
-        logger.info('LLM credentials saved during registration', { userId: user.id, provider: input.llmProvider });
+        logger.info('LLM credentials saved during registration', { userId: user.id, provider: input.llmProvider, model: input.llmModel });
       } catch (error) {
         // Log error but don't fail registration - user can add credentials later
         logger.warn('Failed to save LLM credentials during registration', { userId: user.id, error: (error as Error).message });

@@ -36,14 +36,19 @@ export const wfirmaCredentialsSchema = z.object({
  */
 export const llmCredentialsSchema = z.object({
   body: z.object({
-    provider: z.enum(['openai', 'anthropic'], {
-      errorMap: () => ({ message: 'Provider must be either openai or anthropic' }),
+    provider: z.enum(['openai', 'google'], {
+      errorMap: () => ({ message: 'Provider must be openai or google' }),
     }),
     apiKey: z
       .string()
       .min(1, 'API key is required')
       .max(500, 'API key is too long')
       .trim(),
+    model: z
+      .string()
+      .max(100, 'Model name is too long')
+      .trim()
+      .optional(),
   }),
 });
 

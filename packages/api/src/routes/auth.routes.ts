@@ -82,6 +82,16 @@ router.post(
   authController.resetPassword.bind(authController)
 );
 
+/**
+ * GET /api/auth/llm-models
+ * Fetch available LLM models for registration (public endpoint)
+ */
+router.get(
+  '/llm-models',
+  rateLimiter({ windowMs: 60 * 1000, max: 10 }), // 10 requests per minute
+  authController.getPublicLLMModels.bind(authController)
+);
+
 // ============================================
 // OAUTH ROUTES
 // ============================================
