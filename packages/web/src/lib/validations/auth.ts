@@ -52,6 +52,7 @@ export const registrationSchema = z
     wfirmaCompanyId: z.string().max(50).trim().optional(),
     // Subscription option
     subscribeToPro: z.boolean().default(false),
+    billingPeriod: z.enum(['monthly', 'yearly']).default('monthly'),
     // LLM provider (required for Free plan, optional for Pro)
     llmProvider: z
       .union([z.literal('openai'), z.literal('anthropic'), z.literal('')])
