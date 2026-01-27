@@ -54,6 +54,7 @@
       "choosePlan": "Wybierz plan",
       "connecting": "Łączenie...",
       "proCheckoutInfo": "Po rejestracji zostaniesz przekierowany do płatności, aby dokończyć subskrypcję Pro.",
+      "billingPeriod": "Wybierz okres rozliczeniowy",
       "plan": {
         "free": {
           "name": "Darmowy",
@@ -73,6 +74,17 @@
             "included": "Klucze API w cenie (500 wiad./mies.)",
             "ownKey": "Lub użyj własnego klucza",
             "wfirma": "Nieograniczone żądania wFirma"
+          }
+        },
+        "billing": {
+          "monthly": {
+            "label": "Miesięcznie",
+            "price": "14,99 PLN/miesiąc"
+          },
+          "yearly": {
+            "label": "Rocznie",
+            "savings": "Oszczędź 17%",
+            "price": "12,42 PLN/mies. (149,00 PLN/rok)"
           }
         }
       }

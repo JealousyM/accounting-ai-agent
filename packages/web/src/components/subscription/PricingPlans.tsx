@@ -53,6 +53,14 @@ export function PricingPlans({ showHeader = true }: PricingPlansProps) {
     }
   };
 
+  // Read billing period from URL (for auto-checkout from registration)
+  useEffect(() => {
+    const urlBillingPeriod = searchParams.get('billingPeriod');
+    if (urlBillingPeriod === 'yearly' || urlBillingPeriod === 'monthly') {
+      setBillingInterval(urlBillingPeriod);
+    }
+  }, [searchParams]);
+
   // Auto-checkout if coming from registration
   useEffect(() => {
     const autoCheckout = searchParams.get('autoCheckout');
@@ -64,7 +72,7 @@ export function PricingPlans({ showHeader = true }: PricingPlansProps) {
       return () => clearTimeout(timer);
     }
     return undefined;
-  }, [searchParams, isPro, isCheckingOut, isLoading, handleUpgrade]);
+  }, [searchParams, isPro, isCheckingOut, isLoading, billingInterval, handleUpgrade]);
 
   // Format price for display
   const formatPrice = (cents: number) => {

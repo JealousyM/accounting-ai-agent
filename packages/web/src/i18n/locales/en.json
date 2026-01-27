@@ -54,6 +54,7 @@
       "choosePlan": "Choose Your Plan",
       "connecting": "Connecting...",
       "proCheckoutInfo": "You will be redirected to checkout after registration to complete your Pro subscription.",
+      "billingPeriod": "Choose Billing Period",
       "plan": {
         "free": {
           "name": "Free",
@@ -73,6 +74,17 @@
             "included": "API keys included (500 msg/mo)",
             "ownKey": "Or use your own key",
             "wfirma": "Unlimited wFirma requests"
+          }
+        },
+        "billing": {
+          "monthly": {
+            "label": "Monthly",
+            "price": "PLN 14.99/month"
+          },
+          "yearly": {
+            "label": "Yearly",
+            "savings": "Save 17%",
+            "price": "PLN 12.42/month (PLN 149.00/year)"
           }
         }
       }

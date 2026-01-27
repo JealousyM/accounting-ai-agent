@@ -20,6 +20,7 @@ export interface RegisterData {
   llmApiKey?: string;
   // Subscription option
   subscribeToPro?: boolean;
+  billingPeriod?: 'monthly' | 'yearly';
 }
 
 export interface AuthData {

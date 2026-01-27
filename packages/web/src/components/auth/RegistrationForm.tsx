@@ -83,6 +83,7 @@ export function RegistrationForm() {
     defaultValues: {
       locale: selectedLocale,
       subscribeToPro: false,
+      billingPeriod: 'monthly',
     },
   });
 
@@ -132,7 +133,8 @@ export function RegistrationForm() {
         setTimeout(() => {
           if (data.subscribeToPro) {
             // Redirect to pricing page to complete Pro subscription
-            router.push('/pricing?autoCheckout=true');
+            const billingParam = data.billingPeriod || 'monthly';
+            router.push(`/pricing?autoCheckout=true&billingPeriod=${billingParam}`);
           } else {
             // Redirect to chat for Free plan users
             router.push('/chat');
@@ -453,6 +455,53 @@ export function RegistrationForm() {
               </ul>
             </label>
           </div>
+
+          {/* Billing Period Selector - shown only when Pro is selected */}
+          {watch('subscribeToPro') && (
+            <div className="mt-4">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                {t.billingPeriod}
+              </label>
+              <div className="bg-gray-100 dark:bg-gray-800 p-1 rounded-lg grid grid-cols-2 gap-1">
+                <button
+                  type="button"
+                  onClick={() => setValue('billingPeriod', 'monthly')}
+                  className={cn(
+                    'px-4 py-3 text-sm font-medium rounded-md transition-all',
+                    watch('billingPeriod') === 'monthly'
+                      ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm'
+                      : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                  )}
+                >
+                  <div className="text-left">
+                    <div className="font-semibold">{t.plan.billing.monthly.label}</div>
+                    <div className="text-xs opacity-75 mt-0.5">{t.plan.billing.monthly.price}</div>
+                  </div>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setValue('billingPeriod', 'yearly')}
+                  className={cn(
+                    'px-4 py-3 text-sm font-medium rounded-md transition-all',
+                    watch('billingPeriod') === 'yearly'
+                      ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm'
+                      : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                  )}
+                >
+                  <div className="text-left">
+                    <div className="font-semibold">
+                      {t.plan.billing.yearly.label}
+                      <span className="ml-1 text-green-600 dark:text-green-500 text-xs font-normal">
+                        {t.plan.billing.yearly.savings}
+                      </span>
+                    </div>
+                    <div className="text-xs opacity-75 mt-0.5">{t.plan.billing.yearly.price}</div>
+                  </div>
+                </button>
+              </div>
+            </div>
+          )}
+
           {watch('subscribeToPro') && (
             <p className="mt-3 text-xs text-gray-600 dark:text-gray-400 bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg">
               ℹ️ {t.proCheckoutInfo}
