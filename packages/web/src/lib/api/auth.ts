@@ -15,9 +15,11 @@ export interface RegisterData {
   wfirmaAccessKey?: string;
   wfirmaSecretKey?: string;
   wfirmaCompanyId?: string;
-  // LLM provider credentials (required)
-  llmProvider: 'openai' | 'anthropic';
-  llmApiKey: string;
+  // LLM provider credentials (optional for Pro subscribers)
+  llmProvider?: 'openai' | 'anthropic';
+  llmApiKey?: string;
+  // Subscription option
+  subscribeToPro?: boolean;
 }
 
 export interface AuthData {

@@ -50,7 +50,32 @@
       "llmProviderHelp": "Select your AI provider. You will need to provide your own API key.",
       "llmApiKey": "API Key",
       "llmApiKeyHelpOpenai": "Get your API key from platform.openai.com",
-      "llmApiKeyHelpAnthropic": "Get your API key from console.anthropic.com"
+      "llmApiKeyHelpAnthropic": "Get your API key from console.anthropic.com",
+      "choosePlan": "Choose Your Plan",
+      "connecting": "Connecting...",
+      "proCheckoutInfo": "You will be redirected to checkout after registration to complete your Pro subscription.",
+      "plan": {
+        "free": {
+          "name": "Free",
+          "price": "PLN 0",
+          "features": {
+            "ownKey": "Your own API key required",
+            "unlimited": "Unlimited AI messages",
+            "wfirma": "30 wFirma requests/month"
+          }
+        },
+        "pro": {
+          "name": "Pro",
+          "price": "PLN 14.99",
+          "perMonth": "/mo",
+          "popular": "POPULAR",
+          "features": {
+            "included": "API keys included (500 msg/mo)",
+            "ownKey": "Or use your own key",
+            "wfirma": "Unlimited wFirma requests"
+          }
+        }
+      }
     },
     "login": {
       "title": "Sign in",
@@ -152,6 +177,11 @@
       "emptyDescription": "Ask me anything about Polish taxes, accounting, wFirma, VAT, PIT, CIT, ZUS, invoices, and more. I can also access your wFirma data.",
       "thinking": "Thinking...",
       "toolsUsed": "Used:"
+    },
+    "subscriptionWelcome": {
+      "title": "Welcome to Accounting AI Agent!",
+      "message": "You are currently on the Free plan. Upgrade to Pro anytime for included API credits, unlimited wFirma requests, and priority support.",
+      "upgradeButton": "View Plans & Upgrade"
     },
     "input": {
       "placeholder": "Type your message...",
@@ -469,6 +499,110 @@
       "recentConversations": "Recent Conversations",
       "changeRole": "Change Role",
       "confirmRoleChange": "Are you sure you want to change this user's role?"
+    }
+  },
+  "subscription": {
+    "title": "Choose Your Plan",
+    "subtitle": "Start free with your own API key, or upgrade for included credits",
+    "monthly": "Monthly",
+    "yearly": "Yearly",
+    "savePercent": "Save 17%",
+    "perMonth": "month",
+    "billedYearly": "Billed yearly",
+    "currentPlan": "Current Plan",
+    "getStarted": "Get Started",
+    "upgradeToPro": "Upgrade to Pro",
+    "processing": "Processing...",
+    "popular": "POPULAR",
+    "plans": {
+      "free": {
+        "name": "Free",
+        "description": "Get started with your own API keys"
+      },
+      "pro": {
+        "name": "Pro",
+        "description": "Full access with included API credits"
+      }
+    },
+    "features": {
+      "byok": "Bring your own OpenAI/Anthropic key",
+      "unlimitedWithKey": "Unlimited AI messages (with your key)",
+      "wfirmaLimited": "30 wFirma requests/month",
+      "basicSupport": "Community support",
+      "includedCredits": "500 AI messages/month included",
+      "orOwnKey": "Or use your own key for unlimited",
+      "wfirmaUnlimited": "Unlimited wFirma requests",
+      "prioritySupport": "Priority support"
+    },
+    "faq": {
+      "title": "Questions?",
+      "description": "Free plan requires your own API key from OpenAI or Anthropic. Pro plan includes API credits so you can start immediately."
+    },
+    "management": {
+      "loadError": "Failed to load subscription details",
+      "proPlan": "Pro Plan",
+      "freePlan": "Free Plan",
+      "status": "Status:",
+      "expiresOn": "Expires on",
+      "renewsOn": "Renews on",
+      "manageBilling": "Manage billing",
+      "billingPortal": "Billing Portal",
+      "cancelWarning": "Your subscription is set to cancel at the end of the billing period. You will lose access to Pro features on {date}.",
+      "cancelSubscription": "Cancel Subscription",
+      "usage": "Usage",
+      "ownKeyNoLimits": "Using your own API key - no message limits apply.",
+      "apiKeyPreference": "API Key Preference",
+      "usingOwnKey": "Using your own API key (unlimited messages)",
+      "usingIncluded": "Using included API credits (500 messages/month)",
+      "addKeyHint": "Add your API key in settings to enable unlimited messages.",
+      "getMoreWithPro": "Get more with Pro",
+      "feature500Messages": "500 AI messages/month included (or unlimited with your key)",
+      "featureUnlimitedWfirma": "Unlimited wFirma requests",
+      "featurePrioritySupport": "Priority support",
+      "viewPlans": "View Plans",
+      "cancelTitle": "Cancel Pro Subscription?",
+      "cancelDescription": "Your subscription will remain active until {date}. After this date, you will lose access to Pro features:",
+      "cancelFeatureCredits": "Included API credits (500 messages/month)",
+      "cancelContinueFree": "You can continue to use the Free plan with your own API key.",
+      "keepSubscription": "Keep Subscription",
+      "canceling": "Canceling...",
+      "yesCancel": "Yes, Cancel"
+    },
+    "upgrade": {
+      "apiKeyRequired": "API Key Required",
+      "apiKeyRequiredDesc": "Free plan requires your own OpenAI or Anthropic API key. Add your key to start chatting, or upgrade to Pro for included credits.",
+      "addApiKey": "Add API Key",
+      "limitReached": "Message Limit Reached",
+      "limitReachedDesc": "You've used all your included AI messages this month. Add your own API key for unlimited messages, or wait for your limit to reset.",
+      "addOwnKey": "Add Your Own Key",
+      "viewSubscription": "View Subscription",
+      "wfirmaLimit": "wFirma Limit Reached",
+      "wfirmaLimitDesc": "You've used all your free wFirma requests this month (30/month). Upgrade to Pro for unlimited access."
+    },
+    "badge": {
+      "pro": "Pro",
+      "free": "Free",
+      "upgrade": "Upgrade"
+    },
+    "meter": {
+      "resetsOn": "Resets on {date}",
+      "approachingLimit": "You are approaching your limit. Consider upgrading or adding your own API key."
+    },
+    "pages": {
+      "pricing": "Subscription Plans",
+      "subscription": "Subscription",
+      "success": {
+        "title": "Welcome to Pro!",
+        "description": "Your subscription is now active. You have access to all Pro features including 500 AI messages per month and unlimited wFirma requests.",
+        "startUsing": "Start Using Pro",
+        "redirecting": "Redirecting to chat in 5 seconds..."
+      },
+      "cancel": {
+        "title": "Checkout Cancelled",
+        "description": "No worries! Your subscription was not changed. You can upgrade anytime when you are ready.",
+        "viewPlans": "View Plans",
+        "backToChat": "Back to Chat"
+      }
     }
   }
 }

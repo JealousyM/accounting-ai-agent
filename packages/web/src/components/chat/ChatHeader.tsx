@@ -9,6 +9,7 @@ import { ProfileEditModal, type ProfileTranslations, ApiCredentialsModal, type A
 import { HelpButton, HelpPanel, type HelpPanelTranslations } from '@/components/help';
 import { ConversationDetail } from '@/hooks/useChat';
 import { useAuth } from '@/contexts/AuthContext';
+import { CurrentPlanBadge } from '@/components/subscription';
 
 type Locale = 'en' | 'pl' | 'ru';
 
@@ -93,6 +94,9 @@ export function ChatHeader({
         </div>
 
         <div className="flex items-center gap-2">
+          {/* Current plan badge */}
+          <CurrentPlanBadge className="hidden sm:flex" />
+
           {/* Help button */}
           <HelpButton onClick={() => setIsHelpPanelOpen(true)} />
 

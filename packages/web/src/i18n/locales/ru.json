@@ -50,7 +50,32 @@
       "llmProviderHelp": "Выберите провайдера ИИ. Вам нужно будет предоставить свой API ключ.",
       "llmApiKey": "API ключ",
       "llmApiKeyHelpOpenai": "Получите API ключ на platform.openai.com",
-      "llmApiKeyHelpAnthropic": "Получите API ключ на console.anthropic.com"
+      "llmApiKeyHelpAnthropic": "Получите API ключ на console.anthropic.com",
+      "choosePlan": "Выберите план",
+      "connecting": "Подключение...",
+      "proCheckoutInfo": "После регистрации вы будете перенаправлены на оплату для завершения подписки Pro.",
+      "plan": {
+        "free": {
+          "name": "Бесплатный",
+          "price": "0 PLN",
+          "features": {
+            "ownKey": "Требуется свой API ключ",
+            "unlimited": "Безлимитные сообщения ИИ",
+            "wfirma": "30 запросов wFirma/месяц"
+          }
+        },
+        "pro": {
+          "name": "Pro",
+          "price": "14,99 PLN",
+          "perMonth": "/мес.",
+          "popular": "ПОПУЛЯРНЫЙ",
+          "features": {
+            "included": "API ключи включены (500 сообщ./мес.)",
+            "ownKey": "Или используйте свой ключ",
+            "wfirma": "Безлимитные запросы wFirma"
+          }
+        }
+      }
     },
     "login": {
       "title": "Войти",
@@ -152,6 +177,11 @@
       "emptyDescription": "Спросите меня о польских налогах, бухгалтерии, wFirma, НДС, PIT, CIT, ZUS, счетах и многом другом. Я также могу получить доступ к вашим данным в wFirma.",
       "thinking": "Думаю...",
       "toolsUsed": "Использовано:"
+    },
+    "subscriptionWelcome": {
+      "title": "Добро пожаловать в Accounting AI Agent!",
+      "message": "Вы используете Бесплатный план. Перейдите на Pro для получения включённых кредитов API, безлимитных запросов wFirma и приоритетной поддержки.",
+      "upgradeButton": "Смотреть планы и улучшить"
     },
     "input": {
       "placeholder": "Введите сообщение...",
@@ -469,6 +499,110 @@
       "recentConversations": "Последние разговоры",
       "changeRole": "Изменить роль",
       "confirmRoleChange": "Вы уверены, что хотите изменить роль этого пользователя?"
+    }
+  },
+  "subscription": {
+    "title": "Выберите план",
+    "subtitle": "Начните бесплатно со своим API ключом или оформите подписку для получения кредитов",
+    "monthly": "Ежемесячно",
+    "yearly": "Ежегодно",
+    "savePercent": "Экономия 17%",
+    "perMonth": "месяц",
+    "billedYearly": "Оплата за год",
+    "currentPlan": "Текущий план",
+    "getStarted": "Начать",
+    "upgradeToPro": "Перейти на Pro",
+    "processing": "Обработка...",
+    "popular": "ПОПУЛЯРНЫЙ",
+    "plans": {
+      "free": {
+        "name": "Бесплатный",
+        "description": "Начните с собственными API ключами"
+      },
+      "pro": {
+        "name": "Pro",
+        "description": "Полный доступ с включёнными кредитами API"
+      }
+    },
+    "features": {
+      "byok": "Используйте свой ключ OpenAI/Anthropic",
+      "unlimitedWithKey": "Безлимитные сообщения AI (со своим ключом)",
+      "wfirmaLimited": "30 запросов wFirma/месяц",
+      "basicSupport": "Поддержка сообщества",
+      "includedCredits": "500 сообщений AI/месяц включено",
+      "orOwnKey": "Или используйте свой ключ без лимитов",
+      "wfirmaUnlimited": "Безлимитные запросы wFirma",
+      "prioritySupport": "Приоритетная поддержка"
+    },
+    "faq": {
+      "title": "Вопросы?",
+      "description": "Бесплатный план требует свой API ключ от OpenAI или Anthropic. План Pro включает кредиты API, так что вы можете начать сразу."
+    },
+    "management": {
+      "loadError": "Не удалось загрузить данные подписки",
+      "proPlan": "План Pro",
+      "freePlan": "Бесплатный план",
+      "status": "Статус:",
+      "expiresOn": "Истекает",
+      "renewsOn": "Продление",
+      "manageBilling": "Управление платежами",
+      "billingPortal": "Портал платежей",
+      "cancelWarning": "Ваша подписка будет отменена в конце расчётного периода. Вы потеряете доступ к функциям Pro {date}.",
+      "cancelSubscription": "Отменить подписку",
+      "usage": "Использование",
+      "ownKeyNoLimits": "Используется собственный API ключ - лимиты сообщений не применяются.",
+      "apiKeyPreference": "Настройки API ключа",
+      "usingOwnKey": "Используется собственный API ключ (безлимитные сообщения)",
+      "usingIncluded": "Используются включённые кредиты API (500 сообщений/месяц)",
+      "addKeyHint": "Добавьте свой API ключ в настройках для безлимитных сообщений.",
+      "getMoreWithPro": "Получите больше с Pro",
+      "feature500Messages": "500 сообщений AI/месяц включено (или безлимитно со своим ключом)",
+      "featureUnlimitedWfirma": "Безлимитные запросы wFirma",
+      "featurePrioritySupport": "Приоритетная поддержка",
+      "viewPlans": "Смотреть планы",
+      "cancelTitle": "Отменить подписку Pro?",
+      "cancelDescription": "Ваша подписка останется активной до {date}. После этой даты вы потеряете доступ к функциям Pro:",
+      "cancelFeatureCredits": "Включённые кредиты API (500 сообщений/месяц)",
+      "cancelContinueFree": "Вы можете продолжить использовать Бесплатный план со своим API ключом.",
+      "keepSubscription": "Сохранить подписку",
+      "canceling": "Отмена...",
+      "yesCancel": "Да, отменить"
+    },
+    "upgrade": {
+      "apiKeyRequired": "Требуется API ключ",
+      "apiKeyRequiredDesc": "Бесплатный план требует собственный API ключ OpenAI или Anthropic. Добавьте свой ключ, чтобы начать чат, или перейдите на Pro для получения кредитов.",
+      "addApiKey": "Добавить API ключ",
+      "limitReached": "Лимит сообщений достигнут",
+      "limitReachedDesc": "Вы использовали все включённые сообщения AI в этом месяце. Добавьте собственный API ключ для безлимитных сообщений или дождитесь сброса лимита.",
+      "addOwnKey": "Добавить свой ключ",
+      "viewSubscription": "Посмотреть подписку",
+      "wfirmaLimit": "Лимит wFirma достигнут",
+      "wfirmaLimitDesc": "Вы использовали все бесплатные запросы wFirma в этом месяце (30/месяц). Перейдите на Pro для безлимитного доступа."
+    },
+    "badge": {
+      "pro": "Pro",
+      "free": "Бесплатный",
+      "upgrade": "Улучшить"
+    },
+    "meter": {
+      "resetsOn": "Сброс: {date}",
+      "approachingLimit": "Вы приближаетесь к лимиту. Рассмотрите улучшение плана или добавление своего API ключа."
+    },
+    "pages": {
+      "pricing": "Тарифные планы",
+      "subscription": "Подписка",
+      "success": {
+        "title": "Добро пожаловать в Pro!",
+        "description": "Ваша подписка активна. У вас есть доступ ко всем функциям Pro, включая 500 сообщений AI в месяц и безлимитные запросы wFirma.",
+        "startUsing": "Начать использовать Pro",
+        "redirecting": "Перенаправление в чат через 5 секунд..."
+      },
+      "cancel": {
+        "title": "Оплата отменена",
+        "description": "Не волнуйтесь! Ваша подписка не была изменена. Вы можете оформить подписку в любое время.",
+        "viewPlans": "Смотреть планы",
+        "backToChat": "Вернуться в чат"
+      }
     }
   }
 }

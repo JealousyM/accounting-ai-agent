@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { MessageSquarePlus, X, DollarSign } from 'lucide-react';
+import { MessageSquarePlus, X, DollarSign, Crown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { AppVersion } from '@/components/ui/app-version';
 import Link from 'next/link';
@@ -13,6 +13,8 @@ import { ChatInput } from './ChatInput';
 import { ChatHeader } from './ChatHeader';
 import { WfirmaWelcomeModal } from '@/components/onboarding/WfirmaWelcomeModal';
 import { markFirstLoginComplete } from '@/lib/api/auth';
+import { CurrentPlanBadge } from '@/components/subscription';
+import { useSubscription } from '@/hooks/useSubscription';
 import enTranslations from '@/i18n/locales/en.json';
 import plTranslations from '@/i18n/locales/pl.json';
 import ruTranslations from '@/i18n/locales/ru.json';
@@ -41,9 +43,11 @@ export function ChatContainer() {
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [showWfirmaWelcome, setShowWfirmaWelcome] = useState(false);
+  const [showSubscriptionWelcome, setShowSubscriptionWelcome] = useState(false);
   const { locale, setLocale } = useLocale();
   const t = translations[locale].chat;
   const onboardingTranslations = translations[locale].onboarding;
+  const { isPro, isLoading: isLoadingSubscription } = useSubscription();
 
   // Check for wFirma welcome modal flag on mount
   useEffect(() => {
@@ -52,6 +56,16 @@ export function ChatContainer() {
       setShowWfirmaWelcome(true);
     }
   }, []);
+
+  // Check for subscription welcome banner flag on mount (for Free users)
+  useEffect(() => {
+    if (!isLoadingSubscription && !isPro) {
+      const hasSeenSubscriptionWelcome = localStorage.getItem('hasSeenSubscriptionWelcome');
+      if (!hasSeenSubscriptionWelcome) {
+        setShowSubscriptionWelcome(true);
+      }
+    }
+  }, [isPro, isLoadingSubscription]);
 
   const handleWfirmaWelcomeClose = async () => {
     setShowWfirmaWelcome(false);
@@ -62,6 +76,11 @@ export function ChatContainer() {
     } catch (error) {
       console.error('Failed to mark first login complete:', error);
     }
+  };
+
+  const handleSubscriptionWelcomeClose = () => {
+    setShowSubscriptionWelcome(false);
+    localStorage.setItem('hasSeenSubscriptionWelcome', 'true');
   };
 
   const handleSendMessage = async (content: string) => {
@@ -134,9 +153,19 @@ export function ChatContainer() {
             />
           </div>
 
-          {/* Sidebar footer with AI Costs link - same height as ChatInput */}
-          <div className="mt-auto px-4 bg-gray-50 dark:bg-gray-900/50 h-[92px] flex items-center">
-            <div className="flex items-center justify-between w-full">
+          {/* Sidebar footer with Plan, AI Costs link, and Version */}
+          <div className="mt-auto px-4 bg-gray-50 dark:bg-gray-900/50 border-t border-gray-200 dark:border-gray-700">
+            {/* Current Plan Badge */}
+            <div className="py-3 border-b border-gray-200 dark:border-gray-700">
+              <Link href="/subscription" className="block">
+                <div className="flex items-center justify-between px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors">
+                  <CurrentPlanBadge showUpgradeLink={false} />
+                  <span className="text-xs text-gray-500 dark:text-gray-400">Manage →</span>
+                </div>
+              </Link>
+            </div>
+            {/* AI Costs and Version */}
+            <div className="py-3 flex items-center justify-between">
               <Link
                 href="/dashboard/costs"
                 className="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
@@ -165,6 +194,38 @@ export function ChatContainer() {
           locale={locale}
           onLocaleChange={setLocale}
         />
+
+        {/* Subscription Welcome Banner */}
+        {showSubscriptionWelcome && !isPro && (
+          <div className="mx-4 mt-4 p-4 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 border border-blue-200 dark:border-blue-800 rounded-lg shadow-sm">
+            <div className="flex items-start gap-3">
+              <div className="flex-shrink-0 w-10 h-10 bg-blue-100 dark:bg-blue-900/50 rounded-full flex items-center justify-center">
+                <Crown className="w-5 h-5 text-blue-600" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-1">
+                  {t.subscriptionWelcome?.title || 'Welcome to Accounting AI Agent!'}
+                </h3>
+                <p className="text-sm text-gray-600 dark:text-gray-300 mb-3">
+                  {t.subscriptionWelcome?.message || 'You are currently on the Free plan. Upgrade to Pro anytime for included API credits, unlimited wFirma requests, and priority support.'}
+                </p>
+                <Link
+                  href="/pricing"
+                  className="inline-flex items-center gap-1 text-sm font-medium text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
+                >
+                  {t.subscriptionWelcome?.upgradeButton || 'View Plans & Upgrade'} →
+                </Link>
+              </div>
+              <button
+                onClick={handleSubscriptionWelcomeClose}
+                className="flex-shrink-0 p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                aria-label="Dismiss"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* Messages */}
         <div className="flex-1 overflow-hidden">

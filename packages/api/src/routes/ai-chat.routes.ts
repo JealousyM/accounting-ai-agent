@@ -8,6 +8,7 @@ import { aiChatController } from '../controllers/ai-chat.controller';
 import { authenticate } from '../middleware/auth.middleware';
 import { rateLimiter } from '../middleware/rate-limiter.middleware';
 import { validateRequest } from '../middleware/validation.middleware';
+import { checkAIMessageLimit } from '../middleware/subscription.middleware';
 import {
   createConversationSchema,
   getConversationSchema,
@@ -74,10 +75,16 @@ router.delete(
 /**
  * POST /api/ai/conversations/:id/messages
  * Send message and get AI response
+ *
+ * Subscription limits:
+ * - Free: requires own LLM key
+ * - Pro: 500 messages/month with app keys, unlimited with own key
+ * - Admin: unlimited
  */
 router.post(
   '/conversations/:id/messages',
   rateLimiter({ windowMs: 15 * 60 * 1000, max: 60 }), // 60 messages per 15 minutes
+  checkAIMessageLimit, // Check subscription limits
   validateRequest(sendMessageSchema),
   aiChatController.sendMessage.bind(aiChatController)
 );

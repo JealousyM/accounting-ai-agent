@@ -18,9 +18,9 @@ const translations = {
 
 // Format currency
 function formatCurrency(value: number): string {
-  return new Intl.NumberFormat('en-US', {
+  return new Intl.NumberFormat('pl', {
     style: 'currency',
-    currency: 'USD',
+    currency: 'PLN',
     minimumFractionDigits: 2,
     maximumFractionDigits: 4,
   }).format(value);

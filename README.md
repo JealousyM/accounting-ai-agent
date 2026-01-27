@@ -212,6 +212,24 @@ Complete technical documentation is available in the [docs](./docs) folder:
 
 See [docs/README.md](./docs/README.md) for the full documentation index.
 
+### 💳 Stripe Subscription System
+
+- [**STRIPE_SETUP.md**](./STRIPE_SETUP.md) - Complete setup guide for Stripe integration
+- [**STRIPE_LOCAL_DEVELOPMENT.md**](./STRIPE_LOCAL_DEVELOPMENT.md) - Step-by-step local development guide
+- [**STRIPE_CHEATSHEET.md**](./STRIPE_CHEATSHEET.md) - Quick reference for daily development
+
+**Quick start:**
+```bash
+# Terminal 1: Backend
+npm run dev
+
+# Terminal 2: Stripe webhooks
+stripe listen --forward-to localhost:3011/api/webhooks/stripe
+
+# Terminal 3: Frontend
+npm run dev --filter=@accounting-ai-agent/web
+```
+
 ## 🔧 Troubleshooting
 
 ### Port Already in Use

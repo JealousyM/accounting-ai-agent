@@ -50,7 +50,32 @@
       "llmProviderHelp": "Wybierz dostawcę AI. Musisz podać własny klucz API.",
       "llmApiKey": "Klucz API",
       "llmApiKeyHelpOpenai": "Pobierz klucz API z platform.openai.com",
-      "llmApiKeyHelpAnthropic": "Pobierz klucz API z console.anthropic.com"
+      "llmApiKeyHelpAnthropic": "Pobierz klucz API z console.anthropic.com",
+      "choosePlan": "Wybierz plan",
+      "connecting": "Łączenie...",
+      "proCheckoutInfo": "Po rejestracji zostaniesz przekierowany do płatności, aby dokończyć subskrypcję Pro.",
+      "plan": {
+        "free": {
+          "name": "Darmowy",
+          "price": "0 PLN",
+          "features": {
+            "ownKey": "Wymagany własny klucz API",
+            "unlimited": "Nieograniczone wiadomości AI",
+            "wfirma": "30 żądań wFirma/miesiąc"
+          }
+        },
+        "pro": {
+          "name": "Pro",
+          "price": "14,99 PLN",
+          "perMonth": "/mies.",
+          "popular": "POPULARNE",
+          "features": {
+            "included": "Klucze API w cenie (500 wiad./mies.)",
+            "ownKey": "Lub użyj własnego klucza",
+            "wfirma": "Nieograniczone żądania wFirma"
+          }
+        }
+      }
     },
     "login": {
       "title": "Zaloguj się",
@@ -152,6 +177,11 @@
       "emptyDescription": "Zapytaj mnie o polskie podatki, księgowość, wFirma, VAT, PIT, CIT, ZUS, faktury i więcej. Mogę też uzyskać dostęp do Twoich danych w wFirma.",
       "thinking": "Myślę...",
       "toolsUsed": "Użyto:"
+    },
+    "subscriptionWelcome": {
+      "title": "Witaj w Accounting AI Agent!",
+      "message": "Korzystasz z planu Darmowego. Ulepsz do Pro, aby otrzymać kredyty API w cenie, nieograniczone żądania wFirma i priorytetowe wsparcie.",
+      "upgradeButton": "Zobacz plany i ulepsz"
     },
     "input": {
       "placeholder": "Wpisz wiadomość...",
@@ -469,6 +499,110 @@
       "recentConversations": "Ostatnie rozmowy",
       "changeRole": "Zmień rolę",
       "confirmRoleChange": "Czy na pewno chcesz zmienić rolę tego użytkownika?"
+    }
+  },
+  "subscription": {
+    "title": "Wybierz plan",
+    "subtitle": "Zacznij za darmo z własnym kluczem API lub ulepsz, aby otrzymać kredyty",
+    "monthly": "Miesięcznie",
+    "yearly": "Rocznie",
+    "savePercent": "Zaoszczędź 17%",
+    "perMonth": "miesiąc",
+    "billedYearly": "Rozliczane rocznie",
+    "currentPlan": "Aktualny plan",
+    "getStarted": "Rozpocznij",
+    "upgradeToPro": "Ulepsz do Pro",
+    "processing": "Przetwarzanie...",
+    "popular": "POPULARNE",
+    "plans": {
+      "free": {
+        "name": "Darmowy",
+        "description": "Zacznij z własnymi kluczami API"
+      },
+      "pro": {
+        "name": "Pro",
+        "description": "Pełny dostęp z kredytami API"
+      }
+    },
+    "features": {
+      "byok": "Użyj własnego klucza OpenAI/Anthropic",
+      "unlimitedWithKey": "Nieograniczone wiadomości AI (z własnym kluczem)",
+      "wfirmaLimited": "30 żądań wFirma/miesiąc",
+      "basicSupport": "Wsparcie społeczności",
+      "includedCredits": "500 wiadomości AI/miesiąc w cenie",
+      "orOwnKey": "Lub użyj własnego klucza bez limitu",
+      "wfirmaUnlimited": "Nieograniczone żądania wFirma",
+      "prioritySupport": "Priorytetowe wsparcie"
+    },
+    "faq": {
+      "title": "Pytania?",
+      "description": "Plan darmowy wymaga własnego klucza API z OpenAI lub Anthropic. Plan Pro zawiera kredyty API, więc możesz zacząć natychmiast."
+    },
+    "management": {
+      "loadError": "Nie udało się załadować szczegółów subskrypcji",
+      "proPlan": "Plan Pro",
+      "freePlan": "Plan Darmowy",
+      "status": "Status:",
+      "expiresOn": "Wygasa",
+      "renewsOn": "Odnowienie",
+      "manageBilling": "Zarządzaj płatnościami",
+      "billingPortal": "Portal płatności",
+      "cancelWarning": "Twoja subskrypcja zostanie anulowana na koniec okresu rozliczeniowego. Utracisz dostęp do funkcji Pro w dniu {date}.",
+      "cancelSubscription": "Anuluj subskrypcję",
+      "usage": "Użycie",
+      "ownKeyNoLimits": "Używasz własnego klucza API - brak limitów wiadomości.",
+      "apiKeyPreference": "Preferencje klucza API",
+      "usingOwnKey": "Używasz własnego klucza API (nieograniczone wiadomości)",
+      "usingIncluded": "Używasz kredytów API w cenie (500 wiadomości/miesiąc)",
+      "addKeyHint": "Dodaj swój klucz API w ustawieniach, aby włączyć nieograniczone wiadomości.",
+      "getMoreWithPro": "Zyskaj więcej z Pro",
+      "feature500Messages": "500 wiadomości AI/miesiąc w cenie (lub bez limitu z własnym kluczem)",
+      "featureUnlimitedWfirma": "Nieograniczone żądania wFirma",
+      "featurePrioritySupport": "Priorytetowe wsparcie",
+      "viewPlans": "Zobacz plany",
+      "cancelTitle": "Anulować subskrypcję Pro?",
+      "cancelDescription": "Twoja subskrypcja pozostanie aktywna do {date}. Po tej dacie utracisz dostęp do funkcji Pro:",
+      "cancelFeatureCredits": "Kredyty API w cenie (500 wiadomości/miesiąc)",
+      "cancelContinueFree": "Możesz nadal korzystać z planu Darmowego z własnym kluczem API.",
+      "keepSubscription": "Zachowaj subskrypcję",
+      "canceling": "Anulowanie...",
+      "yesCancel": "Tak, anuluj"
+    },
+    "upgrade": {
+      "apiKeyRequired": "Wymagany klucz API",
+      "apiKeyRequiredDesc": "Plan darmowy wymaga własnego klucza API OpenAI lub Anthropic. Dodaj swój klucz, aby rozpocząć czat, lub ulepsz do Pro, aby otrzymać kredyty.",
+      "addApiKey": "Dodaj klucz API",
+      "limitReached": "Osiągnięto limit wiadomości",
+      "limitReachedDesc": "Wykorzystałeś wszystkie wiadomości AI w tym miesiącu. Dodaj własny klucz API dla nieograniczonych wiadomości lub poczekaj na reset limitu.",
+      "addOwnKey": "Dodaj własny klucz",
+      "viewSubscription": "Zobacz subskrypcję",
+      "wfirmaLimit": "Osiągnięto limit wFirma",
+      "wfirmaLimitDesc": "Wykorzystałeś wszystkie darmowe żądania wFirma w tym miesiącu (30/miesiąc). Ulepsz do Pro dla nieograniczonego dostępu."
+    },
+    "badge": {
+      "pro": "Pro",
+      "free": "Darmowy",
+      "upgrade": "Ulepsz"
+    },
+    "meter": {
+      "resetsOn": "Reset: {date}",
+      "approachingLimit": "Zbliżasz się do limitu. Rozważ ulepszenie lub dodanie własnego klucza API."
+    },
+    "pages": {
+      "pricing": "Plany subskrypcji",
+      "subscription": "Subskrypcja",
+      "success": {
+        "title": "Witaj w Pro!",
+        "description": "Twoja subskrypcja jest aktywna. Masz dostęp do wszystkich funkcji Pro, w tym 500 wiadomości AI miesięcznie i nieograniczonych żądań wFirma.",
+        "startUsing": "Zacznij korzystać z Pro",
+        "redirecting": "Przekierowanie do czatu za 5 sekund..."
+      },
+      "cancel": {
+        "title": "Płatność anulowana",
+        "description": "Bez obaw! Twoja subskrypcja nie została zmieniona. Możesz ulepszać w dowolnym momencie.",
+        "viewPlans": "Zobacz plany",
+        "backToChat": "Wróć do czatu"
+      }
     }
   }
 }
