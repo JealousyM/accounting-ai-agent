@@ -12,6 +12,8 @@ import aiCostsRoutes from './routes/ai-costs.routes';
 import fileRoutes from './routes/file.routes';
 import helpRoutes from './routes/help.routes';
 import adminRoutes from './routes/admin.routes';
+import subscriptionRoutes from './routes/subscription.routes';
+import webhookRoutes from './routes/webhook.routes';
 import { globalRateLimiter } from './middleware/rate-limiter.middleware';
 import { errorHandler, notFoundHandler } from './middleware/error-handler.middleware';
 import { logger } from './utils/logger';
@@ -34,6 +36,11 @@ app.use(cors({
   origin: corsOrigin || 'http://localhost:3010',
   credentials: true, // Allow cookies for future httpOnly token migration
 }));
+
+// IMPORTANT: Webhook routes must be registered BEFORE express.json()
+// because Stripe requires raw body for signature verification
+app.use('/api/webhooks', webhookRoutes);
+
 app.use(express.json({ limit: '100kb' })); // Prevent large payload attacks
 app.use(express.urlencoded({ extended: true, limit: '100kb' }));
 
@@ -73,6 +80,9 @@ app.use('/api/help', helpRoutes);
 
 // Admin routes (admin role required)
 app.use('/api/admin', adminRoutes);
+
+// Subscription routes
+app.use('/api/subscription', subscriptionRoutes);
 
 // 404 handler
 app.use(notFoundHandler);

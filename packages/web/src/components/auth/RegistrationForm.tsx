@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Eye, EyeOff, Check, X, Github, Globe } from 'lucide-react';
+import { Eye, EyeOff, Check, X, Github, Globe, Crown, Zap } from 'lucide-react';
 import axios from 'axios';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -21,6 +21,11 @@ import { LegalModal } from '@/components/legal/LegalModal';
 import enTranslations from '@/i18n/locales/en.json';
 import plTranslations from '@/i18n/locales/pl.json';
 import { API_URL } from '@/lib/config';
+
+const translations = {
+  en: enTranslations,
+  pl: plTranslations,
+};
 
 export function RegistrationForm() {
   const [selectedLocale, setSelectedLocale] = useState<'en' | 'pl'>('en');
@@ -64,9 +69,7 @@ export function RegistrationForm() {
   }, [googleError, githubError, clearGoogleError, clearGithubError]);
 
   // Get translations based on selected locale
-  const t = selectedLocale === 'pl'
-    ? plTranslations.auth.register
-    : enTranslations.auth.register;
+  const t = translations[selectedLocale].auth.register;
 
   const {
     register,
@@ -79,6 +82,7 @@ export function RegistrationForm() {
     mode: 'onChange',
     defaultValues: {
       locale: selectedLocale,
+      subscribeToPro: false,
     },
   });
 
@@ -98,10 +102,17 @@ export function RegistrationForm() {
       setIsSubmitting(true);
       setApiError(null);
 
-      const { confirmPassword, agreeToTerms, ...registerData } = data;
+      const { confirmPassword, agreeToTerms, llmProvider, ...restData } = data;
 
       void confirmPassword;
       void agreeToTerms;
+
+      // Clean up llmProvider - only pass valid values
+      const validProvider = llmProvider === 'openai' || llmProvider === 'anthropic' ? llmProvider : undefined;
+      const registerData = {
+        ...restData,
+        llmProvider: validProvider,
+      };
 
       const response = await registerUser(registerData);
       console.log('Registration successful:', response);
@@ -117,9 +128,15 @@ export function RegistrationForm() {
           localStorage.setItem('showWfirmaWelcome', 'true');
         }
 
-        // Redirect to chat after successful auto-login
+        // Redirect based on subscription choice
         setTimeout(() => {
-          router.push('/chat');
+          if (data.subscribeToPro) {
+            // Redirect to pricing page to complete Pro subscription
+            router.push('/pricing?autoCheckout=true');
+          } else {
+            // Redirect to chat for Free plan users
+            router.push('/chat');
+          }
         }, 1500);
       } else {
         // Fallback: redirect to login if tokens not returned
@@ -271,7 +288,7 @@ export function RegistrationForm() {
               />
             </svg>
           )}
-          {googleLoading ? 'Connecting...' : t.googleButton}
+          {googleLoading ? t.connecting : t.googleButton}
         </Button>
 
         {githubVisible && (
@@ -287,7 +304,7 @@ export function RegistrationForm() {
             ) : (
               <Github className="w-5 h-5 mr-2" />
             )}
-            {githubLoading ? 'Connecting...' : t.githubButton}
+            {githubLoading ? t.connecting : t.githubButton}
           </Button>
         )}
       </div>
@@ -373,6 +390,76 @@ export function RegistrationForm() {
           )}
         </div>
 
+        {/* Subscription Plan Selection */}
+        <div className="border-t border-gray-200 dark:border-gray-700 pt-5 mt-5">
+          <h3 className="text-sm font-medium text-gray-900 dark:text-gray-100 mb-4">
+            {t.choosePlan}
+          </h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {/* Free Plan */}
+            <label className={cn(
+              "relative flex flex-col p-4 border-2 rounded-lg cursor-pointer transition-all",
+              !watch('subscribeToPro')
+                ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20"
+                : "border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500"
+            )}>
+              <input
+                type="radio"
+                className="sr-only"
+                checked={!watch('subscribeToPro')}
+                onChange={() => setValue('subscribeToPro', false)}
+              />
+              <div className="flex items-center gap-2 mb-2">
+                <Zap className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                <span className="font-semibold text-gray-900 dark:text-white">{t.plan.free.name}</span>
+              </div>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white mb-2">{t.plan.free.price}</p>
+              <ul className="text-xs text-gray-600 dark:text-gray-400 space-y-1">
+                <li>✓ {t.plan.free.features.ownKey}</li>
+                <li>✓ {t.plan.free.features.unlimited}</li>
+                <li>✓ {t.plan.free.features.wfirma}</li>
+              </ul>
+            </label>
+
+            {/* Pro Plan */}
+            <label className={cn(
+              "relative flex flex-col p-4 border-2 rounded-lg cursor-pointer transition-all",
+              watch('subscribeToPro')
+                ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20"
+                : "border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500"
+            )}>
+              <input
+                type="radio"
+                className="sr-only"
+                checked={watch('subscribeToPro') || false}
+                onChange={() => setValue('subscribeToPro', true)}
+              />
+              <div className="absolute top-2 right-2">
+                <span className="bg-blue-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
+                  {t.plan.pro.popular}
+                </span>
+              </div>
+              <div className="flex items-center gap-2 mb-2">
+                <Crown className="w-5 h-5 text-blue-600" />
+                <span className="font-semibold text-gray-900 dark:text-white">{t.plan.pro.name}</span>
+              </div>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+                {t.plan.pro.price}<span className="text-sm font-normal text-gray-500">{t.plan.pro.perMonth}</span>
+              </p>
+              <ul className="text-xs text-gray-600 dark:text-gray-400 space-y-1">
+                <li>✓ {t.plan.pro.features.included}</li>
+                <li>✓ {t.plan.pro.features.ownKey}</li>
+                <li>✓ {t.plan.pro.features.wfirma}</li>
+              </ul>
+            </label>
+          </div>
+          {watch('subscribeToPro') && (
+            <p className="mt-3 text-xs text-gray-600 dark:text-gray-400 bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg">
+              ℹ️ {t.proCheckoutInfo}
+            </p>
+          )}
+        </div>
+
         {/* wFirma Integration Section */}
         <div className="border-t border-gray-200 dark:border-gray-700 pt-5 mt-5">
           <div className="flex items-center mb-4">
@@ -441,11 +528,12 @@ export function RegistrationForm() {
           )}
         </div>
 
-        {/* LLM Provider Section (Required) */}
-        <div className="border-t border-gray-200 dark:border-gray-700 pt-5">
-          <label htmlFor="llmProvider" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-            {t.llmProvider || 'AI Provider'} <span className="text-red-500">*</span>
-          </label>
+        {/* LLM Provider Section (Required for Free plan) */}
+        {!watch('subscribeToPro') && (
+          <div className="border-t border-gray-200 dark:border-gray-700 pt-5">
+            <label htmlFor="llmProvider" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+              {t.llmProvider || 'AI Provider'} <span className="text-red-500">*</span>
+            </label>
           <select
             id="llmProvider"
             className={cn(
@@ -488,7 +576,8 @@ export function RegistrationForm() {
               </p>
             </div>
           )}
-        </div>
+          </div>
+        )}
 
         {/* Password */}
         <div>

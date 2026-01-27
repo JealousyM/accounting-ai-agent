@@ -50,13 +50,13 @@ export const registrationSchema = z
     wfirmaAccessKey: z.string().max(200).trim().optional(),
     wfirmaSecretKey: z.string().max(200).trim().optional(),
     wfirmaCompanyId: z.string().max(50).trim().optional(),
-    // LLM provider (required)
+    // Subscription option
+    subscribeToPro: z.boolean().default(false),
+    // LLM provider (required for Free plan, optional for Pro)
     llmProvider: z
       .union([z.literal('openai'), z.literal('anthropic'), z.literal('')])
-      .refine((val): val is 'openai' | 'anthropic' => val === 'openai' || val === 'anthropic', {
-        message: 'Please select an AI provider',
-      }),
-    llmApiKey: z.string().min(1, 'API key is required').max(500).trim(),
+      .optional(),
+    llmApiKey: z.string().max(500).trim().optional(),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: 'Passwords do not match',
@@ -67,6 +67,19 @@ export const registrationSchema = z
     {
       message: 'All wFirma credentials are required when wFirma is enabled',
       path: ['wfirmaAccessKey'],
+    }
+  )
+  .refine(
+    (data) => {
+      // LLM provider and API key are required ONLY if NOT subscribing to Pro
+      if (!data.subscribeToPro) {
+        return data.llmProvider && (data.llmProvider === 'openai' || data.llmProvider === 'anthropic') && data.llmApiKey;
+      }
+      return true;
+    },
+    {
+      message: 'AI provider and API key are required for Free plan',
+      path: ['llmProvider'],
     }
   );
 

@@ -7,6 +7,7 @@ import { Request, Response } from 'express';
 import { aiChatService } from '../services/ai-chat.instance';
 import { logger } from '../utils/logger';
 import { LLMProvider } from '../types/ai-chat.types';
+import { incrementAIUsage } from '../middleware/subscription.middleware';
 
 export class AIChatController {
   /**
@@ -208,6 +209,9 @@ export class AIChatController {
         content,
         provider as LLMProvider | undefined
       );
+
+      // Increment AI usage for subscription tracking (after successful response)
+      await incrementAIUsage(userId);
 
       res.status(200).json({
         success: true,

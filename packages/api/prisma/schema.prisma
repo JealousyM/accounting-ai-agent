@@ -19,6 +19,18 @@ enum UserRole {
   admin
 }
 
+enum SubscriptionPlan {
+  free
+  pro
+}
+
+enum SubscriptionStatus {
+  active
+  canceled
+  past_due
+  trialing
+}
+
 // ============================================
 // USER MANAGEMENT
 // ============================================
@@ -39,6 +51,27 @@ model User {
   role         UserRole @default(user) // User role for access control
   isFirstLogin Boolean  @default(true) // Flag for showing welcome modal on first login
 
+  // Subscription
+  subscriptionPlan      SubscriptionPlan   @default(free)
+  subscriptionStatus    SubscriptionStatus @default(active)
+  stripeCustomerId      String?            @unique
+  stripeSubscriptionId  String?            @unique
+  subscriptionEndDate   DateTime?
+  cancelAtPeriodEnd     Boolean            @default(false)
+
+  // AI usage limits (for Pro with app keys)
+  aiMessagesUsed        Int                @default(0)
+  aiMessagesLimit       Int                @default(500)
+  aiMessagesResetAt     DateTime?
+
+  // wFirma usage limits (for Free plan)
+  wfirmaRequestsUsed    Int                @default(0)
+  wfirmaRequestsLimit   Int                @default(30)
+  wfirmaRequestsResetAt DateTime?
+
+  // LLM key preference (for Pro users)
+  useOwnLLMKey          Boolean            @default(false)
+
   // wFirma integration config
   wfirmaConfig Json?    @db.JsonB
 
@@ -56,6 +89,8 @@ model User {
   @@index([googleId])
   @@index([githubId])
   @@index([createdAt])
+  @@index([stripeCustomerId])
+  @@index([subscriptionPlan])
   @@map("users")
 }
 
