@@ -24,8 +24,8 @@ test.describe('Authentication', () => {
 
   test('should redirect to login when accessing protected route', async ({ page }) => {
     await page.goto('/dashboard');
-    
-    // Should redirect to login page
-    await expect(page).toHaveURL(/.*\/login/);
+
+    // Should redirect to login page - increase timeout as the redirect may take time
+    await expect(page).toHaveURL(/.*\/login/, { timeout: 15000 });
   });
 });

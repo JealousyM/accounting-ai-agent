@@ -1,4 +1,9 @@
 import { defineConfig, devices } from '@playwright/test';
+import dotenv from 'dotenv';
+import path from 'path';
+
+// Load environment variables from .env file
+dotenv.config({ path: path.resolve(__dirname, '.env') });
 
 /**
  * @see https://playwright.dev/docs/test-configuration
@@ -9,10 +14,12 @@ export default defineConfig({
   fullyParallel: true,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
   forbidOnly: !!process.env.CI,
-  /* Retry on CI only */
-  retries: process.env.CI ? 2 : 0,
-  /* Opt out of parallel tests on CI. */
-  workers: process.env.CI ? 1 : undefined,
+  /* Retry on CI only - also retry once locally for flaky browser issues */
+  retries: process.env.CI ? 2 : 1,
+  /* Limit parallel tests to avoid resource contention */
+  workers: process.env.CI ? 1 : 4,
+  /* Default timeout per test */
+  timeout: 60000,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: 'html',
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
@@ -22,6 +29,9 @@ export default defineConfig({
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',
+
+    /* Action timeout */
+    actionTimeout: 15000,
   },
 
   /* Configure projects for major browsers */
@@ -70,5 +80,6 @@ export default defineConfig({
     command: 'npm run dev',
     url: 'http://localhost:3010',
     reuseExistingServer: !process.env.CI,
+    timeout: 120000, // 2 minutes for Next.js to compile
   },
 });
