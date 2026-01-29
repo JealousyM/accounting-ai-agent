@@ -75,6 +75,8 @@ export interface RegisterInput {
   llmProvider?: 'openai' | 'google' | 'none';
   llmApiKey?: string;
   llmModel?: string;
+  // Subscription option
+  subscribeToPro?: boolean;
 }
 
 export interface LoginInput {
@@ -181,6 +183,26 @@ export class AuthService {
       } catch (error) {
         // Log error but don't fail registration - user can add credentials later
         logger.warn('Failed to save LLM credentials during registration', { userId: user.id, error: (error as Error).message });
+      }
+    } else if (input.subscribeToPro) {
+      // PRO users: auto-provision default LLM credentials from environment
+      const defaultProvider = process.env.DEFAULT_LLM_PROVIDER as 'openai' | 'google' | undefined;
+      const defaultApiKey = process.env.DEFAULT_LLM_API_KEY;
+      const defaultModel = process.env.DEFAULT_LLM_MODEL;
+
+      if (defaultProvider && defaultApiKey) {
+        try {
+          await credentialsService.setLLMCredentials(user.id, {
+            provider: defaultProvider,
+            apiKey: defaultApiKey,
+            model: defaultModel,
+          });
+          logger.info('Default LLM credentials provisioned for PRO registration', { userId: user.id, provider: defaultProvider, model: defaultModel });
+        } catch (error) {
+          logger.warn('Failed to provision default LLM credentials during PRO registration', { userId: user.id, error: (error as Error).message });
+        }
+      } else {
+        logger.warn('PRO registration without LLM credentials: DEFAULT_LLM_PROVIDER or DEFAULT_LLM_API_KEY not configured', { userId: user.id });
       }
     }
 
