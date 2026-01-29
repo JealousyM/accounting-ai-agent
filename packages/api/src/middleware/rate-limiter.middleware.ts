@@ -13,6 +13,7 @@ interface RateLimiterOptions {
 
 /**
  * Rate limiter middleware using Redis
+ * Disabled in test environment for E2E testing
  */
 export const rateLimiter = (options: RateLimiterOptions) => {
   const {
@@ -23,6 +24,11 @@ export const rateLimiter = (options: RateLimiterOptions) => {
   } = options;
 
   return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    // Skip rate limiting in test environment
+    if (process.env.NODE_ENV === 'test' || process.env.DISABLE_RATE_LIMIT === 'true') {
+      return next();
+    }
+
     try {
       // Get client identifier (IP address or user ID if authenticated)
       const identifier = req.user?.userId || req.ip || 'unknown';

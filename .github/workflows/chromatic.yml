@@ -1,0 +1,96 @@
+name: Chromatic Visual Testing
+
+on:
+  push:
+    branches: [main, development]
+    paths:
+      - 'packages/web/src/**'
+      - 'packages/web/.storybook/**'
+      - 'packages/web/package.json'
+  pull_request:
+    branches: [main, development]
+    paths:
+      - 'packages/web/src/**'
+      - 'packages/web/.storybook/**'
+      - 'packages/web/package.json'
+
+env:
+  NODE_VERSION: '18'
+
+jobs:
+  # Visual regression testing - runs on both push and PR
+  chromatic:
+    name: Visual Regression Testing
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build Storybook
+        working-directory: packages/web
+        run: npm run build-storybook
+
+      - name: Run Chromatic
+        uses: chromaui/action@latest
+        with:
+          projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
+          workingDir: packages/web
+          storybookBuildDir: storybook-static
+          exitZeroOnChanges: true
+          exitOnceUploaded: true
+          onlyChanged: true
+          skip: ${{ github.event_name == 'pull_request' && github.event.pull_request.draft }}
+
+      - name: Upload Storybook artifacts
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: storybook-static
+          path: packages/web/storybook-static
+          retention-days: 7
+
+  # Storybook interaction tests - runs ONLY on PR, not on push
+  storybook-interaction-tests:
+    name: Storybook Interaction Tests
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers
+        working-directory: packages/web
+        run: npx playwright install --with-deps chromium
+
+      - name: Build Storybook
+        working-directory: packages/web
+        run: npm run build-storybook
+
+      - name: Run Storybook interaction tests
+        working-directory: packages/web
+        run: |
+          npx concurrently -k -s first -n "SB,TEST" -c "magenta,blue" \
+            "npx http-server storybook-static --port 6006 --silent" \
+            "npx wait-on tcp:6006 && npx test-storybook --url http://127.0.0.1:6006"

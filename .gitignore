@@ -5,6 +5,7 @@ node_modules/
 
 # Testing
 coverage/
+playwright-report/
 *.log
 
 # Production
@@ -33,3 +34,4 @@ Thumbs.db
 .kiro/
 .claude/
 .tmp-files/
+test-results/
