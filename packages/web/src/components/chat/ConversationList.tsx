@@ -1,14 +1,27 @@
 'use client';
 
 import React from 'react';
-import { MessageSquare, Trash2, Loader2 } from 'lucide-react';
+import { MessageSquare, Trash2, Loader2, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogBody,
+  DialogFooter,
+} from '@/components/ui/dialog';
 import { Conversation } from '@/hooks/useChat';
 
 interface SidebarTranslations {
   noConversations: string;
   startNewChat: string;
   deleteConfirm: string;
+  deleteTitle: string;
+  deleteWarning: string;
+  deleteCancel: string;
+  deleteButton: string;
   yesterday: string;
   messages: string;
 }
@@ -30,6 +43,27 @@ export function ConversationList({
   isLoading,
   translations,
 }: ConversationListProps) {
+  const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
+  const [pendingDeleteId, setPendingDeleteId] = React.useState<string | null>(null);
+
+  const handleDeleteRequest = (id: string) => {
+    setPendingDeleteId(id);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDeleteConfirm = () => {
+    if (pendingDeleteId) {
+      onDelete(pendingDeleteId);
+    }
+    setDeleteDialogOpen(false);
+    setPendingDeleteId(null);
+  };
+
+  const handleDeleteCancel = () => {
+    setDeleteDialogOpen(false);
+    setPendingDeleteId(null);
+  };
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-8">
@@ -51,18 +85,54 @@ export function ConversationList({
   }
 
   return (
-    <div className="py-2">
-      {conversations.map((conversation) => (
-        <ConversationItem
-          key={conversation.id}
-          conversation={conversation}
-          isActive={conversation.id === currentId}
-          onSelect={() => onSelect(conversation.id)}
-          onDelete={() => onDelete(conversation.id)}
-          translations={translations}
-        />
-      ))}
-    </div>
+    <>
+      <div className="py-2">
+        {conversations.map((conversation) => (
+          <ConversationItem
+            key={conversation.id}
+            conversation={conversation}
+            isActive={conversation.id === currentId}
+            onSelect={() => onSelect(conversation.id)}
+            onDelete={() => handleDeleteRequest(conversation.id)}
+            translations={translations}
+          />
+        ))}
+      </div>
+
+      <Dialog open={deleteDialogOpen} onOpenChange={handleDeleteCancel}>
+        <DialogContent showCloseButton={false} className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <AlertTriangle className="w-5 h-5 text-red-500" />
+              {translations.deleteTitle}
+            </DialogTitle>
+            <DialogDescription>
+              {translations.deleteConfirm}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogBody>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              {translations.deleteWarning}
+            </p>
+          </DialogBody>
+          <DialogFooter>
+            <Button
+              variant="ghost"
+              onClick={handleDeleteCancel}
+            >
+              {translations.deleteCancel}
+            </Button>
+            <Button
+              variant="default"
+              onClick={handleDeleteConfirm}
+              className="bg-red-600 hover:bg-red-700 text-white"
+            >
+              {translations.deleteButton}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }
 
@@ -85,9 +155,7 @@ function ConversationItem({
 
   const handleDelete = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (confirm(translations.deleteConfirm)) {
-      onDelete();
-    }
+    onDelete();
   };
 
   const formatDate = (dateString: string) => {

@@ -2,8 +2,28 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import { API_URL } from '@/lib/config';
+
+// Extract a readable error message from axios errors
+function extractErrorMessage(error: unknown): string {
+  if (axios.isAxiosError(error)) {
+    const axiosError = error as AxiosError<{ message?: string }>;
+    // Use backend error message if available
+    if (axiosError.response?.data?.message) {
+      return axiosError.response.data.message;
+    }
+    // Network error (backend unreachable)
+    if (axiosError.code === 'ERR_NETWORK' || !axiosError.response) {
+      return 'NETWORK_ERROR';
+    }
+    return axiosError.message;
+  }
+  if (error instanceof Error) {
+    return error.message;
+  }
+  return 'UNKNOWN_ERROR';
+}
 
 // ============================================
 // TYPES
@@ -114,6 +134,7 @@ export function useChat() {
   const queryClient = useQueryClient();
   const [currentConversationId, setCurrentConversationId] = useState<string | null>(null);
   const [pendingMessage, setPendingMessage] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   // Fetch conversations list
   const {
@@ -158,6 +179,7 @@ export function useChat() {
     onMutate: async ({ content }) => {
       // Optimistic update: show user message immediately
       setPendingMessage(content);
+      setErrorMessage(null);
     },
     onSuccess: () => {
       setPendingMessage(null);
@@ -165,8 +187,9 @@ export function useChat() {
       queryClient.invalidateQueries({ queryKey: ['conversation', currentConversationId] });
       queryClient.invalidateQueries({ queryKey: ['conversations'] });
     },
-    onError: () => {
+    onError: (error) => {
       setPendingMessage(null);
+      setErrorMessage(extractErrorMessage(error));
     },
   });
 
@@ -174,6 +197,8 @@ export function useChat() {
   const deleteConversationMutation = useMutation({
     mutationFn: deleteConversation,
     onSuccess: (_, deletedId) => {
+      // Remove cached conversation data so stale messages don't linger
+      queryClient.removeQueries({ queryKey: ['conversation', deletedId] });
       if (currentConversationId === deletedId) {
         setCurrentConversationId(null);
       }
@@ -230,8 +255,8 @@ export function useChat() {
     [deleteConversationMutation]
   );
 
-  // Get messages with pending message
-  const messages = currentConversation?.messages || [];
+  // Get messages with pending message (empty when no conversation selected)
+  const messages = currentConversationId ? (currentConversation?.messages || []) : [];
   const allMessages = pendingMessage
     ? [
         ...messages,
@@ -259,6 +284,8 @@ export function useChat() {
 
     // Error states
     error: sendMessageMutation.error,
+    errorMessage,
+    clearError: () => setErrorMessage(null),
 
     // Actions
     sendMessage: handleSendMessage,

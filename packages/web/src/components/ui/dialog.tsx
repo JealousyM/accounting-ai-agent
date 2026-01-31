@@ -1,6 +1,7 @@
 'use client';
 
 import * as React from 'react';
+import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -52,10 +53,11 @@ export function Dialog({ open, onOpenChange, children }: DialogProps) {
 
   if (!open) return null;
 
-  return (
+  return createPortal(
     <DialogContext.Provider value={{ open, onOpenChange }}>
       {children}
-    </DialogContext.Provider>
+    </DialogContext.Provider>,
+    document.body
   );
 }
 

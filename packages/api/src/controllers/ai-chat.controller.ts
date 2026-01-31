@@ -240,6 +240,8 @@ export class AIChatController {
         return;
       }
 
+      const errorMessage = (error as Error).message || 'Failed to process message';
+
       logger.error('Failed to send message', {
         error: error instanceof Error ? {
           message: error.message,
@@ -252,7 +254,7 @@ export class AIChatController {
       res.status(500).json({
         success: false,
         error: 'Internal Server Error',
-        message: 'Failed to process message',
+        message: errorMessage,
       });
     }
   }

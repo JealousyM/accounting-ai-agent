@@ -175,6 +175,10 @@
       "noConversations": "Brak rozmów",
       "startNewChat": "Rozpocznij nowy czat",
       "deleteConfirm": "Usunąć tę rozmowę?",
+      "deleteTitle": "Usuwanie rozmowy",
+      "deleteWarning": "Tej operacji nie można cofnąć. Wszystkie wiadomości w tej rozmowie zostaną trwale usunięte.",
+      "deleteCancel": "Anuluj",
+      "deleteButton": "Usuń",
       "yesterday": "Wczoraj",
       "messages": "wiadomości"
     },
@@ -188,7 +192,11 @@
       "emptyTitle": "Asystent Księgowy AI",
       "emptyDescription": "Zapytaj mnie o polskie podatki, księgowość, wFirma, VAT, PIT, CIT, ZUS, faktury i więcej. Mogę też uzyskać dostęp do Twoich danych w wFirma.",
       "thinking": "Myślę...",
-      "toolsUsed": "Użyto:"
+      "toolsUsed": "Użyto:",
+      "errorTitle": "Błąd",
+      "errorDefault": "Nie udało się wysłać wiadomości. Spróbuj ponownie.",
+      "errorNetwork": "Czat jest niedostępny. Sprawdź połączenie.",
+      "errorDismiss": "Zamknij"
     },
     "subscriptionWelcome": {
       "title": "Witaj w Accounting AI Agent!",

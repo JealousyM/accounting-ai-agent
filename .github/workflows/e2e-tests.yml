@@ -1,12 +1,7 @@
 name: E2E Tests
 
 on:
-  push:
-    branches: [main, development]
-  pull_request:
-    branches: [main, development]
-  schedule:
-    - cron: '0 2 * * *' # Run daily at 2 AM
+  workflow_dispatch: # Manual run only
 
 env:
   NODE_VERSION: '18'
