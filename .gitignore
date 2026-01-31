@@ -18,6 +18,7 @@ out/
 .env
 .env.local
 .env.*.local
+.env.production
 
 # IDE
 .vscode/
@@ -35,3 +36,4 @@ Thumbs.db
 .claude/
 .tmp-files/
 test-results/
+.env.production.example
