@@ -30,10 +30,10 @@ $DC -f "$COMPOSE_FILE" --env-file "$ENV_FILE" restart nginx
 sleep 3
 
 echo "=== Running database migrations ==="
-$DC -f "$COMPOSE_FILE" exec -T api npx prisma migrate deploy || echo "No pending migrations"
+$DC -f "$COMPOSE_FILE" --env-file "$ENV_FILE" exec -T api npx prisma migrate deploy
 
 echo "=== Health checks ==="
-API_STATUS=$($DC -f "$COMPOSE_FILE" exec -T api node -e "
+API_STATUS=$($DC -f "$COMPOSE_FILE" --env-file "$ENV_FILE" exec -T api node -e "
   const http = require('http');
   http.get('http://localhost:3001/health', (r) => {
     let d=''; r.on('data', c => d+=c); r.on('end', () => { console.log(d); process.exit(r.statusCode===200?0:1); });
