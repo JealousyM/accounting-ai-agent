@@ -11,6 +11,10 @@ services:
     volumes:
       - postgres_data_prod:/var/lib/postgresql/data
     restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 1G
     networks:
       - accounting-network
 
@@ -18,6 +22,10 @@ services:
     image: redis:7-alpine
     container_name: accounting-redis-prod
     restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 256M
     networks:
       - accounting-network
 
@@ -30,12 +38,35 @@ services:
       NODE_ENV: production
       PORT: 3001
       DATABASE_URL: ${DATABASE_URL}
-      REDIS_URL: redis://redis:6379
+      REDIS_URL: ${REDIS_URL}
       JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRY: ${JWT_EXPIRY}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
+      REFRESH_TOKEN_EXPIRY: ${REFRESH_TOKEN_EXPIRY}
+      SESSION_SECRET: ${SESSION_SECRET}
+      CREDENTIALS_ENCRYPTION_KEY: ${CREDENTIALS_ENCRYPTION_KEY}
+      FRONTEND_URL: ${FRONTEND_URL}
+      BACKEND_URL: ${BACKEND_URL}
+      CORS_ORIGIN: ${CORS_ORIGIN}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
+      GITHUB_CLIENT_ID: ${GITHUB_CLIENT_ID:-}
+      GITHUB_CLIENT_SECRET: ${GITHUB_CLIENT_SECRET:-}
+      WFIRMA_APP_KEY: ${WFIRMA_APP_KEY:-}
+      WFIRMA_COMPANY_ID: ${WFIRMA_COMPANY_ID:-}
+      WFIRMA_API_URL: ${WFIRMA_API_URL:-https://api2.wfirma.pl}
+      DEFAULT_LLM_PROVIDER: ${DEFAULT_LLM_PROVIDER:-openai}
+      DEFAULT_LLM_API_KEY: ${DEFAULT_LLM_API_KEY:-}
+      DEFAULT_LLM_MODEL: ${DEFAULT_LLM_MODEL:-gpt-4o}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
     depends_on:
       - postgres
       - redis
     restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 1G
     networks:
       - accounting-network
 
@@ -43,13 +74,27 @@ services:
     build:
       context: .
       dockerfile: packages/web/Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: ""
+        NEXT_PUBLIC_APP_NAME: ${NEXT_PUBLIC_APP_NAME:-Eksiegowy AI}
+        NEXT_PUBLIC_GOOGLE_CLIENT_ID: ${NEXT_PUBLIC_GOOGLE_CLIENT_ID:-}
+        NEXT_PUBLIC_GITHUB_CLIENT_ID: ${NEXT_PUBLIC_GITHUB_CLIENT_ID:-}
     container_name: accounting-web-prod
     environment:
       NODE_ENV: production
+      HOSTNAME: 0.0.0.0
+      PORT: 3000
       NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
+      NEXT_PUBLIC_APP_NAME: ${NEXT_PUBLIC_APP_NAME:-Eksiegowy AI}
+      NEXT_PUBLIC_GOOGLE_CLIENT_ID: ${NEXT_PUBLIC_GOOGLE_CLIENT_ID:-}
+      NEXT_PUBLIC_GITHUB_CLIENT_ID: ${NEXT_PUBLIC_GITHUB_CLIENT_ID:-}
     depends_on:
       - api
     restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 512M
     networks:
       - accounting-network
 
@@ -61,10 +106,15 @@ services:
       - "443:443"
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - /etc/letsencrypt:/etc/letsencrypt:ro
     depends_on:
       - web
       - api
     restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 128M
     networks:
       - accounting-network
 

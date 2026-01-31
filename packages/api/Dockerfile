@@ -24,6 +24,8 @@ RUN npm run build
 # Production stage
 FROM node:20-alpine
 
+RUN apk add --no-cache openssl
+
 WORKDIR /app
 
 # Copy package files and lock file
@@ -36,9 +38,9 @@ RUN --mount=type=cache,target=/root/.npm \
 # Copy built files
 COPY --from=builder /app/packages/api/dist ./dist
 
-# Copy Prisma schema and generated client
+# Copy Prisma schema and generate client for this platform
 COPY --from=builder /app/packages/api/prisma ./prisma
-COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
+RUN npx prisma generate
 
 # Expose port
 EXPOSE 3001
