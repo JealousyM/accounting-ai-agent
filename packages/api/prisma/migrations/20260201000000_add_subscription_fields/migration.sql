@@ -18,7 +18,6 @@ ALTER TABLE "users" ADD COLUMN "wfirmaRequestsUsed" INTEGER NOT NULL DEFAULT 0;
 ALTER TABLE "users" ADD COLUMN "wfirmaRequestsLimit" INTEGER NOT NULL DEFAULT 30;
 ALTER TABLE "users" ADD COLUMN "wfirmaRequestsResetAt" TIMESTAMP(3);
 ALTER TABLE "users" ADD COLUMN "useOwnLLMKey" BOOLEAN NOT NULL DEFAULT false;
-ALTER TABLE "users" ADD COLUMN "isFirstLogin" BOOLEAN NOT NULL DEFAULT true;
 
 -- CreateIndex
 CREATE UNIQUE INDEX "users_stripeCustomerId_key" ON "users"("stripeCustomerId");
