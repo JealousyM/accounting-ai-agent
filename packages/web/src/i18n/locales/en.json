@@ -175,6 +175,10 @@
       "noConversations": "No conversations yet",
       "startNewChat": "Start a new chat to begin",
       "deleteConfirm": "Delete this conversation?",
+      "deleteTitle": "Delete Conversation",
+      "deleteWarning": "This action cannot be undone. All messages in this conversation will be permanently deleted.",
+      "deleteCancel": "Cancel",
+      "deleteButton": "Delete",
       "yesterday": "Yesterday",
       "messages": "messages"
     },
@@ -188,7 +192,11 @@
       "emptyTitle": "AI Accounting Assistant",
       "emptyDescription": "Ask me anything about Polish taxes, accounting, wFirma, VAT, PIT, CIT, ZUS, invoices, and more. I can also access your wFirma data.",
       "thinking": "Thinking...",
-      "toolsUsed": "Used:"
+      "toolsUsed": "Used:",
+      "errorTitle": "Error",
+      "errorDefault": "Failed to send message. Please try again.",
+      "errorNetwork": "Chat service is unavailable. Please check your connection.",
+      "errorDismiss": "Dismiss"
     },
     "subscriptionWelcome": {
       "title": "Welcome to Accounting AI Agent!",

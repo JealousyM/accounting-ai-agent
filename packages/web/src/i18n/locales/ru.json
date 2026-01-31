@@ -175,6 +175,10 @@
       "noConversations": "Пока нет разговоров",
       "startNewChat": "Начните новый чат",
       "deleteConfirm": "Удалить этот разговор?",
+      "deleteTitle": "Удаление разговора",
+      "deleteWarning": "Это действие нельзя отменить. Все сообщения в этом разговоре будут безвозвратно удалены.",
+      "deleteCancel": "Отмена",
+      "deleteButton": "Удалить",
       "yesterday": "Вчера",
       "messages": "сообщений"
     },
@@ -188,7 +192,11 @@
       "emptyTitle": "ИИ Бухгалтерский ассистент",
       "emptyDescription": "Спросите меня о польских налогах, бухгалтерии, wFirma, НДС, PIT, CIT, ZUS, счетах и многом другом. Я также могу получить доступ к вашим данным в wFirma.",
       "thinking": "Думаю...",
-      "toolsUsed": "Использовано:"
+      "toolsUsed": "Использовано:",
+      "errorTitle": "Ошибка",
+      "errorDefault": "Не удалось отправить сообщение. Попробуйте ещё раз.",
+      "errorNetwork": "Чат недоступен. Проверьте подключение.",
+      "errorDismiss": "Закрыть"
     },
     "subscriptionWelcome": {
       "title": "Добро пожаловать в Accounting AI Agent!",

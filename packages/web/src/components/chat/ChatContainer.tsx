@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { MessageSquarePlus, X, DollarSign, Crown } from 'lucide-react';
+import { MessageSquarePlus, X, DollarSign, Crown, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { AppVersion } from '@/components/ui/app-version';
 import Link from 'next/link';
@@ -35,6 +35,8 @@ export function ChatContainer() {
     isLoadingConversations,
     isLoadingConversation,
     isCreatingConversation,
+    errorMessage,
+    clearError,
     sendMessage,
     createConversation,
     selectConversation,
@@ -238,6 +240,32 @@ export function ChatContainer() {
             suggestionsTranslations={t.suggestions}
           />
         </div>
+
+        {/* Error message */}
+        {errorMessage && (
+          <div className="mx-4 mb-2 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg flex items-start gap-3">
+            <AlertTriangle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium text-red-800 dark:text-red-300">
+                {t.messages.errorTitle || 'Error'}
+              </p>
+              <p className="text-sm text-red-700 dark:text-red-400 mt-0.5">
+                {errorMessage === 'NETWORK_ERROR'
+                  ? (t.messages.errorNetwork || 'Chat service is unavailable. Please check your connection.')
+                  : errorMessage === 'UNKNOWN_ERROR'
+                    ? (t.messages.errorDefault || 'Failed to send message. Please try again.')
+                    : errorMessage}
+              </p>
+            </div>
+            <button
+              onClick={clearError}
+              className="flex-shrink-0 p-1 text-red-400 hover:text-red-600 dark:hover:text-red-300 rounded transition-colors"
+              aria-label={t.messages.errorDismiss || 'Dismiss'}
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+        )}
 
         {/* Input */}
         <ChatInput

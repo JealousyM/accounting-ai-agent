@@ -9,6 +9,10 @@ const defaultTranslations = {
   deleteConfirm: 'Are you sure you want to delete this conversation?',
   yesterday: 'Yesterday',
   messages: 'messages',
+  deleteTitle: 'Delete conversation',
+  deleteWarning: 'This action cannot be undone.',
+  deleteCancel: 'Cancel',
+  deleteButton: 'Delete',
 };
 
 const mockConversations = [
@@ -247,6 +251,10 @@ export const PolishTranslations: Story = {
       deleteConfirm: 'Czy na pewno chcesz usunac te rozmowe?',
       yesterday: 'Wczoraj',
       messages: 'wiadomosci',
+      deleteTitle: 'Usun rozmowe',
+      deleteWarning: 'Tej operacji nie mozna cofnac.',
+      deleteCancel: 'Anuluj',
+      deleteButton: 'Usun',
     },
   },
 };
