@@ -32,29 +32,32 @@ export class TelegramNotificationService {
     }
   }
 
-  notifyNewUser(email: string, firstName: string, provider?: string): void {
+  notifyNewUser(email: string, firstName: string, provider?: string, plan?: string): void {
     const method = provider || 'email';
+    const planName = plan === 'pro' ? 'Pro' : 'Free';
     const text =
-      `<b>New user registered</b>\n` +
+      `<b>New user registered in eKsiegowyAi.pl</b>\n` +
       `Email: ${email}\n` +
       `Name: ${firstName}\n` +
-      `Method: ${method}`;
+      `Method: ${method}\n` +
+      `Plan: ${planName}`;
 
     this.sendMessage(text).catch(() => {});
   }
 
   notifySubscriptionChanged(email: string, plan: string): void {
+    const planName = plan === 'pro' ? 'Pro' : plan === 'free' ? 'Free' : plan;
     const text =
-      `<b>Subscription upgraded</b>\n` +
+      `<b>Subscription changed in eKsiegowyAi.pl</b>\n` +
       `Email: ${email}\n` +
-      `Plan: ${plan}`;
+      `Plan: ${planName}`;
 
     this.sendMessage(text).catch(() => {});
   }
 
   notifySubscriptionCanceled(email: string): void {
     const text =
-      `<b>Subscription canceled</b>\n` +
+      `<b>Subscription canceled in eKsiegowyAi.pl</b>\n` +
       `Email: ${email}`;
 
     this.sendMessage(text).catch(() => {});
