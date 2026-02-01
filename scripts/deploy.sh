@@ -32,9 +32,6 @@ sleep 3
 echo "=== Running database migrations ==="
 $DC -f "$COMPOSE_FILE" --env-file "$ENV_FILE" exec -T api npx prisma migrate deploy
 
-echo "=== Seeding help topics ==="
-$DC -f "$COMPOSE_FILE" --env-file "$ENV_FILE" exec -T api npx prisma db seed
-
 echo "=== Health checks ==="
 API_STATUS=$($DC -f "$COMPOSE_FILE" --env-file "$ENV_FILE" exec -T api node -e "
   const http = require('http');

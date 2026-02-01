@@ -17,6 +17,7 @@ import webhookRoutes from './routes/webhook.routes';
 import { globalRateLimiter } from './middleware/rate-limiter.middleware';
 import { errorHandler, notFoundHandler } from './middleware/error-handler.middleware';
 import { logger } from './utils/logger';
+import { seedHelpTopicsIfEmpty } from './services/help-seed.service';
 
 const app: Application = express();
 const PORT = process.env.PORT || 3011;
@@ -91,9 +92,12 @@ app.use(notFoundHandler);
 app.use(errorHandler);
 
 // Start server
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
   logger.info(`🚀 API Server running on port ${PORT}`);
   logger.info(`📝 Environment: ${process.env.NODE_ENV}`);
+
+  // Auto-seed help topics if table is empty
+  await seedHelpTopicsIfEmpty();
 });
 
 export default app;
