@@ -18,3 +18,8 @@ body {
   color: rgb(var(--foreground-rgb));
   background: rgb(var(--background-rgb));
 }
+
+/* Prevent mobile browser pull-to-refresh and overscroll bounce */
+html, body {
+  overscroll-behavior: none;
+}

@@ -100,7 +100,7 @@ export function ChatContainer() {
   };
 
   return (
-    <div className="flex h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="flex h-dvh bg-gray-50 dark:bg-gray-900">
       {/* Mobile sidebar overlay */}
       {isSidebarOpen && (
         <div
