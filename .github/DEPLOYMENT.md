@@ -23,6 +23,10 @@ FRONTEND_URL=https://your-domain.com
 BACKEND_URL=https://api.your-domain.com
 CORS_ORIGIN=https://your-domain.com
 NODE_ENV=production
+
+# Telegram Notifications (optional)
+TELEGRAM_BOT_TOKEN=your-bot-token
+TELEGRAM_CHAT_ID=your-chat-id
 ```
 
 #### Staging Environment
@@ -35,6 +39,10 @@ FRONTEND_URL=https://staging.your-domain.com
 BACKEND_URL=https://api-staging.your-domain.com
 CORS_ORIGIN=https://staging.your-domain.com
 NODE_ENV=staging
+
+# Telegram Notifications (optional)
+TELEGRAM_BOT_TOKEN=your-bot-token
+TELEGRAM_CHAT_ID=your-chat-id
 ```
 
 ### 3. Deployment Secrets

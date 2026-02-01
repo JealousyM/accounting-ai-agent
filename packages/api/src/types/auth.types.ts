@@ -29,6 +29,7 @@ export interface TokenPair {
  */
 export interface OAuthTokenPair extends TokenPair {
   needsProfileCompletion: boolean;
+  isNewUser: boolean;
 }
 
 // ============================================

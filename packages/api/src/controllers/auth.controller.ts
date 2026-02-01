@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { authService } from '../services/auth.service';
 import { credentialsService } from '../services/credentials.instance';
 import { emailService } from '../services/email.service';
+import { telegramService } from '../services/telegram.instance';
 import { prisma } from '../lib/prisma';
 import { logger } from '../utils/logger';
 
@@ -90,6 +91,7 @@ export class AuthController {
       if (user?.email && user?.firstName) {
         emailService.sendWelcomeEmail(user.email, user.firstName, user.locale || 'en')
           .catch((err) => logger.warn('Failed to send welcome email', { email: user.email, error: err }));
+        telegramService.notifyNewUser(user.email, user.firstName, 'email');
       }
 
       res.status(201).json({
@@ -506,6 +508,10 @@ export class AuthController {
 
       logger.info('Google OAuth successful', { email: profile.email });
 
+      if (tokens.isNewUser) {
+        telegramService.notifyNewUser(profile.email, profile.name || profile.email, 'google');
+      }
+
       res.status(200).json({
         success: true,
         message: 'OAuth authentication successful',
@@ -545,6 +551,10 @@ export class AuthController {
       const tokens = await authService.findOrCreateOAuthUser(profile);
 
       logger.info('GitHub OAuth successful', { email: profile.email });
+
+      if (tokens.isNewUser) {
+        telegramService.notifyNewUser(profile.email, profile.name || profile.email, 'github');
+      }
 
       res.status(200).json({
         success: true,
@@ -854,6 +864,10 @@ export class AuthController {
       const tokens = await authService.findOrCreateOAuthUser(profile, locale);
 
       logger.info('GitHub OAuth callback successful', { email: profile.email });
+
+      if (tokens.isNewUser) {
+        telegramService.notifyNewUser(profile.email, profile.name || profile.email, 'github');
+      }
 
       res.status(200).json({
         success: true,
