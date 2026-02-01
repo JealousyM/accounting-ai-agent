@@ -11,6 +11,7 @@ import {
   PricingPlan,
 } from '../types/subscription.types';
 import { CredentialsService } from './credentials.service';
+import { telegramService } from './telegram.instance';
 import { logger } from '../utils/logger';
 
 export class SubscriptionService {
@@ -193,7 +194,7 @@ export class SubscriptionService {
     const stripe = getStripeClient();
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
-      select: { stripeSubscriptionId: true },
+      select: { stripeSubscriptionId: true, email: true },
     });
 
     if (!user?.stripeSubscriptionId) {
@@ -208,6 +209,8 @@ export class SubscriptionService {
       where: { id: userId },
       data: { cancelAtPeriodEnd: true },
     });
+
+    telegramService.notifySubscriptionCanceled(user.email);
   }
 
   /**
@@ -310,6 +313,8 @@ export class SubscriptionService {
       },
     });
 
+    telegramService.notifySubscriptionCanceled(user.email);
+
     logger.info('[Subscription] Subscription deleted, reverted to free', { userId: user.id });
   }
 
@@ -358,7 +363,7 @@ export class SubscriptionService {
       cancelAtPeriodEnd: subscription.cancel_at_period_end,
     });
 
-    await this.prisma.user.update({
+    const user = await this.prisma.user.update({
       where: { id: userId },
       data: {
         subscriptionPlan: 'pro',
@@ -368,6 +373,8 @@ export class SubscriptionService {
         cancelAtPeriodEnd: subscription.cancel_at_period_end,
       },
     });
+
+    telegramService.notifySubscriptionChanged(user.email, 'pro');
 
     // Auto-provision default LLM credentials for PRO users
     await this.provisionDefaultLLMCredentials(userId);

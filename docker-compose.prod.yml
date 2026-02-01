@@ -59,6 +59,8 @@ services:
       DEFAULT_LLM_API_KEY: ${DEFAULT_LLM_API_KEY:-}
       DEFAULT_LLM_MODEL: ${DEFAULT_LLM_MODEL:-gpt-4o}
       LOG_LEVEL: ${LOG_LEVEL:-info}
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:-}
+      TELEGRAM_CHAT_ID: ${TELEGRAM_CHAT_ID:-}
     depends_on:
       - postgres
       - redis

@@ -49,6 +49,8 @@ services:
       - FRONTEND_URL=${FRONTEND_URL:-https://staging.your-domain.com}
       - BACKEND_URL=${BACKEND_URL:-https://api-staging.your-domain.com}
       - CORS_ORIGIN=${CORS_ORIGIN:-https://staging.your-domain.com}
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN:-}
+      - TELEGRAM_CHAT_ID=${TELEGRAM_CHAT_ID:-}
     ports:
       - "3002:3001"
     depends_on:

@@ -58,6 +58,7 @@ export interface TokenPair {
 
 export interface OAuthTokenPair extends TokenPair {
   needsProfileCompletion: boolean;
+  isNewUser: boolean;
 }
 
 export interface RegisterInput {
@@ -265,6 +266,8 @@ export class AuthService {
       where: whereClause,
     });
 
+    let isNewUser = false;
+
     // If not found, try to find by email
     if (!user) {
       user = await prisma.user.findUnique({
@@ -282,6 +285,7 @@ export class AuthService {
 
     // If still not found, create new user
     if (!user) {
+      isNewUser = true;
       const nameParts = validated.name?.split(' ') || [];
       const firstName = nameParts[0] || validated.email.split('@')[0];
       const lastName = nameParts.slice(1).join(' ') || '';
@@ -310,6 +314,7 @@ export class AuthService {
     return {
       ...tokens,
       needsProfileCompletion,
+      isNewUser,
     };
   }
 
