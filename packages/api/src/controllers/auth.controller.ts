@@ -91,7 +91,7 @@ export class AuthController {
       if (user?.email && user?.firstName) {
         emailService.sendWelcomeEmail(user.email, user.firstName, user.locale || 'en')
           .catch((err) => logger.warn('Failed to send welcome email', { email: user.email, error: err }));
-        telegramService.notifyNewUser(user.email, user.firstName, 'email');
+        telegramService.notifyNewUser(user.email, user.firstName, 'email', req.body.subscribeToPro ? 'pro' : 'free');
       }
 
       res.status(201).json({
