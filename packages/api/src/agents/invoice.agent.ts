@@ -475,7 +475,8 @@ export class InvoiceAgent extends BaseAgent {
           return this.formatSendResult(result, invoice, locale);
         } catch (error) {
           logger.error('Failed to send invoice', { error, userId, invoiceNumber });
-          return `Error: ${t.errorSend}`;
+          const reason = error instanceof Error ? error.message : String(error);
+          return `Error: ${t.errorSend}\n\n${reason}`;
         }
       },
       {

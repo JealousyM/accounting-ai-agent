@@ -151,7 +151,8 @@ export function createSendInvoiceTool(
         return `✅ **${t.invoiceSent}**\n\n- Invoice: ${invoice.invoiceNumber}\n- Contractor: ${invoice.contractorName}\n- Email: ${result.email || 'contractor email'}`;
       } catch (error) {
         logger.error('Failed to send invoice', { error, userId, invoiceNumber });
-        return `Error: ${getInvoiceTranslations(locale).errorSend}`;
+        const reason = error instanceof Error ? error.message : String(error);
+        return `Error: ${getInvoiceTranslations(locale).errorSend}\n\n${reason}`;
       }
     },
     {
