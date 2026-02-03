@@ -99,7 +99,7 @@ export function CostChart({ data, isLoading, translations = DEFAULT_TRANSLATIONS
               strokeWidth={2}
               dot={{ r: 3, fill: '#3b82f6' }}
               activeDot={{ r: 5, fill: '#2563eb' }}
-              name="Cost (PLN)"
+              name="Cost (USD)"
             />
           </LineChart>
         </ResponsiveContainer>
