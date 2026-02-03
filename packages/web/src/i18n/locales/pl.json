@@ -243,7 +243,19 @@
       "rateSlow": "Wolno",
       "rateNormal": "Normalnie",
       "rateFast": "Szybko",
-      "notSupported": "Synteza mowy nie jest obsługiwana w tej przeglądarce"
+      "notSupported": "Synteza mowy nie jest obsługiwana w tej przeglądarce",
+      "useAI": "Użyj głosu AI",
+      "useAIHint": "Wyższa jakość głosu z OpenAI",
+      "aiVoice": "Głos",
+      "noApiKey": "Najpierw skonfiguruj klucz API OpenAI",
+      "voices": {
+        "nova": "Nova (Kobieta)",
+        "alloy": "Alloy (Neutralny)",
+        "echo": "Echo (Mężczyzna)",
+        "fable": "Fable (Brytyjski)",
+        "onyx": "Onyx (Niski)",
+        "shimmer": "Shimmer (Delikatny)"
+      }
     },
     "aiCosts": "Koszty AI"
   },

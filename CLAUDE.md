@@ -55,6 +55,7 @@ routes/      → controllers/      → services/      → Prisma/Redis
 - **WFirmaCacheService** - PostgreSQL caching layer (TTL-based)
 - **AIChatService** - LangChain/LangGraph AI with tool calling
 - **AuthService** - JWT + OAuth (Google, GitHub)
+- **TTSService** - Text-to-speech via OpenAI TTS API
 
 ### Frontend Structure (packages/web/src/)
 - `app/` - Next.js App Router pages
@@ -85,13 +86,14 @@ Web requires `.env.local` with: NEXT_PUBLIC_API_URL
 - wFirma responses cached in PostgreSQL with configurable TTL
 - AI tools return localized markdown (auto-detect user language)
 - Protected routes via AuthContext + JWT middleware
-- Text-to-speech via Web Speech API (TTSContext, useTextToSpeech hook)
+- Text-to-speech via Web Speech API or OpenAI TTS (TTSContext, useTextToSpeech hook)
 - Voice input via Web Speech Recognition API (useVoiceDictation hook)
+- OpenAI TTS: higher quality voices (Nova, Alloy, Echo, etc.) when user has OpenAI key
 
 ## Documentation
 
 Detailed docs in `packages/api/docs/` (API.md, ARCHITECTURE.md, AUTH_API.md)
-Service docs: `packages/api/src/services/README.wfirma.md`, `README.cache.md`
+Service docs: `packages/api/src/services/README.wfirma.md`, `README.cache.md`, `README.tts.md`
 
 ## Claude Code Subagents
 

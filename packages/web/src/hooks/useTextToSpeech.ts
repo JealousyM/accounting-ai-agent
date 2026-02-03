@@ -9,7 +9,9 @@ export type TTSErrorCode =
   | 'no-voices'
   | 'synthesis-failed'
   | 'cancelled'
-  | 'unknown';
+  | 'unknown'
+  | 'PLAYBACK_ERROR'
+  | 'AI_TTS_ERROR';
 
 export interface TTSError {
   code: TTSErrorCode;

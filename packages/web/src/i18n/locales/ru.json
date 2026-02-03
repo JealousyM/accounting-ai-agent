@@ -243,7 +243,19 @@
       "rateSlow": "Медленно",
       "rateNormal": "Нормально",
       "rateFast": "Быстро",
-      "notSupported": "Синтез речи не поддерживается в вашем браузере"
+      "notSupported": "Синтез речи не поддерживается в вашем браузере",
+      "useAI": "Использовать голос ИИ",
+      "useAIHint": "Более качественный голос с OpenAI",
+      "aiVoice": "Голос",
+      "noApiKey": "Сначала настройте API ключ OpenAI",
+      "voices": {
+        "nova": "Nova (Женский)",
+        "alloy": "Alloy (Нейтральный)",
+        "echo": "Echo (Мужской)",
+        "fable": "Fable (Британский)",
+        "onyx": "Onyx (Низкий)",
+        "shimmer": "Shimmer (Мягкий)"
+      }
     },
     "aiCosts": "Затраты ИИ"
   },

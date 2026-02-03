@@ -54,6 +54,7 @@ interface RequestOptions {
   timeout?: number;
   retries?: number;
   skipAuth?: boolean;
+  _hasRefreshed?: boolean; // Internal flag to prevent refresh loops
 }
 
 // ============================================
@@ -303,13 +304,13 @@ export class ApiClient {
         // Make request
         const response = await this.fetchWithTimeout(url, requestOptions, timeout);
 
-        // Handle 401 Unauthorized - try to refresh token
-        if (response.status === 401 && !skipAuth) {
+        // Handle 401 Unauthorized - try to refresh token (only once per request)
+        if (response.status === 401 && !skipAuth && !options._hasRefreshed) {
           const refreshed = await this.refreshAccessToken();
 
           if (refreshed) {
-            // Retry request with new token
-            return this.request<T>(method, path, data, options);
+            // Retry request with new token (mark as already refreshed to prevent loops)
+            return this.request<T>(method, path, data, { ...options, _hasRefreshed: true });
           } else {
             // Refresh failed - clear tokens and throw error
             this.clearTokens();
