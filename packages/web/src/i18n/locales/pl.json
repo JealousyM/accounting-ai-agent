@@ -230,6 +230,21 @@
       "ipBox": "Co to jest IP Box?",
       "zusPayment": "Kiedy płacić ZUS?"
     },
+    "tts": {
+      "play": "Przeczytaj na głos",
+      "stop": "Zatrzymaj czytanie",
+      "speaking": "Czytam...",
+      "settings": "Ustawienia głosu",
+      "enabled": "Odczyt głosowy",
+      "enabledHint": "Włącz odczytywanie odpowiedzi AI na głos",
+      "autoSpeak": "Automatyczne czytanie",
+      "autoSpeakHint": "Automatycznie czytaj nowe odpowiedzi AI",
+      "rate": "Szybkość",
+      "rateSlow": "Wolno",
+      "rateNormal": "Normalnie",
+      "rateFast": "Szybko",
+      "notSupported": "Synteza mowy nie jest obsługiwana w tej przeglądarce"
+    },
     "aiCosts": "Koszty AI"
   },
   "profile": {

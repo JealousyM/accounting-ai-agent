@@ -4,6 +4,7 @@ import React from 'react';
 import { Bot, User, Wrench } from 'lucide-react';
 import { ChatMessage } from '@/hooks/useChat';
 import { MarkdownRenderer } from '@/components/ui/markdown';
+import { TTSButton } from './TTSButton';
 
 interface ToolsTranslations {
   companyInfo: string;
@@ -15,15 +16,21 @@ interface ToolsTranslations {
   deleteContractor: string;
 }
 
+interface TTSTranslations {
+  play: string;
+  stop: string;
+}
+
 interface MessageBubbleProps {
   message: ChatMessage;
   translations: {
     toolsUsed: string;
   };
   toolsTranslations: ToolsTranslations;
+  ttsTranslations: TTSTranslations;
 }
 
-export function MessageBubble({ message, translations, toolsTranslations }: MessageBubbleProps) {
+export function MessageBubble({ message, translations, toolsTranslations, ttsTranslations }: MessageBubbleProps) {
   const isUser = message.role === 'user';
 
   const formatToolName = (name: string): string => {
@@ -109,6 +116,13 @@ export function MessageBubble({ message, translations, toolsTranslations }: Mess
             <span className="text-gray-300 dark:text-gray-600">
               {message.metadata.model}
             </span>
+          )}
+          {!isUser && (
+            <TTSButton
+              messageId={message.id}
+              content={message.content}
+              translations={ttsTranslations}
+            />
           )}
         </div>
       </div>

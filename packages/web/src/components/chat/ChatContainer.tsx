@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { MessageSquarePlus, X, DollarSign, Crown, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { AppVersion } from '@/components/ui/app-version';
@@ -15,6 +15,7 @@ import { WfirmaWelcomeModal } from '@/components/onboarding/WfirmaWelcomeModal';
 import { markFirstLoginComplete } from '@/lib/api/auth';
 import { CurrentPlanBadge, UsageWidget } from '@/components/subscription';
 import { useSubscription } from '@/hooks/useSubscription';
+import { TTSProvider, useAutoSpeak } from '@/contexts/TTSContext';
 import enTranslations from '@/i18n/locales/en.json';
 import plTranslations from '@/i18n/locales/pl.json';
 import ruTranslations from '@/i18n/locales/ru.json';
@@ -25,7 +26,7 @@ const translations = {
   ru: ruTranslations,
 };
 
-export function ChatContainer() {
+function ChatContainerInner() {
   const {
     conversations,
     currentConversation,
@@ -50,6 +51,37 @@ export function ChatContainer() {
   const t = translations[locale].chat;
   const onboardingTranslations = translations[locale].onboarding;
   const { isPro, isLoading: isLoadingSubscription } = useSubscription();
+
+  // Auto-speak functionality for new AI messages
+  const { triggerAutoSpeak, shouldAutoSpeak } = useAutoSpeak();
+  const lastMessageIdRef = useRef<string | null>(null);
+  const wasLoadingRef = useRef(false);
+
+  // Auto-speak when a new AI message arrives (after loading completes)
+  useEffect(() => {
+    if (!shouldAutoSpeak) return;
+
+    // Track loading state transitions
+    if (isLoading) {
+      wasLoadingRef.current = true;
+      return;
+    }
+
+    // When loading completes and we were loading before
+    if (wasLoadingRef.current && messages.length > 0) {
+      wasLoadingRef.current = false;
+      const lastMessage = messages[messages.length - 1];
+
+      // Only speak new assistant messages
+      if (
+        lastMessage.role === 'assistant' &&
+        lastMessage.id !== lastMessageIdRef.current
+      ) {
+        lastMessageIdRef.current = lastMessage.id;
+        triggerAutoSpeak(lastMessage.content, lastMessage.id);
+      }
+    }
+  }, [messages, isLoading, shouldAutoSpeak, triggerAutoSpeak]);
 
   // Check for wFirma welcome modal flag on mount
   useEffect(() => {
@@ -197,6 +229,7 @@ export function ChatContainer() {
           profileTranslations={translations[locale].profile}
           apiCredentialsTranslations={translations[locale].apiCredentials}
           helpTranslations={translations[locale].help}
+          ttsTranslations={t.tts}
           locale={locale}
           onLocaleChange={setLocale}
         />
@@ -242,6 +275,7 @@ export function ChatContainer() {
             translations={t.messages}
             toolsTranslations={t.tools}
             suggestionsTranslations={t.suggestions}
+            ttsTranslations={t.tts}
           />
         </div>
 
@@ -292,5 +326,16 @@ export function ChatContainer() {
         translations={onboardingTranslations.wfirmaWelcome}
       />
     </div>
+  );
+}
+
+// Wrap ChatContainerInner with TTSProvider
+export function ChatContainer() {
+  const { locale } = useLocale();
+
+  return (
+    <TTSProvider locale={locale}>
+      <ChatContainerInner />
+    </TTSProvider>
   );
 }

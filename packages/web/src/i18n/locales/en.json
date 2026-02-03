@@ -230,6 +230,21 @@
       "ipBox": "What is IP Box?",
       "zusPayment": "When to pay ZUS?"
     },
+    "tts": {
+      "play": "Read aloud",
+      "stop": "Stop reading",
+      "speaking": "Speaking...",
+      "settings": "Voice settings",
+      "enabled": "Voice readout",
+      "enabledHint": "Enable reading AI responses aloud",
+      "autoSpeak": "Auto-read new messages",
+      "autoSpeakHint": "Automatically read new AI responses",
+      "rate": "Speed",
+      "rateSlow": "Slow",
+      "rateNormal": "Normal",
+      "rateFast": "Fast",
+      "notSupported": "Text-to-speech is not supported in your browser"
+    },
     "aiCosts": "AI Costs"
   },
   "profile": {

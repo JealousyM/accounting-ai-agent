@@ -10,6 +10,7 @@ import { HelpButton, HelpPanel, type HelpPanelTranslations } from '@/components/
 import { ConversationDetail } from '@/hooks/useChat';
 import { useAuth } from '@/contexts/AuthContext';
 import { CurrentPlanBadge } from '@/components/subscription';
+import { TTSSettingsButton } from './TTSSettingsButton';
 
 type Locale = 'en' | 'pl' | 'ru';
 
@@ -18,6 +19,19 @@ interface HeaderTranslations {
   subtitle: string;
   newChat: string;
   logout: string;
+}
+
+interface TTSTranslations {
+  settings: string;
+  enabled: string;
+  enabledHint: string;
+  autoSpeak: string;
+  autoSpeakHint: string;
+  rate: string;
+  rateSlow: string;
+  rateNormal: string;
+  rateFast: string;
+  notSupported: string;
 }
 
 interface ChatHeaderProps {
@@ -29,6 +43,7 @@ interface ChatHeaderProps {
   profileTranslations: ProfileTranslations;
   apiCredentialsTranslations: ApiCredentialsTranslations;
   helpTranslations: HelpPanelTranslations;
+  ttsTranslations: TTSTranslations;
   locale: Locale;
   onLocaleChange: (locale: Locale) => void;
 }
@@ -48,6 +63,7 @@ export function ChatHeader({
   profileTranslations,
   apiCredentialsTranslations,
   helpTranslations,
+  ttsTranslations,
   locale,
   onLocaleChange,
 }: ChatHeaderProps) {
@@ -99,6 +115,9 @@ export function ChatHeader({
 
           {/* Help button */}
           <HelpButton onClick={() => setIsHelpPanelOpen(true)} />
+
+          {/* TTS Settings */}
+          <TTSSettingsButton translations={ttsTranslations} />
 
           {/* Theme toggle */}
           <ThemeToggle />
