@@ -243,7 +243,19 @@
       "rateSlow": "Slow",
       "rateNormal": "Normal",
       "rateFast": "Fast",
-      "notSupported": "Text-to-speech is not supported in your browser"
+      "notSupported": "Text-to-speech is not supported in your browser",
+      "useAI": "Use AI voice",
+      "useAIHint": "Higher quality voice using OpenAI",
+      "aiVoice": "Voice",
+      "noApiKey": "Configure OpenAI API key in settings first",
+      "voices": {
+        "nova": "Nova (Female)",
+        "alloy": "Alloy (Neutral)",
+        "echo": "Echo (Male)",
+        "fable": "Fable (British)",
+        "onyx": "Onyx (Deep)",
+        "shimmer": "Shimmer (Soft)"
+      }
     },
     "aiCosts": "AI Costs"
   },

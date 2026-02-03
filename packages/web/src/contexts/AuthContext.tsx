@@ -45,6 +45,10 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+// Module-level variables to prevent multiple simultaneous token refreshes
+let isRefreshing = false;
+let refreshPromise: Promise<boolean> | null = null;
+
 // ============================================
 // PROVIDER
 // ============================================
@@ -99,31 +103,43 @@ export function AuthProvider({ children }: AuthProviderProps) {
   }, []);
 
   /**
-   * Refresh access token
+   * Refresh access token (with protection against multiple simultaneous refreshes)
    */
   const refreshToken = useCallback(async (): Promise<boolean> => {
-    try {
-      const refreshTokenValue = getRefreshToken();
-      
-      if (!refreshTokenValue) {
-        return false;
-      }
+    // If already refreshing, wait for that promise
+    if (isRefreshing && refreshPromise) {
+      return refreshPromise;
+    }
 
-      const response = await axios.post(`${API_URL}/api/auth/refresh`, {
-        refreshToken: refreshTokenValue,
-      });
-
-      if (response.data.success) {
-        const { token, refreshToken: newRefreshToken } = response.data.data;
-        saveTokens(token, newRefreshToken);
-        return true;
-      }
-
-      return false;
-    } catch (error) {
-      console.error('Token refresh failed:', error);
+    const refreshTokenValue = getRefreshToken();
+    if (!refreshTokenValue) {
       return false;
     }
+
+    isRefreshing = true;
+    refreshPromise = (async () => {
+      try {
+        const response = await axios.post(`${API_URL}/api/auth/refresh`, {
+          refreshToken: refreshTokenValue,
+        });
+
+        if (response.data.success) {
+          const { token, refreshToken: newRefreshToken } = response.data.data;
+          saveTokens(token, newRefreshToken);
+          return true;
+        }
+
+        return false;
+      } catch (error) {
+        console.error('Token refresh failed:', error);
+        return false;
+      } finally {
+        isRefreshing = false;
+        refreshPromise = null;
+      }
+    })();
+
+    return refreshPromise;
   }, [getRefreshToken, saveTokens]);
 
   /**
@@ -262,7 +278,19 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   /**
    * Setup axios interceptor for automatic token refresh
+   * Note: We use refs to avoid recreating the interceptor on every render
    */
+  const refreshTokenRef = React.useRef(refreshToken);
+  const getTokenRef = React.useRef(getToken);
+  const logoutRef = React.useRef(logout);
+
+  // Keep refs up to date
+  useEffect(() => {
+    refreshTokenRef.current = refreshToken;
+    getTokenRef.current = getToken;
+    logoutRef.current = logout;
+  }, [refreshToken, getToken, logout]);
+
   useEffect(() => {
     const interceptor = axios.interceptors.response.use(
       (response) => response,
@@ -279,20 +307,18 @@ export function AuthProvider({ children }: AuthProviderProps) {
         if (error.response?.status === 401 && !originalRequest._retry) {
           originalRequest._retry = true;
 
-          const refreshed = await refreshToken();
+          const refreshed = await refreshTokenRef.current();
 
           if (refreshed) {
-            const newToken = getToken();
+            const newToken = getTokenRef.current();
             if (newToken) {
               originalRequest.headers.Authorization = `Bearer ${newToken}`;
               return axios(originalRequest);
             }
           }
 
-          // Refresh failed - logout only if user was authenticated
-          if (user) {
-            logout();
-          }
+          // Refresh failed - logout
+          logoutRef.current();
         }
 
         return Promise.reject(error);
@@ -302,7 +328,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     return () => {
       axios.interceptors.response.eject(interceptor);
     };
-  }, [refreshToken, getToken, logout, user]);
+  }, []); // Empty deps - interceptor created once
 
   const isAdmin = user?.role === 'admin';
 

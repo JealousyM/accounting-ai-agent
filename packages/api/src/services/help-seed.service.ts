@@ -806,25 +806,142 @@ You can use your own AI API key:
     order: 1,
     isFeatured: true,
   },
+  {
+    slug: 'ai-chat-text-to-speech',
+    category: 'aiChat',
+    titlePl: 'Odczyt głosowy (Text-to-Speech)',
+    titleEn: 'Voice Readout (Text-to-Speech)',
+    titleRu: 'Голосовое воспроизведение (Text-to-Speech)',
+    contentPl: `Funkcja odczytu głosowego pozwala słuchać odpowiedzi AI zamiast je czytać.
+
+## Jak włączyć
+
+1. Kliknij **ikonę głośnika** w pasku narzędzi czatu
+2. W ustawieniach włącz **"Odczyt głosowy"**
+
+## Opcje
+
+- **Automatyczne czytanie** - nowe odpowiedzi AI są automatycznie czytane na głos
+- **Szybkość** - regulacja prędkości odczytu (wolno/normalnie/szybko)
+
+## Głos AI (OpenAI TTS)
+
+Jeśli masz skonfigurowany klucz OpenAI, możesz włączyć **"Użyj głosu AI"** dla wyższej jakości:
+
+- **Nova** - kobiecy, naturalny głos
+- **Alloy** - neutralny głos
+- **Echo** - męski głos
+- **Fable** - brytyjski akcent
+- **Onyx** - niski głos
+- **Shimmer** - delikatny głos
+
+Głos AI wymaga klucza OpenAI w ustawieniach lub planu Pro.
+
+## Wskazówki
+
+- Kliknij **ikonę głośnika** przy wiadomości, aby ją przeczytać
+- Kliknij ponownie, aby zatrzymać odczyt
+- Ikona pulsuje podczas odczytu`,
+    contentEn: `Voice readout feature allows you to listen to AI responses instead of reading them.
+
+## How to enable
+
+1. Click the **speaker icon** in the chat toolbar
+2. In settings, enable **"Voice readout"**
+
+## Options
+
+- **Auto-read new messages** - new AI responses are automatically read aloud
+- **Speed** - adjust reading speed (slow/normal/fast)
+
+## AI Voice (OpenAI TTS)
+
+If you have an OpenAI key configured, you can enable **"Use AI voice"** for higher quality:
+
+- **Nova** - female, natural voice
+- **Alloy** - neutral voice
+- **Echo** - male voice
+- **Fable** - British accent
+- **Onyx** - deep voice
+- **Shimmer** - soft voice
+
+AI voice requires OpenAI key in settings or Pro plan.
+
+## Tips
+
+- Click the **speaker icon** next to a message to read it
+- Click again to stop reading
+- Icon pulses during playback`,
+    contentRu: `Функция голосового воспроизведения позволяет слушать ответы AI вместо чтения.
+
+## Как включить
+
+1. Нажмите **иконку динамика** в панели инструментов чата
+2. В настройках включите **"Голосовое воспроизведение"**
+
+## Опции
+
+- **Автоматическое чтение** - новые ответы AI автоматически читаются вслух
+- **Скорость** - регулировка скорости чтения (медленно/нормально/быстро)
+
+## Голос AI (OpenAI TTS)
+
+Если у вас настроен ключ OpenAI, можете включить **"Использовать голос AI"** для более высокого качества:
+
+- **Nova** - женский, естественный голос
+- **Alloy** - нейтральный голос
+- **Echo** - мужской голос
+- **Fable** - британский акцент
+- **Onyx** - низкий голос
+- **Shimmer** - мягкий голос
+
+Голос AI требует ключ OpenAI в настройках или план Pro.
+
+## Советы
+
+- Нажмите **иконку динамика** рядом с сообщением, чтобы его прочитать
+- Нажмите снова, чтобы остановить чтение
+- Иконка пульсирует во время воспроизведения`,
+    searchKeywordsPl: ['głos', 'czytanie', 'tts', 'mowa', 'audio', 'dźwięk', 'słuchaj', 'nova', 'openai'],
+    searchKeywordsEn: ['voice', 'speech', 'tts', 'audio', 'sound', 'listen', 'readout', 'nova', 'openai'],
+    searchKeywordsRu: ['голос', 'речь', 'ттс', 'аудио', 'звук', 'слушать', 'озвучка', 'nova', 'openai'],
+    order: 2,
+    isFeatured: false,
+  },
 ];
 
 export async function seedHelpTopicsIfEmpty(): Promise<void> {
   try {
-    const count = await prisma.helpTopic.count();
-    if (count > 0) {
-      logger.info(`Help topics already seeded (${count} topics)`);
-      return;
-    }
+    const existingCount = await prisma.helpTopic.count();
 
-    logger.info('Seeding help topics...');
+    logger.info(`Syncing help topics (existing: ${existingCount}, defined: ${helpTopics.length})...`);
+
+    let created = 0;
+    let updated = 0;
+
     for (const topic of helpTopics) {
+      const existing = await prisma.helpTopic.findUnique({
+        where: { slug: topic.slug },
+      });
+
       await prisma.helpTopic.upsert({
         where: { slug: topic.slug },
         update: topic,
         create: topic,
       });
+
+      if (existing) {
+        updated++;
+      } else {
+        created++;
+      }
     }
-    logger.info(`Seeded ${helpTopics.length} help topics`);
+
+    if (created > 0 || updated > 0) {
+      logger.info(`Help topics synced: ${created} created, ${updated} updated`);
+    } else {
+      logger.info('Help topics already up to date');
+    }
   } catch (error) {
     logger.error('Failed to seed help topics:', error);
   }
