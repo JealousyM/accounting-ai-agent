@@ -8,6 +8,7 @@ import { Locale } from '../../../i18n';
 import { WFirmaIntegrationService } from '../../wfirma';
 import { WFirmaCacheService } from '../../wfirma-cache.service';
 import { FileStorageService } from '../../file-storage.service';
+import { SubscriptionService } from '../../subscription.service';
 
 // Import tool creators
 import {
@@ -171,86 +172,87 @@ export function createAllTools(
   cacheService: WFirmaCacheService,
   fileStorageService: FileStorageService,
   userId: string,
-  locale: Locale
+  locale: Locale,
+  subscriptionService?: SubscriptionService
 ): StructuredToolInterface[] {
   return [
     // Company tools
-    createGetCompanyInfoTool(wfirmaService, cacheService, userId, locale),
-    createGetCompanyAccountsTool(wfirmaService, cacheService, userId, locale),
-    createGetCompanyAddressesTool(wfirmaService, cacheService, userId, locale),
+    createGetCompanyInfoTool(wfirmaService, cacheService, userId, locale, subscriptionService),
+    createGetCompanyAccountsTool(wfirmaService, cacheService, userId, locale, subscriptionService),
+    createGetCompanyAddressesTool(wfirmaService, cacheService, userId, locale, subscriptionService),
 
     // Financial tool
-    createGetFinancialSummaryTool(wfirmaService, cacheService, userId),
+    createGetFinancialSummaryTool(wfirmaService, cacheService, userId, subscriptionService),
 
     // Contractor tools
-    createGetContractorsTool(wfirmaService, locale),
-    createCreateContractorTool(wfirmaService, cacheService, userId, locale),
-    createUpdateContractorTool(wfirmaService, cacheService, userId, locale),
-    createDeleteContractorTool(wfirmaService, cacheService, userId, locale),
+    createGetContractorsTool(wfirmaService, locale, userId, subscriptionService),
+    createCreateContractorTool(wfirmaService, cacheService, userId, locale, subscriptionService),
+    createUpdateContractorTool(wfirmaService, cacheService, userId, locale, subscriptionService),
+    createDeleteContractorTool(wfirmaService, cacheService, userId, locale, subscriptionService),
 
     // Invoice tools
-    createGetInvoicesTool(wfirmaService, userId, locale),
-    createGetInvoiceDetailsTool(wfirmaService, userId, locale),
-    createSendInvoiceTool(wfirmaService, cacheService, userId, locale),
-    createAddInvoiceNoteTool(wfirmaService, cacheService, userId, locale),
-    createGetInvoiceNotesTool(wfirmaService, userId, locale),
-    createDeleteInvoiceNoteTool(wfirmaService, cacheService, userId, locale),
-    createDownloadInvoiceTool(wfirmaService, fileStorageService, userId, locale),
-    createCreateInvoiceTool(wfirmaService, cacheService, userId, locale),
-    createUpdateInvoiceTool(wfirmaService, cacheService, userId, locale),
-    createDeleteInvoiceTool(wfirmaService, cacheService, userId, locale),
+    createGetInvoicesTool(wfirmaService, userId, locale, subscriptionService),
+    createGetInvoiceDetailsTool(wfirmaService, userId, locale, subscriptionService),
+    createSendInvoiceTool(wfirmaService, cacheService, userId, locale, subscriptionService),
+    createAddInvoiceNoteTool(wfirmaService, cacheService, userId, locale, subscriptionService),
+    createGetInvoiceNotesTool(wfirmaService, userId, locale, subscriptionService),
+    createDeleteInvoiceNoteTool(wfirmaService, cacheService, userId, locale, subscriptionService),
+    createDownloadInvoiceTool(wfirmaService, fileStorageService, userId, locale, subscriptionService),
+    createCreateInvoiceTool(wfirmaService, cacheService, userId, locale, subscriptionService),
+    createUpdateInvoiceTool(wfirmaService, cacheService, userId, locale, subscriptionService),
+    createDeleteInvoiceTool(wfirmaService, cacheService, userId, locale, subscriptionService),
 
     // User tools
-    createGetUsersTool(wfirmaService, cacheService, userId, locale),
-    createGetUserCompaniesTool(wfirmaService, cacheService, userId, locale),
-    createGetUserCompanyByIdTool(wfirmaService, cacheService, userId, locale),
+    createGetUsersTool(wfirmaService, cacheService, userId, locale, subscriptionService),
+    createGetUserCompaniesTool(wfirmaService, cacheService, userId, locale, subscriptionService),
+    createGetUserCompanyByIdTool(wfirmaService, cacheService, userId, locale, subscriptionService),
 
     // Payment tools
-    createGetPaymentsTool(wfirmaService, userId, locale),
-    createGetPaymentDetailsTool(wfirmaService, userId, locale),
-    createAddPaymentTool(wfirmaService, cacheService, userId, locale),
-    createUpdatePaymentTool(wfirmaService, cacheService, userId, locale),
-    createDeletePaymentTool(wfirmaService, cacheService, userId, locale),
+    createGetPaymentsTool(wfirmaService, userId, locale, subscriptionService),
+    createGetPaymentDetailsTool(wfirmaService, userId, locale, subscriptionService),
+    createAddPaymentTool(wfirmaService, cacheService, userId, locale, subscriptionService),
+    createUpdatePaymentTool(wfirmaService, cacheService, userId, locale, subscriptionService),
+    createDeletePaymentTool(wfirmaService, cacheService, userId, locale, subscriptionService),
 
     // Expense tools
-    createGetExpensesTool(wfirmaService, userId, locale),
-    createGetExpenseDetailsTool(wfirmaService, userId, locale),
+    createGetExpensesTool(wfirmaService, userId, locale, subscriptionService),
+    createGetExpenseDetailsTool(wfirmaService, userId, locale, subscriptionService),
 
     // Vehicle tools
-    createGetVehiclesTool(wfirmaService, locale),
-    createGetVehicleDetailsTool(wfirmaService, locale),
-    createAddVehicleTool(wfirmaService, cacheService, userId, locale),
-    createUpdateVehicleTool(wfirmaService, cacheService, userId, locale),
-    createDeleteVehicleTool(wfirmaService, cacheService, userId, locale),
+    createGetVehiclesTool(wfirmaService, userId, locale, subscriptionService),
+    createGetVehicleDetailsTool(wfirmaService, userId, locale, subscriptionService),
+    createAddVehicleTool(wfirmaService, cacheService, userId, locale, subscriptionService),
+    createUpdateVehicleTool(wfirmaService, cacheService, userId, locale, subscriptionService),
+    createDeleteVehicleTool(wfirmaService, cacheService, userId, locale, subscriptionService),
 
     // Term tools
-    createGetTermsTool(wfirmaService, locale),
-    createGetTermDetailsTool(wfirmaService, locale),
-    createAddTermTool(wfirmaService, cacheService, userId, locale),
-    createUpdateTermTool(wfirmaService, cacheService, userId, locale),
-    createDeleteTermTool(wfirmaService, cacheService, userId, locale),
+    createGetTermsTool(wfirmaService, userId, locale, subscriptionService),
+    createGetTermDetailsTool(wfirmaService, userId, locale, subscriptionService),
+    createAddTermTool(wfirmaService, cacheService, userId, locale, subscriptionService),
+    createUpdateTermTool(wfirmaService, cacheService, userId, locale, subscriptionService),
+    createDeleteTermTool(wfirmaService, cacheService, userId, locale, subscriptionService),
 
     // Term Group tools
-    createGetTermGroupsTool(wfirmaService, locale),
-    createGetTermGroupDetailsTool(wfirmaService, locale),
-    createAddTermGroupTool(wfirmaService, cacheService, userId, locale),
-    createUpdateTermGroupTool(wfirmaService, cacheService, userId, locale),
-    createDeleteTermGroupTool(wfirmaService, cacheService, userId, locale),
+    createGetTermGroupsTool(wfirmaService, userId, locale, subscriptionService),
+    createGetTermGroupDetailsTool(wfirmaService, userId, locale, subscriptionService),
+    createAddTermGroupTool(wfirmaService, cacheService, userId, locale, subscriptionService),
+    createUpdateTermGroupTool(wfirmaService, cacheService, userId, locale, subscriptionService),
+    createDeleteTermGroupTool(wfirmaService, cacheService, userId, locale, subscriptionService),
 
     // Declaration tools
-    createGetJpkVatTool(wfirmaService, userId, locale),
-    createGetPitTool(wfirmaService, userId, locale),
+    createGetJpkVatTool(wfirmaService, userId, locale, subscriptionService),
+    createGetPitTool(wfirmaService, userId, locale, subscriptionService),
 
     // Document tools
-    createGetDocumentsTool(wfirmaService, locale),
-    createGetDocumentDetailsTool(wfirmaService, userId, locale),
-    createDownloadDocumentTool(wfirmaService, userId, locale),
-    createDeleteDocumentTool(wfirmaService, cacheService, userId, locale),
+    createGetDocumentsTool(wfirmaService, userId, locale, subscriptionService),
+    createGetDocumentDetailsTool(wfirmaService, userId, locale, subscriptionService),
+    createDownloadDocumentTool(wfirmaService, userId, locale, subscriptionService),
+    createDeleteDocumentTool(wfirmaService, cacheService, userId, locale, subscriptionService),
 
     // Ledger tools (Fiscal Years & Accounting Schemas)
-    createGetFiscalYearsTool(wfirmaService, locale),
-    createGetFiscalYearDetailsTool(wfirmaService, locale),
-    createGetAccountingSchemasTool(wfirmaService, locale),
-    createGetAccountingSchemaDetailsTool(wfirmaService, locale),
+    createGetFiscalYearsTool(wfirmaService, locale, userId, subscriptionService),
+    createGetFiscalYearDetailsTool(wfirmaService, locale, userId, subscriptionService),
+    createGetAccountingSchemasTool(wfirmaService, locale, userId, subscriptionService),
+    createGetAccountingSchemaDetailsTool(wfirmaService, locale, userId, subscriptionService),
   ];
 }

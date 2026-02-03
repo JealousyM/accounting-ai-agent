@@ -15,6 +15,8 @@ import {
   formatUserCompanies,
   formatUserCompany,
 } from '../formatters/user.formatter';
+import { SubscriptionService } from '../../subscription.service';
+import { checkWFirmaLimit, incrementWFirmaUsage } from './usage-tracking';
 
 /**
  * Tool for getting users list
@@ -23,7 +25,8 @@ export function createGetUsersTool(
   wfirmaService: WFirmaIntegrationService,
   cacheService: WFirmaCacheService,
   userId: string,
-  locale: Locale = 'pl'
+  locale: Locale = 'pl',
+  subscriptionService?: SubscriptionService
 ): StructuredToolInterface {
   const t = getUserTranslations(locale);
 
@@ -31,6 +34,9 @@ export function createGetUsersTool(
   return (tool as any)(
     async () => {
       try {
+        const limitError = await checkWFirmaLimit(subscriptionService, userId, locale);
+        if (limitError) return limitError;
+
         const cacheKey = 'all';
         const cached = await cacheService.getCachedData<WFirmaUser[]>(
           userId,
@@ -43,6 +49,7 @@ export function createGetUsersTool(
         }
 
         const users = await wfirmaService.getUsers();
+        await incrementWFirmaUsage(subscriptionService, userId);
         await cacheService.cacheData(userId, 'user', cacheKey, users);
         return formatUsers(users, locale);
       } catch (error) {
@@ -65,7 +72,8 @@ export function createGetUserCompaniesTool(
   wfirmaService: WFirmaIntegrationService,
   cacheService: WFirmaCacheService,
   userId: string,
-  locale: Locale = 'pl'
+  locale: Locale = 'pl',
+  subscriptionService?: SubscriptionService
 ): StructuredToolInterface {
   const t = getUserTranslations(locale);
 
@@ -73,6 +81,9 @@ export function createGetUserCompaniesTool(
   return (tool as any)(
     async ({ limit, page }: { limit?: number; page?: number }) => {
       try {
+        const limitError = await checkWFirmaLimit(subscriptionService, userId, locale);
+        if (limitError) return limitError;
+
         const cacheKey = `list-${limit || 100}-${page || 1}`;
         const cached = await cacheService.getCachedData<WFirmaUserCompany[]>(
           userId,
@@ -85,6 +96,7 @@ export function createGetUserCompaniesTool(
         }
 
         const userCompanies = await wfirmaService.findUserCompanies({ limit, page });
+        await incrementWFirmaUsage(subscriptionService, userId);
         await cacheService.cacheData(userId, 'user_company', cacheKey, userCompanies);
         return formatUserCompanies(userCompanies, locale);
       } catch (error) {
@@ -110,7 +122,8 @@ export function createGetUserCompanyByIdTool(
   wfirmaService: WFirmaIntegrationService,
   cacheService: WFirmaCacheService,
   userId: string,
-  locale: Locale = 'pl'
+  locale: Locale = 'pl',
+  subscriptionService?: SubscriptionService
 ): StructuredToolInterface {
   const t = getUserTranslations(locale);
 
@@ -118,6 +131,9 @@ export function createGetUserCompanyByIdTool(
   return (tool as any)(
     async ({ id }: { id: string }) => {
       try {
+        const limitError = await checkWFirmaLimit(subscriptionService, userId, locale);
+        if (limitError) return limitError;
+
         const cacheKey = id;
         const cached = await cacheService.getCachedData<WFirmaUserCompany>(
           userId,
@@ -134,6 +150,7 @@ export function createGetUserCompanyByIdTool(
           return t.userCompanyNotFound;
         }
 
+        await incrementWFirmaUsage(subscriptionService, userId);
         await cacheService.cacheData(userId, 'user_company', cacheKey, userCompany);
         return formatUserCompany(userCompany, locale);
       } catch (error) {

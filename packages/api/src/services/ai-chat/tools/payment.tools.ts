@@ -9,6 +9,8 @@ import { logger } from '../../../utils/logger';
 import { getPaymentTranslations, Locale } from '../../../i18n';
 import { WFirmaIntegrationService } from '../../wfirma';
 import { WFirmaCacheService } from '../../wfirma-cache.service';
+import { SubscriptionService } from '../../subscription.service';
+import { checkWFirmaLimit, incrementWFirmaUsage } from './usage-tracking';
 import {
   formatPaymentsList,
   formatPaymentDetails,
@@ -23,7 +25,8 @@ import {
 export function createGetPaymentsTool(
   wfirmaService: WFirmaIntegrationService,
   userId: string,
-  locale: Locale
+  locale: Locale,
+  subscriptionService?: SubscriptionService
 ): StructuredToolInterface {
   return (tool as any)(
     async ({
@@ -40,6 +43,9 @@ export function createGetPaymentsTool(
       paymentMethod?: string;
     }) => {
       try {
+        const limitError = await checkWFirmaLimit(subscriptionService, userId, locale);
+        if (limitError) return limitError;
+
         const t = getPaymentTranslations(locale);
 
         let objectId: string | undefined;
@@ -108,6 +114,8 @@ export function createGetPaymentsTool(
           })
         );
 
+        await incrementWFirmaUsage(subscriptionService, userId);
+
         return formatPaymentsList(enrichedPayments, locale);
       } catch (error) {
         logger.error('Failed to fetch payments', { error, userId });
@@ -147,11 +155,15 @@ export function createGetPaymentsTool(
 export function createGetPaymentDetailsTool(
   wfirmaService: WFirmaIntegrationService,
   userId: string,
-  locale: Locale
+  locale: Locale,
+  subscriptionService?: SubscriptionService
 ): StructuredToolInterface {
   return (tool as any)(
     async ({ paymentId }: { paymentId: string }) => {
       try {
+        const limitError = await checkWFirmaLimit(subscriptionService, userId, locale);
+        if (limitError) return limitError;
+
         let payment = await wfirmaService.getPayment(paymentId);
 
         if (!payment) {
@@ -173,6 +185,8 @@ export function createGetPaymentDetailsTool(
             });
           }
         }
+
+        await incrementWFirmaUsage(subscriptionService, userId);
 
         return formatPaymentDetails(payment, locale);
       } catch (error) {
@@ -202,7 +216,8 @@ export function createAddPaymentTool(
   wfirmaService: WFirmaIntegrationService,
   cacheService: WFirmaCacheService,
   userId: string,
-  locale: Locale
+  locale: Locale,
+  subscriptionService?: SubscriptionService
 ): StructuredToolInterface {
   return (tool as any)(
     async ({
@@ -217,6 +232,9 @@ export function createAddPaymentTool(
       paymentMethod?: string;
     }) => {
       try {
+        const limitError = await checkWFirmaLimit(subscriptionService, userId, locale);
+        if (limitError) return limitError;
+
         const t = getPaymentTranslations(locale);
 
         // Find invoice
@@ -239,6 +257,8 @@ export function createAddPaymentTool(
           date: new Date(date),
           paymentMethod: paymentMethod as any,
         });
+
+        await incrementWFirmaUsage(subscriptionService, userId);
 
         // Invalidate cache
         await cacheService.invalidateCache(userId, 'invoice');
@@ -285,7 +305,8 @@ export function createUpdatePaymentTool(
   wfirmaService: WFirmaIntegrationService,
   cacheService: WFirmaCacheService,
   userId: string,
-  locale: Locale
+  locale: Locale,
+  subscriptionService?: SubscriptionService
 ): StructuredToolInterface {
   return (tool as any)(
     async ({
@@ -300,6 +321,9 @@ export function createUpdatePaymentTool(
       paymentMethod?: string;
     }) => {
       try {
+        const limitError = await checkWFirmaLimit(subscriptionService, userId, locale);
+        if (limitError) return limitError;
+
         const t = getPaymentTranslations(locale);
 
         const updateData: any = {};
@@ -316,6 +340,8 @@ export function createUpdatePaymentTool(
           paymentId,
           updateData
         );
+
+        await incrementWFirmaUsage(subscriptionService, userId);
 
         // Invalidate cache
         await cacheService.invalidateCache(userId, 'invoice');
@@ -351,11 +377,15 @@ export function createDeletePaymentTool(
   wfirmaService: WFirmaIntegrationService,
   cacheService: WFirmaCacheService,
   userId: string,
-  locale: Locale
+  locale: Locale,
+  subscriptionService?: SubscriptionService
 ): StructuredToolInterface {
   return (tool as any)(
     async ({ paymentId }: { paymentId: string }) => {
       try {
+        const limitError = await checkWFirmaLimit(subscriptionService, userId, locale);
+        if (limitError) return limitError;
+
         const t = getPaymentTranslations(locale);
 
         // Get payment details before deleting
@@ -366,6 +396,8 @@ export function createDeletePaymentTool(
         }
 
         await wfirmaService.deletePayment(paymentId);
+
+        await incrementWFirmaUsage(subscriptionService, userId);
 
         // Invalidate cache
         await cacheService.invalidateCache(userId, 'invoice');

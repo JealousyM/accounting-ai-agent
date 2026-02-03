@@ -9,6 +9,8 @@ import { logger } from '../../../utils/logger';
 import { getTermTranslations, Locale } from '../../../i18n';
 import { WFirmaIntegrationService } from '../../wfirma';
 import { WFirmaCacheService } from '../../wfirma-cache.service';
+import { SubscriptionService } from '../../subscription.service';
+import { checkWFirmaLimit, incrementWFirmaUsage } from './usage-tracking';
 import {
   formatTermsList,
   formatTermDetails,
@@ -31,7 +33,9 @@ import {
  */
 export function createGetTermsTool(
   wfirmaService: WFirmaIntegrationService,
-  locale: Locale
+  userId: string,
+  locale: Locale,
+  subscriptionService?: SubscriptionService
 ): StructuredToolInterface {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return (tool as any)(
@@ -51,6 +55,9 @@ export function createGetTermsTool(
       limit?: number;
     }) => {
       try {
+        const limitError = await checkWFirmaLimit(subscriptionService, userId, locale);
+        if (limitError) return limitError;
+
         const terms = await wfirmaService.findTerms({
           dateFrom: dateFrom ? new Date(dateFrom) : undefined,
           dateTo: dateTo ? new Date(dateTo) : undefined,
@@ -59,6 +66,8 @@ export function createGetTermsTool(
           search,
           limit: limit || 100,
         });
+
+        await incrementWFirmaUsage(subscriptionService, userId);
 
         logger.info('Fetched terms for AI tool', { count: terms.length });
         return formatTermsList(terms, locale);
@@ -92,12 +101,17 @@ export function createGetTermsTool(
  */
 export function createGetTermDetailsTool(
   wfirmaService: WFirmaIntegrationService,
-  locale: Locale
+  userId: string,
+  locale: Locale,
+  subscriptionService?: SubscriptionService
 ): StructuredToolInterface {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return (tool as any)(
     async ({ termId }: { termId: string }) => {
       try {
+        const limitError = await checkWFirmaLimit(subscriptionService, userId, locale);
+        if (limitError) return limitError;
+
         const t = getTermTranslations(locale);
 
         if (!termId) {
@@ -109,6 +123,8 @@ export function createGetTermDetailsTool(
         if (!term) {
           return t.notFoundById;
         }
+
+        await incrementWFirmaUsage(subscriptionService, userId);
 
         return formatTermDetails(term, locale);
       } catch (error) {
@@ -135,7 +151,8 @@ export function createAddTermTool(
   wfirmaService: WFirmaIntegrationService,
   cacheService: WFirmaCacheService,
   userId: string,
-  locale: Locale
+  locale: Locale,
+  subscriptionService?: SubscriptionService
 ): StructuredToolInterface {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return (tool as any)(
@@ -157,6 +174,9 @@ export function createAddTermTool(
       contactId?: string;
     }) => {
       try {
+        const limitError = await checkWFirmaLimit(subscriptionService, userId, locale);
+        if (limitError) return limitError;
+
         const termData = {
           date: new Date(date),
           hour,
@@ -168,6 +188,8 @@ export function createAddTermTool(
         };
 
         const term = await wfirmaService.createTerm(termData);
+
+        await incrementWFirmaUsage(subscriptionService, userId);
 
         await cacheService.invalidateCache(userId, 'term');
 
@@ -215,7 +237,8 @@ export function createUpdateTermTool(
   wfirmaService: WFirmaIntegrationService,
   cacheService: WFirmaCacheService,
   userId: string,
-  locale: Locale
+  locale: Locale,
+  subscriptionService?: SubscriptionService
 ): StructuredToolInterface {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return (tool as any)(
@@ -239,6 +262,9 @@ export function createUpdateTermTool(
       contactId?: string;
     }) => {
       try {
+        const limitError = await checkWFirmaLimit(subscriptionService, userId, locale);
+        if (limitError) return limitError;
+
         const t = getTermTranslations(locale);
 
         if (!termId) {
@@ -256,6 +282,8 @@ export function createUpdateTermTool(
         if (contactId !== undefined) updateData.contactId = contactId;
 
         const term = await wfirmaService.updateTerm(termId, updateData);
+
+        await incrementWFirmaUsage(subscriptionService, userId);
 
         await cacheService.invalidateCache(userId, 'term');
 
@@ -301,12 +329,16 @@ export function createDeleteTermTool(
   wfirmaService: WFirmaIntegrationService,
   cacheService: WFirmaCacheService,
   userId: string,
-  locale: Locale
+  locale: Locale,
+  subscriptionService?: SubscriptionService
 ): StructuredToolInterface {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return (tool as any)(
     async ({ termId }: { termId: string }) => {
       try {
+        const limitError = await checkWFirmaLimit(subscriptionService, userId, locale);
+        if (limitError) return limitError;
+
         const t = getTermTranslations(locale);
 
         if (!termId) {
@@ -321,6 +353,8 @@ export function createDeleteTermTool(
         }
 
         await wfirmaService.deleteTerm(termId);
+
+        await incrementWFirmaUsage(subscriptionService, userId);
 
         await cacheService.invalidateCache(userId, 'term');
 
@@ -356,7 +390,9 @@ export function createDeleteTermTool(
  */
 export function createGetTermGroupsTool(
   wfirmaService: WFirmaIntegrationService,
-  locale: Locale
+  userId: string,
+  locale: Locale,
+  subscriptionService?: SubscriptionService
 ): StructuredToolInterface {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return (tool as any)(
@@ -368,10 +404,15 @@ export function createGetTermGroupsTool(
       limit?: number;
     }) => {
       try {
+        const limitError = await checkWFirmaLimit(subscriptionService, userId, locale);
+        if (limitError) return limitError;
+
         const termGroups = await wfirmaService.findTermGroups({
           search,
           limit: limit || 100,
         });
+
+        await incrementWFirmaUsage(subscriptionService, userId);
 
         logger.info('Fetched term groups for AI tool', { count: termGroups.length });
         return formatTermGroupsList(termGroups, locale);
@@ -398,12 +439,17 @@ export function createGetTermGroupsTool(
  */
 export function createGetTermGroupDetailsTool(
   wfirmaService: WFirmaIntegrationService,
-  locale: Locale
+  userId: string,
+  locale: Locale,
+  subscriptionService?: SubscriptionService
 ): StructuredToolInterface {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return (tool as any)(
     async ({ termGroupId }: { termGroupId: string }) => {
       try {
+        const limitError = await checkWFirmaLimit(subscriptionService, userId, locale);
+        if (limitError) return limitError;
+
         const t = getTermTranslations(locale);
 
         if (!termGroupId) {
@@ -415,6 +461,8 @@ export function createGetTermGroupDetailsTool(
         if (!termGroup) {
           return t.groupNotFoundById;
         }
+
+        await incrementWFirmaUsage(subscriptionService, userId);
 
         return formatTermGroupDetails(termGroup, locale);
       } catch (error) {
@@ -441,7 +489,8 @@ export function createAddTermGroupTool(
   wfirmaService: WFirmaIntegrationService,
   cacheService: WFirmaCacheService,
   userId: string,
-  locale: Locale
+  locale: Locale,
+  subscriptionService?: SubscriptionService
 ): StructuredToolInterface {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return (tool as any)(
@@ -453,12 +502,17 @@ export function createAddTermGroupTool(
       isReadonly?: boolean;
     }) => {
       try {
+        const limitError = await checkWFirmaLimit(subscriptionService, userId, locale);
+        if (limitError) return limitError;
+
         const termGroupData = {
           name,
           isReadonly: isReadonly || false,
         };
 
         const termGroup = await wfirmaService.createTermGroup(termGroupData);
+
+        await incrementWFirmaUsage(subscriptionService, userId);
 
         await cacheService.invalidateCache(userId, 'term_group');
 
@@ -501,7 +555,8 @@ export function createUpdateTermGroupTool(
   wfirmaService: WFirmaIntegrationService,
   cacheService: WFirmaCacheService,
   userId: string,
-  locale: Locale
+  locale: Locale,
+  subscriptionService?: SubscriptionService
 ): StructuredToolInterface {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return (tool as any)(
@@ -515,6 +570,9 @@ export function createUpdateTermGroupTool(
       isReadonly?: boolean;
     }) => {
       try {
+        const limitError = await checkWFirmaLimit(subscriptionService, userId, locale);
+        if (limitError) return limitError;
+
         const t = getTermTranslations(locale);
 
         if (!termGroupId) {
@@ -527,6 +585,8 @@ export function createUpdateTermGroupTool(
         if (isReadonly !== undefined) updateData.isReadonly = isReadonly;
 
         const termGroup = await wfirmaService.updateTermGroup(termGroupId, updateData);
+
+        await incrementWFirmaUsage(subscriptionService, userId);
 
         await cacheService.invalidateCache(userId, 'term_group');
 
@@ -564,12 +624,16 @@ export function createDeleteTermGroupTool(
   wfirmaService: WFirmaIntegrationService,
   cacheService: WFirmaCacheService,
   userId: string,
-  locale: Locale
+  locale: Locale,
+  subscriptionService?: SubscriptionService
 ): StructuredToolInterface {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return (tool as any)(
     async ({ termGroupId }: { termGroupId: string }) => {
       try {
+        const limitError = await checkWFirmaLimit(subscriptionService, userId, locale);
+        if (limitError) return limitError;
+
         const t = getTermTranslations(locale);
 
         if (!termGroupId) {
@@ -584,6 +648,8 @@ export function createDeleteTermGroupTool(
         }
 
         await wfirmaService.deleteTermGroup(termGroupId);
+
+        await incrementWFirmaUsage(subscriptionService, userId);
 
         await cacheService.invalidateCache(userId, 'term_group');
 

@@ -19,6 +19,8 @@ import {
   formatCompanyAccounts,
   formatCompanyAddresses,
 } from '../formatters';
+import { SubscriptionService } from '../../subscription.service';
+import { checkWFirmaLimit, incrementWFirmaUsage } from './usage-tracking';
 
 /**
  * Tool for getting company basic information
@@ -27,7 +29,8 @@ export function createGetCompanyInfoTool(
   wfirmaService: WFirmaIntegrationService,
   cacheService: WFirmaCacheService,
   userId: string,
-  locale: Locale = 'pl'
+  locale: Locale = 'pl',
+  subscriptionService?: SubscriptionService
 ): StructuredToolInterface {
   const t = getCompanyTranslations(locale);
 
@@ -35,6 +38,9 @@ export function createGetCompanyInfoTool(
   return (tool as any)(
     async () => {
       try {
+        const limitError = await checkWFirmaLimit(subscriptionService, userId, locale);
+        if (limitError) return limitError;
+
         const cached = await cacheService.getCachedData<WFirmaCompany>(
           userId,
           'company',
@@ -47,6 +53,7 @@ export function createGetCompanyInfoTool(
 
         const companyData = await wfirmaService.getCompanyData();
         await cacheService.cacheData(userId, 'company', 'default', companyData);
+        await incrementWFirmaUsage(subscriptionService, userId);
         return formatCompanyInfo(companyData, locale);
       } catch (error) {
         logger.error('Failed to get company info', { error });
@@ -68,7 +75,8 @@ export function createGetCompanyAccountsTool(
   wfirmaService: WFirmaIntegrationService,
   cacheService: WFirmaCacheService,
   userId: string,
-  locale: Locale = 'pl'
+  locale: Locale = 'pl',
+  subscriptionService?: SubscriptionService
 ): StructuredToolInterface {
   const t = getCompanyTranslations(locale);
 
@@ -76,6 +84,9 @@ export function createGetCompanyAccountsTool(
   return (tool as any)(
     async () => {
       try {
+        const limitError = await checkWFirmaLimit(subscriptionService, userId, locale);
+        if (limitError) return limitError;
+
         const cacheKey = 'accounts';
         const cached = await cacheService.getCachedData<WFirmaCompanyAccount[]>(
           userId,
@@ -89,6 +100,7 @@ export function createGetCompanyAccountsTool(
 
         const accounts = await wfirmaService.getCompanyAccounts();
         await cacheService.cacheData(userId, 'company', cacheKey, accounts);
+        await incrementWFirmaUsage(subscriptionService, userId);
         return formatCompanyAccounts(accounts, locale);
       } catch (error) {
         logger.error('Failed to get company accounts', { error });
@@ -110,7 +122,8 @@ export function createGetCompanyAddressesTool(
   wfirmaService: WFirmaIntegrationService,
   cacheService: WFirmaCacheService,
   userId: string,
-  locale: Locale = 'pl'
+  locale: Locale = 'pl',
+  subscriptionService?: SubscriptionService
 ): StructuredToolInterface {
   const t = getCompanyTranslations(locale);
 
@@ -118,6 +131,9 @@ export function createGetCompanyAddressesTool(
   return (tool as any)(
     async () => {
       try {
+        const limitError = await checkWFirmaLimit(subscriptionService, userId, locale);
+        if (limitError) return limitError;
+
         const cacheKey = 'addresses';
         const cached = await cacheService.getCachedData<WFirmaCompanyAddress[]>(
           userId,
@@ -131,6 +147,7 @@ export function createGetCompanyAddressesTool(
 
         const addresses = await wfirmaService.getCompanyAddresses();
         await cacheService.cacheData(userId, 'company', cacheKey, addresses);
+        await incrementWFirmaUsage(subscriptionService, userId);
         return formatCompanyAddresses(addresses, locale);
       } catch (error) {
         logger.error('Failed to get company addresses', { error });

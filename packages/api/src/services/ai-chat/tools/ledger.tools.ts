@@ -8,6 +8,8 @@ import { z } from 'zod';
 import { logger } from '../../../utils/logger';
 import { getLedgerTranslations, Locale } from '../../../i18n';
 import { WFirmaIntegrationService, WFirmaError } from '../../wfirma';
+import { SubscriptionService } from '../../subscription.service';
+import { checkWFirmaLimit, incrementWFirmaUsage } from './usage-tracking';
 import {
   formatFiscalYearsList,
   formatFiscalYearDetails,
@@ -24,7 +26,9 @@ import {
  */
 export function createGetFiscalYearsTool(
   wfirmaService: WFirmaIntegrationService,
-  locale: Locale
+  locale: Locale,
+  userId: string,
+  subscriptionService?: SubscriptionService
 ): StructuredToolInterface {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return (tool as any)(
@@ -36,10 +40,15 @@ export function createGetFiscalYearsTool(
       page?: number;
     }) => {
       try {
+        const limitError = await checkWFirmaLimit(subscriptionService, userId, locale);
+        if (limitError) return limitError;
+
         const years = await wfirmaService.findLedgerAccountantYears({
           limit: limit || 100,
           page: page || 1,
         });
+
+        await incrementWFirmaUsage(subscriptionService, userId);
 
         logger.info('Fetched fiscal years for AI tool', { count: years.length });
         return formatFiscalYearsList(years, locale);
@@ -67,12 +76,17 @@ export function createGetFiscalYearsTool(
  */
 export function createGetFiscalYearDetailsTool(
   wfirmaService: WFirmaIntegrationService,
-  locale: Locale
+  locale: Locale,
+  userId: string,
+  subscriptionService?: SubscriptionService
 ): StructuredToolInterface {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return (tool as any)(
     async ({ fiscalYearId }: { fiscalYearId: string }) => {
       try {
+        const limitError = await checkWFirmaLimit(subscriptionService, userId, locale);
+        if (limitError) return limitError;
+
         const t = getLedgerTranslations(locale);
 
         if (!fiscalYearId) {
@@ -84,6 +98,8 @@ export function createGetFiscalYearDetailsTool(
         if (!year) {
           return t.fiscalYearNotFoundById;
         }
+
+        await incrementWFirmaUsage(subscriptionService, userId);
 
         logger.info('Fetched fiscal year details for AI tool', { yearId: fiscalYearId });
         return formatFiscalYearDetails(year, locale);
@@ -114,7 +130,9 @@ export function createGetFiscalYearDetailsTool(
  */
 export function createGetAccountingSchemasTool(
   wfirmaService: WFirmaIntegrationService,
-  locale: Locale
+  locale: Locale,
+  userId: string,
+  subscriptionService?: SubscriptionService
 ): StructuredToolInterface {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return (tool as any)(
@@ -130,12 +148,17 @@ export function createGetAccountingSchemasTool(
       page?: number;
     }) => {
       try {
+        const limitError = await checkWFirmaLimit(subscriptionService, userId, locale);
+        if (limitError) return limitError;
+
         const schemas = await wfirmaService.findLedgerOperationSchemas({
           ledgerAccountantYearId: fiscalYearId,
           category,
           limit: limit || 100,
           page: page || 1,
         });
+
+        await incrementWFirmaUsage(subscriptionService, userId);
 
         logger.info('Fetched accounting schemas for AI tool', { count: schemas.length });
         return formatOperationSchemasList(schemas, locale);
@@ -165,12 +188,17 @@ export function createGetAccountingSchemasTool(
  */
 export function createGetAccountingSchemaDetailsTool(
   wfirmaService: WFirmaIntegrationService,
-  locale: Locale
+  locale: Locale,
+  userId: string,
+  subscriptionService?: SubscriptionService
 ): StructuredToolInterface {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return (tool as any)(
     async ({ schemaId }: { schemaId: string }) => {
       try {
+        const limitError = await checkWFirmaLimit(subscriptionService, userId, locale);
+        if (limitError) return limitError;
+
         const t = getLedgerTranslations(locale);
 
         if (!schemaId) {
@@ -182,6 +210,8 @@ export function createGetAccountingSchemaDetailsTool(
         if (!schema) {
           return t.operationSchemaNotFoundById;
         }
+
+        await incrementWFirmaUsage(subscriptionService, userId);
 
         logger.info('Fetched accounting schema details for AI tool', { schemaId });
         return formatOperationSchemaDetails(schema, locale);

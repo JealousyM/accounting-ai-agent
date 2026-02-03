@@ -10,6 +10,8 @@ import { getDeclarationTranslations, Locale } from '../../../i18n';
 import { WFirmaIntegrationService } from '../../wfirma';
 import { fileStorageService } from '../../file-storage.instance';
 import { formatDeclarationResult } from '../formatters';
+import { SubscriptionService } from '../../subscription.service';
+import { checkWFirmaLimit, incrementWFirmaUsage } from './usage-tracking';
 
 /**
  * Tool: Get JPK VAT declaration
@@ -18,13 +20,19 @@ import { formatDeclarationResult } from '../formatters';
 export function createGetJpkVatTool(
   wfirmaService: WFirmaIntegrationService,
   userId: string,
-  locale: Locale
+  locale: Locale,
+  subscriptionService?: SubscriptionService
 ): StructuredToolInterface {
   return (tool as any)(
     async ({ year, month }: { year: number; month: number }) => {
       try {
+        const limitError = await checkWFirmaLimit(subscriptionService, userId, locale);
+        if (limitError) return limitError;
+
         // Fetch declaration from wFirma
         const declaration = await wfirmaService.getJpkVat({ year, month });
+
+        await incrementWFirmaUsage(subscriptionService, userId);
 
         // Store file temporarily
         const fileId = await fileStorageService.storeFile(
@@ -88,7 +96,8 @@ export function createGetJpkVatTool(
 export function createGetPitTool(
   wfirmaService: WFirmaIntegrationService,
   userId: string,
-  locale: Locale
+  locale: Locale,
+  subscriptionService?: SubscriptionService
 ): StructuredToolInterface {
   return (tool as any)(
     async ({
@@ -99,9 +108,13 @@ export function createGetPitTool(
       type: 'pit36' | 'pit36l' | 'pit28';
     }) => {
       try {
+        const limitError = await checkWFirmaLimit(subscriptionService, userId, locale);
+        if (limitError) return limitError;
 
         // Fetch declaration from wFirma
         const declaration = await wfirmaService.getPit({ year, type });
+
+        await incrementWFirmaUsage(subscriptionService, userId);
 
         // Store file temporarily
         const fileId = await fileStorageService.storeFile(
