@@ -1,4 +1,9 @@
 {
+  "common": {
+    "wfirmaLimitReached": "You have reached your monthly wFirma request limit. Please upgrade to Pro for unlimited requests or wait until the next billing period.",
+    "aiLimitReached": "You have reached your monthly AI message limit. Please upgrade your plan or use your own API key.",
+    "subscriptionRequired": "This feature requires an active subscription."
+  },
   "contractor": {
     "notFound": "No contractors found.",
     "contractorsTitle": "Contractors",

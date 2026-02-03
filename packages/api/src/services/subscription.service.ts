@@ -500,13 +500,27 @@ export class SubscriptionService {
     // Pro with app keys - check limit
     await this.checkAndResetLimits(userId, 'ai');
 
+    // Re-fetch after potential reset
+    const updatedUser = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        aiMessagesUsed: true,
+        aiMessagesLimit: true,
+        aiMessagesResetAt: true,
+      },
+    });
+
+    if (!updatedUser) {
+      return { allowed: false, reason: 'User not found' };
+    }
+
     const usage = {
-      used: user.aiMessagesUsed,
-      limit: user.aiMessagesLimit,
-      resetAt: user.aiMessagesResetAt,
+      used: updatedUser.aiMessagesUsed,
+      limit: updatedUser.aiMessagesLimit,
+      resetAt: updatedUser.aiMessagesResetAt,
     };
 
-    if (user.aiMessagesUsed >= user.aiMessagesLimit) {
+    if (updatedUser.aiMessagesUsed >= updatedUser.aiMessagesLimit) {
       return { allowed: false, reason: 'AI_LIMIT_REACHED', usage };
     }
 

@@ -10,16 +10,22 @@ import { FinancialData } from '../../../types/wfirma.types';
 import { WFirmaIntegrationService } from '../../wfirma';
 import { WFirmaCacheService } from '../../wfirma-cache.service';
 import { formatFinancialData } from '../formatters';
+import { SubscriptionService } from '../../subscription.service';
+import { checkWFirmaLimit, incrementWFirmaUsage } from './usage-tracking';
 
 export function createGetFinancialSummaryTool(
   wfirmaService: WFirmaIntegrationService,
   cacheService: WFirmaCacheService,
-  userId: string
+  userId: string,
+  subscriptionService?: SubscriptionService
 ): StructuredToolInterface {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return (tool as any)(
     async ({ year }: { year: number }) => {
       try {
+        const limitError = await checkWFirmaLimit(subscriptionService, userId, 'en');
+        if (limitError) return limitError;
+
         const cacheKey = `financial_${year}`;
         const cached = await cacheService.getCachedData<FinancialData>(
           userId,
@@ -33,6 +39,9 @@ export function createGetFinancialSummaryTool(
 
         const financialData = await wfirmaService.getFinancialData(year);
         await cacheService.cacheData(userId, 'financial', cacheKey, financialData);
+
+        await incrementWFirmaUsage(subscriptionService, userId);
+
         return formatFinancialData(financialData);
       } catch (error) {
         logger.error('Failed to get financial summary', { error });

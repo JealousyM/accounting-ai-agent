@@ -186,6 +186,8 @@ export function useChat() {
       // Refetch conversation to get updated messages
       queryClient.invalidateQueries({ queryKey: ['conversation', currentConversationId] });
       queryClient.invalidateQueries({ queryKey: ['conversations'] });
+      // Refresh usage data (wFirma/AI message counters may have changed)
+      queryClient.invalidateQueries({ queryKey: ['subscription-usage'] });
     },
     onError: (error) => {
       setPendingMessage(null);

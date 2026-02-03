@@ -10,6 +10,8 @@ import { getDocumentTranslations, Locale } from '../../../i18n';
 import { WFirmaIntegrationService } from '../../wfirma';
 import { WFirmaCacheService } from '../../wfirma-cache.service';
 import { fileStorageService } from '../../file-storage.instance';
+import { SubscriptionService } from '../../subscription.service';
+import { checkWFirmaLimit, incrementWFirmaUsage } from './usage-tracking';
 import {
   formatDocumentsList,
   formatDocumentDetails,
@@ -22,7 +24,9 @@ import {
  */
 export function createGetDocumentsTool(
   wfirmaService: WFirmaIntegrationService,
-  locale: Locale
+  userId: string,
+  locale: Locale,
+  subscriptionService?: SubscriptionService
 ): StructuredToolInterface {
   return (tool as any)(
     async ({
@@ -41,6 +45,9 @@ export function createGetDocumentsTool(
       limit?: number;
     }) => {
       try {
+        const limitError = await checkWFirmaLimit(subscriptionService, userId, locale);
+        if (limitError) return limitError;
+
         const documents = await wfirmaService.findDocuments({
           objectName,
           objectId,
@@ -49,6 +56,8 @@ export function createGetDocumentsTool(
           search,
           limit: limit || 50,
         });
+
+        await incrementWFirmaUsage(subscriptionService, userId);
 
         logger.info('Fetched documents for AI tool', { count: documents.length });
         return formatDocumentsList(documents, locale);
@@ -94,7 +103,8 @@ export function createGetDocumentsTool(
 export function createGetDocumentDetailsTool(
   wfirmaService: WFirmaIntegrationService,
   userId: string,
-  locale: Locale
+  locale: Locale,
+  subscriptionService?: SubscriptionService
 ): StructuredToolInterface {
   return (tool as any)(
     async ({
@@ -105,9 +115,14 @@ export function createGetDocumentDetailsTool(
       prepareDownload?: boolean;
     }) => {
       try {
+        const limitError = await checkWFirmaLimit(subscriptionService, userId, locale);
+        if (limitError) return limitError;
+
         const t = getDocumentTranslations(locale);
 
         const document = await wfirmaService.getDocument(documentId);
+
+        await incrementWFirmaUsage(subscriptionService, userId);
 
         if (!document) {
           return t.notFoundById;
@@ -178,11 +193,15 @@ export function createGetDocumentDetailsTool(
 export function createDownloadDocumentTool(
   wfirmaService: WFirmaIntegrationService,
   userId: string,
-  locale: Locale
+  locale: Locale,
+  subscriptionService?: SubscriptionService
 ): StructuredToolInterface {
   return (tool as any)(
     async ({ documentId }: { documentId: string }) => {
       try {
+        const limitError = await checkWFirmaLimit(subscriptionService, userId, locale);
+        if (limitError) return limitError;
+
         const t = getDocumentTranslations(locale);
 
         // First get document info
@@ -199,6 +218,8 @@ export function createDownloadDocumentTool(
         // Download the file
         const { content, filename, mime } =
           await wfirmaService.downloadDocument(documentId);
+
+        await incrementWFirmaUsage(subscriptionService, userId);
 
         // Store file temporarily (as base64 for binary content)
         const fileId = await fileStorageService.storeFile(
@@ -244,11 +265,15 @@ export function createDeleteDocumentTool(
   wfirmaService: WFirmaIntegrationService,
   cacheService: WFirmaCacheService,
   userId: string,
-  locale: Locale
+  locale: Locale,
+  subscriptionService?: SubscriptionService
 ): StructuredToolInterface {
   return (tool as any)(
     async ({ documentId }: { documentId: string }) => {
       try {
+        const limitError = await checkWFirmaLimit(subscriptionService, userId, locale);
+        if (limitError) return limitError;
+
         const t = getDocumentTranslations(locale);
 
         // Get document info first
@@ -260,6 +285,8 @@ export function createDeleteDocumentTool(
 
         // Delete the document
         await wfirmaService.deleteDocument(documentId);
+
+        await incrementWFirmaUsage(subscriptionService, userId);
 
         // Invalidate cache
         await cacheService.invalidateCache(userId, 'document');

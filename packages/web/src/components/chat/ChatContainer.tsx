@@ -13,7 +13,7 @@ import { ChatInput } from './ChatInput';
 import { ChatHeader } from './ChatHeader';
 import { WfirmaWelcomeModal } from '@/components/onboarding/WfirmaWelcomeModal';
 import { markFirstLoginComplete } from '@/lib/api/auth';
-import { CurrentPlanBadge } from '@/components/subscription';
+import { CurrentPlanBadge, UsageWidget } from '@/components/subscription';
 import { useSubscription } from '@/hooks/useSubscription';
 import enTranslations from '@/i18n/locales/en.json';
 import plTranslations from '@/i18n/locales/pl.json';
@@ -155,7 +155,7 @@ export function ChatContainer() {
             />
           </div>
 
-          {/* Sidebar footer with Plan, AI Costs link, and Version */}
+          {/* Sidebar footer with Plan, Usage, AI Costs link, and Version */}
           <div className="mt-auto px-4 bg-gray-50 dark:bg-gray-900/50 border-t border-gray-200 dark:border-gray-700">
             {/* Current Plan Badge */}
             <div className="py-3 border-b border-gray-200 dark:border-gray-700">
@@ -165,6 +165,10 @@ export function ChatContainer() {
                   <span className="text-xs text-gray-500 dark:text-gray-400">Manage →</span>
                 </div>
               </Link>
+            </div>
+            {/* Usage Widget - shows wFirma (Free) or AI messages (Pro with app key) */}
+            <div className="py-2 border-b border-gray-200 dark:border-gray-700">
+              <UsageWidget compact />
             </div>
             {/* AI Costs and Version */}
             <div className="py-3 flex items-center justify-between">

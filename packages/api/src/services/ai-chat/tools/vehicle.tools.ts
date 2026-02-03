@@ -9,6 +9,8 @@ import { logger } from '../../../utils/logger';
 import { getVehicleTranslations, Locale } from '../../../i18n';
 import { WFirmaIntegrationService } from '../../wfirma';
 import { WFirmaCacheService } from '../../wfirma-cache.service';
+import { SubscriptionService } from '../../subscription.service';
+import { checkWFirmaLimit, incrementWFirmaUsage } from './usage-tracking';
 import {
   formatVehiclesList,
   formatVehicleDetails,
@@ -22,7 +24,9 @@ import {
  */
 export function createGetVehiclesTool(
   wfirmaService: WFirmaIntegrationService,
-  locale: Locale
+  userId: string,
+  locale: Locale,
+  subscriptionService?: SubscriptionService
 ): StructuredToolInterface {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return (tool as any)(
@@ -38,12 +42,17 @@ export function createGetVehiclesTool(
       limit?: number;
     }) => {
       try {
+        const limitError = await checkWFirmaLimit(subscriptionService, userId, locale);
+        if (limitError) return limitError;
+
         const vehicles = await wfirmaService.findVehicles({
           search,
           type: type as any,
           ownership: ownership as any,
           limit: limit || 100,
         });
+
+        await incrementWFirmaUsage(subscriptionService, userId);
 
         logger.info('Fetched vehicles for AI tool', { count: vehicles.length });
         return formatVehiclesList(vehicles, locale);
@@ -81,7 +90,9 @@ export function createGetVehiclesTool(
  */
 export function createGetVehicleDetailsTool(
   wfirmaService: WFirmaIntegrationService,
-  locale: Locale
+  userId: string,
+  locale: Locale,
+  subscriptionService?: SubscriptionService
 ): StructuredToolInterface {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return (tool as any)(
@@ -93,6 +104,9 @@ export function createGetVehicleDetailsTool(
       register?: string;
     }) => {
       try {
+        const limitError = await checkWFirmaLimit(subscriptionService, userId, locale);
+        if (limitError) return limitError;
+
         const t = getVehicleTranslations(locale);
 
         // Get vehicle by ID or search by register
@@ -129,6 +143,8 @@ export function createGetVehicleDetailsTool(
           return vehicleId ? t.notFoundById : t.notFoundByRegister;
         }
 
+        await incrementWFirmaUsage(subscriptionService, userId);
+
         return formatVehicleDetails(vehicle, locale);
       } catch (error) {
         logger.error('Failed to get vehicle details', { error });
@@ -158,7 +174,8 @@ export function createAddVehicleTool(
   wfirmaService: WFirmaIntegrationService,
   cacheService: WFirmaCacheService,
   userId: string,
-  locale: Locale
+  locale: Locale,
+  subscriptionService?: SubscriptionService
 ): StructuredToolInterface {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return (tool as any)(
@@ -184,6 +201,9 @@ export function createAddVehicleTool(
       vatLeasingValue?: number;
     }) => {
       try {
+        const limitError = await checkWFirmaLimit(subscriptionService, userId, locale);
+        if (limitError) return limitError;
+
         const vehicleData = {
           name,
           register,
@@ -197,6 +217,8 @@ export function createAddVehicleTool(
         };
 
         const vehicle = await wfirmaService.createVehicle(vehicleData);
+
+        await incrementWFirmaUsage(subscriptionService, userId);
 
         await cacheService.invalidateCache(userId, 'vehicle');
 
@@ -265,7 +287,8 @@ export function createUpdateVehicleTool(
   wfirmaService: WFirmaIntegrationService,
   cacheService: WFirmaCacheService,
   userId: string,
-  locale: Locale
+  locale: Locale,
+  subscriptionService?: SubscriptionService
 ): StructuredToolInterface {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return (tool as any)(
@@ -295,6 +318,9 @@ export function createUpdateVehicleTool(
       vatLeasingValue?: number;
     }) => {
       try {
+        const limitError = await checkWFirmaLimit(subscriptionService, userId, locale);
+        if (limitError) return limitError;
+
         const t = getVehicleTranslations(locale);
 
         // Find vehicle by ID or register
@@ -342,6 +368,8 @@ export function createUpdateVehicleTool(
         if (vatLeasingValue !== undefined) updateData.vatLeasingValue = vatLeasingValue;
 
         const vehicle = await wfirmaService.updateVehicle(targetVehicleId, updateData);
+
+        await incrementWFirmaUsage(subscriptionService, userId);
 
         await cacheService.invalidateCache(userId, 'vehicle');
 
@@ -402,12 +430,16 @@ export function createDeleteVehicleTool(
   wfirmaService: WFirmaIntegrationService,
   cacheService: WFirmaCacheService,
   userId: string,
-  locale: Locale
+  locale: Locale,
+  subscriptionService?: SubscriptionService
 ): StructuredToolInterface {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return (tool as any)(
     async ({ vehicleId, register }: { vehicleId?: string; register?: string }) => {
       try {
+        const limitError = await checkWFirmaLimit(subscriptionService, userId, locale);
+        if (limitError) return limitError;
+
         const t = getVehicleTranslations(locale);
 
         // Find vehicle by ID or register
@@ -446,6 +478,8 @@ export function createDeleteVehicleTool(
         }
 
         await wfirmaService.deleteVehicle(targetVehicleId);
+
+        await incrementWFirmaUsage(subscriptionService, userId);
 
         await cacheService.invalidateCache(userId, 'vehicle');
 

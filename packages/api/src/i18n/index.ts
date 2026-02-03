@@ -590,7 +590,14 @@ export interface DocumentTranslations {
   errorReason: string;
 }
 
+export interface CommonTranslations {
+  wfirmaLimitReached: string;
+  aiLimitReached: string;
+  subscriptionRequired: string;
+}
+
 export interface Translations {
+  common: CommonTranslations;
   contractor: ContractorTranslations;
   invoice: InvoiceTranslations;
   company: CompanyTranslations;
@@ -656,4 +663,8 @@ export function getDocumentTranslations(locale: Locale = 'pl'): DocumentTranslat
 
 export function getLedgerTranslations(locale: Locale = 'pl'): LedgerTranslations {
   return getTranslations(locale).ledger;
+}
+
+export function getCommonTranslations(locale: Locale = 'pl'): CommonTranslations {
+  return getTranslations(locale).common;
 }

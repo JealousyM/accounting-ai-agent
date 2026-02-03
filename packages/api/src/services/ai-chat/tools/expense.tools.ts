@@ -9,6 +9,8 @@ import { logger } from '../../../utils/logger';
 import { getExpenseTranslations, Locale } from '../../../i18n';
 import { WFirmaIntegrationService } from '../../wfirma';
 import { formatExpensesList, formatExpenseDetails } from '../formatters';
+import { SubscriptionService } from '../../subscription.service';
+import { checkWFirmaLimit, incrementWFirmaUsage } from './usage-tracking';
 
 /**
  * Tool: Get expenses list with filtering
@@ -16,7 +18,8 @@ import { formatExpensesList, formatExpenseDetails } from '../formatters';
 export function createGetExpensesTool(
   wfirmaService: WFirmaIntegrationService,
   userId: string,
-  locale: Locale
+  locale: Locale,
+  subscriptionService?: SubscriptionService
 ): StructuredToolInterface {
   return (tool as any)(
     async ({
@@ -33,6 +36,9 @@ export function createGetExpensesTool(
       expenseType?: string;
     }) => {
       try {
+        const limitError = await checkWFirmaLimit(subscriptionService, userId, locale);
+        if (limitError) return limitError;
+
         const t = getExpenseTranslations(locale);
 
         let contractorId: string | undefined;
@@ -64,6 +70,8 @@ export function createGetExpensesTool(
         if (expenses.length === 0) {
           return t.notFound;
         }
+
+        await incrementWFirmaUsage(subscriptionService, userId);
 
         return formatExpensesList(expenses, locale);
       } catch (error) {
@@ -104,16 +112,22 @@ export function createGetExpensesTool(
 export function createGetExpenseDetailsTool(
   wfirmaService: WFirmaIntegrationService,
   userId: string,
-  locale: Locale
+  locale: Locale,
+  subscriptionService?: SubscriptionService
 ): StructuredToolInterface {
   return (tool as any)(
     async ({ expenseId }: { expenseId: string }) => {
       try {
+        const limitError = await checkWFirmaLimit(subscriptionService, userId, locale);
+        if (limitError) return limitError;
+
         const expense = await wfirmaService.getExpense(expenseId);
 
         if (!expense) {
           return getExpenseTranslations(locale).notFoundById;
         }
+
+        await incrementWFirmaUsage(subscriptionService, userId);
 
         return formatExpenseDetails(expense, locale);
       } catch (error) {

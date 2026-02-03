@@ -10,6 +10,8 @@ import { getInvoiceTranslations, Locale } from '../../../i18n';
 import { WFirmaIntegrationService, WFirmaError } from '../../wfirma';
 import { WFirmaCacheService } from '../../wfirma-cache.service';
 import { FileStorageService } from '../../file-storage.service';
+import { SubscriptionService } from '../../subscription.service';
+import { checkWFirmaLimit, incrementWFirmaUsage } from './usage-tracking';
 import {
   formatInvoicesList,
   formatInvoiceDetails,
@@ -30,12 +32,17 @@ import {
 export function createGetInvoicesTool(
   wfirmaService: WFirmaIntegrationService,
   userId: string,
-  locale: Locale
+  locale: Locale,
+  subscriptionService?: SubscriptionService
 ): StructuredToolInterface {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return (tool as any)(
     async ({ year, month, status }: { year?: number; month?: number; status?: string }) => {
       try {
+        // Check wFirma usage limit
+        const limitError = await checkWFirmaLimit(subscriptionService, userId, locale);
+        if (limitError) return limitError;
+
         let dateFrom: Date | undefined;
         let dateTo: Date | undefined;
 
@@ -52,6 +59,9 @@ export function createGetInvoicesTool(
           status: status && status !== 'all' ? status as any : undefined,
           limit: 100,
         });
+
+        // Increment usage after successful request
+        await incrementWFirmaUsage(subscriptionService, userId);
 
         if (invoices.length === 0) {
           return getInvoiceTranslations(locale).notFoundPeriod;
@@ -78,12 +88,17 @@ export function createGetInvoicesTool(
 export function createGetInvoiceDetailsTool(
   wfirmaService: WFirmaIntegrationService,
   userId: string,
-  locale: Locale
+  locale: Locale,
+  subscriptionService?: SubscriptionService
 ): StructuredToolInterface {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return (tool as any)(
     async ({ invoiceNumber }: { invoiceNumber: string }) => {
       try {
+        // Check wFirma usage limit
+        const limitError = await checkWFirmaLimit(subscriptionService, userId, locale);
+        if (limitError) return limitError;
+
         const invoices = await wfirmaService.findInvoices({
           invoiceNumber,
           limit: 10,
@@ -97,6 +112,9 @@ export function createGetInvoiceDetailsTool(
         if (!invoice) {
           return getInvoiceTranslations(locale).notFound;
         }
+
+        // Increment usage after successful request
+        await incrementWFirmaUsage(subscriptionService, userId);
 
         return formatInvoiceDetails(invoice, locale);
       } catch (error) {
@@ -118,7 +136,8 @@ export function createSendInvoiceTool(
   wfirmaService: WFirmaIntegrationService,
   cacheService: WFirmaCacheService,
   userId: string,
-  locale: Locale
+  locale: Locale,
+  subscriptionService?: SubscriptionService
 ): StructuredToolInterface {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return (tool as any)(
@@ -129,6 +148,10 @@ export function createSendInvoiceTool(
       body?: string;
     }) => {
       try {
+        // Check wFirma usage limit
+        const limitError = await checkWFirmaLimit(subscriptionService, userId, locale);
+        if (limitError) return limitError;
+
         const invoices = await wfirmaService.findInvoices({
           invoiceNumber,
           limit: 10,
@@ -144,6 +167,9 @@ export function createSendInvoiceTool(
           subject,
           body,
         });
+
+        // Increment usage after successful request
+        await incrementWFirmaUsage(subscriptionService, userId);
 
         await cacheService.invalidateCache(userId, 'invoice');
 
@@ -172,12 +198,17 @@ export function createAddInvoiceNoteTool(
   wfirmaService: WFirmaIntegrationService,
   cacheService: WFirmaCacheService,
   userId: string,
-  locale: Locale
+  locale: Locale,
+  subscriptionService?: SubscriptionService
 ): StructuredToolInterface {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return (tool as any)(
     async ({ invoiceNumber, text }: { invoiceNumber: string; text: string }) => {
       try {
+        // Check wFirma usage limit
+        const limitError = await checkWFirmaLimit(subscriptionService, userId, locale);
+        if (limitError) return limitError;
+
         const invoices = await wfirmaService.findInvoices({
           invoiceNumber,
           limit: 10,
@@ -189,6 +220,9 @@ export function createAddInvoiceNoteTool(
 
         const invoice = invoices[0];
         const note = await wfirmaService.addNote('invoice', invoice.id, text);
+
+        // Increment usage after successful request
+        await incrementWFirmaUsage(subscriptionService, userId);
 
         await cacheService.invalidateCache(userId, 'invoice');
 
@@ -213,12 +247,17 @@ export function createAddInvoiceNoteTool(
 export function createGetInvoiceNotesTool(
   wfirmaService: WFirmaIntegrationService,
   userId: string,
-  locale: Locale
+  locale: Locale,
+  subscriptionService?: SubscriptionService
 ): StructuredToolInterface {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return (tool as any)(
     async ({ invoiceNumber }: { invoiceNumber: string }) => {
       try {
+        // Check wFirma usage limit
+        const limitError = await checkWFirmaLimit(subscriptionService, userId, locale);
+        if (limitError) return limitError;
+
         const invoices = await wfirmaService.findInvoices({
           invoiceNumber,
           limit: 10,
@@ -230,6 +269,9 @@ export function createGetInvoiceNotesTool(
 
         const invoice = invoices[0];
         const notes = await wfirmaService.findNotes('invoice', invoice.id);
+
+        // Increment usage after successful request
+        await incrementWFirmaUsage(subscriptionService, userId);
 
         if (notes.length === 0) {
           return getInvoiceTranslations(locale).noNotes;
@@ -255,13 +297,21 @@ export function createDeleteInvoiceNoteTool(
   wfirmaService: WFirmaIntegrationService,
   cacheService: WFirmaCacheService,
   userId: string,
-  locale: Locale
+  locale: Locale,
+  subscriptionService?: SubscriptionService
 ): StructuredToolInterface {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return (tool as any)(
     async ({ noteId }: { noteId: string }) => {
       try {
+        // Check wFirma usage limit
+        const limitError = await checkWFirmaLimit(subscriptionService, userId, locale);
+        if (limitError) return limitError;
+
         await wfirmaService.deleteNote(noteId);
+
+        // Increment usage after successful request
+        await incrementWFirmaUsage(subscriptionService, userId);
 
         await cacheService.invalidateCache(userId, 'invoice');
 
@@ -286,12 +336,17 @@ export function createDownloadInvoiceTool(
   wfirmaService: WFirmaIntegrationService,
   fileStorageService: FileStorageService,
   userId: string,
-  locale: Locale
+  locale: Locale,
+  subscriptionService?: SubscriptionService
 ): StructuredToolInterface {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return (tool as any)(
     async ({ invoiceNumber, page }: { invoiceNumber: string; page?: string }) => {
       try {
+        // Check wFirma usage limit
+        const limitError = await checkWFirmaLimit(subscriptionService, userId, locale);
+        if (limitError) return limitError;
+
         const t = getInvoiceTranslations(locale);
 
         // Find invoice by number
@@ -322,6 +377,9 @@ export function createDownloadInvoiceTool(
         const backendUrl = process.env.BACKEND_URL || 'http://localhost:3001';
         const downloadUrl = `${backendUrl}/api/files/download/${fileId}`;
 
+        // Increment usage after successful request
+        await incrementWFirmaUsage(subscriptionService, userId);
+
         logger.info('Invoice PDF stored for download', { fileId, invoiceNumber, userId });
 
         return formatInvoiceDownloadLink(invoice, downloadUrl, locale);
@@ -350,7 +408,8 @@ export function createCreateInvoiceTool(
   wfirmaService: WFirmaIntegrationService,
   cacheService: WFirmaCacheService,
   userId: string,
-  locale: Locale
+  locale: Locale,
+  subscriptionService?: SubscriptionService
 ): StructuredToolInterface {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return (tool as any)(
@@ -378,6 +437,10 @@ export function createCreateInvoiceTool(
       description?: string;
     }) => {
       try {
+        // Check wFirma usage limit
+        const limitError = await checkWFirmaLimit(subscriptionService, userId, locale);
+        if (limitError) return limitError;
+
         const t = getInvoiceTranslations(locale);
 
         if (!contractorName && !contractorId) {
@@ -457,6 +520,9 @@ export function createCreateInvoiceTool(
 
         const invoice = await wfirmaService.createInvoice(data);
 
+        // Increment usage after successful request
+        await incrementWFirmaUsage(subscriptionService, userId);
+
         await cacheService.invalidateCache(userId, 'invoice');
 
         logger.info('Invoice created via AI chat', {
@@ -510,7 +576,8 @@ export function createUpdateInvoiceTool(
   wfirmaService: WFirmaIntegrationService,
   cacheService: WFirmaCacheService,
   userId: string,
-  locale: Locale
+  locale: Locale,
+  subscriptionService?: SubscriptionService
 ): StructuredToolInterface {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return (tool as any)(
@@ -528,6 +595,10 @@ export function createUpdateInvoiceTool(
       alreadypaid?: number;
     }) => {
       try {
+        // Check wFirma usage limit
+        const limitError = await checkWFirmaLimit(subscriptionService, userId, locale);
+        if (limitError) return limitError;
+
         const t = getInvoiceTranslations(locale);
 
         const invoices = await wfirmaService.findInvoices({
@@ -548,6 +619,9 @@ export function createUpdateInvoiceTool(
         if (alreadypaid !== undefined) data.alreadypaid = alreadypaid;
 
         const updated = await wfirmaService.updateInvoice(invoice.id, data);
+
+        // Increment usage after successful request
+        await incrementWFirmaUsage(subscriptionService, userId);
 
         await cacheService.invalidateCache(userId, 'invoice');
 
@@ -586,12 +660,17 @@ export function createDeleteInvoiceTool(
   wfirmaService: WFirmaIntegrationService,
   cacheService: WFirmaCacheService,
   userId: string,
-  locale: Locale
+  locale: Locale,
+  subscriptionService?: SubscriptionService
 ): StructuredToolInterface {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return (tool as any)(
     async ({ invoiceNumber }: { invoiceNumber: string }) => {
       try {
+        // Check wFirma usage limit
+        const limitError = await checkWFirmaLimit(subscriptionService, userId, locale);
+        if (limitError) return limitError;
+
         const t = getInvoiceTranslations(locale);
 
         const invoices = await wfirmaService.findInvoices({
@@ -606,6 +685,9 @@ export function createDeleteInvoiceTool(
         const invoice = invoices[0];
 
         await wfirmaService.deleteInvoice(invoice.id);
+
+        // Increment usage after successful request
+        await incrementWFirmaUsage(subscriptionService, userId);
 
         await cacheService.invalidateCache(userId, 'invoice');
 

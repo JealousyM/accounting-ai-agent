@@ -1,4 +1,9 @@
 {
+  "common": {
+    "wfirmaLimitReached": "Osiągnięto miesięczny limit zapytań wFirma. Przejdź na plan Pro dla nieograniczonej liczby zapytań lub poczekaj na następny okres rozliczeniowy.",
+    "aiLimitReached": "Osiągnięto miesięczny limit wiadomości AI. Ulepsz plan lub użyj własnego klucza API.",
+    "subscriptionRequired": "Ta funkcja wymaga aktywnej subskrypcji."
+  },
   "contractor": {
     "notFound": "Nie znaleziono kontrahentów.",
     "contractorsTitle": "Kontrahenci",

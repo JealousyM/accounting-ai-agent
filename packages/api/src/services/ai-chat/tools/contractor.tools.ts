@@ -15,20 +15,29 @@ import {
   formatContractorUpdated,
   formatContractorDeleted,
 } from '../formatters';
+import { SubscriptionService } from '../../subscription.service';
+import { checkWFirmaLimit, incrementWFirmaUsage } from './usage-tracking';
 
 export function createGetContractorsTool(
   wfirmaService: WFirmaIntegrationService,
-  locale: Locale
+  locale: Locale,
+  userId: string,
+  subscriptionService?: SubscriptionService
 ): StructuredToolInterface {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return (tool as any)(
     async ({ search, nip, limit }: { search?: string; nip?: string; limit?: number }) => {
       try {
+        const limitError = await checkWFirmaLimit(subscriptionService, userId, locale);
+        if (limitError) return limitError;
+
         const contractors = await wfirmaService.getContractors({
           search,
           nip,
           limit: limit || 100,
         });
+
+        await incrementWFirmaUsage(subscriptionService, userId);
 
         logger.info('Fetched contractors for AI tool', { count: contractors.length });
         return formatContractorsList(contractors, locale);
@@ -54,7 +63,8 @@ export function createCreateContractorTool(
   wfirmaService: WFirmaIntegrationService,
   cacheService: WFirmaCacheService,
   userId: string,
-  locale: Locale
+  locale: Locale,
+  subscriptionService?: SubscriptionService
 ): StructuredToolInterface {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return (tool as any)(
@@ -84,6 +94,9 @@ export function createCreateContractorTool(
       notes?: string;
     }) => {
       try {
+        const limitError = await checkWFirmaLimit(subscriptionService, userId, locale);
+        if (limitError) return limitError;
+
         const address = (street || city || zip || country)
           ? {
               street: street || '',
@@ -105,6 +118,8 @@ export function createCreateContractorTool(
         };
 
         const contractor = await wfirmaService.createContractor(contractorData);
+
+        await incrementWFirmaUsage(subscriptionService, userId);
 
         await cacheService.invalidateCache(userId, 'contractor');
 
@@ -154,7 +169,8 @@ export function createUpdateContractorTool(
   wfirmaService: WFirmaIntegrationService,
   cacheService: WFirmaCacheService,
   userId: string,
-  locale: Locale
+  locale: Locale,
+  subscriptionService?: SubscriptionService
 ): StructuredToolInterface {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return (tool as any)(
@@ -186,6 +202,9 @@ export function createUpdateContractorTool(
       notes?: string;
     }) => {
       try {
+        const limitError = await checkWFirmaLimit(subscriptionService, userId, locale);
+        if (limitError) return limitError;
+
         const contractors = await wfirmaService.getContractors({ search: contractorName, limit: 10 });
 
         const exactMatch = contractors.find(
@@ -221,6 +240,8 @@ export function createUpdateContractorTool(
         }
 
         const contractor = await wfirmaService.updateContractor(exactMatch.id, updateData);
+
+        await incrementWFirmaUsage(subscriptionService, userId);
 
         await cacheService.invalidateCache(userId, 'contractor');
 
@@ -259,12 +280,16 @@ export function createDeleteContractorTool(
   wfirmaService: WFirmaIntegrationService,
   cacheService: WFirmaCacheService,
   userId: string,
-  locale: Locale
+  locale: Locale,
+  subscriptionService?: SubscriptionService
 ): StructuredToolInterface {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return (tool as any)(
     async ({ name }: { name: string }) => {
       try {
+        const limitError = await checkWFirmaLimit(subscriptionService, userId, locale);
+        if (limitError) return limitError;
+
         const contractors = await wfirmaService.getContractors({ search: name, limit: 10 });
 
         const exactMatch = contractors.find(
@@ -281,6 +306,8 @@ export function createDeleteContractorTool(
         }
 
         await wfirmaService.deleteContractor(exactMatch.id);
+
+        await incrementWFirmaUsage(subscriptionService, userId);
 
         await cacheService.invalidateCache(userId, 'contractor');
 

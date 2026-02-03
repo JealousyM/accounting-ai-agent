@@ -17,6 +17,7 @@ import { WFirmaCacheService } from '../wfirma-cache.service';
 import { FileStorageService } from '../file-storage.service';
 import { WFirmaServiceFactory } from '../wfirma-integration.factory';
 import { CredentialsService } from '../credentials.service';
+import { subscriptionService } from '../subscription.instance';
 import {
   LLMProvider,
   ChatMessage,
@@ -307,8 +308,8 @@ export class AIChatService {
     // Get system prompt with user's language
     const systemPrompt = getSystemPrompt(locale);
 
-    // Create tools with userId and locale bound
-    const tools = createAllTools(wfirmaService, this.cacheService, this.fileStorageService, userId, locale);
+    // Create tools with userId, locale, and subscription tracking
+    const tools = createAllTools(wfirmaService, this.cacheService, this.fileStorageService, userId, locale, subscriptionService);
 
     logger.info('Created tools for agent', {
       toolCount: tools.length,
