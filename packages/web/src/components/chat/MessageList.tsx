@@ -29,6 +29,11 @@ interface SuggestionsTranslations {
   zusPayment: string;
 }
 
+interface TTSTranslations {
+  play: string;
+  stop: string;
+}
+
 interface MessageListProps {
   messages: ChatMessage[];
   isLoading: boolean;
@@ -36,6 +41,7 @@ interface MessageListProps {
   translations: MessagesTranslations;
   toolsTranslations: ToolsTranslations;
   suggestionsTranslations: SuggestionsTranslations;
+  ttsTranslations: TTSTranslations;
 }
 
 export function MessageList({
@@ -45,6 +51,7 @@ export function MessageList({
   translations,
   toolsTranslations,
   suggestionsTranslations,
+  ttsTranslations,
 }: MessageListProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -103,6 +110,7 @@ export function MessageList({
             message={message}
             translations={{ toolsUsed: translations.toolsUsed }}
             toolsTranslations={toolsTranslations}
+            ttsTranslations={ttsTranslations}
           />
         ))}
 

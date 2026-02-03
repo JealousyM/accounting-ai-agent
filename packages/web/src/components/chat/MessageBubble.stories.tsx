@@ -47,6 +47,11 @@ const defaultToolsTranslations = {
   deleteContractor: 'Delete Contractor',
 };
 
+const defaultTTSTranslations = {
+  play: 'Read aloud',
+  stop: 'Stop reading',
+};
+
 // User Message
 export const UserMessage: Story = {
   args: {
@@ -58,6 +63,7 @@ export const UserMessage: Story = {
     },
     translations: defaultTranslations,
     toolsTranslations: defaultToolsTranslations,
+    ttsTranslations: defaultTTSTranslations,
   },
 };
 
@@ -72,6 +78,7 @@ export const AssistantMessage: Story = {
     },
     translations: defaultTranslations,
     toolsTranslations: defaultToolsTranslations,
+    ttsTranslations: defaultTTSTranslations,
   },
 };
 
@@ -90,6 +97,7 @@ export const WithToolCalls: Story = {
     },
     translations: defaultTranslations,
     toolsTranslations: defaultToolsTranslations,
+    ttsTranslations: defaultTTSTranslations,
   },
 };
 
@@ -128,6 +136,7 @@ You can download the full report [here](#).`,
     },
     translations: defaultTranslations,
     toolsTranslations: defaultToolsTranslations,
+    ttsTranslations: defaultTTSTranslations,
   },
 };
 
@@ -154,6 +163,7 @@ Finally, I noticed that several invoices from December are still pending. Would 
     },
     translations: defaultTranslations,
     toolsTranslations: defaultToolsTranslations,
+    ttsTranslations: defaultTTSTranslations,
   },
 };
 
@@ -176,6 +186,7 @@ export const WithModelInfo: Story = {
     },
     translations: defaultTranslations,
     toolsTranslations: defaultToolsTranslations,
+    ttsTranslations: defaultTTSTranslations,
   },
 };
 
@@ -190,6 +201,7 @@ export const SystemMessage: Story = {
     },
     translations: defaultTranslations,
     toolsTranslations: defaultToolsTranslations,
+    ttsTranslations: defaultTTSTranslations,
   },
   parameters: {
     docs: {
@@ -211,6 +223,7 @@ export const ConversationFlow: Story = {
     },
     translations: defaultTranslations,
     toolsTranslations: defaultToolsTranslations,
+    ttsTranslations: defaultTTSTranslations,
   },
   render: () => (
     <div className="flex flex-col gap-4">
@@ -223,6 +236,7 @@ export const ConversationFlow: Story = {
         }}
         translations={defaultTranslations}
         toolsTranslations={defaultToolsTranslations}
+        ttsTranslations={defaultTTSTranslations}
       />
       <MessageBubble
         message={{
@@ -235,6 +249,7 @@ export const ConversationFlow: Story = {
         }}
         translations={defaultTranslations}
         toolsTranslations={defaultToolsTranslations}
+        ttsTranslations={defaultTTSTranslations}
       />
       <MessageBubble
         message={{
@@ -245,6 +260,7 @@ export const ConversationFlow: Story = {
         }}
         translations={defaultTranslations}
         toolsTranslations={defaultToolsTranslations}
+        ttsTranslations={defaultTTSTranslations}
       />
     </div>
   ),
@@ -263,6 +279,7 @@ export const DarkModeComparison: Story = {
     message: { id: '1', role: 'user' as const, content: 'Hello', timestamp: new Date().toISOString() },
     translations: defaultTranslations,
     toolsTranslations: defaultToolsTranslations,
+    ttsTranslations: defaultTTSTranslations,
   },
   render: () => (
     <div className="flex gap-8">
@@ -278,6 +295,7 @@ export const DarkModeComparison: Story = {
             }}
             translations={defaultTranslations}
             toolsTranslations={defaultToolsTranslations}
+            ttsTranslations={defaultTTSTranslations}
           />
           <MessageBubble
             message={{
@@ -289,6 +307,7 @@ export const DarkModeComparison: Story = {
             }}
             translations={defaultTranslations}
             toolsTranslations={defaultToolsTranslations}
+            ttsTranslations={defaultTTSTranslations}
           />
         </div>
       </div>
@@ -304,6 +323,7 @@ export const DarkModeComparison: Story = {
             }}
             translations={defaultTranslations}
             toolsTranslations={defaultToolsTranslations}
+            ttsTranslations={defaultTTSTranslations}
           />
           <MessageBubble
             message={{
@@ -315,6 +335,7 @@ export const DarkModeComparison: Story = {
             }}
             translations={defaultTranslations}
             toolsTranslations={defaultToolsTranslations}
+            ttsTranslations={defaultTTSTranslations}
           />
         </div>
       </div>
@@ -335,6 +356,7 @@ export const AllToolTypes: Story = {
     message: { id: '1', role: 'user' as const, content: 'Hello', timestamp: new Date().toISOString() },
     translations: defaultTranslations,
     toolsTranslations: defaultToolsTranslations,
+    ttsTranslations: defaultTTSTranslations,
   },
   render: () => (
     <div className="flex flex-col gap-4">
@@ -348,6 +370,7 @@ export const AllToolTypes: Story = {
         }}
         translations={defaultTranslations}
         toolsTranslations={defaultToolsTranslations}
+        ttsTranslations={defaultTTSTranslations}
       />
       <MessageBubble
         message={{
@@ -359,6 +382,7 @@ export const AllToolTypes: Story = {
         }}
         translations={defaultTranslations}
         toolsTranslations={defaultToolsTranslations}
+        ttsTranslations={defaultTTSTranslations}
       />
       <MessageBubble
         message={{
@@ -370,6 +394,7 @@ export const AllToolTypes: Story = {
         }}
         translations={defaultTranslations}
         toolsTranslations={defaultToolsTranslations}
+        ttsTranslations={defaultTTSTranslations}
       />
       <MessageBubble
         message={{
@@ -381,6 +406,7 @@ export const AllToolTypes: Story = {
         }}
         translations={defaultTranslations}
         toolsTranslations={defaultToolsTranslations}
+        ttsTranslations={defaultTTSTranslations}
       />
       <MessageBubble
         message={{
@@ -392,6 +418,7 @@ export const AllToolTypes: Story = {
         }}
         translations={defaultTranslations}
         toolsTranslations={defaultToolsTranslations}
+        ttsTranslations={defaultTTSTranslations}
       />
       <MessageBubble
         message={{
@@ -403,6 +430,7 @@ export const AllToolTypes: Story = {
         }}
         translations={defaultTranslations}
         toolsTranslations={defaultToolsTranslations}
+        ttsTranslations={defaultTTSTranslations}
       />
       <MessageBubble
         message={{
@@ -414,6 +442,7 @@ export const AllToolTypes: Story = {
         }}
         translations={defaultTranslations}
         toolsTranslations={defaultToolsTranslations}
+        ttsTranslations={defaultTTSTranslations}
       />
     </div>
   ),

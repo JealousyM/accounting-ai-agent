@@ -59,7 +59,8 @@ routes/      → controllers/      → services/      → Prisma/Redis
 ### Frontend Structure (packages/web/src/)
 - `app/` - Next.js App Router pages
 - `components/` - React components (chat/, auth/, ui/)
-- `hooks/` - Custom hooks (useChat, useAuth)
+- `contexts/` - React contexts (Auth, Locale, TTS)
+- `hooks/` - Custom hooks (useChat, useAuth, useTextToSpeech, useVoiceDictation)
 - `i18n/` - Translations (en, pl, ru)
 - `lib/api/` - Axios API client
 
@@ -84,6 +85,8 @@ Web requires `.env.local` with: NEXT_PUBLIC_API_URL
 - wFirma responses cached in PostgreSQL with configurable TTL
 - AI tools return localized markdown (auto-detect user language)
 - Protected routes via AuthContext + JWT middleware
+- Text-to-speech via Web Speech API (TTSContext, useTextToSpeech hook)
+- Voice input via Web Speech Recognition API (useVoiceDictation hook)
 
 ## Documentation
 

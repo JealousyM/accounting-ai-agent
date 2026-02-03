@@ -428,6 +428,142 @@ After connecting, AI will have access to:
     order: 1,
     isFeatured: true,
   },
+
+  // ========================================
+  // Settings Category - Text-to-Speech
+  // ========================================
+  {
+    slug: 'settings-text-to-speech',
+    category: 'settings',
+    titlePl: 'Odczytywanie głosowe odpowiedzi AI',
+    titleEn: 'Text-to-Speech for AI Responses',
+    titleRu: 'Голосовое воспроизведение ответов AI',
+    contentPl: `Czat AI obsługuje funkcję odczytywania odpowiedzi głosem za pomocą technologii Web Speech API.
+
+## Funkcje
+
+**Ręczne odtwarzanie:**
+- Kliknij ikonę głośnika 🔊 przy dowolnej odpowiedzi AI, aby ją odsłuchać
+- Kliknij ponownie, aby zatrzymać odtwarzanie
+- Odtwarzanie automatycznie zatrzymuje się po zakończeniu tekstu
+
+**Automatyczne odczytywanie:**
+- Włącz opcję "Automatyczne odczytywanie" w ustawieniach głosu
+- Nowe odpowiedzi AI będą automatycznie odczytywane głosem
+- Możesz zatrzymać odtwarzanie w dowolnym momencie
+
+**Kontrola prędkości:**
+- Dostosuj szybkość mówienia od 0.5x (powoli) do 2.0x (szybko)
+- Domyślna prędkość to 1.0x (normalna)
+
+## Jak włączyć
+
+1. Kliknij ikonę głośnika w nagłówku czatu (obok ikony pomocy)
+2. Włącz opcję "Odczytywanie głosowe"
+3. Opcjonalnie włącz "Automatyczne odczytywanie nowych wiadomości"
+4. Dostosuj prędkość mówienia według preferencji
+
+## Obsługiwane języki
+
+- 🇬🇧 Angielski (en-US)
+- 🇵🇱 Polski (pl-PL)
+- 🇷🇺 Rosyjski (ru-RU)
+
+Język jest automatycznie dopasowywany do wybranego języka interfejsu.
+
+## Wskazówki
+
+- Ustawienia są zapisywane lokalnie w przeglądarce
+- Funkcja wymaga przeglądarki obsługującej Web Speech API (Chrome, Edge, Safari, Firefox)
+- Jeśli nie słyszysz dźwięku, sprawdź ustawienia głośności systemu
+- Możesz kliknąć na inną wiadomość podczas odtwarzania - poprzednia zostanie zatrzymana automatycznie`,
+
+    contentEn: `AI Chat supports voice readout of responses using Web Speech API technology.
+
+## Features
+
+**Manual playback:**
+- Click the speaker icon 🔊 on any AI response to hear it read aloud
+- Click again to stop playback
+- Playback automatically stops when the text ends
+
+**Auto-speak:**
+- Enable "Auto-read new messages" in voice settings
+- New AI responses will be automatically read aloud
+- You can stop playback at any time
+
+**Speed control:**
+- Adjust speech rate from 0.5x (slow) to 2.0x (fast)
+- Default speed is 1.0x (normal)
+
+## How to enable
+
+1. Click the speaker icon in the chat header (next to the help icon)
+2. Toggle "Voice readout" on
+3. Optionally enable "Auto-read new messages"
+4. Adjust speech rate to your preference
+
+## Supported languages
+
+- 🇬🇧 English (en-US)
+- 🇵🇱 Polish (pl-PL)
+- 🇷🇺 Russian (ru-RU)
+
+Language is automatically matched to your selected interface language.
+
+## Tips
+
+- Settings are saved locally in your browser
+- Feature requires a browser that supports Web Speech API (Chrome, Edge, Safari, Firefox)
+- If you don't hear audio, check your system volume settings
+- You can click on another message during playback - the previous one will stop automatically`,
+
+    contentRu: `AI чат поддерживает голосовое воспроизведение ответов с помощью технологии Web Speech API.
+
+## Функции
+
+**Ручное воспроизведение:**
+- Нажмите на иконку динамика 🔊 у любого ответа AI, чтобы прослушать его
+- Нажмите снова, чтобы остановить воспроизведение
+- Воспроизведение автоматически останавливается по окончании текста
+
+**Автоматическое воспроизведение:**
+- Включите опцию "Автоматически читать новые сообщения" в настройках голоса
+- Новые ответы AI будут автоматически озвучиваться
+- Вы можете остановить воспроизведение в любой момент
+
+**Контроль скорости:**
+- Настройте скорость речи от 0.5x (медленно) до 2.0x (быстро)
+- Скорость по умолчанию 1.0x (нормальная)
+
+## Как включить
+
+1. Нажмите на иконку динамика в заголовке чата (рядом с иконкой помощи)
+2. Включите "Голосовое воспроизведение"
+3. При желании включите "Автоматически читать новые сообщения"
+4. Настройте скорость речи по вашему предпочтению
+
+## Поддерживаемые языки
+
+- 🇬🇧 Английский (en-US)
+- 🇵🇱 Польский (pl-PL)
+- 🇷🇺 Русский (ru-RU)
+
+Язык автоматически соответствует выбранному языку интерфейса.
+
+## Советы
+
+- Настройки сохраняются локально в браузере
+- Функция требует браузер с поддержкой Web Speech API (Chrome, Edge, Safari, Firefox)
+- Если не слышите звук, проверьте настройки громкости системы
+- Можете кликнуть на другое сообщение во время воспроизведения - предыдущее остановится автоматически`,
+
+    searchKeywordsPl: ['głos', 'dźwięk', 'odczytywanie', 'mówienie', 'tts', 'text-to-speech', 'audio', 'synteza mowy'],
+    searchKeywordsEn: ['voice', 'audio', 'speech', 'read aloud', 'tts', 'text-to-speech', 'speak', 'sound'],
+    searchKeywordsRu: ['голос', 'звук', 'речь', 'озвучивание', 'tts', 'text-to-speech', 'аудио', 'синтез речи'],
+    order: 1,
+    isFeatured: true,
+  },
 ];
 
 async function seedHelpTopics() {

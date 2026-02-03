@@ -55,6 +55,8 @@ packages/web/src/
 ├── hooks/                      # Custom React hooks
 │   ├── useAuth.ts              # Authentication hook
 │   ├── useChat.ts              # Chat functionality hook
+│   ├── useTextToSpeech.ts      # Text-to-speech hook
+│   ├── useVoiceDictation.ts    # Voice input hook
 │   └── useWFirma.ts            # wFirma data hook
 │
 ├── lib/                        # Utilities
@@ -507,6 +509,96 @@ export function ChatMessage({ role, content }: ChatMessageProps) {
       </div>
     </div>
   );
+}
+```
+
+## Text-to-Speech (TTS)
+
+The chat supports voice synthesis for AI responses using the Web Speech API.
+
+### Features
+
+| Feature | Description |
+|---------|-------------|
+| Manual playback | Click speaker icon on any AI message |
+| Auto-speak | Automatically read new AI responses |
+| Multi-language | Supports en-US, pl-PL, ru-RU |
+| Speed control | Adjustable speech rate (0.5x - 2.0x) |
+| Settings persistence | Saved to localStorage |
+
+### Architecture
+
+```
+├── hooks/
+│   └── useTextToSpeech.ts      # Core TTS hook (Web Speech API)
+├── contexts/
+│   └── TTSContext.tsx          # Global TTS state & settings
+├── components/chat/
+│   ├── TTSButton.tsx           # Play/stop button per message
+│   └── TTSSettingsButton.tsx   # Settings popover in header
+```
+
+### Usage
+
+```tsx
+// Using TTS context
+import { useTTS } from '@/contexts/TTSContext';
+
+function MyComponent() {
+  const { speak, stop, isSpeaking, ttsEnabled } = useTTS();
+
+  return (
+    <button onClick={() => speak('Hello world', 'msg-id')}>
+      {isSpeaking ? 'Stop' : 'Play'}
+    </button>
+  );
+}
+```
+
+### Auto-speak Hook
+
+```tsx
+import { useAutoSpeak } from '@/contexts/TTSContext';
+
+function ChatContainer() {
+  const { triggerAutoSpeak, shouldAutoSpeak } = useAutoSpeak();
+
+  useEffect(() => {
+    if (shouldAutoSpeak && newMessage) {
+      triggerAutoSpeak(newMessage.content, newMessage.id);
+    }
+  }, [newMessage]);
+}
+```
+
+### Settings
+
+Settings stored in `localStorage` under key `tts-settings`:
+
+```typescript
+interface TTSSettings {
+  enabled: boolean;    // TTS on/off
+  autoSpeak: boolean;  // Auto-read new messages
+  rate: number;        // Speech rate (0.5-2.0)
+}
+```
+
+### Translations
+
+TTS UI strings are in `chat.tts` namespace:
+
+```json
+{
+  "chat": {
+    "tts": {
+      "play": "Read aloud",
+      "stop": "Stop reading",
+      "settings": "Voice settings",
+      "enabled": "Voice readout",
+      "autoSpeak": "Auto-read new messages",
+      "rate": "Speed"
+    }
+  }
 }
 ```
 

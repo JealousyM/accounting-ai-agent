@@ -8,9 +8,11 @@ Next.js 15 frontend application for Accounting AI Agent.
 - **React 19** with Server Components
 - **TypeScript** for type safety
 - **Tailwind CSS v4** for styling
-- **Internationalization** (English & Polish)
+- **Internationalization** (English, Polish, Russian)
 - **Form Validation** with React Hook Form + Zod
 - **Modern UI Components** with shadcn/ui style
+- **Voice Input** - dictate messages via microphone
+- **Text-to-Speech** - AI responses read aloud (auto-speak or manual)
 
 ## Getting Started
 
@@ -40,22 +42,31 @@ npm start
 ```
 src/
 ├── app/                    # Next.js App Router
-│   │
-│   │── register/      # Registration page
-│   │── login/         # Login page
-│   └── layout.tsx         # Root layout
-├── components/            # React components
-│   ├── auth/             # Authentication components
-│   └── ui/               # UI components (Button, Input, etc.)
-├── lib/                  # Utilities
-│   ├── api/             # API client functions
-│   ├── validations/     # Zod schemas
-│   └── utils.ts         # Helper functions
-├── i18n/                # Internationalization
-│   └── locales/         # Translation files
-│       ├── en.json      # English
-│       └── pl.json      # Polish
-└── hooks/               # Custom React hooks
+│   │── register/           # Registration page
+│   │── login/              # Login page
+│   │── chat/               # AI Chat page
+│   └── layout.tsx          # Root layout
+├── components/             # React components
+│   ├── auth/               # Authentication components
+│   ├── chat/               # Chat components (MessageBubble, TTSButton, etc.)
+│   └── ui/                 # UI components (Button, Input, etc.)
+├── contexts/               # React contexts
+│   ├── AuthContext.tsx     # Authentication state
+│   ├── LocaleContext.tsx   # Language settings
+│   └── TTSContext.tsx      # Text-to-speech state & settings
+├── lib/                    # Utilities
+│   ├── api/                # API client functions
+│   ├── validations/        # Zod schemas
+│   └── utils.ts            # Helper functions
+├── i18n/                   # Internationalization
+│   └── locales/            # Translation files
+│       ├── en.json         # English
+│       ├── pl.json         # Polish
+│       └── ru.json         # Russian
+└── hooks/                  # Custom React hooks
+    ├── useChat.ts          # Chat functionality
+    ├── useTextToSpeech.ts  # TTS (Web Speech API)
+    └── useVoiceDictation.ts # Voice input
 ```
 
 ## Internationalization
@@ -116,6 +127,24 @@ Create `.env.local`:
 ```env
 NEXT_PUBLIC_API_URL=http://localhost:3001
 ```
+
+## Text-to-Speech
+
+AI responses can be read aloud using Web Speech API.
+
+### Features
+- **Manual playback** - Click speaker icon on any AI message
+- **Auto-speak** - Automatically read new AI responses (configurable)
+- **Multi-language** - Supports en-US, pl-PL, ru-RU
+- **Speed control** - Adjustable from 0.5x to 2.0x
+
+### Settings
+Settings button in chat header opens TTS configuration:
+- Enable/disable TTS
+- Toggle auto-speak for new messages
+- Adjust speech rate
+
+Settings are persisted to `localStorage`.
 
 ## Styling
 
