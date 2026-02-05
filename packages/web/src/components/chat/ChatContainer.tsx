@@ -42,6 +42,8 @@ function ChatContainerInner() {
     createConversation,
     selectConversation,
     deleteConversation,
+    latestTTS,
+    clearTTS,
   } = useChat();
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -56,8 +58,10 @@ function ChatContainerInner() {
   const { triggerAutoSpeak, shouldAutoSpeak } = useAutoSpeak();
   const lastMessageIdRef = useRef<string | null>(null);
   const wasLoadingRef = useRef(false);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   // Auto-speak when a new AI message arrives (after loading completes)
+  // Now integrated with LangChain - uses backend TTS when available
   useEffect(() => {
     if (!shouldAutoSpeak) return;
 
@@ -78,10 +82,44 @@ function ChatContainerInner() {
         lastMessage.id !== lastMessageIdRef.current
       ) {
         lastMessageIdRef.current = lastMessage.id;
-        triggerAutoSpeak(lastMessage.content, lastMessage.id);
+
+        // Use backend TTS (LangChain integrated) if available
+        if (latestTTS?.audioBase64 && !latestTTS.skipped) {
+          try {
+            // Stop any currently playing audio
+            if (audioRef.current) {
+              audioRef.current.pause();
+              audioRef.current = null;
+            }
+
+            // Play backend-generated audio
+            const audio = new Audio(`data:audio/mpeg;base64,${latestTTS.audioBase64}`);
+            audioRef.current = audio;
+            audio.play().catch(err => {
+              console.warn('Failed to play backend TTS audio:', err);
+              // Fallback to browser TTS
+              triggerAutoSpeak(lastMessage.content, lastMessage.id);
+            });
+
+            // Clear TTS data after playing
+            clearTTS();
+          } catch (error) {
+            console.warn('Backend TTS playback error:', error);
+            // Fallback to browser TTS
+            triggerAutoSpeak(lastMessage.content, lastMessage.id);
+            clearTTS();
+          }
+        } else if (!latestTTS?.skipped) {
+          // Fallback to browser TTS (when backend TTS not available)
+          triggerAutoSpeak(lastMessage.content, lastMessage.id);
+          if (latestTTS) clearTTS();
+        } else {
+          // TTS was skipped (code-heavy, tables, etc.) - clear it
+          if (latestTTS) clearTTS();
+        }
       }
     }
-  }, [messages, isLoading, shouldAutoSpeak, triggerAutoSpeak]);
+  }, [messages, isLoading, shouldAutoSpeak, triggerAutoSpeak, latestTTS, clearTTS]);
 
   // Check for wFirma welcome modal flag on mount
   useEffect(() => {

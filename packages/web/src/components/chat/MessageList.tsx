@@ -32,6 +32,7 @@ interface SuggestionsTranslations {
 interface TTSTranslations {
   play: string;
   stop: string;
+  loading?: string;
 }
 
 interface MessageListProps {

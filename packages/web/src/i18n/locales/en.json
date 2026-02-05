@@ -233,6 +233,7 @@
     "tts": {
       "play": "Read aloud",
       "stop": "Stop reading",
+      "loading": "Generating voice...",
       "speaking": "Speaking...",
       "settings": "Voice settings",
       "enabled": "Voice readout",
@@ -466,7 +467,8 @@
       "totalTokens": "Total Tokens",
       "conversations": "Conversations",
       "llmRuns": "LLM Runs",
-      "avgLatency": "Avg Latency"
+      "avgLatency": "Avg Latency",
+      "ttsCost": "TTS Cost"
     },
     "charts": {
       "dailyCost": "Daily Cost Trend",
@@ -518,7 +520,8 @@
       "totalAdmins": "Admins",
       "totalCost": "Total AI Cost",
       "totalTokens": "Total Tokens",
-      "totalConversations": "Total Conversations"
+      "totalConversations": "Total Conversations",
+      "ttsCost": "TTS Cost"
     },
     "users": {
       "title": "Users",
@@ -528,6 +531,7 @@
         "name": "Name",
         "role": "Role",
         "aiCost": "AI Cost",
+        "ttsCost": "TTS",
         "tokens": "Tokens",
         "conversations": "Conversations",
         "registered": "Registered"

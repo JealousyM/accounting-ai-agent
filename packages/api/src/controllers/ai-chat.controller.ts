@@ -219,6 +219,7 @@ export class AIChatController {
           userMessage: result.userMessage,
           assistantMessage: result.assistantMessage,
           toolsUsed: result.toolsUsed,
+          tts: result.tts,
         },
       });
     } catch (error) {

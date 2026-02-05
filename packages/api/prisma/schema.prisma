@@ -72,6 +72,10 @@ model User {
   // LLM key preference (for Pro users)
   useOwnLLMKey          Boolean            @default(false)
 
+  // TTS usage tracking (stored in DB instead of LangSmith)
+  ttsCharactersUsed     Int                @default(0)
+  ttsCostUsd            Float              @default(0)
+
   // wFirma integration config
   wfirmaConfig Json?    @db.JsonB
 

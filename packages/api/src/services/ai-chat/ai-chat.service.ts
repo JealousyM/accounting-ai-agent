@@ -11,6 +11,7 @@ import { ChatGoogleGenerativeAI } from '@langchain/google-genai';
 import { HumanMessage, AIMessage, SystemMessage, BaseMessage } from '@langchain/core/messages';
 import { StateGraph, MessagesAnnotation, START, END } from '@langchain/langgraph';
 import { ToolNode } from '@langchain/langgraph/prebuilt';
+import { traceable } from 'langsmith/traceable';
 import { logger } from '../../utils/logger';
 import { WFirmaIntegrationService } from '../wfirma';
 import { WFirmaCacheService } from '../wfirma-cache.service';
@@ -26,12 +27,16 @@ import {
   ProcessMessageResult,
   DEFAULT_LLM_CONFIG,
   ConversationGraphState,
+  Locale,
+  TTSMetadata,
 } from '../../types/ai-chat.types';
 
 // Import from local modules
 import { getSystemPrompt } from './constants';
 import { detectLocale, generateConversationTitle, generateTitleFromMessage } from './utils';
 import { createAllTools } from './tools';
+import { TTSIntegration } from './tts-integration';
+import { ttsService } from '../tts.instance';
 
 export class AIChatService {
   private readonly prisma: PrismaClient;
@@ -41,6 +46,7 @@ export class AIChatService {
   private readonly wfirmaFactory: WFirmaServiceFactory;
   private readonly credentialsService: CredentialsService;
   private readonly defaultProvider: LLMProvider;
+  private readonly ttsIntegration: TTSIntegration;
 
   constructor(
     prisma: PrismaClient,
@@ -56,6 +62,7 @@ export class AIChatService {
     this.fileStorageService = fileStorageService;
     this.wfirmaFactory = wfirmaFactory!;
     this.credentialsService = credentialsService!;
+    this.ttsIntegration = new TTSIntegration(ttsService, prisma);
 
     // Set default provider (used only as fallback, credentials come from DB)
     this.defaultProvider = 'openai';
@@ -97,6 +104,7 @@ export class AIChatService {
 
   /**
    * Send a message and get AI response using LangGraph
+   * Wrapped with traceable for full LangSmith visibility (including TTS)
    */
   async sendMessage(
     conversationId: string,
@@ -104,81 +112,107 @@ export class AIChatService {
     content: string,
     provider?: LLMProvider
   ): Promise<ProcessMessageResult> {
-    const startTime = Date.now();
-    const selectedProvider = provider || this.defaultProvider;
+    // Wrap entire message processing in traceable for unified LangSmith trace
+    const processMessage = traceable(
+      async (): Promise<ProcessMessageResult> => {
+        const startTime = Date.now();
+        const selectedProvider = provider || this.defaultProvider;
 
-    // Get conversation
-    const conversation = await this.getConversationById(conversationId, userId);
-    if (!conversation) {
-      throw new Error('Conversation not found');
-    }
+        // Get conversation
+        const conversation = await this.getConversationById(conversationId, userId);
+        if (!conversation) {
+          throw new Error('Conversation not found');
+        }
 
-    // Parse existing messages
-    const existingMessages = (conversation.messages as any[]) as ChatMessage[];
+        // Parse existing messages
+        const existingMessages = (conversation.messages as any[]) as ChatMessage[];
 
-    // Create user message
-    const userMessage: ChatMessage = {
-      id: uuidv4(),
-      role: 'user',
-      content,
-      timestamp: new Date(),
-    };
+        // Create user message
+        const userMessage: ChatMessage = {
+          id: uuidv4(),
+          role: 'user',
+          content,
+          timestamp: new Date(),
+        };
 
-    // Build LangGraph agent and run
-    const { response, toolsUsed, actualProvider, actualModel } = await this.runAgent(
-      existingMessages,
-      content,
-      userId,
-      conversationId,
-      selectedProvider
+        // Build LangGraph agent and run
+        const { response, toolsUsed, actualProvider, actualModel, locale } = await this.runAgent(
+          existingMessages,
+          content,
+          userId,
+          conversationId,
+          selectedProvider
+        );
+
+        // Create assistant message
+        const assistantMessage: ChatMessage = {
+          id: uuidv4(),
+          role: 'assistant',
+          content: response,
+          timestamp: new Date(),
+          metadata: {
+            provider: actualProvider,
+            model: actualModel,
+          },
+        };
+
+        // Update messages array
+        const updatedMessages = [...existingMessages, userMessage, assistantMessage];
+
+        // Update conversation title if it's the first user message
+        const userMessages = updatedMessages.filter(m => m.role === 'user');
+        let newTitle = conversation.title;
+        if (userMessages.length === 1) {
+          newTitle = generateTitleFromMessage(content);
+        }
+
+        // Update conversation in database
+        await this.prisma.aIConversation.update({
+          where: { id: conversationId },
+          data: {
+            title: newTitle,
+            messages: updatedMessages as any,
+            updatedAt: new Date(),
+          },
+        });
+
+        const processingTimeMs = Date.now() - startTime;
+        logger.info('Message processed with LangGraph', {
+          conversationId,
+          userId,
+          provider: selectedProvider,
+          processingTimeMs,
+          toolsUsed,
+        });
+
+        // Generate TTS for AI response (within same trace context)
+        let tts: TTSMetadata | undefined;
+        try {
+          tts = await this.ttsIntegration.generateForResponse(userId, response, locale);
+        } catch (error) {
+          logger.warn('TTS integration failed', { error, conversationId, userId });
+        }
+
+        return {
+          userMessage,
+          assistantMessage,
+          toolsUsed,
+          tts,
+        };
+      },
+      {
+        name: 'ai_chat_message',
+        run_type: 'chain',
+        metadata: {
+          conversationId,
+          userId,
+          provider: provider || this.defaultProvider,
+        },
+        tags: [`conv:${conversationId}`, `user:${userId}`],
+      }
     );
 
-    // Create assistant message
-    const assistantMessage: ChatMessage = {
-      id: uuidv4(),
-      role: 'assistant',
-      content: response,
-      timestamp: new Date(),
-      metadata: {
-        provider: actualProvider,
-        model: actualModel,
-      },
-    };
-
-    // Update messages array
-    const updatedMessages = [...existingMessages, userMessage, assistantMessage];
-
-    // Update conversation title if it's the first user message
-    const userMessages = updatedMessages.filter(m => m.role === 'user');
-    let newTitle = conversation.title;
-    if (userMessages.length === 1) {
-      newTitle = generateTitleFromMessage(content);
-    }
-
-    // Update conversation in database
-    await this.prisma.aIConversation.update({
-      where: { id: conversationId },
-      data: {
-        title: newTitle,
-        messages: updatedMessages as any,
-        updatedAt: new Date(),
-      },
-    });
-
-    const processingTimeMs = Date.now() - startTime;
-    logger.info('Message processed with LangGraph', {
-      conversationId,
-      userId,
-      provider: selectedProvider,
-      processingTimeMs,
-      toolsUsed,
-    });
-
-    return {
-      userMessage,
-      assistantMessage,
-      toolsUsed,
-    };
+    return processMessage();
   }
 
   /**
@@ -262,7 +296,7 @@ export class AIChatService {
     userId: string,
     conversationId: string,
     _provider: LLMProvider
-  ): Promise<{ response: string; toolsUsed: string[]; actualProvider: LLMProvider; actualModel: string }> {
+  ): Promise<{ response: string; toolsUsed: string[]; actualProvider: LLMProvider; actualModel: string; locale: Locale }> {
     // Get user's LLM credentials from database (REQUIRED)
     if (!this.credentialsService) {
       throw new Error('Credentials service not available');
@@ -420,6 +454,7 @@ export class AIChatService {
       toolsUsed: [...new Set(toolsUsed)],
       actualProvider: selectedProvider,
       actualModel,
+      locale,
     };
   }
 

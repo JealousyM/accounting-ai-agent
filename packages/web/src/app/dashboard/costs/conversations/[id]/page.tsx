@@ -49,6 +49,10 @@ function ConversationCostDetailContent() {
         avgCostPerRun: conversation.runCount > 0 ? conversation.cost / conversation.runCount : 0,
         avgCostPerConversation: conversation.cost,
         avgLatencyMs: 0,
+        // TTS costs not tracked per conversation yet
+        ttsCost: 0,
+        ttsCharacters: 0,
+        ttsCalls: 0,
       }
     : undefined;
 

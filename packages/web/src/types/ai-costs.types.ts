@@ -24,6 +24,10 @@ export interface UserCostSummary {
   avgCostPerRun: number;
   avgCostPerConversation: number;
   avgLatencyMs: number;
+  // TTS costs (separate from LLM)
+  ttsCost: number;
+  ttsCharacters: number;
+  ttsCalls: number;
 }
 
 export interface DailyCostData {

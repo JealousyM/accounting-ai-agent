@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useLocale } from '@/contexts/LocaleContext';
 import { adminApi } from '@/lib/api/admin';
-import { ArrowLeft, RefreshCw, Search, Users, DollarSign, MessageSquare, Shield } from 'lucide-react';
+import { ArrowLeft, RefreshCw, Search, Users, DollarSign, MessageSquare, Shield, Volume2 } from 'lucide-react';
 import Link from 'next/link';
 import enTranslations from '@/i18n/locales/en.json';
 import plTranslations from '@/i18n/locales/pl.json';
@@ -124,7 +124,7 @@ export function AdminDashboard() {
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
           <StatCard
             icon={<Users className="h-6 w-6" />}
             label={t.stats.totalUsers}
@@ -142,6 +142,13 @@ export function AdminDashboard() {
             label={t.stats.totalCost}
             value={formatCurrency(stats?.totalCost ?? 0)}
             isLoading={statsLoading}
+          />
+          <StatCard
+            icon={<Volume2 className="h-6 w-6" />}
+            label={t.stats.ttsCost}
+            value={formatCurrency(stats?.ttsCost ?? 0)}
+            isLoading={statsLoading}
+            color="pink"
           />
           <StatCard
             icon={<MessageSquare className="h-6 w-6" />}
@@ -206,6 +213,9 @@ export function AdminDashboard() {
                     {t.users.table.aiCost}
                   </th>
                   <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    {t.users.table.ttsCost}
+                  </th>
+                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     {t.users.table.conversations}
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
@@ -219,13 +229,13 @@ export function AdminDashboard() {
               <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
                 {usersLoading ? (
                   <tr>
-                    <td colSpan={7} className="px-6 py-8 text-center text-gray-500 dark:text-gray-400">
+                    <td colSpan={8} className="px-6 py-8 text-center text-gray-500 dark:text-gray-400">
                       Loading...
                     </td>
                   </tr>
                 ) : usersData?.users.length === 0 ? (
                   <tr>
-                    <td colSpan={7} className="px-6 py-8 text-center text-gray-500 dark:text-gray-400">
+                    <td colSpan={8} className="px-6 py-8 text-center text-gray-500 dark:text-gray-400">
                       No users found
                     </td>
                   </tr>
@@ -253,6 +263,9 @@ export function AdminDashboard() {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900 dark:text-white">
                         {formatCurrency(user.costs.totalCost)}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-pink-600 dark:text-pink-400">
+                        {formatCurrency(user.costs.ttsCost)}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-600 dark:text-gray-300">
                         {user.costs.conversationCount}
@@ -319,13 +332,19 @@ interface StatCardProps {
   label: string;
   value: number | string;
   isLoading?: boolean;
+  color?: 'blue' | 'pink';
 }
 
-function StatCard({ icon, label, value, isLoading }: StatCardProps) {
+function StatCard({ icon, label, value, isLoading, color = 'blue' }: StatCardProps) {
+  const colorClasses = {
+    blue: 'bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400',
+    pink: 'bg-pink-100 dark:bg-pink-900/30 text-pink-600 dark:text-pink-400',
+  };
+
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
       <div className="flex items-center gap-4">
-        <div className="p-3 bg-blue-100 dark:bg-blue-900/30 rounded-lg text-blue-600 dark:text-blue-400">
+        <div className={`p-3 rounded-lg ${colorClasses[color]}`}>
           {icon}
         </div>
         <div>

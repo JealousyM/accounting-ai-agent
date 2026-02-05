@@ -177,8 +177,28 @@ export interface AIChatServiceConfig {
   // Removed: API keys now stored only in database (user_api_credentials)
 }
 
+// ============================================
+// TTS TYPES
+// ============================================
+
+export type Locale = 'en' | 'pl' | 'ru';
+
+export type TTSSkipReason = 'disabled' | 'code_heavy' | 'table_content' | 'no_api_key' | 'error';
+
+export interface TTSMetadata {
+  locale: Locale;
+  audioBase64?: string;
+  skipped?: boolean;
+  skipReason?: TTSSkipReason;
+}
+
+// ============================================
+// RESULT TYPES
+// ============================================
+
 export interface ProcessMessageResult {
   userMessage: ChatMessage;
   assistantMessage: ChatMessage;
   toolsUsed?: string[];
+  tts?: TTSMetadata;
 }
