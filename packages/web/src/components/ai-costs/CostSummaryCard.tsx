@@ -1,7 +1,7 @@
 'use client';
 
 import { UserCostSummary } from '@/types/ai-costs.types';
-import { DollarSign, Cpu, MessageSquare, Zap, Clock } from 'lucide-react';
+import { DollarSign, Cpu, MessageSquare, Zap, Clock, Volume2 } from 'lucide-react';
 
 interface SummaryTranslations {
   totalCost: string;
@@ -9,6 +9,7 @@ interface SummaryTranslations {
   conversations: string;
   llmRuns: string;
   avgLatency: string;
+  ttsCost?: string;
 }
 
 interface CostSummaryCardProps {
@@ -30,6 +31,7 @@ const DEFAULT_TRANSLATIONS: SummaryTranslations = {
   conversations: 'Conversations',
   llmRuns: 'LLM Runs',
   avgLatency: 'Avg Latency',
+  ttsCost: 'TTS Cost',
 };
 
 export function CostSummaryCard({ summary, isLoading, translations = DEFAULT_TRANSLATIONS }: CostSummaryCardProps) {
@@ -37,8 +39,8 @@ export function CostSummaryCard({ summary, isLoading, translations = DEFAULT_TRA
 
   if (isLoading) {
     return (
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-        {[...Array(5)].map((_, i) => (
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+        {[...Array(6)].map((_, i) => (
           <div key={i} className="animate-pulse bg-gray-200 dark:bg-gray-700 h-24 rounded-lg" />
         ))}
       </div>
@@ -88,10 +90,16 @@ export function CostSummaryCard({ summary, isLoading, translations = DEFAULT_TRA
       icon: Clock,
       color: 'text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-700',
     },
+    {
+      label: t.ttsCost || '',
+      value: formatCost(summary?.ttsCost || 0),
+      icon: Volume2,
+      color: 'text-pink-600 dark:text-pink-400 bg-pink-50 dark:bg-pink-900/30',
+    },
   ];
 
   return (
-    <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
       {stats.map((stat) => {
         const Icon = stat.icon;
         return (

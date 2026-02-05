@@ -1,15 +1,24 @@
 /**
  * TTS Routes
  * API endpoints for text-to-speech synthesis
+ * Tracks costs in database for reliable billing
  */
 
 import { Router, Request, Response } from 'express';
+import { traceable } from 'langsmith/traceable';
 import { authenticate } from '../middleware/auth.middleware';
 import { rateLimiter } from '../middleware/rate-limiter.middleware';
 import { TTSVoice, TTSModel } from '../services/tts.service';
 import { ttsService } from '../services/tts.instance';
+import { prisma } from '../lib/prisma';
 import { logger } from '../utils/logger';
 import { z } from 'zod';
+
+// TTS pricing constants
+const TTS_PRICING = {
+  'tts-1': 0.015, // $0.015 per 1K characters
+  'tts-1-hd': 0.030, // $0.030 per 1K characters
+};
 
 const router = Router();
 
@@ -52,11 +61,64 @@ router.post(
 
       const { text, voice, model } = parsed.data;
 
-      // Synthesize audio
-      const audioBuffer = await ttsService.synthesize(userId, text, {
-        voice: voice as TTSVoice,
-        model: model as TTSModel,
-      });
+      // Calculate cost for LangSmith tracking
+      const characterCount = text.length;
+      const costPer1K = TTS_PRICING[model as keyof typeof TTS_PRICING] || TTS_PRICING['tts-1'];
+      const estimatedCostUSD = (characterCount / 1000) * costPer1K;
+
+      // Wrap synthesis in traceable for LangSmith visibility
+      const synthesizeWithTracing = traceable(
+        async () => {
+          const buffer = await ttsService.synthesize(userId, text, {
+            voice: voice as TTSVoice,
+            model: model as TTSModel,
+          });
+          // Return with usage info for LangSmith cost tracking
+          return {
+            audioBuffer: buffer,
+            usage: {
+              characters: characterCount,
+              cost_usd: parseFloat(estimatedCostUSD.toFixed(6)),
+              model,
+              voice,
+            },
+          };
+        },
+        {
+          name: 'tts_manual_speak',
+          run_type: 'llm', // Use 'llm' type so LangSmith shows cost column
+          metadata: {
+            userId,
+            voice,
+            model,
+            characters: characterCount,
+            estimated_cost_usd: parseFloat(estimatedCostUSD.toFixed(6)),
+            pricing: `$${costPer1K} per 1K characters`,
+            source: 'manual_button',
+          },
+          tags: [`user:${userId}`], // Required for LangSmith cost dashboard queries
+        }
+      );
+
+      const { audioBuffer } = await synthesizeWithTracing();
+
+      // Save TTS cost to database for reliable tracking
+      try {
+        await prisma.user.update({
+          where: { id: userId },
+          data: {
+            ttsCharactersUsed: { increment: characterCount },
+            ttsCostUsd: { increment: estimatedCostUSD },
+          },
+        });
+        logger.debug('TTS cost saved to database', { userId, characters: characterCount, costUsd: estimatedCostUSD });
+      } catch (dbError) {
+        // Log but don't fail the TTS request if cost tracking fails
+        logger.error('Failed to save TTS cost to database', {
+          error: dbError instanceof Error ? dbError.message : dbError,
+          userId,
+        });
+      }
 
       // Send audio response
       res.set({

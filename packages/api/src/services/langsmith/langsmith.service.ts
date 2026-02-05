@@ -85,11 +85,14 @@ export class LangSmithService {
 
     logger.debug('Getting dashboard data', { userId: params.userId, start, end });
 
-    // Fetch all runs for user in parallel
-    const runs = await this.fetchUserRuns(params);
+    // Fetch LLM runs from LangSmith and TTS costs from database in parallel
+    const [runs, dbTTS] = await Promise.all([
+      this.fetchUserRuns(params),
+      this.getUserTTSFromDatabase(params.userId),
+    ]);
 
-    // Calculate all metrics
-    const userSummary = this.calculateUserSummary(runs, params.userId);
+    // Calculate all metrics (TTS from database)
+    const userSummary = this.calculateUserSummary(runs, params.userId, dbTTS);
     const dailyData = this.calculateDailyCosts(runs);
     const byModel = this.calculateCostsByModel(runs);
     const conversations = await this.calculateConversationCosts(runs, params.userId);
@@ -99,6 +102,7 @@ export class LangSmithService {
       dailyData,
       byModel,
       conversations,
+      ttsRuns: [], // TTS runs now tracked in database, not LangSmith
       period: {
         start,
         end,
@@ -111,8 +115,11 @@ export class LangSmithService {
    * Get user cost summary only
    */
   async getUserSummary(params: CostQueryParams): Promise<UserCostSummary> {
-    const runs = await this.fetchUserRuns(params);
-    return this.calculateUserSummary(runs, params.userId);
+    const [runs, dbTTS] = await Promise.all([
+      this.fetchUserRuns(params),
+      this.getUserTTSFromDatabase(params.userId),
+    ]);
+    return this.calculateUserSummary(runs, params.userId, dbTTS);
   }
 
   /**
@@ -482,13 +489,17 @@ export class LangSmithService {
   }
 
   /**
-   * Get aggregated stats for ALL users (single API call)
+   * Get aggregated stats for ALL users
    * Returns a map of userId -> UserCostSummary
    */
   async getAllUserStats(timeRange: string = 'year'): Promise<Map<string, UserCostSummary>> {
-    const allRuns = await this.fetchAllRuns(timeRange);
+    // Fetch LLM runs from LangSmith and TTS costs from database in parallel
+    const [allRuns, allUsersTTS] = await Promise.all([
+      this.fetchAllRuns(timeRange),
+      this.getAllUsersTTSFromDatabase(),
+    ]);
 
-    // Group runs by userId
+    // Group LLM runs by userId
     const runsByUser = new Map<string, LangSmithRunMetrics[]>();
     for (const run of allRuns) {
       if (!run.userId) continue;
@@ -498,31 +509,43 @@ export class LangSmithService {
       runsByUser.set(run.userId, userRuns);
     }
 
+    // Get all unique user IDs (from both LLM runs and TTS database)
+    const allUserIds = new Set([...runsByUser.keys(), ...allUsersTTS.keys()]);
+
     // Calculate summary for each user
     const userStats = new Map<string, UserCostSummary>();
-    for (const [userId, runs] of runsByUser) {
-      userStats.set(userId, this.calculateUserSummary(runs, userId));
+    for (const userId of allUserIds) {
+      const runs = runsByUser.get(userId) || [];
+      const dbTTS = allUsersTTS.get(userId) || { ttsCost: 0, ttsCharacters: 0 };
+      userStats.set(userId, this.calculateUserSummary(runs, userId, dbTTS));
     }
 
     logger.info('getAllUserStats completed', {
       totalRuns: allRuns.length,
+      usersWithTTS: allUsersTTS.size,
       uniqueUsers: userStats.size,
-      userIds: Array.from(userStats.keys()),
     });
 
     return userStats;
   }
 
   /**
-   * Get admin dashboard aggregated totals (single API call)
+   * Get admin dashboard aggregated totals
    */
   async getAdminTotals(timeRange: string = 'year'): Promise<{
     totalCost: number;
     totalTokens: number;
     totalConversations: number;
     totalRuns: number;
+    ttsCost: number;
+    ttsCharacters: number;
+    ttsCalls: number;
   }> {
-    const allRuns = await this.fetchAllRuns(timeRange);
+    // Fetch LLM runs from LangSmith and TTS totals from database in parallel
+    const [allRuns, dbTTS] = await Promise.all([
+      this.fetchAllRuns(timeRange),
+      this.getTotalTTSFromDatabase(),
+    ]);
 
     let totalCost = 0;
     let totalTokens = 0;
@@ -541,6 +564,9 @@ export class LangSmithService {
       totalTokens,
       totalConversations: conversationIds.size,
       totalRuns: allRuns.length,
+      ttsCost: dbTTS.ttsCost,
+      ttsCharacters: dbTTS.ttsCharacters,
+      ttsCalls: 0, // No longer tracking individual calls
     };
   }
 
@@ -589,13 +615,76 @@ export class LangSmithService {
   }
 
   // ============================================
+  // DATABASE - TTS COST TRACKING
+  // ============================================
+
+  /**
+   * Get TTS costs from database for a user
+   * More reliable than LangSmith for cost tracking
+   */
+  private async getUserTTSFromDatabase(userId: string): Promise<{ ttsCost: number; ttsCharacters: number }> {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: { ttsCostUsd: true, ttsCharactersUsed: true },
+    });
+    return {
+      ttsCost: user?.ttsCostUsd || 0,
+      ttsCharacters: user?.ttsCharactersUsed || 0,
+    };
+  }
+
+  /**
+   * Get aggregated TTS costs from database for all users
+   */
+  private async getAllUsersTTSFromDatabase(): Promise<Map<string, { ttsCost: number; ttsCharacters: number }>> {
+    const users = await this.prisma.user.findMany({
+      where: {
+        OR: [
+          { ttsCostUsd: { gt: 0 } },
+          { ttsCharactersUsed: { gt: 0 } },
+        ],
+      },
+      select: { id: true, ttsCostUsd: true, ttsCharactersUsed: true },
+    });
+
+    const result = new Map<string, { ttsCost: number; ttsCharacters: number }>();
+    for (const user of users) {
+      result.set(user.id, {
+        ttsCost: user.ttsCostUsd,
+        ttsCharacters: user.ttsCharactersUsed,
+      });
+    }
+    return result;
+  }
+
+  /**
+   * Get total TTS costs from database
+   */
+  private async getTotalTTSFromDatabase(): Promise<{ ttsCost: number; ttsCharacters: number }> {
+    const result = await this.prisma.user.aggregate({
+      _sum: {
+        ttsCostUsd: true,
+        ttsCharactersUsed: true,
+      },
+    });
+    return {
+      ttsCost: result._sum.ttsCostUsd || 0,
+      ttsCharacters: result._sum.ttsCharactersUsed || 0,
+    };
+  }
+
+  // ============================================
   // PRIVATE - CALCULATIONS
   // ============================================
 
   /**
-   * Calculate user summary from runs
+   * Calculate user summary from runs (LLM only, TTS from database)
    */
-  private calculateUserSummary(runs: LangSmithRunMetrics[], userId: string): UserCostSummary {
+  private calculateUserSummary(
+    runs: LangSmithRunMetrics[],
+    userId: string,
+    dbTTS: { ttsCost: number; ttsCharacters: number } = { ttsCost: 0, ttsCharacters: 0 }
+  ): UserCostSummary {
     const conversationIds = new Set<string>();
     let totalCost = 0;
     let totalTokens = 0;
@@ -629,6 +718,10 @@ export class LangSmithService {
       avgCostPerRun: runCount > 0 ? totalCost / runCount : 0,
       avgCostPerConversation: conversationCount > 0 ? totalCost / conversationCount : 0,
       avgLatencyMs: runCount > 0 ? totalLatency / runCount : 0,
+      // TTS costs from database
+      ttsCost: dbTTS.ttsCost,
+      ttsCharacters: dbTTS.ttsCharacters,
+      ttsCalls: 0, // No longer tracking individual calls
     };
   }
 

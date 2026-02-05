@@ -34,6 +34,10 @@ export interface UserCostSummary {
   avgCostPerRun: number;
   avgCostPerConversation: number;
   avgLatencyMs: number;
+  // TTS costs (separate from LLM)
+  ttsCost: number;
+  ttsCharacters: number;
+  ttsCalls: number;
 }
 
 export interface DailyCostData {
@@ -118,6 +122,22 @@ export interface LangSmithRunMetrics {
   error?: string;
 }
 
+// TTS run metrics (from LangSmith traces)
+export interface TTSRunMetrics {
+  runId: string;
+  name: string;
+  startTime: Date;
+  endTime: Date;
+  latencyMs: number;
+  characters: number;
+  cost: number;
+  model: string;
+  voice: string;
+  conversationId?: string;
+  userId?: string;
+  source: 'auto_speak' | 'manual_button';
+}
+
 // ============================================
 // DASHBOARD RESPONSE TYPES
 // ============================================
@@ -127,6 +147,7 @@ export interface CostDashboardResponse {
   dailyData: DailyCostData[];
   byModel: CostByModel[];
   conversations: ConversationCost[];
+  ttsRuns?: TTSRunMetrics[];
   period: {
     start: Date;
     end: Date;
@@ -150,6 +171,12 @@ export interface ModelPricing {
   input: number;  // per 1M tokens
   output: number; // per 1M tokens
 }
+
+// TTS pricing (per 1K characters)
+export const TTS_PRICING: Record<string, number> = {
+  'tts-1': 0.015,    // $0.015 per 1K characters
+  'tts-1-hd': 0.030, // $0.030 per 1K characters
+};
 
 export const MODEL_PRICING: Record<string, ModelPricing> = {
   // OpenAI models (per 1M tokens)

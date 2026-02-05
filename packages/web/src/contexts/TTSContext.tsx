@@ -54,6 +54,7 @@ interface TTSContextType {
   resume: () => void;
   clearError: () => void;
   isMessageSpeaking: (messageId: string) => boolean;
+  isMessageLoading: (messageId: string) => boolean;
   checkAIAvailability: () => Promise<void>;
 }
 
@@ -368,6 +369,14 @@ export function TTSProvider({ children, locale = 'en' }: TTSProviderProps) {
     [settings.useAI, isAIAvailable, isAISpeaking, browserTTS.isSpeaking, browserTTS.currentMessageId]
   );
 
+  // Check if specific message is loading (AI TTS fetching audio)
+  const isMessageLoading = useCallback(
+    (messageId: string) => {
+      return isLoading && currentAIMessageIdRef.current === messageId;
+    },
+    [isLoading]
+  );
+
   // Combined state
   const isSpeaking = settings.useAI && isAIAvailable ? isAISpeaking : browserTTS.isSpeaking;
   const currentMessageId = settings.useAI && isAIAvailable
@@ -409,6 +418,7 @@ export function TTSProvider({ children, locale = 'en' }: TTSProviderProps) {
     resume: browserTTS.resume,
     clearError,
     isMessageSpeaking,
+    isMessageLoading,
     checkAIAvailability,
   };
 

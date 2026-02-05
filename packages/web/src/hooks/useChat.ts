@@ -49,6 +49,13 @@ export interface ChatMessage {
   };
 }
 
+export interface TTSMetadata {
+  locale: 'en' | 'pl' | 'ru';
+  audioBase64?: string;
+  skipped?: boolean;
+  skipReason?: 'disabled' | 'code_heavy' | 'table_content' | 'no_api_key' | 'error';
+}
+
 export interface Conversation {
   id: string;
   title: string;
@@ -111,6 +118,7 @@ const sendMessage = async (
   userMessage: ChatMessage;
   assistantMessage: ChatMessage;
   toolsUsed?: string[];
+  tts?: TTSMetadata;
 }> => {
   const response = await axios.post(
     `${API_URL}/api/ai/conversations/${conversationId}/messages`,
@@ -135,6 +143,7 @@ export function useChat() {
   const [currentConversationId, setCurrentConversationId] = useState<string | null>(null);
   const [pendingMessage, setPendingMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [latestTTS, setLatestTTS] = useState<TTSMetadata | null>(null);
 
   // Fetch conversations list
   const {
@@ -181,8 +190,12 @@ export function useChat() {
       setPendingMessage(content);
       setErrorMessage(null);
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       setPendingMessage(null);
+      // Store TTS data from response (for backend TTS integration)
+      if (data.tts) {
+        setLatestTTS(data.tts);
+      }
       // Refetch conversation to get updated messages
       queryClient.invalidateQueries({ queryKey: ['conversation', currentConversationId] });
       queryClient.invalidateQueries({ queryKey: ['conversations'] });
@@ -288,6 +301,10 @@ export function useChat() {
     error: sendMessageMutation.error,
     errorMessage,
     clearError: () => setErrorMessage(null),
+
+    // TTS data from backend (LangChain integrated)
+    latestTTS,
+    clearTTS: () => setLatestTTS(null),
 
     // Actions
     sendMessage: handleSendMessage,

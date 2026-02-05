@@ -15,6 +15,9 @@ export interface UserWithCosts {
     totalTokens: number;
     conversationCount: number;
     runCount: number;
+    ttsCost: number;
+    ttsCharacters: number;
+    ttsCalls: number;
   };
 }
 
@@ -24,6 +27,9 @@ export interface AdminDashboardStats {
   totalCost: number;
   totalTokens: number;
   totalConversations: number;
+  ttsCost: number;
+  ttsCharacters: number;
+  ttsCalls: number;
 }
 
 export interface GetUsersParams {
@@ -88,12 +94,18 @@ export class AdminService {
               totalTokens: stats.totalTokens,
               conversationCount: stats.conversationCount,
               runCount: stats.runCount,
+              ttsCost: stats.ttsCost,
+              ttsCharacters: stats.ttsCharacters,
+              ttsCalls: stats.ttsCalls,
             }
           : {
               totalCost: 0,
               totalTokens: 0,
               conversationCount: 0,
               runCount: 0,
+              ttsCost: 0,
+              ttsCharacters: 0,
+              ttsCalls: 0,
             },
       };
     });
@@ -125,6 +137,9 @@ export class AdminService {
       totalCost: costTotals.totalCost,
       totalTokens: costTotals.totalTokens,
       totalConversations: costTotals.totalConversations,
+      ttsCost: costTotals.ttsCost,
+      ttsCharacters: costTotals.ttsCharacters,
+      ttsCalls: costTotals.ttsCalls,
     };
   }
 

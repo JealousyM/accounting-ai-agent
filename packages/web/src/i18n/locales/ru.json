@@ -233,6 +233,7 @@
     "tts": {
       "play": "Прочитать вслух",
       "stop": "Остановить чтение",
+      "loading": "Генерирую голос...",
       "speaking": "Читаю...",
       "settings": "Настройки голоса",
       "enabled": "Голосовое воспроизведение",
@@ -466,7 +467,8 @@
       "totalTokens": "Всего токенов",
       "conversations": "Разговоры",
       "llmRuns": "Запросы LLM",
-      "avgLatency": "Ср. задержка"
+      "avgLatency": "Ср. задержка",
+      "ttsCost": "Стоимость TTS"
     },
     "charts": {
       "dailyCost": "Дневной тренд затрат",
@@ -518,7 +520,8 @@
       "totalAdmins": "Администраторы",
       "totalCost": "Общая стоимость AI",
       "totalTokens": "Всего токенов",
-      "totalConversations": "Всего разговоров"
+      "totalConversations": "Всего разговоров",
+      "ttsCost": "Стоимость TTS"
     },
     "users": {
       "title": "Пользователи",
@@ -528,6 +531,7 @@
         "name": "Имя",
         "role": "Роль",
         "aiCost": "Стоимость AI",
+        "ttsCost": "TTS",
         "tokens": "Токены",
         "conversations": "Разговоры",
         "registered": "Зарегистрирован"

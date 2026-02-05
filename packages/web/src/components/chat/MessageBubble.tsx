@@ -19,6 +19,7 @@ interface ToolsTranslations {
 interface TTSTranslations {
   play: string;
   stop: string;
+  loading?: string;
 }
 
 interface MessageBubbleProps {

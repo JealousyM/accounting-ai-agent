@@ -10,6 +10,9 @@ export interface AdminDashboardStats {
   totalCost: number;
   totalTokens: number;
   totalConversations: number;
+  ttsCost: number;
+  ttsCharacters: number;
+  ttsCalls: number;
 }
 
 export interface UserCosts {
@@ -17,6 +20,9 @@ export interface UserCosts {
   totalTokens: number;
   conversationCount: number;
   runCount: number;
+  ttsCost: number;
+  ttsCharacters: number;
+  ttsCalls: number;
 }
 
 export interface UserWithCosts {
