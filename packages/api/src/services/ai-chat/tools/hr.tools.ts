@@ -1,4 +1,4 @@
-/**
+  /**
  * HR Tools
  * LangChain tools for employee management, contracts, payroll, and absences
  */
@@ -17,6 +17,7 @@ import {
   formatEmployeeDeleted,
   formatContractsList,
   formatPayrollCalculation,
+  formatPayrollRecordCreated,
   formatPayrollRecords,
   formatAbsencesList,
   formatHRSummary,
@@ -264,7 +265,7 @@ export function createUpdateEmployeeTool(
         if (bankAccount !== undefined) updateData.bankAccount = bankAccount;
         if (taxOffice !== undefined) updateData.taxOffice = taxOffice;
         if (hiredAt !== undefined) updateData.hiredAt = new Date(hiredAt);
-        if (isActive !== undefined) updateData.isActive = isActive;
+        if (isActive !== undefined && isActive !== null) updateData.isActive = isActive;
 
         if (Object.keys(updateData).length === 0) {
           const t = getHRTranslations(locale);
@@ -644,6 +645,149 @@ export function createCalculatePayrollTool(
         period: z.string().describe('Payroll period in YYYY-MM format (e.g., 2026-02)'),
         bonuses: z.number().nullable().optional().describe('Additional bonuses in PLN (default 0)'),
         deductions: z.number().nullable().optional().describe('Deductions in PLN (default 0)'),
+      }),
+    }
+  );
+}
+
+// ============================================
+// 9b. SAVE PAYROLL RECORD
+// ============================================
+
+export function createSavePayrollRecordTool(
+  hrService: HRService,
+  userId: string,
+  locale: Locale,
+): StructuredToolInterface {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (tool as any)(
+    async ({
+      contractId,
+      period,
+      bonuses,
+      deductions,
+    }: {
+      contractId: string;
+      period: string;
+      bonuses?: number;
+      deductions?: number;
+    }) => {
+      try {
+        const contract = await hrService.getContractById(userId, contractId);
+
+        if (!contract) {
+          const t = getHRTranslations(locale);
+          return t.notFound;
+        }
+
+        const employeeName = contract.employee
+          ? `${contract.employee.firstName} ${contract.employee.lastName}`
+          : '-';
+
+        const record = await hrService.savePayrollRecord(
+          userId,
+          contractId,
+          period,
+          bonuses || 0,
+          deductions || 0,
+        );
+
+        logger.info('Saved payroll record for AI tool', { contractId, period, recordId: record.id });
+
+        const formatterData = {
+          grossAmount: Number(record.grossAmount),
+          zusEmerytalne: Number(record.zusEmerytalne),
+          zusRentowe: Number(record.zusRentowe),
+          zusChorobowe: Number(record.zusChorobowe),
+          zusZdrowotne: Number(record.zusZdrowotne),
+          zusEmployeeTotal: Number(record.zusEmerytalne) + Number(record.zusRentowe) + Number(record.zusChorobowe) + Number(record.zusZdrowotne),
+          zusEmerytalneEmployer: Number(record.zusEmerytalneEmployer),
+          zusRentoweEmployer: Number(record.zusRentoweEmployer),
+          zusWypadkowe: Number(record.zusWypadkowe),
+          zusFP: Number(record.zusFP),
+          zusFGSP: Number(record.zusFGSP),
+          zusEmployerTotal: Number(record.zusEmerytalneEmployer) + Number(record.zusRentoweEmployer) + Number(record.zusWypadkowe) + Number(record.zusFP) + Number(record.zusFGSP),
+          taxBase: Number(record.taxBase),
+          incomeTax: Number(record.incomeTax),
+          netAmount: Number(record.netAmount),
+          totalEmployerCost: Number(record.totalEmployerCost),
+        };
+
+        const t = getHRTranslations(locale);
+        const typeMap: Record<string, string> = {
+          employment: t.employment,
+          mandate_contract: t.mandateContract,
+          work_contract: t.workContract,
+          board_resolution: t.boardResolution,
+          dividend: t.dividend,
+        };
+        const contractTypeName = typeMap[contract.type] || contract.type;
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        return formatPayrollRecordCreated(formatterData as any, employeeName, period, contractTypeName, locale);
+      } catch (error) {
+        logger.error('Failed to save payroll record', { error, contractId, period });
+        const t = getHRTranslations(locale);
+        if (error instanceof Error) {
+          return `Error: ${t.errorCreate} - ${error.message}`;
+        }
+        return `Error: ${t.errorCreate}`;
+      }
+    },
+    {
+      name: 'save_payroll_record',
+      description: 'Calculate payroll AND save the record to the system. Use this when the user wants to create/register/save a payroll entry. This performs the calculation and permanently stores the result in the database.',
+      schema: z.object({
+        contractId: z.string().describe('Contract ID (UUID) to calculate and save payroll for'),
+        period: z.string().describe('Payroll period in YYYY-MM format (e.g., 2026-02)'),
+        bonuses: z.number().nullable().optional().describe('Additional bonuses in PLN (default 0)'),
+        deductions: z.number().nullable().optional().describe('Deductions in PLN (default 0)'),
+      }),
+    }
+  );
+}
+
+// ============================================
+// 9c. DELETE PAYROLL RECORD
+// ============================================
+
+export function createDeletePayrollRecordTool(
+  hrService: HRService,
+  userId: string,
+  locale: Locale,
+): StructuredToolInterface {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (tool as any)(
+    async ({ id }: { id: string }) => {
+      try {
+        const result = await hrService.deletePayrollRecord(userId, id);
+
+        if (!result) {
+          const t = getHRTranslations(locale);
+          return t.notFound;
+        }
+
+        logger.info('Deleted payroll record for AI tool', { payrollRecordId: id });
+        const t = getHRTranslations(locale);
+        return `## ${t.payrollDeleted}
+
+- **${t.id}:** \`${id}\`
+
+> ${t.payrollDeletedWarning}`;
+      } catch (error) {
+        logger.error('Failed to delete payroll record', { error, id });
+        const t = getHRTranslations(locale);
+        if (error instanceof Error) {
+          return `Error: ${t.errorDelete} - ${error.message}`;
+        }
+        return `Error: ${t.errorDelete}`;
+      }
+    },
+    {
+      name: 'delete_payroll_record',
+      description: 'Delete a saved payroll record by its ID. WARNING: This permanently removes the record from the database and cannot be undone.',
+      schema: z.object({
+        id: z.string().describe('Payroll record ID (UUID) to delete'),
       }),
     }
   );

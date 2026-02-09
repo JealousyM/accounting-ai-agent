@@ -320,14 +320,6 @@ export class AIChatService {
       model: selectedModel,
     });
 
-    // Check if using newer OpenAI model (gpt-5, o1, o3) which have different behavior
-    const modelToUse = selectedModel || DEFAULT_LLM_CONFIG[selectedProvider].model;
-    const isNewerModel = selectedProvider === 'openai' && (
-      modelToUse.startsWith('gpt-5') ||
-      modelToUse.startsWith('o1') ||
-      modelToUse.startsWith('o3')
-    );
-
     // Create the LLM based on provider (with REQUIRED user API key)
     const model = this.createModel(selectedProvider, apiKey, selectedModel);
 
@@ -402,8 +394,7 @@ export class AIChatService {
     ];
 
     // Run the graph with recursion limit and LangSmith metadata for cost tracking
-    // Lower recursion limit for newer models that can be more persistent
-    const recursionLimit = isNewerModel ? 6 : 10;
+    const recursionLimit = 25;
 
     const result = await graph.invoke(
       { messages: langchainMessages },

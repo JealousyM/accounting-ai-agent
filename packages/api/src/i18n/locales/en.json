@@ -486,7 +486,7 @@
     "notFound": "No employees found.",
     "employeesTitle": "Employees",
     "employeeTitle": "Employee",
-    "tableHeaders": "| # | First Name | Last Name | Position | Department | Contract | Status |",
+    "tableHeaders": "| # | ID | First Name | Last Name | Position | Department | Contract | Status |",
     "created": "Employee Created",
     "createdHint": "Employee has been added to the system and is available for payroll processing.",
     "updated": "Employee Updated",
@@ -548,6 +548,11 @@
     "sickLeave": "Sick Leave",
     "maternity": "Maternity / Paternity Leave",
     "unpaid": "Unpaid Leave",
+
+    "payrollSaved": "Payroll Record Saved",
+    "payrollSavedHint": "Payroll record has been saved to the system. You can view it in the payroll records list.",
+    "payrollDeleted": "Payroll Record Deleted",
+    "payrollDeletedWarning": "Payroll record has been permanently deleted from the system. This action cannot be undone.",
 
     "hrSummary": "HR Summary",
     "totalEmployees": "Total Employees",

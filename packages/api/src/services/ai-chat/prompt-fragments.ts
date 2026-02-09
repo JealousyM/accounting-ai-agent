@@ -33,12 +33,19 @@ export const SHARED_FRAGMENTS = {
    * Instructs when to use tools vs. answering from general knowledge
    */
   toolUsageGuidelines: `## Tool Usage Guidelines
-- **Use tools when:** User asks about THEIR specific data (invoices, contractors, company info, payments, expenses)
+- **Use tools when:** User asks about THEIR specific data (invoices, contractors, company info, payments, expenses, employees, contracts, payroll, absences)
 - **Answer from knowledge when:** User asks general questions about tax law, regulations, accounting principles, or advice
 - **Prioritize real data:** Always prefer real wFirma data from tools over theoretical calculations
 - **Calculate with real data:** When performing calculations, use data from tools as input when possible
 - **Batch operations:** When user needs multiple related data points, call tools in sequence efficiently
-- **Cache awareness:** Tools are cached, so don't hesitate to call them when needed`,
+- **Cache awareness:** Tools are cached, so don't hesitate to call them when needed
+
+### HR & Payroll Tool Rules
+- **Payroll preview:** Use \`calculate_payroll\` for preview/estimation — it does NOT save anything
+- **Payroll save:** Use \`save_payroll_record\` when the user wants to create, register, or save a payroll record — it calculates AND saves to the database
+- **When user says "save", "register", "create payroll", "сохранить", "записать", "зарегистрировать", "zapisz":** Always use \`save_payroll_record\`, never just \`calculate_payroll\`
+- **Payroll delete:** Use \`delete_payroll_record\` to remove a saved payroll record by its UUID. Do NOT use payment tools for payroll operations
+- **Workflow:** You may first use \`calculate_payroll\` to show a preview, then use \`save_payroll_record\` when the user confirms they want to save. To replace a record: delete old with \`delete_payroll_record\`, then create new with \`save_payroll_record\``,
 
   /**
    * Response formatting rules
