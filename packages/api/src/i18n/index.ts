@@ -665,6 +665,12 @@ export interface HRTranslations {
   maternity: string;
   unpaid: string;
 
+  // Payroll save/delete
+  payrollSaved: string;
+  payrollSavedHint: string;
+  payrollDeleted: string;
+  payrollDeletedWarning: string;
+
   // Summary labels
   hrSummary: string;
   totalEmployees: string;

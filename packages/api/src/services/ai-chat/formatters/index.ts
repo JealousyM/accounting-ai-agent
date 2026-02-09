@@ -86,6 +86,7 @@ export {
   formatEmployeeDeleted,
   formatContractsList,
   formatPayrollCalculation,
+  formatPayrollRecordCreated,
   formatPayrollRecords,
   formatAbsencesList,
   formatHRSummary,

@@ -486,7 +486,7 @@
     "notFound": "Nie znaleziono pracowników.",
     "employeesTitle": "Pracownicy",
     "employeeTitle": "Pracownik",
-    "tableHeaders": "| # | Imię | Nazwisko | Stanowisko | Dział | Umowa | Status |",
+    "tableHeaders": "| # | ID | Imię | Nazwisko | Stanowisko | Dział | Umowa | Status |",
     "created": "Pracownik utworzony",
     "createdHint": "Pracownik został dodany do systemu i jest dostępny do naliczania wynagrodzeń.",
     "updated": "Pracownik zaktualizowany",
@@ -548,6 +548,11 @@
     "sickLeave": "Zwolnienie lekarskie",
     "maternity": "Urlop macierzyński / ojcowski",
     "unpaid": "Urlop bezpłatny",
+
+    "payrollSaved": "Naliczenie zapisane",
+    "payrollSavedHint": "Naliczenie zostało zapisane w systemie. Możesz je zobaczyć na liście naliczeń płacowych.",
+    "payrollDeleted": "Naliczenie usunięte",
+    "payrollDeletedWarning": "Naliczenie zostało trwale usunięte z systemu. Tej akcji nie można cofnąć.",
 
     "hrSummary": "Podsumowanie kadrowe",
     "totalEmployees": "Łączna liczba pracowników",

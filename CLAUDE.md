@@ -120,3 +120,111 @@ Reference the agent file when asking Claude Code for specialized help:
 ```
 
 Each agent contains domain-specific context, patterns, and examples to guide development in that area.
+
+## Claude Code Agent Teams (Experimental)
+
+Agent Teams spawn **independent Claude Code instances** that work in parallel with shared task lists and inter-agent messaging. Unlike subagents (which run within a single session), teammates have their own context windows and can communicate directly.
+
+### Enabling
+
+Enabled via `.claude/settings.json` (`env.CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS`). Teams are created through natural language prompts.
+
+### Teams vs Subagents
+
+| | Subagents (`@.claude/agents/*.md`) | Agent Teams |
+|---|---|---|
+| **Context** | Shared with main session | Independent per teammate |
+| **Communication** | Report back to caller only | Teammates message each other |
+| **Best for** | Single-domain tasks | Multi-layer collaborative work |
+| **Example** | `@prisma.md Add Employee table` | `Create team to add HR module` |
+
+### Recommended Team Structures
+
+#### 1. Full-Stack Feature (6 members)
+
+**Use for**: New features spanning backend + frontend + AI tools + database.
+
+```
+Create an agent team with:
+- Team Lead: coordinate architecture, review integration
+- Backend Developer: services and routes in packages/api/src/
+- Database Specialist: Prisma schema and migrations
+- LangGraph AI Developer: AI tools and formatters in packages/api/src/services/ai-chat/
+- Frontend Developer: React components and hooks in packages/web/src/
+- Test Engineer: unit, integration, and E2E tests
+```
+
+**Example** (invoice approval workflow):
+```
+Create a full-stack feature team to add invoice approval workflow:
+- Team Lead: design architecture, coordinate integration
+- Backend: create ApprovalService in packages/api/src/services/, add routes
+- Database: add approval_status, approver_id fields to Prisma schema, run migration
+- LangGraph: create approval tools in packages/api/src/services/ai-chat/tools/approval.tools.ts,
+  formatter in formatters/approval.formatter.ts (follow contractor.tools.ts pattern)
+- Frontend: ApprovalButton component, useApproval hook in packages/web/src/
+- Test: test service, API routes, and UI components
+```
+
+#### 2. wFirma Integration Module (7 members)
+
+**Use for**: Adding new wFirma module (service + tools + formatters + routes + UI).
+
+```
+Create a wFirma integration team with:
+- Team Lead: coordinate integration pattern
+- wFirma API Specialist: service with retry logic and WFirmaCacheService integration
+- LangGraph Tool Developer: AI tools with Zod schemas
+- Formatter Developer: markdown formatters with pl/en/ru localization
+- Backend Developer: routes and controllers with auth middleware
+- Frontend Developer: React components and hooks
+- Database Specialist: cache schema updates
+```
+
+**Example** (bank reconciliation):
+```
+Create a wFirma integration team to add bank statement reconciliation:
+- Team Lead: coordinate, follow existing wFirma integration pattern
+- wFirma Specialist: BankStatementService following packages/api/src/services/wfirma/invoice.service.ts
+- LangGraph: tools in packages/api/src/services/ai-chat/tools/bank-statement.tools.ts
+  (follow contractor.tools.ts pattern)
+- Formatter: packages/api/src/services/ai-chat/formatters/bank-statement.formatter.ts
+  (follow invoice.formatter.ts pattern)
+- Backend: packages/api/src/routes/bank-statement.routes.ts (follow hr.routes.ts pattern)
+- Frontend: BankReconciliation components in packages/web/src/components/
+- Database: update Prisma schema, add cache type to WFirmaCache
+```
+
+#### 3. Bug Investigation (5 members)
+
+**Use for**: Cross-layer debugging with competing hypotheses.
+
+```
+Create a bug investigation team with:
+- Team Lead: coordinate debugging, analyze git history
+- Backend Investigator: services, routes, API responses
+- Frontend Investigator: React components, hooks, state management
+- Database Investigator: data integrity, query performance, cache validity
+- Test Engineer: reproduce bug, create failing test, verify fix
+```
+
+#### 4. Code Review (5 members)
+
+**Use for**: Comprehensive PR review before merging.
+
+```
+Create a code review team with:
+- Team Lead: review architecture and API design
+- Code Simplifier: refactor for clarity (follow .claude/agents/code-simplifier.md patterns)
+- Security Reviewer: auth, credentials, validation, Zod schemas
+- Test Coverage Analyst: check test adequacy for all changed files
+- Documentation Reviewer: CLAUDE.md, i18n files, service READMEs
+```
+
+### Tips
+
+- Keep teams at 5-7 members; smaller teams coordinate faster
+- Assign clear file ownership per teammate to avoid merge conflicts
+- Reference existing files as patterns (e.g., "follow `contractor.tools.ts` pattern")
+- Run `npm run test` and `npm run build` after team integration
+- Use subagents for single-domain tasks, teams for multi-layer work

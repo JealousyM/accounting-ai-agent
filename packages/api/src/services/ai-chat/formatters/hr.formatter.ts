@@ -76,11 +76,11 @@ export function formatEmployeesList(employees: Employee[], locale: Locale = 'pl'
 
   let result = `## ${t.employeesTitle} (${employees.length})\n\n`;
   result += t.tableHeaders + '\n';
-  result += '|---|----------|----------|----------|----------|----------|--------|\n';
+  result += '|---|------|----------|----------|----------|----------|----------|--------|\n';
 
   employees.forEach((emp, i) => {
     const status = emp.isActive ? t.active : t.terminated;
-    result += `| ${i + 1} | **${emp.firstName}** | **${emp.lastName}** | ${(emp as any).position || '-'} | ${(emp as any).department || '-'} | - | ${status} |\n`;
+    result += `| ${i + 1} | \`${emp.id}\` | **${emp.firstName}** | **${emp.lastName}** | ${(emp as any).position || '-'} | ${(emp as any).department || '-'} | - | ${status} |\n`;
   });
 
   result += `\n> ${t.updateDeleteHint}`;
@@ -155,8 +155,8 @@ export function formatContractsList(contracts: ContractWithEmployeeName[], local
   }
 
   let result = `## ${t.contractType} (${contracts.length})\n\n`;
-  result += `| # | ${t.firstName} ${t.lastName} | ${t.contractType} | ${t.contractStatus} | ${t.position} | ${t.grossAmount} | ${t.hireDate} |\n`;
-  result += '|---|----------|----------|----------|----------|----------|----------|\n';
+  result += `| # | ${t.id} | ${t.firstName} ${t.lastName} | ${t.contractType} | ${t.contractStatus} | ${t.position} | ${t.grossAmount} | ${t.hireDate} |\n`;
+  result += '|---|------|----------|----------|----------|----------|----------|----------|\n';
 
   contracts.forEach((c, i) => {
     const empName = c.employee
@@ -164,7 +164,7 @@ export function formatContractsList(contracts: ContractWithEmployeeName[], local
       : '-';
     const type = formatContractType(c.type, locale);
     const status = formatContractStatus(c.status, locale);
-    result += `| ${i + 1} | ${empName} | ${type} | ${status} | ${c.position || '-'} | ${formatMoney(c.baseSalaryGross)} | ${formatDate(c.startDate)} - ${formatDate(c.endDate)} |\n`;
+    result += `| ${i + 1} | \`${c.id}\` | ${empName} | ${type} | ${status} | ${c.position || '-'} | ${formatMoney(c.baseSalaryGross)} | ${formatDate(c.startDate)} - ${formatDate(c.endDate)} |\n`;
   });
 
   return result;
@@ -213,6 +213,23 @@ export function formatPayrollCalculation(
 | **${t.totalEmployerCost}** | **${formatMoney(calculation.totalEmployerCost)}** |`;
 }
 
+export function formatPayrollRecordCreated(
+  calculation: PayrollCalculation,
+  employeeName: string,
+  period: string,
+  contractType: string,
+  locale: Locale = 'pl',
+): string {
+  const t = getHRTranslations(locale);
+  const details = formatPayrollCalculation(calculation, employeeName, period, contractType, locale);
+
+  return `## ${t.payrollSaved}
+
+${details}
+
+> ${t.payrollSavedHint}`;
+}
+
 interface PayrollRecordWithEmployee extends PayrollRecord {
   employee?: { firstName: string; lastName: string };
 }
@@ -225,15 +242,15 @@ export function formatPayrollRecords(records: PayrollRecordWithEmployee[], local
   }
 
   let result = `## ${t.payrollTitle} (${records.length})\n\n`;
-  result += `| # | ${t.firstName} ${t.lastName} | ${t.period} | ${t.grossAmount} | ${t.netAmount} | Status |\n`;
-  result += '|---|----------|----------|----------|----------|--------|\n';
+  result += `| # | ${t.id} | ${t.firstName} ${t.lastName} | ${t.period} | ${t.grossAmount} | ${t.netAmount} | Status |\n`;
+  result += '|---|------|----------|----------|----------|----------|--------|\n';
 
   records.forEach((r, i) => {
     const empName = r.employee
       ? `${r.employee.firstName} ${r.employee.lastName}`
       : '-';
     const paidStatus = r.paidAt ? formatDate(r.paidAt) : t.unpaid;
-    result += `| ${i + 1} | ${empName} | ${r.period} | ${formatMoney(r.grossAmount)} | ${formatMoney(r.netAmount)} | ${paidStatus} |\n`;
+    result += `| ${i + 1} | \`${r.id}\` | ${empName} | ${r.period} | ${formatMoney(r.grossAmount)} | ${formatMoney(r.netAmount)} | ${paidStatus} |\n`;
   });
 
   return result;
@@ -255,8 +272,8 @@ export function formatAbsencesList(absences: AbsenceWithEmployee[], locale: Loca
   }
 
   let result = `## ${t.absencesTitle} (${absences.length})\n\n`;
-  result += `| # | ${t.firstName} ${t.lastName} | ${t.contractType} | ${t.hireDate} | ${t.period} | Status |\n`;
-  result += '|---|----------|----------|----------|----------|--------|\n';
+  result += `| # | ${t.id} | ${t.firstName} ${t.lastName} | ${t.contractType} | ${t.hireDate} | ${t.period} | Status |\n`;
+  result += '|---|------|----------|----------|----------|----------|--------|\n';
 
   absences.forEach((a, i) => {
     const empName = a.employee
@@ -265,7 +282,7 @@ export function formatAbsencesList(absences: AbsenceWithEmployee[], locale: Loca
     const type = formatAbsenceType(a.type, locale);
     const dates = `${formatDate(a.startDate)} - ${formatDate(a.endDate)}`;
     const approvedStr = a.approved ? t.active : t.draft;
-    result += `| ${i + 1} | ${empName} | ${type} | ${dates} | ${a.businessDays} | ${approvedStr} |\n`;
+    result += `| ${i + 1} | \`${a.id}\` | ${empName} | ${type} | ${dates} | ${a.businessDays} | ${approvedStr} |\n`;
   });
 
   return result;
