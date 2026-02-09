@@ -37,6 +37,7 @@ import { detectLocale, generateConversationTitle, generateTitleFromMessage } fro
 import { createAllTools } from './tools';
 import { TTSIntegration } from './tts-integration';
 import { ttsService } from '../tts.instance';
+import { hrService } from '../hr/hr.instance';
 
 export class AIChatService {
   private readonly prisma: PrismaClient;
@@ -343,7 +344,7 @@ export class AIChatService {
     const systemPrompt = getSystemPrompt(locale);
 
     // Create tools with userId, locale, and subscription tracking
-    const tools = createAllTools(wfirmaService, this.cacheService, this.fileStorageService, userId, locale, subscriptionService);
+    const tools = createAllTools(wfirmaService, this.cacheService, this.fileStorageService, userId, locale, subscriptionService, hrService);
 
     logger.info('Created tools for agent', {
       toolCount: tools.length,

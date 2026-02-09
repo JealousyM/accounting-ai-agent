@@ -15,6 +15,7 @@ import adminRoutes from './routes/admin.routes';
 import subscriptionRoutes from './routes/subscription.routes';
 import webhookRoutes from './routes/webhook.routes';
 import ttsRoutes from './routes/tts.routes';
+import hrRoutes from './routes/hr.routes';
 import { globalRateLimiter } from './middleware/rate-limiter.middleware';
 import { errorHandler, notFoundHandler } from './middleware/error-handler.middleware';
 import { logger } from './utils/logger';
@@ -88,6 +89,9 @@ app.use('/api/subscription', subscriptionRoutes);
 
 // TTS routes (text-to-speech)
 app.use('/api/tts', ttsRoutes);
+
+// HR routes (employees, contracts, payroll, absences)
+app.use('/api/hr', hrRoutes);
 
 // 404 handler
 app.use(notFoundHandler);
