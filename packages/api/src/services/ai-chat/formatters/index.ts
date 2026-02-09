@@ -78,3 +78,15 @@ export {
   formatOperationSchemasList,
   formatOperationSchemaDetails,
 } from './ledger.formatter';
+export {
+  formatEmployeesList,
+  formatEmployeeDetails,
+  formatEmployeeCreated,
+  formatEmployeeUpdated,
+  formatEmployeeDeleted,
+  formatContractsList,
+  formatPayrollCalculation,
+  formatPayrollRecords,
+  formatAbsencesList,
+  formatHRSummary,
+} from './hr.formatter';

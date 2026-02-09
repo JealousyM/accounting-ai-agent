@@ -590,6 +590,98 @@ export interface DocumentTranslations {
   errorReason: string;
 }
 
+export interface HRTranslations {
+  // Employee CRUD
+  notFound: string;
+  employeesTitle: string;
+  employeeTitle: string;
+  tableHeaders: string;
+  created: string;
+  createdHint: string;
+  updated: string;
+  updatedHint: string;
+  deleted: string;
+  deletedWarning: string;
+  updateDeleteHint: string;
+
+  // Field labels
+  id: string;
+  firstName: string;
+  lastName: string;
+  pesel: string;
+  nip: string;
+  email: string;
+  phone: string;
+  address: string;
+  bankAccount: string;
+  taxOffice: string;
+  position: string;
+  department: string;
+  hireDate: string;
+  field: string;
+  value: string;
+
+  // Contract types
+  contractType: string;
+  boardResolution: string;
+  employment: string;
+  mandateContract: string;
+  workContract: string;
+  dividend: string;
+
+  // Contract statuses
+  contractStatus: string;
+  draft: string;
+  active: string;
+  terminated: string;
+  expired: string;
+
+  // Payroll labels
+  payrollTitle: string;
+  grossAmount: string;
+  netAmount: string;
+  bonuses: string;
+  deductions: string;
+  period: string;
+  totalEmployerCost: string;
+
+  // ZUS labels
+  zusTitle: string;
+  zusEmerytalne: string;
+  zusRentowe: string;
+  zusChorobowe: string;
+  zusZdrowotne: string;
+  zusEmployer: string;
+
+  // Tax labels
+  taxTitle: string;
+  taxBase: string;
+  incomeTax: string;
+
+  // Absence types
+  absencesTitle: string;
+  vacation: string;
+  sickLeave: string;
+  maternity: string;
+  unpaid: string;
+
+  // Summary labels
+  hrSummary: string;
+  totalEmployees: string;
+  activeContracts: string;
+  totalPayrollFund: string;
+
+  // Errors
+  errorFetch: string;
+  errorCreate: string;
+  errorUpdate: string;
+  errorDelete: string;
+  errorCreateTitle: string;
+  errorReason: string;
+  requiredFields: string;
+  tryAgain: string;
+}
+
 export interface CommonTranslations {
   wfirmaLimitReached: string;
   aiLimitReached: string;
@@ -609,6 +701,7 @@ export interface Translations {
   declarations: DeclarationTranslations;
   document: DocumentTranslations;
   ledger: LedgerTranslations;
+  hr: HRTranslations;
 }
 
 const translations: Record<Locale, Translations> = {
@@ -663,6 +756,10 @@ export function getDocumentTranslations(locale: Locale = 'pl'): DocumentTranslat
 
 export function getLedgerTranslations(locale: Locale = 'pl'): LedgerTranslations {
   return getTranslations(locale).ledger;
+}
+
+export function getHRTranslations(locale: Locale = 'pl'): HRTranslations {
+  return getTranslations(locale).hr;
 }
 
 export function getCommonTranslations(locale: Locale = 'pl'): CommonTranslations {

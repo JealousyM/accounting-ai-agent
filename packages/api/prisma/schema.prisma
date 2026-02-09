@@ -31,6 +31,29 @@ enum SubscriptionStatus {
   trialing
 }
 
+enum PaymentType {
+  board_resolution
+  employment
+  mandate_contract
+  work_contract
+  dividend
+}
+
+enum ContractStatus {
+  draft
+  active
+  terminated
+  expired
+}
+
+enum AbsenceType {
+  vacation
+  sick_leave
+  maternity
+  unpaid
+  other
+}
+
 // ============================================
 // USER MANAGEMENT
 // ============================================
@@ -88,6 +111,7 @@ model User {
   conversations   AIConversation[]
   wfirmaCache     WFirmaCache[]
   apiCredentials  UserApiCredentials?
+  employees       Employee[]
 
   @@index([email])
   @@index([googleId])
@@ -194,6 +218,139 @@ model WFirmaCache {
   @@index([expiresAt])
   @@index([isValid])
   @@map("wfirma_cache")
+}
+
+// ============================================
+// HR & PAYROLL
+// ============================================
+
+model Employee {
+  id            String    @id @default(uuid()) @db.Uuid
+  userId        String    @db.Uuid
+  firstName     String
+  lastName      String
+  pesel         String?
+  nip           String?
+  dateOfBirth   DateTime?
+  email         String?
+  phone         String?
+  street        String?
+  city          String?
+  zip           String?
+  country       String    @default("PL")
+  bankAccount   String?
+  taxOffice     String?
+  notes         String?
+  isActive      Boolean   @default(true)
+  hiredAt       DateTime?
+  firedAt       DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  deletedAt     DateTime?
+
+  // Relations
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  contracts     EmploymentContract[]
+  payrolls      PayrollRecord[]
+  absences      Absence[]
+
+  @@index([userId])
+  @@index([userId, isActive])
+  @@map("employees")
+}
+
+model EmploymentContract {
+  id                String          @id @default(uuid()) @db.Uuid
+  employeeId        String          @db.Uuid
+  type              PaymentType
+  status            ContractStatus  @default(draft)
+  position          String?
+  department        String?
+  startDate         DateTime
+  endDate           DateTime?
+  baseSalaryGross   Decimal         @db.Decimal(12, 2)
+  workHoursPerWeek  Decimal?        @db.Decimal(4, 1)
+  costDeductionRate Decimal?        @db.Decimal(5, 2)
+  notes             String?
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+
+  // Relations
+  employee          Employee        @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  payrolls          PayrollRecord[]
+
+  @@index([employeeId])
+  @@index([employeeId, status])
+  @@map("employment_contracts")
+}
+
+model PayrollRecord {
+  id              String    @id @default(uuid()) @db.Uuid
+  employeeId      String    @db.Uuid
+  contractId      String    @db.Uuid
+  period          String
+
+  // Gross
+  grossAmount     Decimal   @db.Decimal(12, 2)
+  bonuses         Decimal   @default(0) @db.Decimal(12, 2)
+  deductions      Decimal   @default(0) @db.Decimal(12, 2)
+
+  // ZUS employee side
+  zusEmerytalne   Decimal   @default(0) @db.Decimal(12, 2)
+  zusRentowe      Decimal   @default(0) @db.Decimal(12, 2)
+  zusChorobowe    Decimal   @default(0) @db.Decimal(12, 2)
+  zusZdrowotne    Decimal   @default(0) @db.Decimal(12, 2)
+
+  // ZUS employer side
+  zusEmerytalneEmployer  Decimal @default(0) @db.Decimal(12, 2)
+  zusRentoweEmployer     Decimal @default(0) @db.Decimal(12, 2)
+  zusWypadkowe           Decimal @default(0) @db.Decimal(12, 2)
+  zusFP                  Decimal @default(0) @db.Decimal(12, 2)
+  zusFGSP                Decimal @default(0) @db.Decimal(12, 2)
+
+  // Tax
+  taxBase         Decimal   @default(0) @db.Decimal(12, 2)
+  incomeTax       Decimal   @default(0) @db.Decimal(12, 2)
+
+  // Net
+  netAmount       Decimal   @db.Decimal(12, 2)
+
+  // Total employer cost
+  totalEmployerCost Decimal @db.Decimal(12, 2)
+
+  paidAt          DateTime?
+  notes           String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  // Relations
+  employee        Employee  @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  contract        EmploymentContract @relation(fields: [contractId], references: [id])
+
+  @@unique([employeeId, contractId, period])
+  @@index([employeeId])
+  @@index([period])
+  @@map("payroll_records")
+}
+
+model Absence {
+  id            String      @id @default(uuid()) @db.Uuid
+  employeeId    String      @db.Uuid
+  type          AbsenceType
+  startDate     DateTime
+  endDate       DateTime
+  businessDays  Int
+  notes         String?
+  approved      Boolean     @default(false)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  // Relations
+  employee      Employee    @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+
+  @@index([employeeId])
+  @@index([employeeId, startDate, endDate])
+  @@map("absences")
 }
 
 // ============================================

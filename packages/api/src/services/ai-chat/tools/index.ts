@@ -9,6 +9,7 @@ import { WFirmaIntegrationService } from '../../wfirma';
 import { WFirmaCacheService } from '../../wfirma-cache.service';
 import { FileStorageService } from '../../file-storage.service';
 import { SubscriptionService } from '../../subscription.service';
+import { HRService } from '../../hr';
 
 // Import tool creators
 import {
@@ -86,6 +87,21 @@ import {
   createGetAccountingSchemasTool,
   createGetAccountingSchemaDetailsTool,
 } from './ledger.tools';
+import {
+  createGetEmployeesTool,
+  createGetEmployeeDetailsTool,
+  createAddEmployeeTool,
+  createUpdateEmployeeTool,
+  createDeleteEmployeeTool,
+  createGetHRContractsTool,
+  createAddHRContractTool,
+  createTerminateHRContractTool,
+  createCalculatePayrollTool,
+  createGetPayrollRecordsTool,
+  createAddAbsenceTool,
+  createGetAbsencesTool,
+  createGetHRSummaryTool,
+} from './hr.tools';
 
 // Re-export individual tool creators
 export {
@@ -163,6 +179,21 @@ export {
   createGetAccountingSchemasTool,
   createGetAccountingSchemaDetailsTool,
 } from './ledger.tools';
+export {
+  createGetEmployeesTool,
+  createGetEmployeeDetailsTool,
+  createAddEmployeeTool,
+  createUpdateEmployeeTool,
+  createDeleteEmployeeTool,
+  createGetHRContractsTool,
+  createAddHRContractTool,
+  createTerminateHRContractTool,
+  createCalculatePayrollTool,
+  createGetPayrollRecordsTool,
+  createAddAbsenceTool,
+  createGetAbsencesTool,
+  createGetHRSummaryTool,
+} from './hr.tools';
 
 /**
  * Create all AI chat tools for wFirma integration
@@ -173,7 +204,8 @@ export function createAllTools(
   fileStorageService: FileStorageService,
   userId: string,
   locale: Locale,
-  subscriptionService?: SubscriptionService
+  subscriptionService?: SubscriptionService,
+  hrService?: HRService,
 ): StructuredToolInterface[] {
   return [
     // Company tools
@@ -254,5 +286,22 @@ export function createAllTools(
     createGetFiscalYearDetailsTool(wfirmaService, locale, userId, subscriptionService),
     createGetAccountingSchemasTool(wfirmaService, locale, userId, subscriptionService),
     createGetAccountingSchemaDetailsTool(wfirmaService, locale, userId, subscriptionService),
+
+    // HR tools (if hrService is available)
+    ...(hrService ? [
+      createGetEmployeesTool(hrService, userId, locale),
+      createGetEmployeeDetailsTool(hrService, userId, locale),
+      createAddEmployeeTool(hrService, userId, locale),
+      createUpdateEmployeeTool(hrService, userId, locale),
+      createDeleteEmployeeTool(hrService, userId, locale),
+      createGetHRContractsTool(hrService, userId, locale),
+      createAddHRContractTool(hrService, userId, locale),
+      createTerminateHRContractTool(hrService, userId, locale),
+      createCalculatePayrollTool(hrService, userId, locale),
+      createGetPayrollRecordsTool(hrService, userId, locale),
+      createAddAbsenceTool(hrService, userId, locale),
+      createGetAbsencesTool(hrService, userId, locale),
+      createGetHRSummaryTool(hrService, userId, locale),
+    ] : []),
   ];
 }
