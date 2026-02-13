@@ -45,6 +45,11 @@ export const CreateEmployeeSchema = z.object({
   email: z.string().email().optional().or(z.literal('')),
   phone: z.string().optional(),
   street: z.string().optional(),
+  voivodeship: z.string().optional(),
+  powiat: z.string().optional(),
+  gmina: z.string().optional(),
+  houseNumber: z.string().optional(),
+  apartmentNumber: z.string().optional(),
   city: z.string().optional(),
   zip: z.string().optional(),
   country: z.string().default('PL'),
@@ -83,6 +88,11 @@ export interface Employee {
   email?: string;
   phone?: string;
   street?: string;
+  voivodeship?: string;
+  powiat?: string;
+  gmina?: string;
+  houseNumber?: string;
+  apartmentNumber?: string;
   city?: string;
   zip?: string;
   country: string;
@@ -520,4 +530,117 @@ export interface PayrollWithAll extends PayrollRecord {
 
 export interface AbsenceWithEmployee extends Absence {
   employee: Employee;
+}
+
+// ============================================
+// PDF Generation Types (Phase 2)
+// ============================================
+
+export interface PayslipData {
+  employee: Employee;
+  contract: EmploymentContract;
+  payroll: PayrollRecord;
+  period: string;
+  companyName: string;
+  companyAddress: string;
+  companyNip: string;
+}
+
+export interface PIT11Data {
+  employee: Employee;
+  contracts: EmploymentContract[];
+  payrollRecords: PayrollRecord[];
+  year: number;
+  companyName: string;
+  companyAddress: string;
+  companyNip: string;
+}
+
+export interface MonthlyTaxBreakdown {
+  month: string;
+  employeeCount: number;
+  totalTaxAdvance: number;
+}
+
+export interface IncomeByContractType {
+  grossIncome: number;
+  zusSocial: number;
+  zusHealth: number;
+  kup: number;
+  taxBase: number;
+  taxWithheld: number;
+}
+
+export interface AnnualPayrollSummary {
+  employee: Employee;
+  contracts: EmploymentContract[];
+  payrollRecords: PayrollRecord[];
+  totals: {
+    grossIncome: number;
+    zusSocial: number;
+    zusHealth: number;
+    kup: number;
+    taxBase: number;
+    taxWithheld: number;
+  };
+  incomeByContractType: Record<string, IncomeByContractType>;
+}
+
+export interface AnnualTaxSummary {
+  year: number;
+  employees: AnnualPayrollSummary[];
+  monthlyBreakdown: MonthlyTaxBreakdown[];
+  grandTotals: {
+    totalGross: number;
+    totalTax: number;
+    employeeCount: number;
+  };
+}
+
+export interface PIT4RData {
+  employees: Array<{
+    employee: Employee;
+    totalGross: number;
+    totalTax: number;
+    totalZusSocial: number;
+    totalZusHealth: number;
+  }>;
+  year: number;
+  companyName: string;
+  companyAddress: string;
+  companyNip: string;
+  monthlyBreakdown: MonthlyTaxBreakdown[];
+}
+
+export interface AnnualFlatTaxSummary {
+  year: number;
+  records: Array<{
+    employee: Employee;
+    incomeType: PaymentType;
+    totalGross: number;
+    totalTax: number;
+  }>;
+  monthlyBreakdown: Array<{
+    month: string;
+    totalFlatTax: number;
+    recordCount: number;
+  }>;
+}
+
+export interface PIT8ARData {
+  records: Array<{
+    employee: Employee;
+    incomeType: 'board_resolution' | 'dividend';
+    totalGross: number;
+    totalTax: number;
+  }>;
+  year: number;
+  companyName: string;
+  companyAddress: string;
+  companyNip: string;
+  monthlyBreakdown: Array<{
+    month: string;
+    totalFlatTax: number;
+    recordCount: number;
+  }>;
 }

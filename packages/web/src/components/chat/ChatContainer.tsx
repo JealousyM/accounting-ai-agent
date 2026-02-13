@@ -15,7 +15,7 @@ import { WfirmaWelcomeModal } from '@/components/onboarding/WfirmaWelcomeModal';
 import { markFirstLoginComplete } from '@/lib/api/auth';
 import { CurrentPlanBadge, UsageWidget } from '@/components/subscription';
 import { useSubscription } from '@/hooks/useSubscription';
-import { TTSProvider, useAutoSpeak } from '@/contexts/TTSContext';
+import { TTSProvider, useAutoSpeak, useTTS } from '@/contexts/TTSContext';
 import enTranslations from '@/i18n/locales/en.json';
 import plTranslations from '@/i18n/locales/pl.json';
 import ruTranslations from '@/i18n/locales/ru.json';
@@ -53,6 +53,9 @@ function ChatContainerInner() {
   const t = translations[locale].chat;
   const onboardingTranslations = translations[locale].onboarding;
   const { isPro, isLoading: isLoadingSubscription } = useSubscription();
+
+  // TTS settings — only request server-side TTS when AI voice is enabled
+  const { ttsEnabled, useAI: useAIVoice, isAIAvailable } = useTTS();
 
   // Auto-speak functionality for new AI messages
   const { triggerAutoSpeak, shouldAutoSpeak } = useAutoSpeak();
@@ -156,7 +159,8 @@ function ChatContainerInner() {
   };
 
   const handleSendMessage = async (content: string) => {
-    await sendMessage(content);
+    const shouldGenerateTts = ttsEnabled && useAIVoice && isAIAvailable;
+    await sendMessage(content, undefined, shouldGenerateTts);
   };
 
   const handleNewChat = async () => {

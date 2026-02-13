@@ -28,7 +28,7 @@ export interface StoredFile {
 
 export class FileStorageService {
   private readonly storageDir: string;
-  private readonly ttlMs: number = 15 * 60 * 1000; // 15 minutes
+  private readonly ttlMs: number = 2 * 60 * 60 * 1000; // 2 hours
   private readonly fileStore = new Map<string, StoredFile>();
   private cleanupInterval: ReturnType<typeof setInterval> | null = null;
 
@@ -183,11 +183,22 @@ export class FileStorageService {
    * @param fileId - File UUID
    */
   async deleteFile(fileId: string): Promise<void> {
+    const file = this.fileStore.get(fileId);
     this.fileStore.delete(fileId);
 
     try {
-      const filePath = path.join(this.storageDir, `${fileId}.xml`);
-      await fs.unlink(filePath);
+      if (file) {
+        const ext = this.getFileExtension(file.filename, file.mimeType);
+        await fs.unlink(path.join(this.storageDir, `${fileId}${ext}`));
+      } else {
+        // Fallback: try common extensions when metadata is unavailable
+        for (const ext of ['.pdf', '.xml', '.json', '.bin']) {
+          try {
+            await fs.unlink(path.join(this.storageDir, `${fileId}${ext}`));
+            break;
+          } catch { /* try next extension */ }
+        }
+      }
       logger.debug('File deleted from disk', { fileId });
     } catch (error) {
       // File may not exist on disk - that's OK
@@ -216,9 +227,9 @@ export class FileStorageService {
       if (expiredFiles.length > 0) {
         logger.info('Cleaned up expired files', { count: expiredFiles.length });
       }
-    }, 5 * 60 * 1000); // Every 5 minutes
+    }, 15 * 60 * 1000); // Every 15 minutes
 
-    logger.info('File cleanup task started (runs every 5 minutes)');
+    logger.info('File cleanup task started (runs every 15 minutes)');
   }
 
   /**

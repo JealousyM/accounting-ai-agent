@@ -192,7 +192,7 @@ export class AIChatController {
     try {
       const userId = req.user?.userId;
       const { id } = req.params;
-      const { content, provider } = req.body;
+      const { content, provider, generateTts } = req.body;
 
       if (!userId) {
         res.status(401).json({
@@ -207,7 +207,8 @@ export class AIChatController {
         id,
         userId,
         content,
-        provider as LLMProvider | undefined
+        provider as LLMProvider | undefined,
+        generateTts
       );
 
       // Increment AI usage for subscription tracking (after successful response)

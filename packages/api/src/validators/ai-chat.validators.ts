@@ -86,6 +86,7 @@ export const sendMessageSchema = z.object({
       .max(10000, 'Message is too long (max 10000 characters)')
       .trim(),
     provider: llmProvider,
+    generateTts: z.boolean().optional(),
   }),
 });
 

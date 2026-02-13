@@ -6,6 +6,8 @@
 import { Router, Request, Response } from 'express';
 import { authenticate } from '../middleware/auth.middleware';
 import { hrService } from '../services/hr/hr.instance';
+import { fileStorageService } from '../services/file-storage.instance';
+import { HRPdfGenerator } from '../services/hr/pdf-generator';
 import { logger } from '../utils/logger';
 import { z } from 'zod';
 import {
@@ -561,6 +563,303 @@ router.get('/summary', async (req: Request, res: Response) => {
       userId: req.user?.userId,
     });
     return res.status(500).json({ error: 'Failed to fetch HR summary' });
+  }
+});
+
+// ============================================
+// PDF DOWNLOAD ROUTES (Phase 2)
+// ============================================
+
+const pdfGenerator = new HRPdfGenerator();
+
+/**
+ * GET /api/hr/payroll/:id/pdf
+ * Download payslip PDF for a specific payroll record
+ */
+router.get('/payroll/:id/pdf', async (req: Request, res: Response) => {
+  try {
+    const userId = req.user?.userId;
+    if (!userId) return res.status(401).json({ error: 'Unauthorized' });
+    const { id } = req.params;
+
+    // Get payroll record by ID directly (includes employee and contract)
+    const record = await hrService.getPayrollRecordById(userId, id);
+    if (!record) {
+      return res.status(404).json({ error: 'Payroll record not found' });
+    }
+
+    const employee = record.employee;
+    const contract = record.contract;
+
+    // TODO: Get company info from user profile/settings
+    const companyName = 'Firma';
+    const companyAddress = '';
+    const companyNip = '';
+
+    const pdfBuffer = await pdfGenerator.generatePayslip({
+      employee: {
+        firstName: employee.firstName,
+        lastName: employee.lastName,
+        pesel: (employee as any).pesel,
+        nip: (employee as any).nip,
+        street: (employee as any).street,
+        city: (employee as any).city,
+        zip: (employee as any).zip,
+      },
+      contract: {
+        type: contract.type,
+        position: (contract as any).position,
+        baseSalaryGross: Number((contract as any).baseSalaryGross),
+      },
+      payroll: {
+        period: record.period,
+        grossAmount: Number((record as any).grossAmount),
+        bonuses: Number((record as any).bonuses),
+        deductions: Number((record as any).deductions),
+        zusEmerytalne: Number((record as any).zusEmerytalne),
+        zusRentowe: Number((record as any).zusRentowe),
+        zusChorobowe: Number((record as any).zusChorobowe),
+        zusZdrowotne: Number((record as any).zusZdrowotne),
+        zusEmerytalneEmployer: Number((record as any).zusEmerytalneEmployer),
+        zusRentoweEmployer: Number((record as any).zusRentoweEmployer),
+        zusWypadkowe: Number((record as any).zusWypadkowe),
+        zusFP: Number((record as any).zusFP),
+        zusFGSP: Number((record as any).zusFGSP),
+        taxBase: Number((record as any).taxBase),
+        incomeTax: Number((record as any).incomeTax),
+        netAmount: Number((record as any).netAmount),
+        totalEmployerCost: Number((record as any).totalEmployerCost),
+      },
+      companyName,
+      companyAddress,
+      companyNip,
+    });
+
+    const filename = `lista-plac-${record.period}-${employee.lastName}.pdf`;
+    const fileId = await fileStorageService.storeFile(
+      filename,
+      pdfBuffer.toString('base64'),
+      userId,
+      'application/pdf',
+    );
+
+    const backendUrl = process.env.BACKEND_URL || 'http://localhost:3001';
+    const downloadUrl = `${backendUrl}/api/files/download/${fileId}`;
+
+    return res.status(200).json({ downloadUrl, filename, fileId });
+  } catch (error) {
+    logger.error('Failed to generate payslip PDF', {
+      error: error instanceof Error ? error.message : 'Unknown error',
+      userId: req.user?.userId,
+      payrollId: req.params.id,
+    });
+    return res.status(500).json({ error: 'Failed to generate payslip PDF' });
+  }
+});
+
+/**
+ * GET /api/hr/declarations/pit11/:employeeId/:year
+ * Download PIT-11 for employee
+ */
+router.get('/declarations/pit11/:employeeId/:year', async (req: Request, res: Response) => {
+  try {
+    const userId = req.user?.userId;
+    if (!userId) return res.status(401).json({ error: 'Unauthorized' });
+    const { employeeId, year } = req.params;
+    const yearNum = parseInt(year, 10);
+
+    const summary = await hrService.getAnnualPayrollSummary(userId, employeeId, yearNum);
+    const emp = summary.employee;
+    const byType = summary.incomeByContractType;
+
+    const formatDob = (d: Date | null | undefined): string | undefined => {
+      if (!d) return undefined;
+      const dt = d instanceof Date ? d : new Date(d);
+      const dd = dt.getDate().toString().padStart(2, '0');
+      const mm = (dt.getMonth() + 1).toString().padStart(2, '0');
+      return `${dd}-${mm}-${dt.getFullYear()}`;
+    };
+
+    const empIncome = byType['employment'];
+    const workIncome = byType['work_contract'];
+    const mandateIncome = byType['mandate_contract'];
+
+    const pdfBuffer = await pdfGenerator.generatePIT11({
+      payerNip: '',
+      year: yearNum,
+      informationNumber: 1,
+      taxOfficeName: emp.taxOffice || '',
+      purpose: 1,
+      payerType: 1,
+      payerFullName: 'Firma',
+      taxObligationType: 1,
+      taxpayerPesel: emp.pesel || undefined,
+      lastName: emp.lastName,
+      firstName: emp.firstName,
+      dateOfBirth: formatDob(emp.dateOfBirth),
+      country: emp.country || 'Polska',
+      voivodeship: emp.voivodeship || undefined,
+      powiat: emp.powiat || undefined,
+      gmina: emp.gmina || undefined,
+      street: emp.street || undefined,
+      houseNumber: emp.houseNumber || undefined,
+      apartmentNumber: emp.apartmentNumber || undefined,
+      city: emp.city || undefined,
+      postalCode: emp.zip || undefined,
+      employmentIncome: empIncome ? {
+        income: empIncome.grossIncome,
+        costs: empIncome.kup,
+        netIncome: empIncome.grossIncome - empIncome.zusSocial - empIncome.kup,
+        taxExempt: 0,
+        taxAdvance: empIncome.taxWithheld,
+      } : undefined,
+      workContractIncome: workIncome ? {
+        income: workIncome.grossIncome,
+        costs: workIncome.kup,
+        netIncome: workIncome.grossIncome - workIncome.zusSocial - workIncome.kup,
+        taxAdvance: workIncome.taxWithheld,
+      } : undefined,
+      mandateContractIncome: mandateIncome ? {
+        income: mandateIncome.grossIncome,
+        costs: mandateIncome.kup,
+        netIncome: mandateIncome.grossIncome - mandateIncome.zusSocial - mandateIncome.kup,
+        taxAdvance: mandateIncome.taxWithheld,
+      } : undefined,
+      zusSocial: summary.totals.zusSocial,
+      zusSocialExempt: 0,
+      zusSocialFromExemptIncome: 0,
+      healthInsurance: summary.totals.zusHealth,
+      pitRAttached: false,
+    });
+
+    const filename = `PIT-11-${yearNum}-${summary.employee.lastName}.pdf`;
+    const fileId = await fileStorageService.storeFile(
+      filename,
+      pdfBuffer.toString('base64'),
+      userId,
+      'application/pdf',
+    );
+
+    const backendUrl = process.env.BACKEND_URL || 'http://localhost:3001';
+    const downloadUrl = `${backendUrl}/api/files/download/${fileId}`;
+
+    return res.status(200).json({ downloadUrl, filename, fileId });
+  } catch (error) {
+    logger.error('Failed to generate PIT-11 PDF', {
+      error: error instanceof Error ? error.message : 'Unknown error',
+      userId: req.user?.userId,
+    });
+    return res.status(500).json({ error: 'Failed to generate PIT-11 PDF' });
+  }
+});
+
+/**
+ * GET /api/hr/declarations/pit4r/:year
+ * Download PIT-4R for year
+ */
+router.get('/declarations/pit4r/:year', async (req: Request, res: Response) => {
+  try {
+    const userId = req.user?.userId;
+    if (!userId) return res.status(401).json({ error: 'Unauthorized' });
+    const yearNum = parseInt(req.params.year, 10);
+
+    const taxSummary = await hrService.getAnnualTaxSummary(userId, yearNum);
+
+    // Convert month numbers to Polish names
+    const monthNames = [
+      'Styczen', 'Luty', 'Marzec', 'Kwiecien', 'Maj', 'Czerwiec',
+      'Lipiec', 'Sierpien', 'Wrzesien', 'Pazdziernik', 'Listopad', 'Grudzien',
+    ];
+    const monthlyBreakdown = taxSummary.monthlyBreakdown.map(m => ({
+      ...m,
+      month: monthNames[parseInt(m.month, 10) - 1] || m.month,
+    }));
+
+    const pdfBuffer = await pdfGenerator.generatePIT4R({
+      year: yearNum,
+      monthlyBreakdown,
+      grandTotals: taxSummary.grandTotals,
+      companyName: 'Firma',
+      companyAddress: '',
+      companyNip: '',
+    });
+
+    const filename = `PIT-4R-${yearNum}.pdf`;
+    const fileId = await fileStorageService.storeFile(
+      filename,
+      pdfBuffer.toString('base64'),
+      userId,
+      'application/pdf',
+    );
+
+    const backendUrl = process.env.BACKEND_URL || 'http://localhost:3001';
+    const downloadUrl = `${backendUrl}/api/files/download/${fileId}`;
+
+    return res.status(200).json({ downloadUrl, filename, fileId });
+  } catch (error) {
+    logger.error('Failed to generate PIT-4R PDF', {
+      error: error instanceof Error ? error.message : 'Unknown error',
+      userId: req.user?.userId,
+    });
+    return res.status(500).json({ error: 'Failed to generate PIT-4R PDF' });
+  }
+});
+
+/**
+ * GET /api/hr/declarations/pit8ar/:year
+ * Download PIT-8AR for year
+ */
+router.get('/declarations/pit8ar/:year', async (req: Request, res: Response) => {
+  try {
+    const userId = req.user?.userId;
+    if (!userId) return res.status(401).json({ error: 'Unauthorized' });
+    const yearNum = parseInt(req.params.year, 10);
+
+    const flatTaxSummary = await hrService.getAnnualFlatTaxSummary(userId, yearNum);
+
+    const monthNames = [
+      'Styczen', 'Luty', 'Marzec', 'Kwiecien', 'Maj', 'Czerwiec',
+      'Lipiec', 'Sierpien', 'Wrzesien', 'Pazdziernik', 'Listopad', 'Grudzien',
+    ];
+    const monthlyBreakdown = flatTaxSummary.monthlyBreakdown.map(m => ({
+      ...m,
+      month: monthNames[parseInt(m.month, 10) - 1] || m.month,
+    }));
+
+    const records = flatTaxSummary.records.map(r => ({
+      employeeName: `${r.employee.firstName} ${r.employee.lastName}`,
+      incomeType: r.incomeType,
+      totalGross: r.totalGross,
+      totalTax: r.totalTax,
+    }));
+
+    const pdfBuffer = await pdfGenerator.generatePIT8AR({
+      year: yearNum,
+      records,
+      monthlyBreakdown,
+      companyName: 'Firma',
+      companyAddress: '',
+      companyNip: '',
+    });
+
+    const filename = `PIT-8AR-${yearNum}.pdf`;
+    const fileId = await fileStorageService.storeFile(
+      filename,
+      pdfBuffer.toString('base64'),
+      userId,
+      'application/pdf',
+    );
+
+    const backendUrl = process.env.BACKEND_URL || 'http://localhost:3001';
+    const downloadUrl = `${backendUrl}/api/files/download/${fileId}`;
+
+    return res.status(200).json({ downloadUrl, filename, fileId });
+  } catch (error) {
+    logger.error('Failed to generate PIT-8AR PDF', {
+      error: error instanceof Error ? error.message : 'Unknown error',
+      userId: req.user?.userId,
+    });
+    return res.status(500).json({ error: 'Failed to generate PIT-8AR PDF' });
   }
 });
 

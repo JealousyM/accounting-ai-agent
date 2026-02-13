@@ -194,6 +194,11 @@ ${t.tryAgain}`;
         email: z.string().nullable().optional().describe('Email address'),
         phone: z.string().nullable().optional().describe('Phone number'),
         street: z.string().nullable().optional().describe('Street address'),
+        voivodeship: z.string().nullable().optional().describe('Voivodeship / Wojewodztwo (e.g., pomorskie)'),
+        powiat: z.string().nullable().optional().describe('District / Powiat (e.g., Gdansk)'),
+        gmina: z.string().nullable().optional().describe('Municipality / Gmina (e.g., Gdansk)'),
+        houseNumber: z.string().nullable().optional().describe('House number / Nr domu'),
+        apartmentNumber: z.string().nullable().optional().describe('Apartment number / Nr lokalu'),
         city: z.string().nullable().optional().describe('City'),
         zip: z.string().nullable().optional().describe('Postal code (e.g., 00-001)'),
         bankAccount: z.string().nullable().optional().describe('Bank account number'),
@@ -304,6 +309,11 @@ export function createUpdateEmployeeTool(
         email: z.string().nullable().optional().describe('New email address'),
         phone: z.string().nullable().optional().describe('New phone number'),
         street: z.string().nullable().optional().describe('New street address'),
+        voivodeship: z.string().nullable().optional().describe('New voivodeship / Wojewodztwo'),
+        powiat: z.string().nullable().optional().describe('New district / Powiat'),
+        gmina: z.string().nullable().optional().describe('New municipality / Gmina'),
+        houseNumber: z.string().nullable().optional().describe('New house number / Nr domu'),
+        apartmentNumber: z.string().nullable().optional().describe('New apartment number / Nr lokalu'),
         city: z.string().nullable().optional().describe('New city'),
         zip: z.string().nullable().optional().describe('New postal code'),
         bankAccount: z.string().nullable().optional().describe('New bank account number'),
@@ -1020,6 +1030,250 @@ export function createGetHRSummaryTool(
       name: 'get_hr_summary',
       description: 'Get an HR overview/summary: total employees, active contracts by type, and total monthly payroll cost. Use when user asks for a general HR overview or dashboard.',
       schema: z.object({}),
+    }
+  );
+}
+
+// ============================================
+// 14. DOWNLOAD PAYSLIP PDF
+// ============================================
+
+export function createDownloadPayslipTool(
+  hrService: HRService,
+  fileStorageService: any,
+  userId: string,
+  locale: Locale,
+  downloadLinks?: string[],
+): StructuredToolInterface {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (tool as any)(
+    async ({ payrollRecordId }: { payrollRecordId: string }) => {
+      try {
+        const { HRPdfGenerator } = await import('../../hr/pdf-generator');
+        const pdfGenerator = new HRPdfGenerator();
+
+        // Get payroll record by ID directly
+        const record = await hrService.getPayrollRecordById(userId, payrollRecordId);
+        if (!record) {
+          const t = getHRTranslations(locale);
+          return t.payrollRecordNotFound;
+        }
+
+        const employee = record.employee;
+        const contract = record.contract;
+
+        const pdfBuffer = await pdfGenerator.generatePayslip({
+          employee: {
+            firstName: employee.firstName,
+            lastName: employee.lastName,
+            pesel: (employee as any).pesel,
+            nip: (employee as any).nip,
+            street: (employee as any).street,
+            city: (employee as any).city,
+            zip: (employee as any).zip,
+          },
+          contract: {
+            type: contract.type,
+            position: (contract as any).position,
+            baseSalaryGross: Number((contract as any).baseSalaryGross),
+          },
+          payroll: {
+            period: record.period,
+            grossAmount: Number((record as any).grossAmount),
+            bonuses: Number((record as any).bonuses),
+            deductions: Number((record as any).deductions),
+            zusEmerytalne: Number((record as any).zusEmerytalne),
+            zusRentowe: Number((record as any).zusRentowe),
+            zusChorobowe: Number((record as any).zusChorobowe),
+            zusZdrowotne: Number((record as any).zusZdrowotne),
+            zusEmerytalneEmployer: Number((record as any).zusEmerytalneEmployer),
+            zusRentoweEmployer: Number((record as any).zusRentoweEmployer),
+            zusWypadkowe: Number((record as any).zusWypadkowe),
+            zusFP: Number((record as any).zusFP),
+            zusFGSP: Number((record as any).zusFGSP),
+            taxBase: Number((record as any).taxBase),
+            incomeTax: Number((record as any).incomeTax),
+            netAmount: Number((record as any).netAmount),
+            totalEmployerCost: Number((record as any).totalEmployerCost),
+          },
+          companyName: 'Firma',
+          companyAddress: '',
+          companyNip: '',
+        });
+
+        const filename = `lista-plac-${record.period}-${employee.lastName}.pdf`;
+        const fileId = await fileStorageService.storeFile(
+          filename,
+          pdfBuffer.toString('base64'),
+          userId,
+          'application/pdf',
+        );
+
+        const backendUrl = process.env.BACKEND_URL || 'http://localhost:3001';
+        const downloadUrl = `${backendUrl}/api/files/download/${fileId}`;
+
+        const mdLink = `[📄 ${filename}](${downloadUrl})`;
+        if (downloadLinks) {
+          downloadLinks.push(mdLink);
+          logger.info('download_payslip: pushed link to collector', { mdLink, collectorSize: downloadLinks.length });
+        } else {
+          logger.warn('download_payslip: downloadLinks collector is undefined!');
+        }
+
+        const t = getHRTranslations(locale);
+        return `## ${t.pdfDownloadPayslip}
+
+**${t.pdfEmployee}:** ${employee.firstName} ${employee.lastName}
+**${t.pdfPeriod}:** ${record.period}
+
+${mdLink}
+
+> ${t.pdfDownloadReady}`;
+      } catch (error) {
+        logger.error('Failed to generate payslip PDF', { error, payrollRecordId });
+        const t = getHRTranslations(locale);
+        return `Error: ${t.errorFetch}`;
+      }
+    },
+    {
+      name: 'download_payslip',
+      description: 'Generate and download a payroll slip (lista płac) PDF for a specific payroll record. Returns a download link.',
+      schema: z.object({
+        payrollRecordId: z.string().describe('Payroll record ID (UUID) to generate payslip for'),
+      }),
+    }
+  );
+}
+
+// ============================================
+// 15. DOWNLOAD PIT-11 PDF
+// ============================================
+
+export function createDownloadPIT11Tool(
+  hrService: HRService,
+  fileStorageService: any,
+  userId: string,
+  locale: Locale,
+  downloadLinks?: string[],
+): StructuredToolInterface {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (tool as any)(
+    async ({ employeeId, year }: { employeeId: string; year: number }) => {
+      try {
+        const { HRPdfGenerator } = await import('../../hr/pdf-generator');
+        const pdfGenerator = new HRPdfGenerator();
+
+        const summary = await hrService.getAnnualPayrollSummary(userId, employeeId, year);
+        const emp = summary.employee;
+        const byType = summary.incomeByContractType;
+
+        const formatDob = (d: Date | null | undefined): string | undefined => {
+          if (!d) return undefined;
+          const dt = d instanceof Date ? d : new Date(d);
+          const dd = dt.getDate().toString().padStart(2, '0');
+          const mm = (dt.getMonth() + 1).toString().padStart(2, '0');
+          return `${dd}-${mm}-${dt.getFullYear()}`;
+        };
+
+        const empIncome = byType['employment'];
+        const workIncome = byType['work_contract'];
+        const mandateIncome = byType['mandate_contract'];
+
+        const pdfBuffer = await pdfGenerator.generatePIT11({
+          payerNip: '',
+          year,
+          informationNumber: 1,
+          taxOfficeName: emp.taxOffice || '',
+          purpose: 1,
+          payerType: 1,
+          payerFullName: 'Firma',
+          taxObligationType: 1,
+          taxpayerPesel: emp.pesel || undefined,
+          lastName: emp.lastName,
+          firstName: emp.firstName,
+          dateOfBirth: formatDob(emp.dateOfBirth),
+          country: emp.country || 'Polska',
+          voivodeship: emp.voivodeship || undefined,
+          powiat: emp.powiat || undefined,
+          gmina: emp.gmina || undefined,
+          street: emp.street || undefined,
+          houseNumber: emp.houseNumber || undefined,
+          apartmentNumber: emp.apartmentNumber || undefined,
+          city: emp.city || undefined,
+          postalCode: emp.zip || undefined,
+          employmentIncome: empIncome ? {
+            income: empIncome.grossIncome,
+            costs: empIncome.kup,
+            netIncome: empIncome.grossIncome - empIncome.zusSocial - empIncome.kup,
+            taxExempt: 0,
+            taxAdvance: empIncome.taxWithheld,
+          } : undefined,
+          workContractIncome: workIncome ? {
+            income: workIncome.grossIncome,
+            costs: workIncome.kup,
+            netIncome: workIncome.grossIncome - workIncome.zusSocial - workIncome.kup,
+            taxAdvance: workIncome.taxWithheld,
+          } : undefined,
+          mandateContractIncome: mandateIncome ? {
+            income: mandateIncome.grossIncome,
+            costs: mandateIncome.kup,
+            netIncome: mandateIncome.grossIncome - mandateIncome.zusSocial - mandateIncome.kup,
+            taxAdvance: mandateIncome.taxWithheld,
+          } : undefined,
+          zusSocial: summary.totals.zusSocial,
+          zusSocialExempt: 0,
+          zusSocialFromExemptIncome: 0,
+          healthInsurance: summary.totals.zusHealth,
+          pitRAttached: false,
+        });
+
+        const filename = `PIT-11-${year}-${summary.employee.lastName}.pdf`;
+        const fileId = await fileStorageService.storeFile(
+          filename,
+          pdfBuffer.toString('base64'),
+          userId,
+          'application/pdf',
+        );
+
+        const backendUrl = process.env.BACKEND_URL || 'http://localhost:3001';
+        const downloadUrl = `${backendUrl}/api/files/download/${fileId}`;
+
+        const mdLink = `[📄 ${filename}](${downloadUrl})`;
+        if (downloadLinks) {
+          downloadLinks.push(mdLink);
+          logger.info('download_pit11: pushed link to collector', { mdLink, collectorSize: downloadLinks.length });
+        } else {
+          logger.warn('download_pit11: downloadLinks collector is undefined!');
+        }
+
+        const t = getHRTranslations(locale);
+        return `## ${t.pdfDownloadPit11}
+
+**${t.pdfEmployee}:** ${summary.employee.firstName} ${summary.employee.lastName}
+**${t.pdfForYear}:** ${year}
+
+**${t.pdfIncome}:** ${summary.totals.grossIncome.toLocaleString('pl-PL', { minimumFractionDigits: 2 })} PLN
+**${t.pdfTaxAdvance}:** ${summary.totals.taxWithheld.toLocaleString('pl-PL', { minimumFractionDigits: 2 })} PLN
+
+${mdLink}
+
+> ${t.pdfDownloadReady}`;
+      } catch (error) {
+        logger.error('Failed to generate PIT-11 PDF', { error, employeeId, year });
+        const t = getHRTranslations(locale);
+        if (error instanceof Error) {
+          return `Error: ${t.errorFetch} - ${error.message}`;
+        }
+        return `Error: ${t.errorFetch}`;
+      }
+    },
+    {
+      name: 'download_pit11',
+      description: 'Generate and download a PIT-11 annual income certificate PDF for a specific employee and year. Returns a download link.',
+      schema: z.object({
+        employeeId: z.string().describe('Employee ID (UUID) to generate PIT-11 for'),
+        year: z.number().describe('Tax year (e.g., 2026)'),
+      }),
     }
   );
 }

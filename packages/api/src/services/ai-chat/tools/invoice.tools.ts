@@ -337,7 +337,8 @@ export function createDownloadInvoiceTool(
   fileStorageService: FileStorageService,
   userId: string,
   locale: Locale,
-  subscriptionService?: SubscriptionService
+  subscriptionService?: SubscriptionService,
+  downloadLinks?: string[],
 ): StructuredToolInterface {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return (tool as any)(
@@ -377,6 +378,14 @@ export function createDownloadInvoiceTool(
         const backendUrl = process.env.BACKEND_URL || 'http://localhost:3001';
         const downloadUrl = `${backendUrl}/api/files/download/${fileId}`;
 
+        const mdLink = `[📄 ${filename}](${downloadUrl})`;
+        if (downloadLinks) {
+          downloadLinks.push(mdLink);
+          logger.info('download_invoice: pushed link to collector', { mdLink, collectorSize: downloadLinks.length });
+        } else {
+          logger.warn('download_invoice: downloadLinks collector is undefined!');
+        }
+
         // Increment usage after successful request
         await incrementWFirmaUsage(subscriptionService, userId);
 
@@ -394,7 +403,7 @@ export function createDownloadInvoiceTool(
     },
     {
       name: 'download_invoice',
-      description: 'Download invoice as PDF file. Returns a download link valid for 15 minutes.',
+      description: 'Download invoice as PDF file. Returns a download link valid for 2 hours.',
       schema: z.object({
         invoiceNumber: z.string().describe('Invoice number to download (e.g., FV 1/2024)'),
         page: z.enum(['all', 'invoice', 'invoicecopy']).nullable().optional()

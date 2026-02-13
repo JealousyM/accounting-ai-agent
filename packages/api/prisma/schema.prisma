@@ -235,6 +235,11 @@ model Employee {
   email         String?
   phone         String?
   street        String?
+  voivodeship   String?
+  powiat        String?
+  gmina         String?
+  houseNumber   String?
+  apartmentNumber String?
   city          String?
   zip           String?
   country       String    @default("PL")

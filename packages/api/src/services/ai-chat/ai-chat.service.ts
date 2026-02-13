@@ -39,6 +39,22 @@ import { TTSIntegration } from './tts-integration';
 import { ttsService } from '../tts.instance';
 import { hrService } from '../hr/hr.instance';
 
+/**
+ * Remove temporary file download URLs from stored messages so the LLM
+ * is forced to call download tools again instead of reusing stale links.
+ * Removes entire lines containing download URLs to prevent the LLM
+ * from copying placeholder text into responses.
+ */
+function stripDownloadUrls(text: string): string {
+  return text
+    // Remove lines with markdown download links: [text](http://.../api/files/download/uuid)
+    .replace(/^.*\[([^\]]*)\]\(https?:\/\/[^)]*\/api\/files\/download\/[^)]+\).*$/gm, '')
+    // Remove lines with plain download URLs
+    .replace(/^.*https?:\/\/[^\s)]*\/api\/files\/download\/[a-f0-9-]+.*$/gm, '')
+    // Clean up multiple blank lines left after removal
+    .replace(/\n{3,}/g, '\n\n');
+}
+
 export class AIChatService {
   private readonly prisma: PrismaClient;
   private readonly wfirmaService: WFirmaIntegrationService;
@@ -111,7 +127,8 @@ export class AIChatService {
     conversationId: string,
     userId: string,
     content: string,
-    provider?: LLMProvider
+    provider?: LLMProvider,
+    generateTts?: boolean
   ): Promise<ProcessMessageResult> {
     // Wrap entire message processing in traceable for unified LangSmith trace
     const processMessage = traceable(
@@ -157,8 +174,15 @@ export class AIChatService {
           },
         };
 
+        // Strip temporary download URLs from stored messages so LLM re-invokes
+        // download tools on subsequent requests instead of reusing expired links
+        const storedAssistantMessage: ChatMessage = {
+          ...assistantMessage,
+          content: stripDownloadUrls(response),
+        };
+
         // Update messages array
-        const updatedMessages = [...existingMessages, userMessage, assistantMessage];
+        const updatedMessages = [...existingMessages, userMessage, storedAssistantMessage];
 
         // Update conversation title if it's the first user message
         const userMessages = updatedMessages.filter(m => m.role === 'user');
@@ -186,12 +210,14 @@ export class AIChatService {
           toolsUsed,
         });
 
-        // Generate TTS for AI response (within same trace context)
+        // Generate TTS for AI response only when client requests it
         let tts: TTSMetadata | undefined;
-        try {
-          tts = await this.ttsIntegration.generateForResponse(userId, response, locale);
-        } catch (error) {
-          logger.warn('TTS integration failed', { error, conversationId, userId });
+        if (generateTts) {
+          try {
+            tts = await this.ttsIntegration.generateForResponse(userId, response, locale);
+          } catch (error) {
+            logger.warn('TTS integration failed', { error, conversationId, userId });
+          }
         }
 
         return {
@@ -335,8 +361,12 @@ export class AIChatService {
     // Get system prompt with user's language
     const systemPrompt = getSystemPrompt(locale);
 
+    // Collector: download tools push their markdown links here so we can
+    // guarantee they appear in the response even if the LLM drops them.
+    const downloadLinks: string[] = [];
+
     // Create tools with userId, locale, and subscription tracking
-    const tools = createAllTools(wfirmaService, this.cacheService, this.fileStorageService, userId, locale, subscriptionService, hrService);
+    const tools = createAllTools(wfirmaService, this.cacheService, this.fileStorageService, userId, locale, subscriptionService, hrService, downloadLinks);
 
     logger.info('Created tools for agent', {
       toolCount: tools.length,
@@ -387,7 +417,7 @@ export class AIChatService {
       new SystemMessage(systemPrompt),
       ...existingMessages.map(msg => {
         if (msg.role === 'user') return new HumanMessage(msg.content);
-        if (msg.role === 'assistant') return new AIMessage(msg.content);
+        if (msg.role === 'assistant') return new AIMessage(stripDownloadUrls(msg.content));
         return new HumanMessage(msg.content);
       }),
       new HumanMessage(userMessage),
@@ -408,34 +438,62 @@ export class AIChatService {
       }
     );
 
-    // Extract final response and tools used
+    // Extract final response and tools used.
+    // IMPORTANT: Do NOT rely on `instanceof AIMessage` — it can fail across
+    // module copies. Instead use duck-typing (check properties directly).
     const toolsUsed: string[] = [];
     let finalResponse = '';
 
     for (const message of result.messages) {
-      if (message instanceof AIMessage) {
-        if (message.tool_calls && message.tool_calls.length > 0) {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          toolsUsed.push(...message.tool_calls.map((tc: any) => tc.name));
-        }
-        // Handle both string content and array content
-        if (message.content) {
-          if (typeof message.content === 'string') {
-            finalResponse = message.content;
-          } else if (Array.isArray(message.content)) {
-            // Extract text from content blocks
-            const textContent = message.content
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              .filter((block: any) => block.type === 'text')
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              .map((block: any) => block.text)
-              .join('');
-            if (textContent) {
-              finalResponse = textContent;
-            }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const msg = message as any;
+
+      // Collect tool calls from any message that has them
+      if (msg.tool_calls && msg.tool_calls.length > 0) {
+        toolsUsed.push(...msg.tool_calls.map((tc: any) => tc.name));
+      }
+
+      // Skip ToolMessages (they have a tool_call_id property)
+      if (msg.tool_call_id) continue;
+
+      // Determine message type without instanceof
+      const msgType = typeof msg._getType === 'function' ? msg._getType() : null;
+      const isAI = msgType === 'ai' || msg instanceof AIMessage;
+      if (!isAI) continue;
+
+      // Extract text content (handles both string and array formats)
+      if (msg.content) {
+        if (typeof msg.content === 'string' && msg.content.length > 0) {
+          finalResponse = msg.content;
+        } else if (Array.isArray(msg.content)) {
+          const textContent = msg.content
+            .filter((block: any) => block.type === 'text')
+            .map((block: any) => block.text)
+            .join('');
+          if (textContent) {
+            finalResponse = textContent;
           }
         }
       }
+    }
+
+    logger.info('Graph execution complete', {
+      totalMessages: result.messages.length,
+      finalResponseLength: finalResponse.length,
+      finalResponseSnippet: finalResponse.substring(0, 300),
+      downloadLinksCount: downloadLinks.length,
+      downloadLinks: downloadLinks,
+    });
+
+    // ALWAYS append download links from the collector if there are any.
+    // Some LLMs (e.g. gpt-5-mini) reformulate tool output and drop URLs.
+    // We use a side-channel collector (downloadLinks[]) that tools write to
+    // directly, bypassing LangGraph message serialization entirely.
+    if (downloadLinks.length > 0) {
+      finalResponse += `\n\n${downloadLinks[downloadLinks.length - 1]}`;
+      logger.info('Appended download link from collector', {
+        link: downloadLinks[downloadLinks.length - 1],
+      });
     }
 
     // Determine the actual model used (either user's selected model or config default)

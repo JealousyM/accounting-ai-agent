@@ -113,7 +113,8 @@ const createConversation = async (title?: string): Promise<{ id: string; title: 
 const sendMessage = async (
   conversationId: string,
   content: string,
-  provider?: 'openai' | 'google'
+  provider?: 'openai' | 'google',
+  generateTts?: boolean
 ): Promise<{
   userMessage: ChatMessage;
   assistantMessage: ChatMessage;
@@ -122,7 +123,7 @@ const sendMessage = async (
 }> => {
   const response = await axios.post(
     `${API_URL}/api/ai/conversations/${conversationId}/messages`,
-    { content, provider },
+    { content, provider, generateTts },
     { headers: getAuthHeaders() }
   );
   return response.data.data;
@@ -180,11 +181,13 @@ export function useChat() {
       conversationId,
       content,
       provider,
+      generateTts,
     }: {
       conversationId: string;
       content: string;
       provider?: 'openai' | 'google';
-    }) => sendMessage(conversationId, content, provider),
+      generateTts?: boolean;
+    }) => sendMessage(conversationId, content, provider, generateTts),
     onMutate: async ({ content }) => {
       // Optimistic update: show user message immediately
       setPendingMessage(content);
@@ -196,10 +199,24 @@ export function useChat() {
       if (data.tts) {
         setLatestTTS(data.tts);
       }
-      // Refetch conversation to get updated messages
-      queryClient.invalidateQueries({ queryKey: ['conversation', currentConversationId] });
+      // Update conversation cache directly with the API response.
+      // This preserves download URLs that are stripped from DB storage
+      // (to prevent the LLM from reusing stale links in future turns).
+      // If we used invalidateQueries here, React Query would refetch from DB
+      // and the stripped version would overwrite the URLs.
+      queryClient.setQueryData(
+        ['conversation', currentConversationId],
+        (old: ConversationDetail | undefined) => {
+          if (!old) return old;
+          return {
+            ...old,
+            messages: [...old.messages, data.userMessage, data.assistantMessage],
+            updatedAt: new Date().toISOString(),
+          };
+        }
+      );
+      // Refresh the conversations list (for title updates) and usage counters
       queryClient.invalidateQueries({ queryKey: ['conversations'] });
-      // Refresh usage data (wFirma/AI message counters may have changed)
       queryClient.invalidateQueries({ queryKey: ['subscription-usage'] });
     },
     onError: (error) => {
@@ -230,7 +247,7 @@ export function useChat() {
 
   // Send message handler
   const handleSendMessage = useCallback(
-    async (content: string, provider?: 'openai' | 'google') => {
+    async (content: string, provider?: 'openai' | 'google', generateTts?: boolean) => {
       if (!content.trim()) return;
 
       // If no conversation, create one first
@@ -240,12 +257,14 @@ export function useChat() {
           conversationId: newConv.id,
           content,
           provider,
+          generateTts,
         });
       } else {
         sendMessageMutation.mutate({
           conversationId: currentConversationId,
           content,
           provider,
+          generateTts,
         });
       }
     },

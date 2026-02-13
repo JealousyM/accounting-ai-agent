@@ -67,13 +67,26 @@ export class HRService {
     }
 
     if (search) {
-      where.OR = [
-        { firstName: { contains: search, mode: 'insensitive' } },
-        { lastName: { contains: search, mode: 'insensitive' } },
-        { email: { contains: search, mode: 'insensitive' } },
-        { pesel: { contains: search, mode: 'insensitive' } },
-        { nip: { contains: search, mode: 'insensitive' } },
-      ];
+      // Split multi-word queries so "Mikhail Peraviortkin" matches
+      // firstName:"Mikhail" OR lastName:"Peraviortkin" independently
+      const words = search.trim().split(/\s+/).filter(Boolean);
+      if (words.length > 1) {
+        where.AND = words.map(word => ({
+          OR: [
+            { firstName: { contains: word, mode: 'insensitive' as const } },
+            { lastName: { contains: word, mode: 'insensitive' as const } },
+            { email: { contains: word, mode: 'insensitive' as const } },
+          ],
+        }));
+      } else {
+        where.OR = [
+          { firstName: { contains: search, mode: 'insensitive' } },
+          { lastName: { contains: search, mode: 'insensitive' } },
+          { email: { contains: search, mode: 'insensitive' } },
+          { pesel: { contains: search, mode: 'insensitive' } },
+          { nip: { contains: search, mode: 'insensitive' } },
+        ];
+      }
     }
 
     const [data, total] = await Promise.all([
@@ -514,6 +527,27 @@ export class HRService {
   }
 
   /**
+   * Get a single payroll record by id, including employee and contract.
+   */
+  async getPayrollRecordById(userId: string, id: string) {
+    logger.info('HRService.getPayrollRecordById', { userId, id });
+
+    const record = await this.prisma.payrollRecord.findFirst({
+      where: {
+        id,
+        employee: { userId, deletedAt: null },
+      },
+      include: { employee: true, contract: true },
+    });
+
+    if (!record) {
+      return null;
+    }
+
+    return record;
+  }
+
+  /**
    * Delete a payroll record.
    */
   async deletePayrollRecord(userId: string, id: string) {
@@ -838,5 +872,322 @@ export class HRService {
     });
 
     return Number(result._sum.grossAmount ?? 0);
+  }
+
+  // ============================================
+  // PDF DATA AGGREGATION (Phase 2)
+  // ============================================
+
+  /**
+   * Get annual payroll summary for a specific employee (for PIT-11)
+   */
+  async getAnnualPayrollSummary(
+    userId: string,
+    employeeId: string,
+    year: number,
+  ): Promise<{
+    employee: any;
+    contracts: any[];
+    payrollRecords: any[];
+    totals: {
+      grossIncome: number;
+      zusSocial: number;
+      zusHealth: number;
+      kup: number;
+      taxBase: number;
+      taxWithheld: number;
+    };
+    incomeByContractType: Record<string, {
+      grossIncome: number;
+      zusSocial: number;
+      zusHealth: number;
+      kup: number;
+      taxBase: number;
+      taxWithheld: number;
+    }>;
+  }> {
+    const employee = await this.prisma.employee.findFirst({
+      where: { id: employeeId, userId, deletedAt: null },
+    });
+
+    if (!employee) {
+      throw new Error(`Employee ${employeeId} not found`);
+    }
+
+    const contracts = await this.prisma.employmentContract.findMany({
+      where: { employeeId, employee: { userId } },
+    });
+
+    const periodPrefix = `${year}-`;
+    const payrollRecords = await this.prisma.payrollRecord.findMany({
+      where: {
+        employeeId,
+        employee: { userId },
+        period: { startsWith: periodPrefix },
+      },
+      include: { contract: true },
+      orderBy: { period: 'asc' },
+    });
+
+    const totals = {
+      grossIncome: 0,
+      zusSocial: 0,
+      zusHealth: 0,
+      kup: 0,
+      taxBase: 0,
+      taxWithheld: 0,
+    };
+
+    for (const record of payrollRecords) {
+      totals.grossIncome += record.grossAmount.toNumber();
+      totals.zusSocial += record.zusEmerytalne.toNumber() + record.zusRentowe.toNumber() + record.zusChorobowe.toNumber();
+      totals.zusHealth += record.zusZdrowotne.toNumber();
+      totals.taxBase += record.taxBase.toNumber();
+      totals.taxWithheld += record.incomeTax.toNumber();
+    }
+
+    // Calculate KUP based on contract types
+    for (const record of payrollRecords) {
+      const contract = contracts.find(c => c.id === record.contractId);
+      if (contract) {
+        if (contract.costDeductionRate) {
+          totals.kup += record.grossAmount.toNumber() * (contract.costDeductionRate.toNumber() / 100);
+        } else {
+          totals.kup += 250; // Standard KUP per month
+        }
+      }
+    }
+
+    // Group income by contract type for PIT-11
+    const incomeByContractType: Record<string, {
+      grossIncome: number;
+      zusSocial: number;
+      zusHealth: number;
+      kup: number;
+      taxBase: number;
+      taxWithheld: number;
+    }> = {};
+
+    for (const record of payrollRecords) {
+      const contractType = record.contract?.type || 'employment';
+      if (!incomeByContractType[contractType]) {
+        incomeByContractType[contractType] = {
+          grossIncome: 0, zusSocial: 0, zusHealth: 0, kup: 0, taxBase: 0, taxWithheld: 0,
+        };
+      }
+      const group = incomeByContractType[contractType];
+      group.grossIncome += record.grossAmount.toNumber();
+      group.zusSocial += record.zusEmerytalne.toNumber() + record.zusRentowe.toNumber() + record.zusChorobowe.toNumber();
+      group.zusHealth += record.zusZdrowotne.toNumber();
+      group.taxBase += record.taxBase.toNumber();
+      group.taxWithheld += record.incomeTax.toNumber();
+
+      // KUP by contract type
+      const contract = contracts.find(c => c.id === record.contractId);
+      if (contract) {
+        if (contract.costDeductionRate) {
+          group.kup += record.grossAmount.toNumber() * (contract.costDeductionRate.toNumber() / 100);
+        } else {
+          group.kup += 250; // Standard KUP per month
+        }
+      }
+    }
+
+    return {
+      employee,
+      contracts,
+      payrollRecords,
+      totals,
+      incomeByContractType,
+    };
+  }
+
+  /**
+   * Get annual tax summary for all employees (for PIT-4R)
+   */
+  async getAnnualTaxSummary(
+    userId: string,
+    year: number,
+  ): Promise<{
+    year: number;
+    employees: Array<{
+      employee: any;
+      totalGross: number;
+      totalTax: number;
+      totalZusSocial: number;
+      totalZusHealth: number;
+    }>;
+    monthlyBreakdown: Array<{
+      month: string;
+      employeeCount: number;
+      totalTaxAdvance: number;
+    }>;
+    grandTotals: {
+      totalGross: number;
+      totalTax: number;
+      employeeCount: number;
+    };
+  }> {
+    const periodPrefix = `${year}-`;
+    const payrollRecords = await this.prisma.payrollRecord.findMany({
+      where: {
+        employee: { userId },
+        period: { startsWith: periodPrefix },
+      },
+      include: { employee: true },
+      orderBy: { period: 'asc' },
+    });
+
+    // Group by employee
+    const employeeMap = new Map<string, {
+      employee: any;
+      totalGross: number;
+      totalTax: number;
+      totalZusSocial: number;
+      totalZusHealth: number;
+    }>();
+
+    // Group by month
+    const monthMap = new Map<string, {
+      employeeIds: Set<string>;
+      totalTaxAdvance: number;
+    }>();
+
+    for (const record of payrollRecords) {
+      // Employee aggregation
+      const empId = record.employeeId;
+      if (!employeeMap.has(empId)) {
+        employeeMap.set(empId, {
+          employee: record.employee,
+          totalGross: 0,
+          totalTax: 0,
+          totalZusSocial: 0,
+          totalZusHealth: 0,
+        });
+      }
+      const emp = employeeMap.get(empId)!;
+      emp.totalGross += record.grossAmount.toNumber();
+      emp.totalTax += record.incomeTax.toNumber();
+      emp.totalZusSocial += record.zusEmerytalne.toNumber() + record.zusRentowe.toNumber() + record.zusChorobowe.toNumber();
+      emp.totalZusHealth += record.zusZdrowotne.toNumber();
+
+      // Monthly aggregation
+      const month = record.period.split('-')[1];
+      if (!monthMap.has(month)) {
+        monthMap.set(month, { employeeIds: new Set(), totalTaxAdvance: 0 });
+      }
+      const m = monthMap.get(month)!;
+      m.employeeIds.add(empId);
+      m.totalTaxAdvance += record.incomeTax.toNumber();
+    }
+
+    const employees = Array.from(employeeMap.values());
+    const monthlyBreakdown = Array.from({ length: 12 }, (_, i) => {
+      const month = String(i + 1).padStart(2, '0');
+      const m = monthMap.get(month);
+      return {
+        month,
+        employeeCount: m ? m.employeeIds.size : 0,
+        totalTaxAdvance: m ? m.totalTaxAdvance : 0,
+      };
+    });
+
+    return {
+      year,
+      employees,
+      monthlyBreakdown,
+      grandTotals: {
+        totalGross: employees.reduce((sum, e) => sum + e.totalGross, 0),
+        totalTax: employees.reduce((sum, e) => sum + e.totalTax, 0),
+        employeeCount: employees.length,
+      },
+    };
+  }
+
+  /**
+   * Get annual flat-rate tax summary (for PIT-8AR)
+   * Covers board_resolution and dividend contract types
+   */
+  async getAnnualFlatTaxSummary(
+    userId: string,
+    year: number,
+  ): Promise<{
+    year: number;
+    records: Array<{
+      employee: any;
+      incomeType: string;
+      totalGross: number;
+      totalTax: number;
+    }>;
+    monthlyBreakdown: Array<{
+      month: string;
+      totalFlatTax: number;
+      recordCount: number;
+    }>;
+  }> {
+    const periodPrefix = `${year}-`;
+    const payrollRecords = await this.prisma.payrollRecord.findMany({
+      where: {
+        employee: { userId },
+        period: { startsWith: periodPrefix },
+        contract: {
+          type: { in: ['board_resolution', 'dividend'] },
+        },
+      },
+      include: { employee: true, contract: true },
+      orderBy: { period: 'asc' },
+    });
+
+    // Group by employee + contract type
+    const recordMap = new Map<string, {
+      employee: any;
+      incomeType: string;
+      totalGross: number;
+      totalTax: number;
+    }>();
+
+    const monthMap = new Map<string, {
+      totalFlatTax: number;
+      recordCount: number;
+    }>();
+
+    for (const record of payrollRecords) {
+      const key = `${record.employeeId}-${record.contract.type}`;
+      if (!recordMap.has(key)) {
+        recordMap.set(key, {
+          employee: record.employee,
+          incomeType: record.contract.type,
+          totalGross: 0,
+          totalTax: 0,
+        });
+      }
+      const r = recordMap.get(key)!;
+      r.totalGross += record.grossAmount.toNumber();
+      r.totalTax += record.incomeTax.toNumber();
+
+      const month = record.period.split('-')[1];
+      if (!monthMap.has(month)) {
+        monthMap.set(month, { totalFlatTax: 0, recordCount: 0 });
+      }
+      const m = monthMap.get(month)!;
+      m.totalFlatTax += record.incomeTax.toNumber();
+      m.recordCount += 1;
+    }
+
+    const monthlyBreakdown = Array.from({ length: 12 }, (_, i) => {
+      const month = String(i + 1).padStart(2, '0');
+      const m = monthMap.get(month);
+      return {
+        month,
+        totalFlatTax: m ? m.totalFlatTax : 0,
+        recordCount: m ? m.recordCount : 0,
+      };
+    });
+
+    return {
+      year,
+      records: Array.from(recordMap.values()),
+      monthlyBreakdown,
+    };
   }
 }

@@ -9,3 +9,5 @@ export {
   calculateBoardResolutionPayroll,
   calculateDividendPayroll,
 } from './payroll-calculator';
+export { HRPdfGenerator } from './pdf-generator';
+export type { PayslipPdfData, PIT11PdfData, PIT4RPdfData, PIT8ARPdfData } from './pdf-generator';

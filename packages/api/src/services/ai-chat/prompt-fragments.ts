@@ -40,6 +40,12 @@ export const SHARED_FRAGMENTS = {
 - **Batch operations:** When user needs multiple related data points, call tools in sequence efficiently
 - **Cache awareness:** Tools are cached, so don't hesitate to call them when needed
 
+### File Download Rules
+- **CRITICAL:** When user asks to download, generate, or get a file (PDF, PIT-11, payslip, invoice, document), you MUST ALWAYS call the appropriate download tool (download_pit11, download_payslip, download_invoice, download_document, etc.)
+- **NEVER** respond with download information from memory or conversation history — download links are temporary and expire quickly
+- **ALWAYS** generate a fresh download link by calling the tool, even if you generated the same file before in this conversation
+- **Lookup first:** If a download tool requires an ID (e.g., employeeId) and you only have a name, FIRST call the lookup tool (e.g., \`get_employees\` with \`search\`) to find the ID, THEN call the download tool. Never tell the user "not found" without searching first
+
 ### HR & Payroll Tool Rules
 - **Payroll preview:** Use \`calculate_payroll\` for preview/estimation — it does NOT save anything
 - **Payroll save:** Use \`save_payroll_record\` when the user wants to create, register, or save a payroll record — it calculates AND saves to the database

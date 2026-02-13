@@ -103,6 +103,8 @@ import {
   createAddAbsenceTool,
   createGetAbsencesTool,
   createGetHRSummaryTool,
+  createDownloadPayslipTool,
+  createDownloadPIT11Tool,
 } from './hr.tools';
 
 // Re-export individual tool creators
@@ -197,6 +199,8 @@ export {
   createAddAbsenceTool,
   createGetAbsencesTool,
   createGetHRSummaryTool,
+  createDownloadPayslipTool,
+  createDownloadPIT11Tool,
 } from './hr.tools';
 
 /**
@@ -210,6 +214,7 @@ export function createAllTools(
   locale: Locale,
   subscriptionService?: SubscriptionService,
   hrService?: HRService,
+  downloadLinks?: string[],
 ): StructuredToolInterface[] {
   return [
     // Company tools
@@ -233,7 +238,7 @@ export function createAllTools(
     createAddInvoiceNoteTool(wfirmaService, cacheService, userId, locale, subscriptionService),
     createGetInvoiceNotesTool(wfirmaService, userId, locale, subscriptionService),
     createDeleteInvoiceNoteTool(wfirmaService, cacheService, userId, locale, subscriptionService),
-    createDownloadInvoiceTool(wfirmaService, fileStorageService, userId, locale, subscriptionService),
+    createDownloadInvoiceTool(wfirmaService, fileStorageService, userId, locale, subscriptionService, downloadLinks),
     createCreateInvoiceTool(wfirmaService, cacheService, userId, locale, subscriptionService),
     createUpdateInvoiceTool(wfirmaService, cacheService, userId, locale, subscriptionService),
     createDeleteInvoiceTool(wfirmaService, cacheService, userId, locale, subscriptionService),
@@ -308,6 +313,8 @@ export function createAllTools(
       createAddAbsenceTool(hrService, userId, locale),
       createGetAbsencesTool(hrService, userId, locale),
       createGetHRSummaryTool(hrService, userId, locale),
+      createDownloadPayslipTool(hrService, fileStorageService, userId, locale, downloadLinks),
+      createDownloadPIT11Tool(hrService, fileStorageService, userId, locale, downloadLinks),
     ] : []),
   ];
 }

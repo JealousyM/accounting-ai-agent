@@ -593,6 +593,7 @@ export interface DocumentTranslations {
 export interface HRTranslations {
   // Employee CRUD
   notFound: string;
+  payrollRecordNotFound: string;
   employeesTitle: string;
   employeeTitle: string;
   tableHeaders: string;
@@ -686,6 +687,49 @@ export interface HRTranslations {
   errorReason: string;
   requiredFields: string;
   tryAgain: string;
+
+  // PDF-related translations
+  pdfPayslipTitle: string;
+  pdfPeriod: string;
+  pdfEmployee: string;
+  pdfPosition: string;
+  pdfContractType: string;
+  pdfGross: string;
+  pdfBonuses: string;
+  pdfDeductions: string;
+  pdfZusEmployee: string;
+  pdfZusEmployer: string;
+  pdfTax: string;
+  pdfTaxBase: string;
+  pdfTaxAdvance: string;
+  pdfNet: string;
+  pdfEmployerCost: string;
+  pdfTotalCost: string;
+  pdfDate: string;
+  pdfSignature: string;
+  pdfGenerated: string;
+  pdfDownloadReady: string;
+  pit11Title: string;
+  pit4rTitle: string;
+  pit8arTitle: string;
+  pdfPayerData: string;
+  pdfTaxpayerData: string;
+  pdfIncomeAndTax: string;
+  pdfIncome: string;
+  pdfZusSocial: string;
+  pdfKup: string;
+  pdfNetIncome: string;
+  pdfHealthInsurance: string;
+  pdfMonthlyAdvances: string;
+  pdfMonth: string;
+  pdfTaxpayerCount: string;
+  pdfAnnualSummary: string;
+  pdfFlatTaxByMonth: string;
+  pdfBySource: string;
+  pdfTotal: string;
+  pdfForYear: string;
+  pdfDownloadPayslip: string;
+  pdfDownloadPit11: string;
 }
 
 export interface CommonTranslations {
