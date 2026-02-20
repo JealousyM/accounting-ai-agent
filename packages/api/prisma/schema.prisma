@@ -54,6 +54,28 @@ enum AbsenceType {
   other
 }
 
+enum KSeFSessionStatus {
+  active
+  expired
+  terminated
+  failed
+}
+
+enum KSeFInvoiceStatusEnum {
+  pending
+  sending
+  sent
+  accepted
+  rejected
+  completed
+  failed
+}
+
+enum KSeFAdapterType {
+  wfirma
+  direct
+}
+
 // ============================================
 // USER MANAGEMENT
 // ============================================
@@ -112,6 +134,11 @@ model User {
   wfirmaCache     WFirmaCache[]
   apiCredentials  UserApiCredentials?
   employees       Employee[]
+  ksefConfig        KSeFConfig?
+  ksefCertificates  KSeFCertificate[]
+  ksefSessions      KSeFSession[]
+  ksefInvoices      KSeFInvoiceStatus[]
+  ksefContractors   KSeFContractor[]
 
   @@index([email])
   @@index([googleId])
@@ -351,6 +378,137 @@ model Absence {
   @@index([employeeId])
   @@index([employeeId, startDate, endDate])
   @@map("absences")
+}
+
+// ============================================
+// KSEF (Polish National e-Invoice System)
+// ============================================
+
+model KSeFConfig {
+  id                String          @id @default(uuid()) @db.Uuid
+  userId            String          @unique @db.Uuid
+  preferredAdapter  KSeFAdapterType @default(wfirma)
+  autoSendEnabled   Boolean         @default(false)
+  autoSendOnCreate  Boolean         @default(false)
+  environment       String          @default("test")
+  defaultCertId     String?         @db.Uuid
+  notifyOnAccepted  Boolean         @default(true)
+  notifyOnRejected  Boolean         @default(true)
+  notificationEmail String?
+  ksefToken         String?         @db.Text // Autoryzacyjny token from KSeF portal (encrypted in future)
+  ksefNip           String?                  // NIP/identifier for KSeF session
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+  user              User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("ksef_config")
+}
+
+model KSeFCertificate {
+  id              String   @id @default(uuid()) @db.Uuid
+  userId          String   @db.Uuid
+  certificateData String   @db.Text
+  password        String?  @db.Text
+  subject         String
+  issuer          String
+  serialNumber    String
+  validFrom       DateTime
+  validUntil      DateTime
+  isActive        Boolean  @default(true)
+  isDefault       Boolean  @default(false)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sessions        KSeFSession[]
+
+  @@index([userId])
+  @@index([validUntil])
+  @@map("ksef_certificates")
+}
+
+model KSeFSession {
+  id              String            @id @default(uuid()) @db.Uuid
+  userId          String            @db.Uuid
+  sessionToken    String            @db.Text
+  certificateId   String?           @db.Uuid
+  status          KSeFSessionStatus @default(active)
+  initiatedAt     DateTime          @default(now())
+  expiresAt       DateTime
+  terminatedAt    DateTime?
+  environment     String            @default("test")
+  lastUsedAt      DateTime          @default(now())
+  user            User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  certificate     KSeFCertificate?  @relation(fields: [certificateId], references: [id], onDelete: SetNull)
+  invoices        KSeFInvoiceStatus[]
+
+  @@index([userId])
+  @@index([expiresAt])
+  @@map("ksef_sessions")
+}
+
+model KSeFInvoiceStatus {
+  id                  String                @id @default(uuid()) @db.Uuid
+  userId              String                @db.Uuid
+  wfirmaInvoiceId     String?
+  ksefReferenceNumber String?               @unique
+  ksefInvoiceNumber   String?
+  ksefSessionRef      String?               // KSeF session reference (e.g. 20260218-SO-...) for status polling
+  contractorName      String?               // Contractor/counterparty name (for display in lists)
+  contractorNip       String?               // Contractor NIP (for incoming invoice matching)
+  totalGross          Decimal?              @db.Decimal(12, 2) // Total gross amount
+  currency            String?               @default("PLN")    // Currency code
+  invoiceDate         DateTime?             // Invoice issue date from the document
+  status              KSeFInvoiceStatusEnum @default(pending)
+  adapter             KSeFAdapterType       @default(wfirma)
+  direction           String                @default("sent")
+  sessionId           String?               @db.Uuid
+  upoDownloaded       Boolean               @default(false)
+  upoContent          Bytes?
+  upoDownloadedAt     DateTime?
+  sentAt              DateTime?
+  acceptedAt          DateTime?
+  rejectedAt          DateTime?
+  invoicePayload      Json?                 // Full FA(3) invoice data (stored for direct adapter invoices to enable copy)
+  errorCode           String?
+  errorMessage        String?               @db.Text
+  retryCount          Int                   @default(0)
+  lastRetryAt         DateTime?
+  createdAt           DateTime              @default(now())
+  updatedAt           DateTime              @updatedAt
+  user                User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  session             KSeFSession?          @relation(fields: [sessionId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([wfirmaInvoiceId])
+  @@index([status])
+  @@index([sentAt])
+  @@index([userId, status])
+  @@index([userId, direction])
+  @@map("ksef_invoice_status")
+}
+
+model KSeFContractor {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @db.Uuid
+  name      String
+  nip       String?
+  email     String?
+  street    String?
+  city      String?
+  zip       String?
+  country   String   @default("PL")
+  source    String   @default("local") // 'local' | 'wfirma' | 'company'
+  wfirmaId  String?  // null for local-only entries
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, wfirmaId])
+  @@index([userId])
+  @@index([userId, source])
+  @@map("ksef_contractors")
 }
 
 // ============================================

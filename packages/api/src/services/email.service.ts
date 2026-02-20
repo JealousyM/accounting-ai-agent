@@ -335,6 +335,121 @@ const getPasswordResetEmailTemplate = (
 };
 
 // ============================================
+// KSeF NOTIFICATION TEMPLATE
+// ============================================
+
+export interface KSeFNotificationParams {
+  invoiceNumber: string;
+  status: 'accepted' | 'rejected';
+  referenceNumber?: string;
+  errorCode?: string;
+  errorMessage?: string;
+  dashboardLink: string;
+}
+
+const emailStyles = `
+  body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; }
+  .container { background: #f9f9f9; border-radius: 8px; padding: 30px; }
+  .header { text-align: center; margin-bottom: 30px; }
+  .header h1 { margin: 0; }
+  .content { background: #fff; border-radius: 8px; padding: 20px; margin-bottom: 20px; }
+  .button { display: inline-block; background: #2563eb; color: #fff !important; text-decoration: none; padding: 12px 30px; border-radius: 6px; margin: 20px 0; }
+  .button:hover { background: #1d4ed8; }
+  .footer { text-align: center; font-size: 12px; color: #666; margin-top: 30px; }
+  .success { color: #16a34a; }
+  .error { color: #dc2626; }
+  .details { background: #f3f4f6; border-radius: 6px; padding: 15px; margin-top: 15px; }
+  .details p { margin: 5px 0; }
+`;
+
+const getKSeFNotificationTemplate = (
+  params: KSeFNotificationParams,
+  locale: string = 'en'
+): EmailTemplates => {
+  const { invoiceNumber, status, referenceNumber, errorCode, errorMessage, dashboardLink } = params;
+  const isAccepted = status === 'accepted';
+
+  const detailsHtml = `
+    <div class="details">
+      <p><strong>${isAccepted ? (locale === 'pl' ? 'Numer faktury' : locale === 'ru' ? 'Номер счёта' : 'Invoice number') : (locale === 'pl' ? 'Numer faktury' : locale === 'ru' ? 'Номер счёта' : 'Invoice number')}:</strong> ${invoiceNumber}</p>
+      ${referenceNumber ? `<p><strong>${locale === 'pl' ? 'Numer referencyjny KSeF' : locale === 'ru' ? 'Референс KSeF' : 'KSeF reference'}:</strong> ${referenceNumber}</p>` : ''}
+      ${!isAccepted && errorCode ? `<p><strong>${locale === 'pl' ? 'Kod bledu' : locale === 'ru' ? 'Код ошибки' : 'Error code'}:</strong> ${errorCode}</p>` : ''}
+      ${!isAccepted && errorMessage ? `<p><strong>${locale === 'pl' ? 'Przyczyna' : locale === 'ru' ? 'Причина' : 'Reason'}:</strong> ${errorMessage}</p>` : ''}
+    </div>`;
+
+  const templates: Record<string, EmailTemplates> = {
+    en: {
+      subject: isAccepted
+        ? `KSeF: Invoice ${invoiceNumber} accepted`
+        : `KSeF: Invoice ${invoiceNumber} rejected`,
+      html: `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>KSeF Notification</title><style>${emailStyles}</style></head><body>
+  <div class="container">
+    <div class="header">
+      <h1 class="${isAccepted ? 'success' : 'error'}">${isAccepted ? 'Invoice Accepted' : 'Invoice Rejected'}</h1>
+    </div>
+    <div class="content">
+      <p>Your invoice <strong>${invoiceNumber}</strong> has been <strong>${isAccepted ? 'accepted' : 'rejected'}</strong> by KSeF.</p>
+      ${detailsHtml}
+      <p style="text-align: center;">
+        <a href="${dashboardLink}" class="button">View in KSeF Dashboard</a>
+      </p>
+    </div>
+    <div class="footer">
+      <p>This is an automated notification from Accounting AI Agent.</p>
+    </div>
+  </div>
+</body></html>`,
+    },
+    pl: {
+      subject: isAccepted
+        ? `KSeF: Faktura ${invoiceNumber} zaakceptowana`
+        : `KSeF: Faktura ${invoiceNumber} odrzucona`,
+      html: `<!DOCTYPE html><html lang="pl"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Powiadomienie KSeF</title><style>${emailStyles}</style></head><body>
+  <div class="container">
+    <div class="header">
+      <h1 class="${isAccepted ? 'success' : 'error'}">${isAccepted ? 'Faktura zaakceptowana' : 'Faktura odrzucona'}</h1>
+    </div>
+    <div class="content">
+      <p>Twoja faktura <strong>${invoiceNumber}</strong> zostala <strong>${isAccepted ? 'zaakceptowana' : 'odrzucona'}</strong> przez KSeF.</p>
+      ${detailsHtml}
+      <p style="text-align: center;">
+        <a href="${dashboardLink}" class="button">Zobacz w panelu KSeF</a>
+      </p>
+    </div>
+    <div class="footer">
+      <p>To jest automatyczne powiadomienie z Accounting AI Agent.</p>
+    </div>
+  </div>
+</body></html>`,
+    },
+    ru: {
+      subject: isAccepted
+        ? `KSeF: Счёт ${invoiceNumber} принят`
+        : `KSeF: Счёт ${invoiceNumber} отклонён`,
+      html: `<!DOCTYPE html><html lang="ru"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Уведомление KSeF</title><style>${emailStyles}</style></head><body>
+  <div class="container">
+    <div class="header">
+      <h1 class="${isAccepted ? 'success' : 'error'}">${isAccepted ? 'Счёт принят' : 'Счёт отклонён'}</h1>
+    </div>
+    <div class="content">
+      <p>Ваш счёт <strong>${invoiceNumber}</strong> был <strong>${isAccepted ? 'принят' : 'отклонён'}</strong> системой KSeF.</p>
+      ${detailsHtml}
+      <p style="text-align: center;">
+        <a href="${dashboardLink}" class="button">Открыть панель KSeF</a>
+      </p>
+    </div>
+    <div class="footer">
+      <p>Это автоматическое уведомление от Accounting AI Agent.</p>
+    </div>
+  </div>
+</body></html>`,
+    },
+  };
+
+  return templates[locale] || templates['en'];
+};
+
+// ============================================
 // EMAIL SERVICE
 // ============================================
 
@@ -481,6 +596,49 @@ export class EmailService {
     } catch (error) {
       logger.error('Failed to send welcome email', {
         email,
+        error: error instanceof Error ? error.message : 'Unknown error',
+      });
+      return false;
+    }
+  }
+
+  /**
+   * Send KSeF invoice status notification email
+   */
+  async sendKSeFNotification(
+    email: string,
+    params: KSeFNotificationParams,
+    locale: string = 'en'
+  ): Promise<boolean> {
+    if (!this.transporter) {
+      logger.warn('Email service not configured. Cannot send KSeF notification.', { email });
+      return false;
+    }
+
+    try {
+      const template = getKSeFNotificationTemplate(params, locale);
+
+      const mailOptions = {
+        from: `"${this.fromName}" <${this.fromEmail}>`,
+        to: email,
+        subject: template.subject,
+        html: template.html,
+      };
+
+      const result = await this.transporter.sendMail(mailOptions);
+
+      logger.info('KSeF notification email sent', {
+        email,
+        invoiceNumber: params.invoiceNumber,
+        status: params.status,
+        messageId: result.messageId,
+      });
+
+      return true;
+    } catch (error) {
+      logger.error('Failed to send KSeF notification email', {
+        email,
+        invoiceNumber: params.invoiceNumber,
         error: error instanceof Error ? error.message : 'Unknown error',
       });
       return false;

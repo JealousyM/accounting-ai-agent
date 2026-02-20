@@ -91,3 +91,13 @@ export {
   formatAbsencesList,
   formatHRSummary,
 } from './hr.formatter';
+export {
+  formatKSeFSendResult,
+  formatKSeFStatus,
+  formatKSeFUPO,
+  formatKSeFInvoicesList,
+  formatKSeFStatistics,
+  formatKSeFBulkResult,
+  formatIncomingInvoicesList,
+  formatIncomingInvoiceMatch,
+} from './ksef.formatter';

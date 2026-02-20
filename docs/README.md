@@ -13,6 +13,7 @@ Welcome to the technical documentation for the Accounting AI Agent project.
 | [Database](./DATABASE.md) | PostgreSQL schema and Prisma ORM |
 | [AI Agents](./AI_AGENTS.md) | LangGraph multi-agent system |
 | [wFirma Integration](./WFIRMA_INTEGRATION.md) | Polish accounting system integration |
+| [KSeF Integration](./KSEF_INTEGRATION.md) | KSeF e-invoice system (FA3 XML, AI tools, contractor lookup) |
 | [Frontend](./FRONTEND.md) | Next.js 15 web application |
 | [Deployment](./DEPLOYMENT.md) | Production deployment guide |
 
@@ -79,6 +80,7 @@ docs/
 ├── DATABASE.md             # Database schema
 ├── AI_AGENTS.md            # AI agent system
 ├── WFIRMA_INTEGRATION.md   # wFirma integration
+├── KSEF_INTEGRATION.md     # KSeF e-invoice integration
 ├── FRONTEND.md             # Frontend documentation
 └── DEPLOYMENT.md           # Deployment guide
 ```

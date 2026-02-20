@@ -264,9 +264,37 @@ Language detection is automatic based on:
 2. Browser locale
 3. Message content analysis (for AI responses)
 
+## KSeF Integration Layer
+
+The KSeF (National e-Invoice System) module adds a dedicated integration layer alongside wFirma:
+
+```
+KSeFService (facade)
+     │
+     ├── WFirmaKSeFAdapter  — proxies KSeF operations via wFirma (in progress)
+     └── DirectKSeFAdapter  — direct KSeF 2.0 API with FA(3) XML generation
+           │
+           ├── KSeFXMLGenerator      — generates FA(3) XML v1-0E
+           ├── DirectKSeFClient      — HTTP client for KSeF 2.0 API
+           └── KSeFCertificateService
+```
+
+**Background services:**
+- `KSeFStatusPoller` — polls pending invoice statuses every minute, sends email notifications
+- `KSeFAutoSendService` — auto-submits invoices to KSeF when created in wFirma
+
+**AI tools (9 tools):** `create_and_send_to_ksef`, `send_invoice_to_ksef`, `check_ksef_status`, `download_ksef_upo`, `query_ksef_invoices`, `get_incoming_ksef_invoices`, `match_incoming_ksef_invoice`, `get_ksef_statistics`, `bulk_send_to_ksef`
+
+**Contractor auto-fill:** When creating a KSeF invoice via chat with only a company name, the `create_and_send_to_ksef` tool automatically resolves NIP and address from the local `KSeFContractor` database (populated by syncing from wFirma).
+
+**New database models:** `KSeFConfig`, `KSeFCertificate`, `KSeFSession`, `KSeFInvoiceStatus`, `KSeFContractor`
+
+See [KSeF Integration](./KSEF_INTEGRATION.md) for full details.
+
 ## Related Documentation
 
 - [API Reference](./API_REFERENCE.md)
 - [Database Schema](./DATABASE.md)
 - [AI Agents](./AI_AGENTS.md)
 - [wFirma Integration](./WFIRMA_INTEGRATION.md)
+- [KSeF Integration](./KSEF_INTEGRATION.md)

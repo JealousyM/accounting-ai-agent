@@ -479,6 +479,152 @@ Returns PDF file download link.
 
 ---
 
+## KSeF Endpoints
+
+All KSeF routes require `Authorization: Bearer <token>`.
+
+### POST /api/ksef/send
+
+Submit a wFirma invoice to KSeF by ID.
+
+**Request Body:**
+```json
+{ "invoiceId": "wfirma-invoice-id", "adapter": "direct" }
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "referenceNumber": "1234567890-20260219-ABCD1234",
+  "status": "accepted",
+  "adapter": "direct",
+  "message": "Faktura wysłana do KSeF",
+  "timestamp": "2026-02-19T10:00:00.000Z"
+}
+```
+
+---
+
+### POST /api/ksef/send-raw
+
+Submit a KSeF invoice from raw `FA3InvoiceData` (no wFirma required).
+
+**Request Body:** `FA3InvoiceData` object (see [KSeF Integration](./KSEF_INTEGRATION.md#type-definitions))
+
+---
+
+### GET /api/ksef/status/:referenceNumber
+
+Get invoice status from KSeF.
+
+**Response (200):**
+```json
+{
+  "referenceNumber": "1234567890-20260219-ABCD1234",
+  "invoiceNumber": "FV/2026/02/001",
+  "status": "accepted",
+  "adapter": "direct",
+  "sentAt": "2026-02-19T10:00:00.000Z",
+  "acceptedAt": "2026-02-19T10:00:05.000Z",
+  "upoAvailable": true
+}
+```
+
+---
+
+### GET /api/ksef/upo/:referenceNumber
+
+Download UPO (official confirmation) for an accepted invoice.
+
+**Response:** XML file (`application/xml`)
+
+---
+
+### GET /api/ksef/invoices
+
+Query KSeF invoices.
+
+**Query Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| dateFrom | ISO string | Filter from date |
+| dateTo | ISO string | Filter to date |
+| status | string | pending / sent / accepted / rejected / completed / failed |
+| direction | string | `sent` or `received` (received fetches from KSeF API) |
+| limit | number | Default: 50 |
+| offset | number | For pagination |
+
+---
+
+### GET /api/ksef/invoices/:referenceNumber
+
+Get invoice details including `invoicePayload` (full FA3 data for copy feature).
+
+---
+
+### GET /api/ksef/invoices/:referenceNumber/download
+
+Download invoice as PDF or XML.
+
+**Query Parameters:** `format=pdf` (default) or `format=xml`
+
+---
+
+### POST /api/ksef/bulk/send
+
+Batch-send multiple invoices to KSeF.
+
+**Request Body:**
+```json
+{ "invoiceIds": ["id1", "id2"], "continueOnError": true }
+```
+
+---
+
+### GET /api/ksef/statistics
+
+Get KSeF statistics (totals by status, monthly breakdown).
+
+---
+
+### GET /api/ksef/config
+
+Get user's KSeF configuration.
+
+### PATCH /api/ksef/config
+
+Update KSeF configuration (`ksefToken`, `ksefNip`, `preferredAdapter`, `environment`, notifications).
+
+---
+
+### GET /api/ksef/contractors
+
+List KSeF contractors. Supports `?search=` query parameter.
+
+### POST /api/ksef/contractors/sync
+
+Sync contractors from wFirma into the local KSeF contractor database (202 Accepted, non-blocking).
+
+### POST /api/ksef/contractors
+
+Create a local contractor record.
+
+### PUT /api/ksef/contractors/:id
+
+Update a local contractor (only `source='local'` records).
+
+### DELETE /api/ksef/contractors/:id
+
+Delete a local contractor (only `source='local'` records).
+
+### GET /api/ksef/company
+
+Get own company entry (`source='company'`).
+
+---
+
 ## Rate Limiting
 
 All endpoints are rate limited:

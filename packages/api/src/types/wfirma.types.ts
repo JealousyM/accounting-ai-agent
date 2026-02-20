@@ -223,6 +223,8 @@ export interface WFirmaInvoice {
   notes?: string;
   createdAt: Date;
   updatedAt: Date;
+  ksefReferenceNumber?: string;  // KSeF canonical reference (set by wFirma after auto-send)
+  ksefStatus?: string;            // KSeF processing status from wFirma
 }
 
 export interface WFirmaInvoiceItem {
