@@ -12,6 +12,7 @@ import {
 } from '@/components/ui/dialog';
 import enTranslations from '@/i18n/locales/en.json';
 import plTranslations from '@/i18n/locales/pl.json';
+import ruTranslations from '@/i18n/locales/ru.json';
 
 // ============================================
 // COMPONENT PROPS
@@ -21,7 +22,7 @@ interface LegalModalProps {
   open: boolean;
   onClose: () => void;
   type: 'terms' | 'privacy';
-  locale?: 'en' | 'pl';
+  locale?: 'en' | 'pl' | 'ru';
 }
 
 // ============================================
@@ -29,7 +30,7 @@ interface LegalModalProps {
 // ============================================
 
 export function LegalModal({ open, onClose, type, locale = 'en' }: LegalModalProps) {
-  const translations = locale === 'pl' ? plTranslations : enTranslations;
+  const translations = locale === 'pl' ? plTranslations : locale === 'ru' ? ruTranslations : enTranslations;
   const t = translations.legal;
 
   const content = type === 'terms' ? t.termsOfService : t.privacyPolicy;

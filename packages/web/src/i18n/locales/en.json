@@ -199,7 +199,7 @@
       "errorDismiss": "Dismiss"
     },
     "subscriptionWelcome": {
-      "title": "Welcome to Accounting AI Agent!",
+      "title": "Welcome to eKsięgowy AI!",
       "message": "You are currently on the Free plan. Upgrade to Pro anytime for included API credits, unlimited wFirma requests, and priority support.",
       "upgradeButton": "View Plans & Upgrade"
     },
@@ -330,17 +330,26 @@
   },
   "legal": {
     "close": "Close",
+    "footer": {
+      "allRightsReserved": "All rights reserved",
+      "links": {
+        "terms": "Terms of Service",
+        "privacy": "Privacy Policy",
+        "cookies": "Cookie Policy",
+        "rodo": "GDPR Clause"
+      }
+    },
     "termsOfService": {
       "title": "Terms of Service",
       "lastUpdated": "Last updated: January 2025",
       "sections": {
         "acceptance": {
           "title": "1. Acceptance of Terms",
-          "content": "By accessing and using Accounting AI Agent (\"the Service\"), you agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use the Service."
+          "content": "By accessing and using eKsięgowy AI (\"the Service\"), you agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use the Service."
         },
         "services": {
           "title": "2. Description of Services",
-          "content": "Accounting AI Agent provides AI-powered accounting assistance, including but not limited to: financial data analysis, invoice management through wFirma integration, document generation, and AI chat functionality for accounting queries."
+          "content": "eKsięgowy AI provides AI-powered accounting assistance, including but not limited to: financial data analysis, invoice management through wFirma integration, document generation, and AI chat functionality for accounting queries."
         },
         "accounts": {
           "title": "3. User Accounts",
@@ -356,7 +365,7 @@
         },
         "intellectualProperty": {
           "title": "6. Intellectual Property",
-          "content": "The Service and its original content, features, and functionality are owned by Accounting AI Agent and are protected by international copyright, trademark, and other intellectual property laws."
+          "content": "The Service and its original content, features, and functionality are owned by eKsięgowy AI and are protected by international copyright, trademark, and other intellectual property laws."
         },
         "limitations": {
           "title": "7. Limitations of Liability",
@@ -373,6 +382,18 @@
         "contact": {
           "title": "10. Contact Information",
           "content": "For questions about these Terms, please contact us through the application's chat feature or email support."
+        },
+        "parties": {
+          "title": "0. Parties to the Agreement",
+          "content": "The Service Provider is MICODE SPÓŁKA Z OGRANICZONĄ ODPOWIEDZIALNOŚCIĄ (MICODE Ltd.), with registered office at ul. Jana Heweliusza 11/811, 80-890 Gdańsk, Poland, entered in the National Court Register (KRS) under number 0001108050, NIP: 5833510147, REGON: 528740633 (hereinafter: \"Service Provider\"), operating the eKsięgowy AI service at https://eksiegowyai.pl. The User is any individual, legal entity, or organizational unit without legal personality using the Service."
+        },
+        "complaints": {
+          "title": "11. Complaints Procedure",
+          "content": "Complaints regarding the Service may be submitted electronically to the Administrator's e-mail address. A complaint should include: name or company name, e-mail address, description of the issue. We will process complaints within 14 business days of receipt, in accordance with applicable Polish consumer protection law."
+        },
+        "governingLaw": {
+          "title": "12. Governing Law and Jurisdiction",
+          "content": "These Terms are governed by Polish law. Any disputes arising from or related to these Terms shall be resolved by the common courts of the Republic of Poland with jurisdiction over the Service Provider's registered office, subject to consumer protection provisions."
         }
       }
     },
@@ -382,7 +403,7 @@
       "sections": {
         "introduction": {
           "title": "1. Introduction",
-          "content": "This Privacy Policy explains how Accounting AI Agent collects, uses, and protects your personal information when you use our Service."
+          "content": "This Privacy Policy explains how eKsięgowy AI collects, uses, and protects your personal information when you use our Service."
         },
         "dataCollection": {
           "title": "2. Information We Collect",
@@ -422,7 +443,103 @@
         },
         "contact": {
           "title": "11. Contact Us",
-          "content": "If you have questions about this Privacy Policy, please contact us through the application's chat feature or email support."
+          "content": "If you have questions about this Privacy Policy, please contact the Administrator: MICODE sp. z o.o., ul. Jana Heweliusza 11/811, 80-890 Gdańsk, Poland, e-mail: perevertkinma@gmail.com."
+        },
+        "dataController": {
+          "title": "Data Controller",
+          "content": "The Data Controller within the meaning of Article 4(7) GDPR is MICODE SPÓŁKA Z OGRANICZONĄ ODPOWIEDZIALNOŚCIĄ (MICODE Ltd.), with registered office at ul. Jana Heweliusza 11/811, 80-890 Gdańsk, Poland, KRS: 0001108050, NIP: 5833510147, REGON: 528740633. Contact: perevertkinma@gmail.com. We process your data in accordance with Regulation (EU) 2016/679 of the European Parliament and of the Council (GDPR) and the Polish Personal Data Protection Act of May 10, 2018."
+        },
+        "legalBasis": {
+          "title": "Legal Basis for Processing",
+          "content": "We process your personal data on the following legal bases: Art. 6(1)(b) GDPR — performance of the electronic services contract; Art. 6(1)(c) GDPR — compliance with our legal obligations (tax, accounting); Art. 6(1)(f) GDPR — our legitimate interests (security, fraud prevention, claims); Art. 6(1)(a) GDPR — your consent (marketing, analytical cookies — only when explicitly provided)."
+        },
+        "dataRetention": {
+          "title": "Data Retention Periods",
+          "content": "Account data and conversation history are retained for the duration of the contract plus 3 years after termination (civil claims). Invoice and financial documents — 5 years from the end of the tax year (accounting law requirements). System and security logs — 12 months. Consent-based data — until consent is withdrawn."
+        },
+        "dpoInfo": {
+          "title": "Data Protection Officer (DPO)",
+          "content": "As a micro-enterprise, we are not obliged to appoint a Data Protection Officer under Art. 37 GDPR. For matters related to the protection of your personal data, please contact the Administrator directly using the e-mail address provided in the Contact section."
+        },
+        "uodo": {
+          "title": "Right to Lodge a Complaint with the Supervisory Authority",
+          "content": "If you believe that the processing of your personal data violates GDPR, you have the right to lodge a complaint with the supervisory authority. In Poland, the supervisory authority is the President of the Personal Data Protection Office (UODO): ul. Stawki 2, 00-193 Warsaw, e-mail: kancelaria@uodo.gov.pl, phone: +48 606-950-000."
+        },
+        "eeaTransfers": {
+          "title": "Data Transfers Outside the EEA",
+          "content": "Some of our technology providers are located outside the European Economic Area (EEA), including in the United States (e.g., OpenAI, Anthropic, Google). We base these transfers on Standard Contractual Clauses (SCCs) adopted by the European Commission pursuant to Art. 46(2) GDPR, ensuring an adequate level of data protection."
+        }
+      }
+    },
+    "cookiePolicy": {
+      "title": "Cookie Policy",
+      "lastUpdated": "Last updated: January 2025",
+      "sections": {
+        "introduction": {
+          "title": "1. What are cookies?",
+          "content": "Cookies are small text files stored on your device (computer, smartphone, tablet) when you visit our website. They allow us to remember your preferences and actions. We use them in accordance with Polish electronic services law and telecommunications regulations."
+        },
+        "necessaryCookies": {
+          "title": "2. Necessary Cookies",
+          "content": "Necessary cookies are required for the proper functioning of the service. These include: authentication session tokens, CSRF protection tokens, language preference storage, and theme preference storage. They do not require your consent and cannot be disabled without losing core service functionality. Legal basis: Art. 6(1)(b) GDPR."
+        },
+        "analyticalCookies": {
+          "title": "3. Analytical Cookies",
+          "content": "Analytical cookies help us understand how you use the service, measure performance, and make improvements. They collect data in an anonymous or pseudonymous manner. We only use them after obtaining your consent. You can disable them in the service's privacy settings or your browser settings. Legal basis: Art. 6(1)(a) GDPR (consent)."
+        },
+        "cookieList": {
+          "title": "4. List of Cookies Used",
+          "content": "session_token (necessary, browser session) — user authentication token; cookie_consent (necessary, 1 year) — cookie consent preferences record; locale (necessary, 1 year) — user's selected interface language; theme (necessary, 1 year) — visual theme preference (light/dark)."
+        },
+        "management": {
+          "title": "5. Managing Cookies",
+          "content": "You can manage cookies in two ways: (1) through our service settings — by clicking the shield icon in the application interface, you can grant or withdraw consent for specific cookie categories; (2) through your browser settings — most browsers allow you to block or delete cookies. Note that disabling necessary cookies may prevent you from using core service features."
+        },
+        "legalBasis": {
+          "title": "6. Legal Basis",
+          "content": "Processing data through cookies is based on: Art. 6(1)(b) GDPR — for cookies necessary to perform the contract (authentication, session); Art. 6(1)(a) GDPR (consent) — for analytical and marketing cookies; Polish Telecommunications Law — notification obligation regarding cookies."
+        },
+        "contact": {
+          "title": "7. Contact Regarding Cookies",
+          "content": "Questions and comments regarding this Cookie Policy should be directed to the Data Administrator via the in-app chat feature or the e-mail address provided in the Privacy Policy."
+        }
+      }
+    },
+    "rodoClause": {
+      "title": "GDPR Information Clause (Art. 13 and Art. 14)",
+      "lastUpdated": "Last updated: January 2025",
+      "sections": {
+        "controller": {
+          "title": "1. Data Controller",
+          "content": "The Data Controller is MICODE SPÓŁKA Z OGRANICZONĄ ODPOWIEDZIALNOŚCIĄ (MICODE Ltd.), ul. Jana Heweliusza 11/811, 80-890 Gdańsk, Poland, KRS: 0001108050, NIP: 5833510147, REGON: 528740633. Contact: perevertkinma@gmail.com."
+        },
+        "purposes": {
+          "title": "2. Purposes of Processing",
+          "content": "We process your personal data for the following purposes: (a) providing AI-assisted accounting and bookkeeping services, including account management and wFirma integration; (b) payment processing and subscription management; (c) user communication — responding to queries and support requests; (d) handling complaints and pursuing claims; (e) compliance with legal requirements arising from tax and accounting regulations; (f) ensuring service security and preventing abuse."
+        },
+        "legalBasis": {
+          "title": "3. Legal Bases for Processing",
+          "content": "Art. 6(1)(b) GDPR — processing necessary to perform the electronic services contract or to take pre-contractual steps; Art. 6(1)(c) GDPR — compliance with the Controller's legal obligations (tax, accounting, AML); Art. 6(1)(f) GDPR — legitimate interests of the Controller: IT security, fraud prevention, claims; Art. 6(1)(a) GDPR — user consent (marketing, analytical cookies, newsletter)."
+        },
+        "recipients": {
+          "title": "4. Data Recipients",
+          "content": "Your data may be disclosed to the following categories of recipients: (a) IT service providers — hosting, cloud infrastructure, system maintenance; (b) AI service providers (OpenAI, Anthropic) — solely to the extent necessary to provide AI Assistant functionality; (c) wFirma system — for accounting data integration based on your authorization; (d) data processors acting on our behalf — under data processing agreements; (e) public authorities — in cases provided by law (courts, law enforcement, tax authorities)."
+        },
+        "retention": {
+          "title": "5. Retention Periods",
+          "content": "We process data for the following periods: (a) account data and conversation history — for the duration of the contract and 3 years after termination (civil claims limitation); (b) financial data and accounting documents — 5 years from the end of the tax year in which the document was created (Accounting Act); (c) system and security logs — 12 months; (d) consent-based data — until consent is withdrawn; (e) tax-required data — for periods specified in the Tax Ordinance."
+        },
+        "rights": {
+          "title": "6. Your Rights",
+          "content": "Under GDPR you have the following rights: right of access (Art. 15 GDPR) — you may request a copy of your data; right to rectification (Art. 16 GDPR) — you may request correction or completion of inaccurate/incomplete data; right to erasure (Art. 17 GDPR) — in specific cases you may request deletion; right to restriction of processing (Art. 18 GDPR); right to data portability (Art. 20 GDPR) — receive your data in a structured format; right to object (Art. 21 GDPR) — to processing based on legitimate interest; right to withdraw consent (Art. 7(3) GDPR) — without affecting prior lawful processing. To exercise your rights: contact via in-app chat or Administrator's e-mail."
+        },
+        "uodo": {
+          "title": "7. Right to Lodge a Complaint",
+          "content": "If you believe the processing of your personal data violates GDPR or other data protection regulations, you have the right to lodge a complaint with the supervisory authority. In Poland, the supervisory authority is the President of the Personal Data Protection Office (UODO): address: ul. Stawki 2, 00-193 Warsaw; phone: +48 606-950-000; e-mail: kancelaria@uodo.gov.pl; website: https://uodo.gov.pl."
+        },
+        "voluntary": {
+          "title": "8. Voluntary Nature of Data Provision and Automated Decision-Making",
+          "content": "Providing personal data is voluntary but necessary to use the Service — failure to provide required registration data prevents account creation. Optional data (AI provider API keys, wFirma credentials) is only required to use additional features. We do not use automated decision-making, including profiling, that would produce legal effects or similarly significantly affect you."
         }
       }
     }

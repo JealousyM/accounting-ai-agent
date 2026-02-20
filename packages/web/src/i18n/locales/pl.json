@@ -199,7 +199,7 @@
       "errorDismiss": "Zamknij"
     },
     "subscriptionWelcome": {
-      "title": "Witaj w Accounting AI Agent!",
+      "title": "Witaj w eKsięgowy AI!",
       "message": "Korzystasz z planu Darmowego. Ulepsz do Pro, aby otrzymać kredyty API w cenie, nieograniczone żądania wFirma i priorytetowe wsparcie.",
       "upgradeButton": "Zobacz plany i ulepsz"
     },
@@ -330,17 +330,26 @@
   },
   "legal": {
     "close": "Zamknij",
+    "footer": {
+      "allRightsReserved": "Wszelkie prawa zastrzeżone",
+      "links": {
+        "terms": "Regulamin",
+        "privacy": "Polityka Prywatności",
+        "cookies": "Polityka Cookies",
+        "rodo": "Klauzula RODO"
+      }
+    },
     "termsOfService": {
       "title": "Regulamin",
       "lastUpdated": "Ostatnia aktualizacja: Styczeń 2025",
       "sections": {
         "acceptance": {
           "title": "1. Akceptacja Regulaminu",
-          "content": "Korzystając z Accounting AI Agent (\"Usługa\"), zgadzasz się przestrzegać niniejszego Regulaminu. Jeśli nie zgadzasz się z tymi warunkami, prosimy o niekorzystanie z Usługi."
+          "content": "Korzystając z eKsięgowy AI (\"Usługa\"), zgadzasz się przestrzegać niniejszego Regulaminu. Jeśli nie zgadzasz się z tymi warunkami, prosimy o niekorzystanie z Usługi."
         },
         "services": {
           "title": "2. Opis Usług",
-          "content": "Accounting AI Agent zapewnia wsparcie księgowe oparte na AI, w tym: analizę danych finansowych, zarządzanie fakturami poprzez integrację z wFirma, generowanie dokumentów i funkcję czatu AI do zapytań księgowych."
+          "content": "eKsięgowy AI zapewnia wsparcie księgowe oparte na AI, w tym: analizę danych finansowych, zarządzanie fakturami poprzez integrację z wFirma, generowanie dokumentów i funkcję czatu AI do zapytań księgowych."
         },
         "accounts": {
           "title": "3. Konta Użytkowników",
@@ -356,7 +365,7 @@
         },
         "intellectualProperty": {
           "title": "6. Własność Intelektualna",
-          "content": "Usługa i jej oryginalna zawartość, funkcje i funkcjonalność są własnością Accounting AI Agent i są chronione międzynarodowymi prawami autorskimi, znakami towarowymi i innymi prawami własności intelektualnej."
+          "content": "Usługa i jej oryginalna zawartość, funkcje i funkcjonalność są własnością eKsięgowy AI i są chronione międzynarodowymi prawami autorskimi, znakami towarowymi i innymi prawami własności intelektualnej."
         },
         "limitations": {
           "title": "7. Ograniczenie Odpowiedzialności",
@@ -372,7 +381,19 @@
         },
         "contact": {
           "title": "10. Dane Kontaktowe",
-          "content": "W przypadku pytań dotyczących niniejszego Regulaminu, prosimy o kontakt poprzez funkcję czatu w aplikacji lub e-mail."
+          "content": "W przypadku pytań dotyczących niniejszego Regulaminu prosimy o kontakt: MICODE sp. z o.o., ul. Jana Heweliusza 11/811, 80-890 Gdańsk, e-mail: perevertkinma@gmail.com."
+        },
+        "parties": {
+          "title": "0. Strony Umowy",
+          "content": "Usługodawcą jest MICODE SPÓŁKA Z OGRANICZONĄ ODPOWIEDZIALNOŚCIĄ z siedzibą przy ul. Jana Heweliusza 11/811, 80-890 Gdańsk, wpisana do Rejestru Przedsiębiorców Krajowego Rejestru Sądowego pod numerem KRS 0001108050, NIP: 5833510147, REGON: 528740633 (zwaną dalej Usługodawcą), prowadząca serwis eKsięgowy AI dostępny pod adresem https://eksiegowyai.pl. Usługobiorcą jest każda osoba fizyczna, osoba prawna lub jednostka organizacyjna nieposiadająca osobowości prawnej, korzystająca z Usługi."
+        },
+        "complaints": {
+          "title": "11. Tryb Reklamacyjny",
+          "content": "Reklamacje dotyczące Usługi można składać drogą elektroniczną na adres e-mail Administratora. Reklamacja powinna zawierać: imię i nazwisko lub nazwę, adres e-mail, opis problemu. Rozpatrzymy reklamację w terminie 14 dni roboczych od jej otrzymania, zgodnie z art. 7a Ustawy o prawach konsumenta (Dz.U. 2014 poz. 827 ze zm.)."
+        },
+        "governingLaw": {
+          "title": "12. Prawo Właściwe i Sąd Właściwy",
+          "content": "Niniejszy Regulamin podlega prawu polskiemu. Wszelkie spory wynikające z niniejszego Regulaminu lub z nim związane będą rozstrzygane przez sądy powszechne Rzeczypospolitej Polskiej właściwe dla siedziby Usługodawcy, z zastrzeżeniem przepisów o ochronie konsumentów."
         }
       }
     },
@@ -382,7 +403,7 @@
       "sections": {
         "introduction": {
           "title": "1. Wprowadzenie",
-          "content": "Niniejsza Polityka Prywatności wyjaśnia, w jaki sposób Accounting AI Agent zbiera, wykorzystuje i chroni Twoje dane osobowe podczas korzystania z naszej Usługi."
+          "content": "Niniejsza Polityka Prywatności wyjaśnia, w jaki sposób eKsięgowy AI zbiera, wykorzystuje i chroni Twoje dane osobowe podczas korzystania z naszej Usługi."
         },
         "dataCollection": {
           "title": "2. Zbierane Informacje",
@@ -422,7 +443,103 @@
         },
         "contact": {
           "title": "11. Kontakt",
-          "content": "Jeśli masz pytania dotyczące niniejszej Polityki Prywatności, skontaktuj się z nami poprzez funkcję czatu w aplikacji lub e-mail."
+          "content": "Jeśli masz pytania dotyczące niniejszej Polityki Prywatności, skontaktuj się z Administratorem: MICODE sp. z o.o., ul. Jana Heweliusza 11/811, 80-890 Gdańsk, e-mail: perevertkinma@gmail.com."
+        },
+        "dataController": {
+          "title": "Administrator Danych Osobowych",
+          "content": "Administratorem Twoich danych osobowych w rozumieniu art. 4 pkt 7 RODO jest MICODE SPÓŁKA Z OGRANICZONĄ ODPOWIEDZIALNOŚCIĄ z siedzibą przy ul. Jana Heweliusza 11/811, 80-890 Gdańsk, KRS: 0001108050, NIP: 5833510147, REGON: 528740633. Kontakt z Administratorem: perevertkinma@gmail.com. Przetwarzamy Twoje dane zgodnie z Rozporządzeniem Parlamentu Europejskiego i Rady (UE) 2016/679 z dnia 27 kwietnia 2016 r. (RODO) oraz polską Ustawą o ochronie danych osobowych z dnia 10 maja 2018 r."
+        },
+        "legalBasis": {
+          "title": "Podstawa Prawna Przetwarzania",
+          "content": "Przetwarzamy Twoje dane osobowe na następujących podstawach prawnych: art. 6 ust. 1 lit. b RODO — wykonanie umowy o świadczenie usług drogą elektroniczną; art. 6 ust. 1 lit. c RODO — wypełnienie ciążącego na nas obowiązku prawnego (przepisy podatkowe, rachunkowe); art. 6 ust. 1 lit. f RODO — realizacja naszych prawnie uzasadnionych interesów (bezpieczeństwo serwisu, zapobieganie nadużyciom, dochodzenie roszczeń); art. 6 ust. 1 lit. a RODO — zgoda użytkownika (marketing, cookies analityczne — jedynie gdy ją wyrazisz)."
+        },
+        "dataRetention": {
+          "title": "Okresy Retencji Danych",
+          "content": "Dane konta i historię rozmów przechowujemy przez czas trwania umowy oraz 3 lata od jej rozwiązania (roszczenia cywilne). Dane faktur i dokumenty finansowe — 5 lat od końca roku podatkowego (art. 74 Ustawy o rachunkowości). Logi systemowe i bezpieczeństwa — 12 miesięcy. Dane przetwarzane na podstawie zgody — do czasu jej wycofania."
+        },
+        "dpoInfo": {
+          "title": "Inspektor Ochrony Danych (IOD/DPO)",
+          "content": "Jako mikroprzedsiębiorstwo, zgodnie z art. 37 RODO, nie mamy obowiązku wyznaczenia Inspektora Ochrony Danych. W sprawach dotyczących ochrony Twoich danych osobowych prosimy o bezpośredni kontakt z Administratorem za pomocą adresu e-mail podanego w sekcji Kontakt."
+        },
+        "uodo": {
+          "title": "Prawo Skargi do UODO",
+          "content": "Jeśli uważasz, że przetwarzanie Twoich danych osobowych narusza przepisy RODO, masz prawo wniesienia skargi do organu nadzorczego — Prezesa Urzędu Ochrony Danych Osobowych (UODO), ul. Stawki 2, 00-193 Warszawa, e-mail: kancelaria@uodo.gov.pl, telefon: 606-950-000."
+        },
+        "eeaTransfers": {
+          "title": "Przekazywanie Danych poza Europejski Obszar Gospodarczy (EOG)",
+          "content": "Część naszych dostawców technologicznych ma siedziby poza EOG, w tym w Stanach Zjednoczonych (m.in. OpenAI, Anthropic, Google). Transfery tych danych opieramy na standardowych klauzulach umownych (SCC) przyjętych przez Komisję Europejską na podstawie art. 46 ust. 2 RODO, zapewniających odpowiedni poziom ochrony danych."
+        }
+      }
+    },
+    "cookiePolicy": {
+      "title": "Polityka Plików Cookie",
+      "lastUpdated": "Ostatnia aktualizacja: Styczeń 2025",
+      "sections": {
+        "introduction": {
+          "title": "1. Czym są pliki cookie?",
+          "content": "Pliki cookie to małe pliki tekstowe zapisywane na Twoim urządzeniu (komputerze, smartfonie, tablecie) podczas odwiedzania naszego serwisu. Umożliwiają zapamiętywanie Twoich preferencji i działań. Używamy ich zgodnie z Ustawą z dnia 18 lipca 2002 r. o świadczeniu usług drogą elektroniczną (Dz.U. 2002 nr 144 poz. 1204 ze zm.) oraz art. 173 Ustawy Prawo Telekomunikacyjne."
+        },
+        "necessaryCookies": {
+          "title": "2. Pliki Cookie Niezbędne",
+          "content": "Cookies niezbędne są wymagane do prawidłowego działania serwisu. Zaliczamy do nich: tokeny sesji uwierzytelniania, tokeny CSRF (ochrona przed atakami Cross-Site Request Forgery), zapis preferencji językowych i motywu wizualnego. Nie wymagają one Twojej zgody i nie można ich wyłączyć bez utraty podstawowych funkcji serwisu. Podstawa prawna: art. 6 ust. 1 lit. b RODO."
+        },
+        "analyticalCookies": {
+          "title": "3. Pliki Cookie Analityczne",
+          "content": "Analityczne pliki cookie pozwalają nam monitorować, jak korzystasz z serwisu, mierzyć jego wydajność i wprowadzać ulepszenia. Zbierają dane w sposób anonimowy lub pseudoanonimowy. Używamy ich wyłącznie po uzyskaniu Twojej zgody. Możesz je wyłączyć w ustawieniach prywatności serwisu lub przeglądarki. Podstawa prawna: art. 6 ust. 1 lit. a RODO (zgoda)."
+        },
+        "cookieList": {
+          "title": "4. Wykaz Używanych Plików Cookie",
+          "content": "session_token (niezbędny, czas sesji przeglądarki) — token uwierzytelniający użytkownika; cookie_consent (niezbędny, 1 rok) — zapis preferencji dotyczących zgody na pliki cookie; locale (niezbędny, 1 rok) — wybrany przez użytkownika język interfejsu; theme (niezbędny, 1 rok) — preferencje motywu (jasny/ciemny)."
+        },
+        "management": {
+          "title": "5. Zarządzanie Plikami Cookie",
+          "content": "Możesz zarządzać plikami cookie na dwa sposoby: (1) przez ustawienia naszego serwisu — klikając ikonę tarczy w interfejsie aplikacji, możesz wyrazić lub wycofać zgodę na poszczególne kategorie cookies; (2) przez ustawienia przeglądarki — większość przeglądarek pozwala blokować lub usuwać pliki cookie. Pamiętaj, że wyłączenie niezbędnych cookies może uniemożliwić korzystanie z podstawowych funkcji serwisu."
+        },
+        "legalBasis": {
+          "title": "6. Podstawa Prawna",
+          "content": "Przetwarzanie danych za pośrednictwem plików cookie opiera się na: art. 6 ust. 1 lit. b RODO — dla cookies niezbędnych do wykonania umowy (uwierzytelnianie, sesja); art. 6 ust. 1 lit. a RODO (zgoda) — dla cookies analitycznych i marketingowych; art. 173 ustawy Prawo Telekomunikacyjne (Dz.U. 2004 nr 171 poz. 1800) — obowiązek informacyjny o plikach cookie."
+        },
+        "contact": {
+          "title": "7. Kontakt w Sprawie Cookies",
+          "content": "Pytania i uwagi dotyczące niniejszej Polityki Cookies prosimy kierować do Administratora danych za pośrednictwem funkcji czatu w aplikacji lub adresu e-mail podanego w Polityce Prywatności."
+        }
+      }
+    },
+    "rodoClause": {
+      "title": "Klauzula Informacyjna RODO (Art. 13 i Art. 14)",
+      "lastUpdated": "Ostatnia aktualizacja: Styczeń 2025",
+      "sections": {
+        "controller": {
+          "title": "1. Administrator Danych Osobowych",
+          "content": "Administratorem Twoich danych osobowych jest MICODE SPÓŁKA Z OGRANICZONĄ ODPOWIEDZIALNOŚCIĄ z siedzibą przy ul. Jana Heweliusza 11/811, 80-890 Gdańsk, KRS: 0001108050, NIP: 5833510147, REGON: 528740633. Kontakt: perevertkinma@gmail.com."
+        },
+        "purposes": {
+          "title": "2. Cele Przetwarzania Danych",
+          "content": "Przetwarzamy Twoje dane osobowe w następujących celach: (a) świadczenie usług rozliczeniowo-księgowych wspomaganych przez AI, w tym prowadzenie konta użytkownika i integracja z wFirma; (b) obsługa płatności i zarządzanie subskrypcjami; (c) komunikacja z użytkownikiem — odpowiedzi na pytania i obsługa zgłoszeń; (d) rozpatrywanie reklamacji i dochodzenie roszczeń; (e) spełnienie wymogów prawnych wynikających z przepisów podatkowych i rachunkowych; (f) zapewnienie bezpieczeństwa serwisu i zapobieganie nadużyciom."
+        },
+        "legalBasis": {
+          "title": "3. Podstawy Prawne Przetwarzania",
+          "content": "Art. 6 ust. 1 lit. b RODO — przetwarzanie niezbędne do wykonania umowy o świadczenie usług drogą elektroniczną lub do podjęcia działań przed jej zawarciem; Art. 6 ust. 1 lit. c RODO — wypełnienie obowiązków prawnych Administratora (przepisy podatkowe, rachunkowe, AML); Art. 6 ust. 1 lit. f RODO — prawnie uzasadnione interesy Administratora: bezpieczeństwo systemów IT, zapobieganie nadużyciom, dochodzenie roszczeń; Art. 6 ust. 1 lit. a RODO — zgoda wyrażona przez użytkownika (marketing, cookies analityczne, komunikacja newsletter)."
+        },
+        "recipients": {
+          "title": "4. Odbiorcy Danych Osobowych",
+          "content": "Twoje dane mogą być przekazywane następującym kategoriom odbiorców: (a) podmiotom świadczącym usługi IT — hosting, infrastruktura chmurowa, utrzymanie systemów; (b) dostawcom usług AI (OpenAI, Anthropic) — wyłącznie w zakresie niezbędnym do realizacji funkcji AI Asystenta; (c) systemowi wFirma — w zakresie integracji danych księgowych na podstawie Twojego upoważnienia; (d) podmiotom przetwarzającym dane w naszym imieniu (procesorzy) — na podstawie umów o przetwarzanie danych osobowych; (e) organom publicznym — w przypadkach przewidzianych przepisami prawa (sądy, organy ścigania, organy podatkowe)."
+        },
+        "retention": {
+          "title": "5. Okres Retencji Danych",
+          "content": "Dane przetwarzamy przez następujące okresy: (a) dane konta i historia rozmów — przez czas obowiązywania umowy i 3 lata po jej rozwiązaniu (przedawnienie roszczeń cywilnych); (b) dane finansowe i dokumenty księgowe — 5 lat od końca roku podatkowego, w którym dokument powstał (art. 74 Ustawy o rachunkowości); (c) logi systemowe i bezpieczeństwa — 12 miesięcy; (d) dane przetwarzane na podstawie zgody — do czasu jej cofnięcia; (e) dane wymagane przez prawo podatkowe — przez okresy wskazane w Ordynacji podatkowej."
+        },
+        "rights": {
+          "title": "6. Twoje Prawa",
+          "content": "Na podstawie przepisów RODO przysługują Ci następujące prawa: prawo dostępu do swoich danych (art. 15 RODO) — możesz zażądać kopii przetwarzanych danych; prawo do sprostowania (art. 16 RODO) — możesz żądać korekty nieprawidłowych lub uzupełnienia niekompletnych danych; prawo do usunięcia danych (art. 17 RODO) — w określonych przypadkach możesz żądać usunięcia danych; prawo do ograniczenia przetwarzania (art. 18 RODO); prawo do przenoszenia danych (art. 20 RODO) — możesz otrzymać dane w ustrukturyzowanym formacie; prawo do sprzeciwu (art. 21 RODO) — wobec przetwarzania opartego na uzasadnionym interesie; prawo do cofnięcia zgody (art. 7 ust. 3 RODO) — bez wpływu na zgodność z prawem wcześniejszego przetwarzania. Realizacja praw: kontakt przez czat w aplikacji lub e-mail Administratora."
+        },
+        "uodo": {
+          "title": "7. Prawo do Wniesienia Skargi",
+          "content": "Jeżeli uważasz, że przetwarzanie Twoich danych osobowych narusza przepisy RODO lub inne przepisy o ochronie danych osobowych, masz prawo wniesienia skargi do organu nadzorczego. W Polsce organem nadzorczym jest Prezes Urzędu Ochrony Danych Osobowych (UODO): adres: ul. Stawki 2, 00-193 Warszawa; telefon: 606-950-000; e-mail: kancelaria@uodo.gov.pl; strona: https://uodo.gov.pl."
+        },
+        "voluntary": {
+          "title": "8. Dobrowolność Podania Danych i Zautomatyzowane Podejmowanie Decyzji",
+          "content": "Podanie danych osobowych jest dobrowolne, lecz konieczne do korzystania z Usługi — brak danych wymaganych przy rejestracji uniemożliwia założenie konta. Dane opcjonalne (klucze API dostawców AI, dane uwierzytelniające wFirma) są niezbędne wyłącznie do korzystania z funkcji dodatkowych. Informujemy, że nie stosujemy zautomatyzowanego podejmowania decyzji, w tym profilowania, które wywoływałoby skutki prawne lub w podobny sposób istotnie wpływało na Twoją sytuację."
         }
       }
     }

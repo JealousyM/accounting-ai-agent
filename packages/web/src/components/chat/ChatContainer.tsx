@@ -291,7 +291,7 @@ function ChatContainerInner() {
               </div>
               <div className="flex-1 min-w-0">
                 <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-1">
-                  {t.subscriptionWelcome?.title || 'Welcome to Accounting AI Agent!'}
+                  {t.subscriptionWelcome?.title || 'Welcome to eKsięgowy AI!'}
                 </h3>
                 <p className="text-sm text-gray-600 dark:text-gray-300 mb-3">
                   {t.subscriptionWelcome?.message || 'You are currently on the Free plan. Upgrade to Pro anytime for included API credits, unlimited wFirma requests, and priority support.'}

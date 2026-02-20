@@ -20,15 +20,17 @@ import { cn } from '@/lib/utils';
 import { LegalModal } from '@/components/legal/LegalModal';
 import enTranslations from '@/i18n/locales/en.json';
 import plTranslations from '@/i18n/locales/pl.json';
+import ruTranslations from '@/i18n/locales/ru.json';
 import { API_URL } from '@/lib/config';
 
 const translations = {
   en: enTranslations,
   pl: plTranslations,
+  ru: ruTranslations,
 };
 
 export function RegistrationForm() {
-  const [selectedLocale, setSelectedLocale] = useState<'en' | 'pl'>('en');
+  const [selectedLocale, setSelectedLocale] = useState<'en' | 'pl' | 'ru'>('en');
   const router = useRouter();
   const { login } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
@@ -39,6 +41,7 @@ export function RegistrationForm() {
   const [githubVisible, setGithubVisible] = useState(false);
   const [showTermsModal, setShowTermsModal] = useState(false);
   const [showPrivacyModal, setShowPrivacyModal] = useState(false);
+  const legalLinks = (translations[selectedLocale] as any).legal?.footer?.links;
   const [availableModels, setAvailableModels] = useState<LLMModelInfo[]>([]);
   const [isLoadingModels, setIsLoadingModels] = useState(false);
 
@@ -95,7 +98,7 @@ export function RegistrationForm() {
   const passwordStrength = checkPasswordStrength(password);
 
   // Update locale in form when user changes language
-  const handleLocaleChange = (locale: 'en' | 'pl') => {
+  const handleLocaleChange = (locale: 'en' | 'pl' | 'ru') => {
     setSelectedLocale(locale);
     setValue('locale', locale);
   };
@@ -259,6 +262,19 @@ export function RegistrationForm() {
           >
             <Globe className="h-4 w-4" />
             Polski
+          </button>
+          <button
+            type="button"
+            onClick={() => handleLocaleChange('ru')}
+            className={cn(
+              'flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-all',
+              selectedLocale === 'ru'
+                ? 'bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm'
+                : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
+            )}
+          >
+            <Globe className="h-4 w-4" />
+            Русский
           </button>
         </div>
       </div>
@@ -818,6 +834,25 @@ export function RegistrationForm() {
           {errors.agreeToTerms && (
             <p className="mt-1.5 text-sm text-red-600 dark:text-red-400">{errors.agreeToTerms.message}</p>
           )}
+          <p className="mt-2 ml-6 text-xs text-gray-500 dark:text-gray-400">
+            <a
+              href="/cookies"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-600 dark:text-blue-400 hover:underline"
+            >
+              {legalLinks?.cookies || 'Cookie Policy'}
+            </a>
+            {' · '}
+            <a
+              href="/rodo"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-600 dark:text-blue-400 hover:underline"
+            >
+              {legalLinks?.rodo || 'RODO'}
+            </a>
+          </p>
         </div>
 
         {/* Submit Button */}
@@ -852,13 +887,13 @@ export function RegistrationForm() {
         open={showTermsModal}
         onClose={() => setShowTermsModal(false)}
         type="terms"
-        locale={selectedLocale}
+        locale={selectedLocale as 'en' | 'pl' | 'ru'}
       />
       <LegalModal
         open={showPrivacyModal}
         onClose={() => setShowPrivacyModal(false)}
         type="privacy"
-        locale={selectedLocale}
+        locale={selectedLocale as 'en' | 'pl' | 'ru'}
       />
     </div>
   );

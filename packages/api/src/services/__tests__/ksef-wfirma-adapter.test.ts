@@ -368,7 +368,7 @@ describe('WFirmaKSeFAdapter', () => {
 
       try {
         await adapter.downloadUPO(USER_ID, RECORD_UUID);
-        fail('Expected error to be thrown');
+        throw new Error('Expected error to be thrown');
       } catch (error) {
         expect(error).toBeInstanceOf(KSeFError);
         expect((error as KSeFError).code).toBe('UPO_NOT_AVAILABLE');
@@ -381,7 +381,7 @@ describe('WFirmaKSeFAdapter', () => {
 
       try {
         await adapter.downloadUPO(USER_ID, KSEF_REF);
-        fail('Expected error to be thrown');
+        throw new Error('Expected error to be thrown');
       } catch (error) {
         expect(error).toBeInstanceOf(KSeFError);
         expect((error as KSeFError).code).toBe('STATUS_NOT_FOUND');

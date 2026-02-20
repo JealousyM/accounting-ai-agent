@@ -50,11 +50,12 @@ export function ForgotPasswordForm() {
 
       await forgotPassword(data.email);
       setIsSuccess(true);
-    } catch (error: any) {
-      if (error.response?.data) {
-        setApiError(error.response.data.message || t.errorMessage);
-      } else if (error.message) {
-        setApiError(error.message);
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { message?: string } }; message?: string };
+      if (err.response?.data) {
+        setApiError(err.response.data.message || t.errorMessage);
+      } else if (err.message) {
+        setApiError(err.message);
       } else {
         setApiError(t.errorMessage);
       }
