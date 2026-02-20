@@ -688,6 +688,105 @@ export interface HRTranslations {
   tryAgain: string;
 }
 
+export interface KSeFTranslations {
+  // Send
+  sendSuccess: string;
+  sendFailed: string;
+
+  // Status
+  statusTitle: string;
+  statusPending: string;
+  statusSending: string;
+  statusSent: string;
+  statusAccepted: string;
+  statusRejected: string;
+  statusCompleted: string;
+  statusFailed: string;
+
+  // Fields
+  field: string;
+  value: string;
+  referenceNumber: string;
+  invoiceNumber: string;
+  status: string;
+  adapter: string;
+  directAPI: string;
+  timestamp: string;
+  sentAt: string;
+  acceptedAt: string;
+  rejectedAt: string;
+  direction: string;
+  directionSent: string;
+  directionReceived: string;
+
+  // UPO
+  upoDownloaded: string;
+  upoAvailableHint: string;
+  upoSavedHint: string;
+  fileName: string;
+  fileSize: string;
+
+  // Lists
+  invoicesTitle: string;
+  tableHeaders: string;
+  noInvoicesFound: string;
+
+  // Statistics
+  statisticsTitle: string;
+  totalSent: string;
+  totalReceived: string;
+  accepted: string;
+  rejected: string;
+  pending: string;
+  completed: string;
+  monthlyTrend: string;
+
+  // Bulk
+  bulkSendTitle: string;
+  bulkSendResult: string;
+  bulkSuccessful: string;
+  bulkFailed: string;
+
+  // Hints
+  statusCheckHint: string;
+  queryHint: string;
+  checkWFirmaConfig: string;
+
+  // Incoming invoices
+  incomingTitle: string;
+  incomingTableHeaders: string;
+  noIncomingInvoices: string;
+  incomingMatchTitle: string;
+  incomingMatchHint: string;
+  matchResult: string;
+  matchFound: string;
+  matchNotFound: string;
+  matchCount: string;
+  matchedInvoicesTitle: string;
+  matchContractor: string;
+  matchAmount: string;
+  matchDate: string;
+  noMatchHint: string;
+
+  // Errors
+  errorSend: string;
+  errorStatus: string;
+  errorUPO: string;
+  errorQuery: string;
+  errorQueryIncoming: string;
+  errorMatchIncoming: string;
+  errorStatistics: string;
+  errorBulkSend: string;
+  errorDirectSend: string;
+  errorReason: string;
+
+  // Token auth config
+  ksefToken: string;
+  ksefNip: string;
+  ksefTokenHint: string;
+  ksefNipHint: string;
+}
+
 export interface CommonTranslations {
   wfirmaLimitReached: string;
   aiLimitReached: string;
@@ -708,6 +807,7 @@ export interface Translations {
   document: DocumentTranslations;
   ledger: LedgerTranslations;
   hr: HRTranslations;
+  ksef: KSeFTranslations;
 }
 
 const translations: Record<Locale, Translations> = {
@@ -766,6 +866,10 @@ export function getLedgerTranslations(locale: Locale = 'pl'): LedgerTranslations
 
 export function getHRTranslations(locale: Locale = 'pl'): HRTranslations {
   return getTranslations(locale).hr;
+}
+
+export function getKSeFTranslations(locale: Locale = 'pl'): KSeFTranslations {
+  return getTranslations(locale).ksef;
 }
 
 export function getCommonTranslations(locale: Locale = 'pl'): CommonTranslations {

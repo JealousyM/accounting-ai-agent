@@ -12,6 +12,7 @@ import { WFirmaCacheService } from '../../wfirma-cache.service';
 import { FileStorageService } from '../../file-storage.service';
 import { SubscriptionService } from '../../subscription.service';
 import { checkWFirmaLimit, incrementWFirmaUsage } from './usage-tracking';
+import { ksefAutoSendService } from '../../ksef/auto-send.instance';
 import {
   formatInvoicesList,
   formatInvoiceDetails,
@@ -519,6 +520,9 @@ export function createCreateInvoiceTool(
         };
 
         const invoice = await wfirmaService.createInvoice(data);
+
+        // Fire-and-forget: auto-send to KSeF if enabled (never throws)
+        ksefAutoSendService.onInvoiceCreated(userId, invoice.id);
 
         // Increment usage after successful request
         await incrementWFirmaUsage(subscriptionService, userId);

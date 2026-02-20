@@ -1,453 +1,523 @@
-# Lista kontrolna QA - Accounting AI Agent
+# QA Checklist — Accounting AI Agent
 
-Kompleksowa lista kontrolna do weryfikacji aplikacji przed wdrozeniem.
-
----
-
-## 1. Uwierzytelnianie i rejestracja
-
-| # | Scenariusz testowy | Oczekiwany rezultat | Status |
-|---|---|---|---|
-| 1.1 | Rejestracja nowego uzytkownika (plan Free) z poprawnymi danymi | Konto utworzone, przekierowanie do /chat, wyswietlenie modalu powitalnego | |
-| 1.2 | Rejestracja nowego uzytkownika (plan Pro Monthly) | Przekierowanie do Stripe Checkout, po platnosci - konto Pro aktywne | |
-| 1.3 | Rejestracja nowego uzytkownika (plan Pro Yearly) | Przekierowanie do Stripe Checkout, roczna subskrypcja aktywna | |
-| 1.4 | Rejestracja z istniejacym adresem e-mail | Blad: "E-mail juz istnieje" | |
-| 1.5 | Rejestracja ze slabym haslem (brak duzej litery, cyfry, znaku specjalnego) | Blad walidacji hasla | |
-| 1.6 | Rejestracja bez zaakceptowania regulaminu | Formularz nie pozwala na wyslanie | |
-| 1.7 | Rejestracja Free bez wyboru dostawcy LLM | Blad walidacji - dostawca LLM wymagany | |
-| 1.8 | Logowanie z poprawnymi danymi (e-mail/haslo) | Przekierowanie do /chat, zaladowanie konwersacji | |
-| 1.9 | Logowanie z nieprawidlowym haslem | Blad: "Nieprawidlowe dane logowania" | |
-| 1.10 | Logowanie z nieistniejacym e-mailem | Blad: "Nieprawidlowe dane logowania" | |
-| 1.11 | Logowanie przez Google OAuth | Konto utworzone/polaczone, przekierowanie do /chat lub /auth/complete-profile | |
-| 1.12 | Logowanie przez GitHub OAuth | Konto utworzone/polaczone, przekierowanie do /chat lub /auth/complete-profile | |
-| 1.13 | Uzupelnienie profilu po OAuth (complete-profile) | Wybor dostawcy LLM, opcjonalne dane wFirma, przekierowanie do /chat | |
-| 1.14 | Wylogowanie | Sesja zakonczona, przekierowanie do /login | |
-| 1.15 | Odzyskiwanie hasla - wyslanie e-maila | E-mail z linkiem resetujacym wyslany | |
-| 1.16 | Resetowanie hasla z poprawnym tokenem | Haslo zmienione, mozliwosc logowania nowym haslem | |
-| 1.17 | Resetowanie hasla z wygaslym tokenem | Blad: "Token wygasl" | |
-| 1.18 | Odswiezanie tokenu JWT (refresh token) | Nowy access token wydany | |
-| 1.19 | Dostep do chronionej strony bez logowania | Przekierowanie do /login | |
-| 1.20 | Rate limiting logowania (>10 prob/15 min) | Blad 429: "Zbyt wiele prob" | |
+Comprehensive test checklist for pre-deployment verification.
 
 ---
 
-## 2. Czat AI
+## 1. Authentication & Registration
 
-| # | Scenariusz testowy | Oczekiwany rezultat | Status |
+| # | Test Scenario | Expected Result | Status |
 |---|---|---|---|
-| 2.1 | Utworzenie nowej konwersacji | Nowa konwersacja na liscie, tytul automatycznie wygenerowany | |
-| 2.2 | Wyslanie wiadomosci tekstowej | Wiadomosc uzytkownika wyswietlona, odpowiedz AI streamowana | |
-| 2.3 | Odpowiedz AI z formatowaniem Markdown | Poprawne renderowanie naglowkow, list, kodu, tabel | |
-| 2.4 | Odpowiedz AI z podswietlaniem skladni kodu | Bloki kodu z kolorowaniem skladni | |
-| 2.5 | Wprowadzanie glosowe (Web Speech API) | Przycisk mikrofonu aktywny, rozpoznanie mowy, tekst w polu | |
-| 2.6 | Przelaczanie miedzy konwersacjami | Poprawne ladowanie historii wybranej konwersacji | |
-| 2.7 | Usuwanie konwersacji | Konwersacja usunieta z listy, wiadomosci skasowane | |
-| 2.8 | Wyslanie pustej wiadomosci | Przycisk wyslania nieaktywny lub blad walidacji | |
-| 2.9 | Rate limiting wiadomosci (>60/15 min) | Blad 429 z informacja o limicie | |
-| 2.10 | Limit wiadomosci subskrypcji (Free/Pro) | Komunikat o osiagnieciu limitu z opcja upgrade | |
-| 2.11 | Wywolanie narzedzia wFirma przez AI | AI uzywa narzedzia, wyswietla sformatowany wynik | |
-| 2.12 | Blad API LLM podczas rozmowy | Czytelny komunikat bledu dla uzytkownika | |
-| 2.13 | Brak skonfigurowanego klucza LLM (plan Free) | Komunikat o koniecznosci konfiguracji klucza | |
-| 2.14 | Blad polaczenia z wFirma podczas uzycia narzedzia | Czytelny komunikat o bledzie integracji | |
-| 2.15 | Dluga konwersacja (>50 wiadomosci) | Plynne przewijanie, brak problemow z wydajnoscia | |
+| 1.1 | Register new user (Free plan) with valid data | Account created, redirect to /chat, welcome modal shown | |
+| 1.2 | Register new user (Pro Monthly plan) | Redirect to Stripe Checkout, Pro account active after payment | |
+| 1.3 | Register new user (Pro Yearly plan) | Redirect to Stripe Checkout, annual subscription active | |
+| 1.4 | Register with existing email address | Error: "Email already exists" | |
+| 1.5 | Register with weak password (no uppercase, digit, special char) | Password validation error | |
+| 1.6 | Register without accepting terms of service | Form submission blocked | |
+| 1.7 | Register Free without selecting LLM provider | Validation error — LLM provider required | |
+| 1.8 | Login with valid credentials (email/password) | Redirect to /chat, conversations loaded | |
+| 1.9 | Login with incorrect password | Error: "Invalid credentials" | |
+| 1.10 | Login with non-existent email | Error: "Invalid credentials" | |
+| 1.11 | Login via Google OAuth | Account created/linked, redirect to /chat or /auth/complete-profile | |
+| 1.12 | Login via GitHub OAuth | Account created/linked, redirect to /chat or /auth/complete-profile | |
+| 1.13 | Complete profile after OAuth | LLM provider selection, optional wFirma data, redirect to /chat | |
+| 1.14 | Logout | Session ended, redirect to /login | |
+| 1.15 | Password recovery — send email | Reset link email sent | |
+| 1.16 | Reset password with valid token | Password changed, login with new password works | |
+| 1.17 | Reset password with expired token | Error: "Token expired" | |
+| 1.18 | JWT token refresh | New access token issued | |
+| 1.19 | Access protected page without login | Redirect to /login | |
+| 1.20 | Login rate limiting (>10 attempts / 15 min) | Error 429: "Too many attempts" | |
 
 ---
 
-## 3. Narzedzia AI - wFirma (44 narzedzia)
+## 2. AI Chat
 
-### 3.1 Firma
-
-| # | Scenariusz testowy | Oczekiwany rezultat | Status |
+| # | Test Scenario | Expected Result | Status |
 |---|---|---|---|
-| 3.1.1 | "Pokaz informacje o mojej firmie" | Dane firmy z wFirma wyswietlone | |
-| 3.1.2 | "Pokaz konta bankowe firmy" | Lista kont bankowych | |
-| 3.1.3 | "Pokaz adresy firmy" | Lista adresow firmy | |
-
-### 3.2 Kontrahenci
-
-| # | Scenariusz testowy | Oczekiwany rezultat | Status |
-|---|---|---|---|
-| 3.2.1 | "Pokaz liste kontrahentow" | Lista kontrahentow z wFirma | |
-| 3.2.2 | "Dodaj nowego kontrahenta [dane]" | Kontrahent utworzony w wFirma | |
-| 3.2.3 | "Zaktualizuj kontrahenta [dane]" | Dane kontrahenta zaktualizowane | |
-| 3.2.4 | "Usun kontrahenta [nazwa]" | Kontrahent usuniety z wFirma | |
-
-### 3.3 Faktury
-
-| # | Scenariusz testowy | Oczekiwany rezultat | Status |
-|---|---|---|---|
-| 3.3.1 | "Pokaz liste faktur" | Lista faktur z wFirma | |
-| 3.3.2 | "Pokaz szczegoly faktury [numer]" | Pelne dane faktury | |
-| 3.3.3 | "Wystaw nowa fakture [dane]" | Faktura utworzona w wFirma | |
-| 3.3.4 | "Zaktualizuj fakture [dane]" | Faktura zaktualizowana | |
-| 3.3.5 | "Usun fakture [numer]" | Faktura usunieta | |
-| 3.3.6 | "Wyslij fakture e-mailem [numer]" | Faktura wyslana na wskazany adres | |
-| 3.3.7 | "Pobierz fakture PDF [numer]" | Plik PDF do pobrania | |
-| 3.3.8 | "Dodaj notatke do faktury [numer]" | Notatka dodana | |
-| 3.3.9 | "Pokaz notatki faktury [numer]" | Lista notatek | |
-| 3.3.10 | "Usun notatke z faktury" | Notatka usunieta | |
-
-### 3.4 Platnosci
-
-| # | Scenariusz testowy | Oczekiwany rezultat | Status |
-|---|---|---|---|
-| 3.4.1 | "Pokaz liste platnosci" | Lista platnosci | |
-| 3.4.2 | "Pokaz szczegoly platnosci [id]" | Dane platnosci | |
-| 3.4.3 | "Dodaj platnosc [dane]" | Platnosc zarejestrowana | |
-| 3.4.4 | "Zaktualizuj platnosc [dane]" | Platnosc zaktualizowana | |
-| 3.4.5 | "Usun platnosc [id]" | Platnosc usunieta | |
-
-### 3.5 Wydatki
-
-| # | Scenariusz testowy | Oczekiwany rezultat | Status |
-|---|---|---|---|
-| 3.5.1 | "Pokaz liste wydatkow" | Lista wydatkow | |
-| 3.5.2 | "Pokaz szczegoly wydatku [id]" | Dane wydatku | |
-
-### 3.6 Pojazdy
-
-| # | Scenariusz testowy | Oczekiwany rezultat | Status |
-|---|---|---|---|
-| 3.6.1 | "Pokaz liste pojazdow" | Lista pojazdow | |
-| 3.6.2 | "Pokaz szczegoly pojazdu [id]" | Dane pojazdu | |
-| 3.6.3 | "Dodaj pojazd [dane]" | Pojazd dodany | |
-| 3.6.4 | "Zaktualizuj pojazd [dane]" | Pojazd zaktualizowany | |
-| 3.6.5 | "Usun pojazd [id]" | Pojazd usuniety | |
-
-### 3.7 Terminy platnosci
-
-| # | Scenariusz testowy | Oczekiwany rezultat | Status |
-|---|---|---|---|
-| 3.7.1 | "Pokaz terminy platnosci" | Lista terminow | |
-| 3.7.2 | "Dodaj termin platnosci [dane]" | Termin utworzony | |
-| 3.7.3 | "Zaktualizuj termin [dane]" | Termin zaktualizowany | |
-| 3.7.4 | "Usun termin [id]" | Termin usuniety | |
-| 3.7.5 | "Pokaz grupy terminow" | Lista grup terminow | |
-| 3.7.6 | "Dodaj grupe terminow [dane]" | Grupa utworzona | |
-
-### 3.8 Deklaracje podatkowe
-
-| # | Scenariusz testowy | Oczekiwany rezultat | Status |
-|---|---|---|---|
-| 3.8.1 | "Pokaz deklaracje JPK VAT" | Lista deklaracji VAT | |
-| 3.8.2 | "Pokaz deklaracje PIT" | Lista deklaracji PIT | |
-
-### 3.9 Dokumenty
-
-| # | Scenariusz testowy | Oczekiwany rezultat | Status |
-|---|---|---|---|
-| 3.9.1 | "Pokaz liste dokumentow" | Lista dokumentow | |
-| 3.9.2 | "Pokaz szczegoly dokumentu [id]" | Dane dokumentu | |
-| 3.9.3 | "Pobierz dokument [id]" | Plik do pobrania | |
-| 3.9.4 | "Usun dokument [id]" | Dokument usuniety | |
-
-### 3.10 Ksiegowosc
-
-| # | Scenariusz testowy | Oczekiwany rezultat | Status |
-|---|---|---|---|
-| 3.10.1 | "Pokaz lata obrachunkowe" | Lista lat obrachunkowych | |
-| 3.10.2 | "Pokaz szczegoly roku [id]" | Dane roku obrachunkowego | |
-| 3.10.3 | "Pokaz schematy ksiegowe" | Lista schematow | |
-| 3.10.4 | "Pokaz szczegoly schematu [id]" | Dane schematu ksiegowego | |
-
-### 3.11 Podsumowanie finansowe
-
-| # | Scenariusz testowy | Oczekiwany rezultat | Status |
-|---|---|---|---|
-| 3.11.1 | "Pokaz podsumowanie finansowe" | Przeglad finansowy firmy | |
-
-### 3.12 Uzytkownicy wFirma
-
-| # | Scenariusz testowy | Oczekiwany rezultat | Status |
-|---|---|---|---|
-| 3.12.1 | "Pokaz uzytkownikow wFirma" | Lista uzytkownikow | |
-| 3.12.2 | "Pokaz firmy uzytkownika" | Lista firm | |
-| 3.12.3 | "Pokaz szczegoly firmy [id]" | Dane firmy | |
+| 2.1 | Create new conversation | New conversation in list, title auto-generated | |
+| 2.2 | Send text message | User message displayed, AI response streamed | |
+| 2.3 | AI response with Markdown formatting | Correct rendering of headings, lists, code, tables | |
+| 2.4 | AI response with syntax highlighting | Code blocks with syntax coloring | |
+| 2.5 | Voice input (Web Speech API) | Microphone button active, speech recognized, text in field | |
+| 2.6 | Switch between conversations | Correct history loaded for selected conversation | |
+| 2.7 | Delete conversation | Conversation removed from list, messages deleted | |
+| 2.8 | Send empty message | Send button disabled or validation error | |
+| 2.9 | Message rate limiting (>60 / 15 min) | Error 429 with limit info | |
+| 2.10 | Subscription message limit (Free/Pro) | Message shown about limit reached with upgrade option | |
+| 2.11 | AI invokes wFirma tool | AI uses tool, displays formatted result | |
+| 2.12 | LLM API error during conversation | User-friendly error message shown | |
+| 2.13 | No LLM key configured (Free plan) | Message about needing to configure API key | |
+| 2.14 | wFirma connection error during tool use | User-friendly integration error message | |
+| 2.15 | Long conversation (>50 messages) | Smooth scrolling, no performance issues | |
 
 ---
 
-## 4. Subskrypcje i platnosci
+## 3. AI Tools — wFirma (44 tools)
 
-| # | Scenariusz testowy | Oczekiwany rezultat | Status |
+### 3.1 Company
+
+| # | Test Scenario | Expected Result | Status |
 |---|---|---|---|
-| 4.1 | Wyswietlenie strony cennikowej (/pricing) | Plany Free i Pro z cenami w PLN | |
-| 4.2 | Przelaczanie okresu rozliczeniowego (miesiecznie/rocznie) | Ceny sie aktualizuja, oszczednosc 17% widoczna | |
-| 4.3 | Upgrade z Free do Pro Monthly | Stripe Checkout, aktywacja po platnosci | |
-| 4.4 | Upgrade z Free do Pro Yearly | Stripe Checkout, roczna subskrypcja aktywna | |
-| 4.5 | Anulowanie subskrypcji Pro | Subskrypcja anulowana na koniec okresu rozliczeniowego | |
-| 4.6 | Platnosc odrzucona (karta odrzucona) | Komunikat bledu, subskrypcja nieaktywna | |
-| 4.7 | Dostep do portalu rozliczeniowego Stripe | Przekierowanie do Stripe Customer Portal | |
-| 4.8 | Wyswietlenie biezacego uzycia (wiadomosci AI, zapytania wFirma) | Poprawne liczniki uzycia | |
-| 4.9 | Przelaczenie preferencji klucza LLM (wlasny/aplikacji) - Pro | Preferencja zapisana, zmiana zrodla LLM | |
-| 4.10 | Webhook Stripe: checkout.session.completed | Subskrypcja aktywowana w bazie | |
-| 4.11 | Webhook Stripe: customer.subscription.deleted | Subskrypcja zdezaktywowana | |
-| 4.12 | Webhook Stripe: invoice.payment_failed | Uzytkownik powiadomiony o bledzie platnosci | |
+| 3.1.1 | „Pokaż dane mojej firmy" | Company data from wFirma displayed | |
+| 3.1.2 | „Pokaż konta bankowe firmy" | List of bank accounts | |
+| 3.1.3 | „Pokaż adresy firmy" | List of company addresses | |
+
+### 3.2 Contractors
+
+| # | Test Scenario | Expected Result | Status |
+|---|---|---|---|
+| 3.2.1 | „Pokaż listę kontrahentów" | Contractor list from wFirma | |
+| 3.2.2 | „Dodaj nowego kontrahenta [dane]" | Contractor created in wFirma | |
+| 3.2.3 | „Zaktualizuj kontrahenta [dane]" | Contractor data updated | |
+| 3.2.4 | „Usuń kontrahenta [nazwa]" | Contractor deleted from wFirma | |
+
+### 3.3 Invoices
+
+| # | Test Scenario | Expected Result | Status |
+|---|---|---|---|
+| 3.3.1 | „Pokaż listę faktur" | Invoice list from wFirma | |
+| 3.3.2 | „Pokaż szczegóły faktury [numer]" | Full invoice data | |
+| 3.3.3 | „Utwórz nową fakturę [dane]" | Invoice created in wFirma | |
+| 3.3.4 | „Zaktualizuj fakturę [dane]" | Invoice updated | |
+| 3.3.5 | „Usuń fakturę [numer]" | Invoice deleted | |
+| 3.3.6 | „Wyślij fakturę emailem [numer]" | Invoice sent to specified address | |
+| 3.3.7 | „Pobierz PDF faktury [numer]" | PDF file available for download | |
+| 3.3.8 | „Dodaj notatkę do faktury [numer]" | Note added | |
+| 3.3.9 | „Pokaż notatki faktury [numer]" | Notes list displayed | |
+| 3.3.10 | „Usuń notatkę z faktury" | Note deleted | |
+
+### 3.4 Payments
+
+| # | Test Scenario | Expected Result | Status |
+|---|---|---|---|
+| 3.4.1 | „Pokaż listę płatności" | Payments list | |
+| 3.4.2 | „Pokaż szczegóły płatności [id]" | Payment data | |
+| 3.4.3 | „Dodaj płatność [dane]" | Payment registered | |
+| 3.4.4 | „Zaktualizuj płatność [dane]" | Payment updated | |
+| 3.4.5 | „Usuń płatność [id]" | Payment deleted | |
+
+### 3.5 Expenses
+
+| # | Test Scenario | Expected Result | Status |
+|---|---|---|---|
+| 3.5.1 | „Pokaż listę wydatków" | Expenses list | |
+| 3.5.2 | „Pokaż szczegóły wydatku [id]" | Expense data | |
+
+### 3.6 Vehicles
+
+| # | Test Scenario | Expected Result | Status |
+|---|---|---|---|
+| 3.6.1 | „Pokaż listę pojazdów" | Vehicle list | |
+| 3.6.2 | „Pokaż szczegóły pojazdu [id]" | Vehicle data | |
+| 3.6.3 | „Dodaj pojazd [dane]" | Vehicle added | |
+| 3.6.4 | „Zaktualizuj pojazd [dane]" | Vehicle updated | |
+| 3.6.5 | „Usuń pojazd [id]" | Vehicle deleted | |
+
+### 3.7 Payment Terms
+
+| # | Test Scenario | Expected Result | Status |
+|---|---|---|---|
+| 3.7.1 | „Pokaż terminy płatności" | Terms list | |
+| 3.7.2 | „Dodaj termin płatności [dane]" | Term created | |
+| 3.7.3 | „Zaktualizuj termin [dane]" | Term updated | |
+| 3.7.4 | „Usuń termin [id]" | Term deleted | |
+| 3.7.5 | „Pokaż grupy terminów" | Term groups list | |
+| 3.7.6 | „Dodaj grupę terminów [dane]" | Group created | |
+
+### 3.8 Tax Declarations
+
+| # | Test Scenario | Expected Result | Status |
+|---|---|---|---|
+| 3.8.1 | „Pokaż deklaracje JPK VAT" | VAT declaration list | |
+| 3.8.2 | „Pokaż deklaracje PIT" | PIT declaration list | |
+
+### 3.9 Documents
+
+| # | Test Scenario | Expected Result | Status |
+|---|---|---|---|
+| 3.9.1 | „Pokaż listę dokumentów" | Document list | |
+| 3.9.2 | „Pokaż szczegóły dokumentu [id]" | Document data | |
+| 3.9.3 | „Pobierz dokument [id]" | File downloaded | |
+| 3.9.4 | „Usuń dokument [id]" | Document deleted | |
+
+### 3.10 Accounting
+
+| # | Test Scenario | Expected Result | Status |
+|---|---|---|---|
+| 3.10.1 | „Pokaż lata podatkowe" | Fiscal year list | |
+| 3.10.2 | „Pokaż szczegóły roku podatkowego [id]" | Fiscal year data | |
+| 3.10.3 | „Pokaż schematy księgowe" | Schema list | |
+| 3.10.4 | „Pokaż szczegóły schematu [id]" | Accounting schema data | |
+
+### 3.11 Financial Summary
+
+| # | Test Scenario | Expected Result | Status |
+|---|---|---|---|
+| 3.11.1 | „Pokaż podsumowanie finansowe" | Company financial overview | |
+
+### 3.12 wFirma Users
+
+| # | Test Scenario | Expected Result | Status |
+|---|---|---|---|
+| 3.12.1 | „Pokaż użytkowników wFirma" | User list | |
+| 3.12.2 | „Pokaż firmy użytkownika" | Company list | |
+| 3.12.3 | „Pokaż szczegóły firmy [id]" | Company data | |
 
 ---
 
-## 5. Zarzadzanie danymi uwierzytelniajacymi
+## 4. AI Tools — KSeF (9 tools)
 
-| # | Scenariusz testowy | Oczekiwany rezultat | Status |
+### 4.1 Invoice Submission
+
+| # | Test Scenario | Expected Result | Status |
 |---|---|---|---|
-| 5.1 | Konfiguracja danych wFirma (Access Key, Secret Key, Company ID) | Dane zaszyfrowane i zapisane, walidacja poprawnosci | |
-| 5.2 | Aktualizacja danych wFirma | Nowe dane zastepuja stare | |
-| 5.3 | Usuniecie danych wFirma | Dane usunite, status "Nieskonfigurowane" | |
-| 5.4 | Konfiguracja klucza LLM (OpenAI) | Klucz zaszyfrowany, lista modeli zaladowana | |
-| 5.5 | Konfiguracja klucza LLM (Google/Gemini) | Klucz zaszyfrowany, lista modeli zaladowana | |
-| 5.6 | Wybor modelu LLM z listy | Model zapisany w profilu | |
-| 5.7 | Usuniecie klucza LLM | Klucz usuniety, powrot do domyslnego | |
-| 5.8 | Podanie nieprawidlowego klucza wFirma | Blad walidacji przy zapisie | |
-| 5.9 | Podanie nieprawidlowego klucza LLM | Blad walidacji przy zapisie | |
-| 5.10 | Wyswietlenie zamaskowanych danych (GET /credentials) | Klucze zamaskowane (np. sk-...xxxx) | |
+| 4.1.1 | „Wyślij fakturę [ID wFirma] do KSeF" | Invoice submitted, reference number returned | |
+| 4.1.2 | „Utwórz i wyślij fakturę KSeF: [pełne dane]" | FA(3) XML generated and submitted to KSeF | |
+| 4.1.3 | Create KSeF invoice with company name only (no NIP) | NIP and address auto-filled from contractor DB | |
+| 4.1.4 | Create KSeF invoice — company name not in contractor DB | Error asking user to provide NIP manually | |
+| 4.1.5 | Send KSeF invoice with invalid NIP format | Error: TNrNIP pattern constraint failed | |
+| 4.1.6 | „Wyślij od razu faktury nr [X, Y, Z] do KSeF" | All invoices submitted, result summary shown | |
+
+### 4.2 Status & UPO
+
+| # | Test Scenario | Expected Result | Status |
+|---|---|---|---|
+| 4.2.1 | „Sprawdź status KSeF [numer referencyjny]" | Status returned (pending/accepted/rejected) | |
+| 4.2.2 | Status check for accepted invoice | Status: accepted, upoAvailable: true | |
+| 4.2.3 | Status check for rejected invoice | Status: rejected, errorCode and errorMessage shown | |
+| 4.2.4 | „Pobierz UPO [numer referencyjny]" | UPO XML file downloaded | |
+| 4.2.5 | Download UPO for non-accepted invoice | Error: UPO not available | |
+| 4.2.6 | Background status poller updates invoice | Status auto-updated, email notification sent | |
+
+### 4.3 Invoice List & Statistics
+
+| # | Test Scenario | Expected Result | Status |
+|---|---|---|---|
+| 4.3.1 | „Pokaż faktury KSeF" | List of sent invoices | |
+| 4.3.2 | „Pokaż przychodzące faktury KSeF" | Incoming invoices fetched from KSeF API | |
+| 4.3.3 | Filter KSeF invoices by date range | Filtered results returned | |
+| 4.3.4 | Filter KSeF invoices by status | Only matching invoices shown | |
+| 4.3.5 | „Pokaż statystyki KSeF za ten miesiąc" | Totals by status, monthly breakdown | |
+| 4.3.6 | „Dopasuj przychodzącą fakturę KSeF [numer referencyjny]" | Match found in wFirma records | |
+
+### 4.4 Contractor Auto-fill
+
+| # | Test Scenario | Expected Result | Status |
+|---|---|---|---|
+| 4.4.1 | Sync contractors from wFirma | KSeFContractor table populated with wFirma data | |
+| 4.4.2 | Sync populates own company (source='company') | Company NIP, address stored in KSeFContractor | |
+| 4.4.3 | Create KSeF invoice — seller name matches company record | NIP and address resolved from source='company' | |
+| 4.4.4 | Create KSeF invoice — buyer name matches wFirma contractor | NIP and address resolved from source='wfirma' | |
+| 4.4.5 | Create KSeF invoice — buyer name matches local contractor | NIP and address resolved from source='local' | |
+| 4.4.6 | Partial match: buyer name contains contractor name | Fuzzy match resolves contractor data | |
+
+### 4.5 KSeF Configuration
+
+| # | Test Scenario | Expected Result | Status |
+|---|---|---|---|
+| 4.5.1 | Set KSeF token and NIP via config | Config saved, direct adapter enabled | |
+| 4.5.2 | Send invoice without KSeF token configured | Returns pending status with configuration instruction | |
+| 4.5.3 | Enable auto-send on invoice creation | Invoice auto-submitted to KSeF after wFirma creation | |
+| 4.5.4 | Change KSeF environment (test/production) | Requests routed to correct KSeF endpoint | |
+| 4.5.5 | Enable email notifications (accepted/rejected) | Email sent on status change | |
 
 ---
 
-## 6. Profil uzytkownika
+## 5. Subscriptions & Payments
 
-| # | Scenariusz testowy | Oczekiwany rezultat | Status |
+| # | Test Scenario | Expected Result | Status |
 |---|---|---|---|
-| 6.1 | Edycja imienia i nazwiska | Dane zaktualizowane | |
-| 6.2 | Edycja nazwy firmy | Nazwa firmy zaktualizowana | |
-| 6.3 | Zmiana jezyka (en/pl/ru) | Jezyk interfejsu zmieniony natychmiastowo | |
-| 6.4 | Wyswietlenie danych profilu (/dashboard) | Poprawne dane uzytkownika | |
-| 6.5 | Modal powitalny - pierwsza wizyta | Modal wyswietlony | |
-| 6.6 | Modal powitalny - zamkniecie | Modal nie pojawia sie ponownie (firstLoginComplete) | |
+| 5.1 | View pricing page (/pricing) | Free and Pro plans shown with PLN prices | |
+| 5.2 | Toggle billing period (monthly/yearly) | Prices update, 17% savings visible | |
+| 5.3 | Upgrade from Free to Pro Monthly | Stripe Checkout, activation after payment | |
+| 5.4 | Upgrade from Free to Pro Yearly | Stripe Checkout, annual subscription active | |
+| 5.5 | Cancel Pro subscription | Subscription cancelled at end of billing period | |
+| 5.6 | Payment declined (card rejected) | Error message, subscription inactive | |
+| 5.7 | Access Stripe billing portal | Redirect to Stripe Customer Portal | |
+| 5.8 | View current usage (AI messages, wFirma queries) | Correct usage counters | |
+| 5.9 | Switch LLM key preference (own/app) — Pro | Preference saved, LLM source changed | |
+| 5.10 | Stripe webhook: checkout.session.completed | Subscription activated in database | |
+| 5.11 | Stripe webhook: customer.subscription.deleted | Subscription deactivated | |
+| 5.12 | Stripe webhook: invoice.payment_failed | User notified about payment failure | |
 
 ---
 
-## 7. Panel administratora
+## 6. Credential Management
 
-| # | Scenariusz testowy | Oczekiwany rezultat | Status |
+| # | Test Scenario | Expected Result | Status |
 |---|---|---|---|
-| 7.1 | Dostep do /admin jako administrator | Dashboard ze statystykami | |
-| 7.2 | Dostep do /admin jako zwykly uzytkownik | Blad 403 lub przekierowanie | |
-| 7.3 | Wyswietlenie statystyk (uzytkownicy, konwersacje, koszty) | Poprawne liczby | |
-| 7.4 | Lista uzytkownikow z paginacja | Tabela z uzytkownikami, stronicowanie dziala | |
-| 7.5 | Wyszukiwanie uzytkownika po e-mail/nazwisku | Filtrowane wyniki | |
-| 7.6 | Zmiana roli uzytkownika (user <-> admin) | Rola zmieniona, badge zaktualizowany | |
-| 7.7 | Wyswietlenie szczegolowych danych uzytkownika | Profil, subskrypcja, uzycie, konwersacje | |
+| 6.1 | Configure wFirma credentials (Access Key, Secret Key, Company ID) | Data encrypted and saved, validation passed | |
+| 6.2 | Update wFirma credentials | New credentials replace old ones | |
+| 6.3 | Delete wFirma credentials | Data deleted, status "Not configured" | |
+| 6.4 | Configure LLM key (OpenAI) | Key encrypted, model list loaded | |
+| 6.5 | Configure LLM key (Google/Gemini) | Key encrypted, model list loaded | |
+| 6.6 | Select LLM model from list | Model saved in profile | |
+| 6.7 | Delete LLM key | Key deleted, fall back to default | |
+| 6.8 | Provide invalid wFirma key | Validation error on save | |
+| 6.9 | Provide invalid LLM key | Validation error on save | |
+| 6.10 | View masked credentials (GET /credentials) | Keys masked (e.g. sk-...xxxx) | |
 
 ---
 
-## 8. Sledzenie kosztow AI
+## 7. User Profile
 
-| # | Scenariusz testowy | Oczekiwany rezultat | Status |
+| # | Test Scenario | Expected Result | Status |
 |---|---|---|---|
-| 8.1 | Dashboard kosztow (/dashboard/costs) | Karty podsumowania, wykres dzienny, rozklad modeli | |
-| 8.2 | Filtrowanie kosztow wg zakresu dat | Dane filtrowane poprawnie | |
-| 8.3 | Rozklad kosztow wg modelu | Wykres z podzialem na modele (GPT-4, itp.) | |
-| 8.4 | Lista konwersacji z kosztami | Tabela z kosztami na konwersacje | |
-| 8.5 | Szczegoly kosztow konwersacji | Tabela uruchomien, tokeny, koszty | |
-| 8.6 | Podsumowanie kosztow uzytkownika | Calkowity koszt, biezacy miesiac, ostatnie 30 dni | |
+| 7.1 | Edit first and last name | Data updated | |
+| 7.2 | Edit company name | Company name updated | |
+| 7.3 | Change language (en/pl/ru) | UI language changed immediately | |
+| 7.4 | View profile data (/dashboard) | Correct user data displayed | |
+| 7.5 | Welcome modal — first visit | Modal shown | |
+| 7.6 | Welcome modal — close | Modal does not reappear (firstLoginComplete) | |
 
 ---
 
-## 9. System pomocy
+## 8. Admin Panel
 
-| # | Scenariusz testowy | Oczekiwany rezultat | Status |
+| # | Test Scenario | Expected Result | Status |
 |---|---|---|---|
-| 9.1 | Otwarcie panelu pomocy (przycisk ?) | Panel wysuwa sie z prawej strony | |
-| 9.2 | Przegladanie kategorii pomocy | Lista kategorii z tematami | |
-| 9.3 | Wyszukiwanie w tematach pomocy | Filtrowane wyniki | |
-| 9.4 | Wyswietlenie tematu pomocy | Tresc w formacie Markdown | |
-| 9.5 | Tresc pomocy w wybranym jezyku (pl/en/ru) | Tresc w odpowiednim jezyku | |
+| 8.1 | Access /admin as administrator | Dashboard with statistics | |
+| 8.2 | Access /admin as regular user | Error 403 or redirect | |
+| 8.3 | View statistics (users, conversations, costs) | Correct numbers shown | |
+| 8.4 | User list with pagination | Table with users, pagination works | |
+| 8.5 | Search user by email/name | Filtered results | |
+| 8.6 | Change user role (user <-> admin) | Role changed, badge updated | |
+| 8.7 | View detailed user data | Profile, subscription, usage, conversations | |
 
 ---
 
-## 10. Internacjonalizacja (i18n)
+## 9. AI Cost Tracking
 
-| # | Scenariusz testowy | Oczekiwany rezultat | Status |
+| # | Test Scenario | Expected Result | Status |
 |---|---|---|---|
-| 10.1 | Interfejs w jezyku polskim | Wszystkie etykiety, komunikaty, przyciski po polsku | |
-| 10.2 | Interfejs w jezyku angielskim | Wszystkie etykiety po angielsku | |
-| 10.3 | Interfejs w jezyku rosyjskim | Wszystkie etykiety po rosyjsku | |
-| 10.4 | Przelaczanie jezyka w ustawieniach | Zmiana natychmiastowa bez przeladowania | |
-| 10.5 | Odpowiedzi AI w jezyku uzytkownika | AI odpowiada w wybranym jezyku | |
-| 10.6 | Komunikaty bledow w wybranym jezyku | Bledy przetlumaczone | |
+| 9.1 | Cost dashboard (/dashboard/costs) | Summary cards, daily chart, model breakdown | |
+| 9.2 | Filter costs by date range | Data filtered correctly | |
+| 9.3 | Cost breakdown by model | Chart with model split (GPT-4, etc.) | |
+| 9.4 | Conversation list with costs | Table with per-conversation costs | |
+| 9.5 | Conversation cost details | Runs table, tokens, costs | |
+| 9.6 | User cost summary | Total cost, current month, last 30 days | |
 
 ---
 
-## 11. Tryb ciemny / jasny
+## 10. Help System
 
-| # | Scenariusz testowy | Oczekiwany rezultat | Status |
+| # | Test Scenario | Expected Result | Status |
 |---|---|---|---|
-| 11.1 | Przelaczanie na tryb ciemny | Wszystkie elementy w ciemnych kolorach | |
-| 11.2 | Przelaczanie na tryb jasny | Wszystkie elementy w jasnych kolorach | |
-| 11.3 | Detekcja preferencji systemowych | Automatyczny wybor motywu | |
-| 11.4 | Zachowanie preferencji po odswiezeniu | Motyw przywrocony z localStorage | |
-| 11.5 | Kontrast tekstu w obu trybach | Czytelnosc zachowana (WCAG AA) | |
+| 10.1 | Open help panel (? button) | Panel slides in from right | |
+| 10.2 | Browse help categories | Category list with topics | |
+| 10.3 | Search help topics | Filtered results | |
+| 10.4 | View help topic | Content in Markdown format | |
+| 10.5 | Help content in selected language (pl/en/ru) | Content in correct language | |
 
 ---
 
-## 12. Pliki i pobieranie
+## 11. Internationalization (i18n)
 
-| # | Scenariusz testowy | Oczekiwany rezultat | Status |
+| # | Test Scenario | Expected Result | Status |
 |---|---|---|---|
-| 12.1 | Pobieranie faktury PDF | Plik PDF pobrany poprawnie | |
-| 12.2 | Pobieranie dokumentu z wFirma | Plik pobrany z poprawnym MIME type | |
-| 12.3 | Pobieranie pliku z wygaslym linkiem (>15 min) | Blad: "Link wygasl" | |
-| 12.4 | Pobieranie bez autoryzacji | Blad 401 | |
+| 11.1 | Interface in Polish | All labels, messages, buttons in Polish | |
+| 11.2 | Interface in English | All labels in English | |
+| 11.3 | Interface in Russian | All labels in Russian | |
+| 11.4 | Switch language in settings | Immediate change without page reload | |
+| 11.5 | AI responses in user's language | AI responds in detected language | |
+| 11.6 | Error messages in selected language | Errors translated | |
 
 ---
 
-## 13. Prywatnosc i cookies (RODO/GDPR)
+## 12. Dark / Light Mode
 
-| # | Scenariusz testowy | Oczekiwany rezultat | Status |
+| # | Test Scenario | Expected Result | Status |
 |---|---|---|---|
-| 13.1 | Wyswietlenie banera cookies (pierwsza wizyta) | Baner z opcjami zgody | |
-| 13.2 | Akceptacja wszystkich cookies | Baner znika, preferencje zapisane | |
-| 13.3 | Odrzucenie opcjonalnych cookies | Tylko niezbedne cookies aktywne | |
-| 13.4 | Zmiana preferencji cookies (ustawienia) | Modal z opcjami, zmiana zapisana | |
-| 13.5 | Link do polityki prywatnosci | Strona/modal z trescia polityki | |
-| 13.6 | Link do regulaminu | Strona/modal z trescia regulaminu | |
+| 12.1 | Switch to dark mode | All elements in dark colors | |
+| 12.2 | Switch to light mode | All elements in light colors | |
+| 12.3 | System preference detection | Theme auto-selected | |
+| 12.4 | Preference preserved after refresh | Theme restored from localStorage | |
+| 12.5 | Text contrast in both modes | Readability maintained (WCAG AA) | |
 
 ---
 
-## 14. Responsywnosc (RWD)
+## 13. Files & Downloads
 
-| # | Scenariusz testowy | Urzadzenie | Oczekiwany rezultat | Status |
+| # | Test Scenario | Expected Result | Status |
+|---|---|---|---|
+| 13.1 | Download invoice PDF (wFirma) | PDF file downloaded correctly | |
+| 13.2 | Download document from wFirma | File downloaded with correct MIME type | |
+| 13.3 | Download file with expired link (>15 min) | Error: "Link expired" | |
+| 13.4 | Download without authorization | Error 401 | |
+| 13.5 | Download KSeF invoice as PDF | PDF with KSeF QR code downloaded | |
+| 13.6 | Download KSeF invoice as XML | FA(3) XML file downloaded | |
+| 13.7 | Download KSeF UPO | UPO XML file downloaded | |
+
+---
+
+## 14. Privacy & Cookies (GDPR)
+
+| # | Test Scenario | Expected Result | Status |
+|---|---|---|---|
+| 14.1 | Cookie banner on first visit | Banner with consent options | |
+| 14.2 | Accept all cookies | Banner disappears, preferences saved | |
+| 14.3 | Reject optional cookies | Only essential cookies active | |
+| 14.4 | Change cookie preferences (settings) | Modal with options, change saved | |
+| 14.5 | Privacy policy link | Page/modal with policy content | |
+| 14.6 | Terms of service link | Page/modal with terms content | |
+
+---
+
+## 15. Responsiveness (RWD)
+
+| # | Test Scenario | Device | Expected Result | Status |
 |---|---|---|---|---|
-| 14.1 | Strona logowania | Mobile (320px) | Formularz czytelny, przyciski dotykowe | |
-| 14.2 | Strona rejestracji | Mobile (320px) | Formularz przewijalny, wszystkie pola dostepne | |
-| 14.3 | Czat AI - sidebar | Mobile (320px) | Sidebar zwijany, przycisk hamburger | |
-| 14.4 | Czat AI - wiadomosci | Mobile (320px) | Wiadomosci pelna szerokosc, przewijanie | |
-| 14.5 | Panel admina - tabela | Tablet (768px) | Tabela przewijalna poziomo | |
-| 14.6 | Cennik | Mobile (320px) | Karty planow jedna pod druga | |
-| 14.7 | Dashboard kosztow - wykresy | Tablet (768px) | Wykresy skaluja sie do kontenera | |
-| 14.8 | Formularz danych uwierzytelniajacych | Mobile (320px) | Pola pelna szerokosc | |
+| 15.1 | Login page | Mobile (320px) | Form readable, touch buttons | |
+| 15.2 | Registration page | Mobile (320px) | Scrollable form, all fields accessible | |
+| 15.3 | AI chat — sidebar | Mobile (320px) | Sidebar collapsible, hamburger button | |
+| 15.4 | AI chat — messages | Mobile (320px) | Messages full width, scrollable | |
+| 15.5 | Admin panel — table | Tablet (768px) | Table horizontally scrollable | |
+| 15.6 | Pricing page | Mobile (320px) | Plan cards stacked vertically | |
+| 15.7 | Cost dashboard — charts | Tablet (768px) | Charts scale to container | |
+| 15.8 | Credentials form | Mobile (320px) | Fields full width | |
 
 ---
 
-## 15. Wydajnosc
+## 16. Performance
 
-| # | Scenariusz testowy | Oczekiwany rezultat | Status |
+| # | Test Scenario | Expected Result | Status |
 |---|---|---|---|
-| 15.1 | Czas ladowania strony glownej | < 3 sekundy (First Contentful Paint) | |
-| 15.2 | Czas odpowiedzi API (endpointy CRUD) | < 500ms (p95) | |
-| 15.3 | Czas pierwszej odpowiedzi AI (streaming) | < 3 sekundy do poczatku streamu | |
-| 15.4 | Cache wFirma - trafienie | Odpowiedz < 100ms | |
-| 15.5 | Cache wFirma - pudlo | Odpowiedz < 2 sekundy | |
-| 15.6 | Lista konwersacji (>100 konwersacji) | Ladowanie < 1 sekunda | |
-| 15.7 | Jednoczesni uzytkownicy (10/50/100) | Brak degradacji ponizej 50 uzytkownikow | |
+| 16.1 | Home page load time | < 3 seconds (First Contentful Paint) | |
+| 16.2 | API response time (CRUD endpoints) | < 500ms (p95) | |
+| 16.3 | First AI response time (streaming) | < 3 seconds to start of stream | |
+| 16.4 | wFirma cache hit | Response < 100ms | |
+| 16.5 | wFirma cache miss | Response < 2 seconds | |
+| 16.6 | Conversation list (>100 conversations) | Load < 1 second | |
+| 16.7 | Concurrent users (10/50/100) | No degradation below 50 users | |
 
 ---
 
-## 16. Bezpieczenstwo
+## 17. Security
 
-| # | Scenariusz testowy | Oczekiwany rezultat | Status |
+| # | Test Scenario | Expected Result | Status |
 |---|---|---|---|
-| 16.1 | Walidacja tokenu JWT (zmodyfikowany token) | Blad 401: "Nieprawidlowy token" | |
-| 16.2 | Dostep do cudzych konwersacji | Blad 403 lub 404 | |
-| 16.3 | Dostep do endpointow admina bez roli admin | Blad 403 | |
-| 16.4 | SQL Injection w polach formularzy | Zapytanie odrzucone, brak wycieku danych | |
-| 16.5 | XSS w wiadomosciach czatu | Skrypty nie sa wykonywane | |
-| 16.6 | CSRF na endpointach mutujacych | Ochrona CSRF aktywna | |
-| 16.7 | Szyfrowanie klucza API w bazie (AES-256-GCM) | Klucze nie sa czytelne w bazie | |
-| 16.8 | Hashowanie hasel (bcrypt) | Hasla nie sa czytelne w bazie | |
-| 16.9 | Rate limiting - proba obejscia | Limity egzekwowane per IP | |
-| 16.10 | Wyciek klucza API w logach | Brak kluczy w logach | |
-| 16.11 | HTTPS wymuszony w produkcji | Przekierowanie HTTP -> HTTPS | |
-| 16.12 | Izolacja danych uzytkownikow | Uzytkownik widzi tylko swoje dane | |
+| 17.1 | JWT token validation (tampered token) | Error 401: "Invalid token" | |
+| 17.2 | Access another user's conversations | Error 403 or 404 | |
+| 17.3 | Access admin endpoints without admin role | Error 403 | |
+| 17.4 | SQL injection in form fields | Query rejected, no data leak | |
+| 17.5 | XSS in chat messages | Scripts not executed | |
+| 17.6 | CSRF on mutating endpoints | CSRF protection active | |
+| 17.7 | API key encryption in DB (AES-256-GCM) | Keys not readable in database | |
+| 17.8 | Password hashing (bcrypt) | Passwords not readable in database | |
+| 17.9 | Rate limiting — bypass attempt | Limits enforced per IP | |
+| 17.10 | API key leak in logs | No keys present in logs | |
+| 17.11 | HTTPS enforced in production | HTTP → HTTPS redirect | |
+| 17.12 | User data isolation | User sees only their own data | |
+| 17.13 | KSeF token stored securely in DB | Token not exposed in API responses | |
+| 17.14 | KSeF invoice payload isolation | User can only access their own invoices | |
 
 ---
 
-## 17. Obsluga bledow
+## 18. Error Handling
 
-| # | Scenariusz testowy | Oczekiwany rezultat | Status |
+| # | Test Scenario | Expected Result | Status |
 |---|---|---|---|
-| 17.1 | Blad 400 - bledne dane wejsciowe | Czytelny komunikat walidacji | |
-| 17.2 | Blad 401 - wygasla sesja | Przekierowanie do logowania | |
-| 17.3 | Blad 403 - brak uprawnien | Komunikat o braku dostepu | |
-| 17.4 | Blad 404 - nieistniejacy zasob | Strona "Nie znaleziono" | |
-| 17.5 | Blad 429 - rate limit | Komunikat "Zbyt wiele prob, sprobuj pozniej" | |
-| 17.6 | Blad 500 - blad serwera | Ogolny komunikat bledu (bez szczegolów w produkcji) | |
-| 17.7 | Blad sieci (brak internetu) | Komunikat o problemie z polaczeniem | |
-| 17.8 | Timeout API (>30s) | Komunikat o przekroczeniu czasu | |
+| 18.1 | Error 400 — invalid input | Readable validation message | |
+| 18.2 | Error 401 — expired session | Redirect to login | |
+| 18.3 | Error 403 — no permission | Access denied message | |
+| 18.4 | Error 404 — resource not found | "Not found" page | |
+| 18.5 | Error 429 — rate limit | Message "Too many requests, try later" | |
+| 18.6 | Error 500 — server error | Generic error message (no details in production) | |
+| 18.7 | Network error (no internet) | Connection problem message | |
+| 18.8 | API timeout (>30s) | Timeout message | |
+| 18.9 | KSeF NIP validation failure | Clear error: TNrNIP pattern constraint | |
+| 18.10 | KSeF authentication failure | Error: KSeF token invalid or expired | |
+| 18.11 | KSeF invoice rejected | Rejection reason displayed | |
 
 ---
 
-## 18. Dostepnosc (a11y)
+## 19. Accessibility (a11y)
 
-| # | Scenariusz testowy | Oczekiwany rezultat | Status |
+| # | Test Scenario | Expected Result | Status |
 |---|---|---|---|
-| 18.1 | Nawigacja klawiatura (Tab/Enter/Escape) | Wszystkie elementy interaktywne dostepne | |
-| 18.2 | Czytnik ekranu - formularze | Etykiety ARIA poprawne | |
-| 18.3 | Czytnik ekranu - czat AI | Wiadomosci odczytywane poprawnie | |
-| 18.4 | Kontrast kolorow (WCAG AA) | Stosunek min. 4.5:1 dla tekstu | |
-| 18.5 | Focus widoczny | Obramowanie/podswietlenie na aktywnym elemencie | |
-| 18.6 | Tekst alternatywny dla obrazow | Atrybuty alt obecne | |
+| 19.1 | Keyboard navigation (Tab/Enter/Escape) | All interactive elements accessible | |
+| 19.2 | Screen reader — forms | Correct ARIA labels | |
+| 19.3 | Screen reader — AI chat | Messages read correctly | |
+| 19.4 | Color contrast (WCAG AA) | Minimum ratio 4.5:1 for text | |
+| 19.5 | Visible focus indicator | Border/highlight on active element | |
+| 19.6 | Alt text for images | Alt attributes present | |
 
 ---
 
-## 19. Kompatybilnosc przegladarek
+## 20. Browser Compatibility
 
-| # | Przegladarka | Funkcja do testowania | Status |
+| # | Browser | Feature | Status |
 |---|---|---|---|
-| 19.1 | Chrome (najnowszy) | Pelna funkcjonalnosc | |
-| 19.2 | Firefox (najnowszy) | Pelna funkcjonalnosc | |
-| 19.3 | Safari (najnowszy) | Pelna funkcjonalnosc | |
-| 19.4 | Edge (najnowszy) | Pelna funkcjonalnosc | |
-| 19.5 | Chrome - Web Speech API | Wprowadzanie glosowe | |
-| 19.6 | Safari - Web Speech API | Wprowadzanie glosowe (ograniczone) | |
-| 19.7 | Firefox - streaming SSE | Streaming odpowiedzi AI | |
+| 20.1 | Chrome (latest) | Full functionality | |
+| 20.2 | Firefox (latest) | Full functionality | |
+| 20.3 | Safari (latest) | Full functionality | |
+| 20.4 | Edge (latest) | Full functionality | |
+| 20.5 | Chrome — Web Speech API | Voice input | |
+| 20.6 | Safari — Web Speech API | Voice input (limited) | |
+| 20.7 | Firefox — SSE streaming | AI response streaming | |
 
 ---
 
-## 20. Baza danych i cache
+## 21. Database & Cache
 
-| # | Scenariusz testowy | Oczekiwany rezultat | Status |
+| # | Test Scenario | Expected Result | Status |
 |---|---|---|---|
-| 20.1 | Migracje Prisma - aktualna wersja | Wszystkie migracje zastosowane | |
-| 20.2 | Seedowanie bazy danych | Dane poczatkowe zaladowane | |
-| 20.3 | Kaskadowe usuwanie (User -> Conversations -> Messages) | Powiazane rekordy usuniate | |
-| 20.4 | Indeksy bazy danych | Zapytania wykorzystuja indeksy | |
-| 20.5 | Polaczenie Redis | Redis dostepny i odpowiada | |
-| 20.6 | Cache TTL - wygasniecie | Dane odswiezone po wygasnieciu TTL | |
-| 20.7 | Cache invalidation po mutacji | Cache wyczyszczony po zmianie danych | |
+| 21.1 | Prisma migrations — current version | All migrations applied | |
+| 21.2 | Database seeding | Initial data loaded | |
+| 21.3 | Cascade delete (User → Conversations → Messages) | Related records deleted | |
+| 21.4 | Database indexes | Queries using indexes | |
+| 21.5 | Redis connection | Redis accessible and responding | |
+| 21.6 | Cache TTL — expiry | Data refreshed after TTL expires | |
+| 21.7 | Cache invalidation after mutation | Cache cleared after data change | |
+| 21.8 | KSeF invoice payload stored as JSON | invoicePayload field saved correctly in DB | |
+| 21.9 | KSeF contractor sync — upsert | Existing records updated, no duplicates | |
+| 21.10 | KSeF status poller — DB updates | Invoice statuses updated automatically | |
 
 ---
 
-## 21. CI/CD i wdrozenie
+## 22. CI/CD & Deployment
 
-| # | Scenariusz testowy | Oczekiwany rezultat | Status |
+| # | Test Scenario | Expected Result | Status |
 |---|---|---|---|
-| 21.1 | Linting kodu (npm run lint) | Brak bledow ESLint | |
-| 21.2 | Testy jednostkowe (npm run test) | Wszystkie testy zaliczone | |
-| 21.3 | Build projektu (npm run build) | Build zakonczony bez bledow | |
-| 21.4 | Testy E2E (npm run test:e2e) | Wszystkie scenariusze zaliczone | |
-| 21.5 | Docker Compose - uruchomienie | PostgreSQL i Redis dostepne | |
-| 21.6 | Zmienne srodowiskowe - kompletnosc | Wszystkie wymagane zmienne ustawione | |
-| 21.7 | Generowanie klienta Prisma | Klient wygenerowany bez bledow | |
+| 22.1 | Code linting (npm run lint) | No ESLint errors | |
+| 22.2 | Unit tests (npm run test) | All tests pass | |
+| 22.3 | Project build (npm run build) | Build completes without errors | |
+| 22.4 | E2E tests (npm run test:e2e) | All scenarios pass | |
+| 22.5 | Docker Compose — startup | PostgreSQL and Redis available | |
+| 22.6 | Environment variables — completeness | All required variables set | |
+| 22.7 | Prisma client generation | Client generated without errors | |
 
 ---
 
-## Podsumowanie
+## Summary
 
-| Kategoria | Liczba testow |
+| Category | Test Count |
 |---|---|
-| Uwierzytelnianie i rejestracja | 20 |
-| Czat AI | 15 |
-| Narzedzia AI - wFirma | 44 |
-| Subskrypcje i platnosci | 12 |
-| Dane uwierzytelniajace | 10 |
-| Profil uzytkownika | 6 |
-| Panel administratora | 7 |
-| Sledzenie kosztow AI | 6 |
-| System pomocy | 5 |
-| Internacjonalizacja | 6 |
-| Tryb ciemny/jasny | 5 |
-| Pliki i pobieranie | 4 |
-| Prywatnosc i cookies | 6 |
-| Responsywnosc | 8 |
-| Wydajnosc | 7 |
-| Bezpieczenstwo | 12 |
-| Obsluga bledow | 8 |
-| Dostepnosc | 6 |
-| Kompatybilnosc przegladarek | 7 |
-| Baza danych i cache | 7 |
-| CI/CD i wdrozenie | 7 |
-| **RAZEM** | **208** |
+| Authentication & Registration | 20 |
+| AI Chat | 15 |
+| AI Tools — wFirma | 44 |
+| AI Tools — KSeF | 28 |
+| Subscriptions & Payments | 12 |
+| Credential Management | 10 |
+| User Profile | 6 |
+| Admin Panel | 7 |
+| AI Cost Tracking | 6 |
+| Help System | 5 |
+| Internationalization | 6 |
+| Dark / Light Mode | 5 |
+| Files & Downloads | 7 |
+| Privacy & Cookies | 6 |
+| Responsiveness | 8 |
+| Performance | 7 |
+| Security | 14 |
+| Error Handling | 11 |
+| Accessibility | 6 |
+| Browser Compatibility | 7 |
+| Database & Cache | 10 |
+| CI/CD & Deployment | 7 |
+| **TOTAL** | **248** |
 
 ---
 
-*Ostatnia aktualizacja: 2026-01-29*
+*Last updated: 2026-02-19*

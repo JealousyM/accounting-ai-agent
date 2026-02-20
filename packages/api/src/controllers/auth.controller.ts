@@ -3,6 +3,7 @@ import { authService } from '../services/auth.service';
 import { credentialsService } from '../services/credentials.instance';
 import { emailService } from '../services/email.service';
 import { telegramService } from '../services/telegram.instance';
+import { ksefContractorService } from '../services/ksef/contractor.instance';
 import { prisma } from '../lib/prisma';
 import { logger } from '../utils/logger';
 
@@ -159,6 +160,13 @@ export class AuthController {
       const isFirstLogin = (user as any)?.isFirstLogin ?? false;
 
       logger.info('User logged in successfully', { userId: user?.id, email: user?.email });
+
+      // Background sync of KSeF contractors (fire-and-forget)
+      if (wfirmaEnabled && user?.id) {
+        ksefContractorService.syncFromWFirma(user.id)
+          .then(result => logger.info('KSeF contractor sync on login', { userId: user!.id, synced: result.synced }))
+          .catch(err => logger.warn('KSeF contractor sync failed (non-fatal)', { userId: user!.id, error: (err as Error).message }));
+      }
 
       res.status(200).json({
         success: true,
@@ -512,6 +520,17 @@ export class AuthController {
         telegramService.notifyNewUser(profile.email, profile.name || profile.email, 'google');
       }
 
+      // Background sync of KSeF contractors on OAuth login
+      const googleOAuthUser = await prisma.user.findUnique({ where: { email: profile.email }, select: { id: true } });
+      if (googleOAuthUser) {
+        credentialsService.hasWFirmaEnabled(googleOAuthUser.id).then(enabled => {
+          if (enabled) {
+            ksefContractorService.syncFromWFirma(googleOAuthUser.id)
+              .catch(err => logger.warn('KSeF contractor sync failed (non-fatal)', { userId: googleOAuthUser.id, error: (err as Error).message }));
+          }
+        }).catch(() => {});
+      }
+
       res.status(200).json({
         success: true,
         message: 'OAuth authentication successful',
@@ -554,6 +573,17 @@ export class AuthController {
 
       if (tokens.isNewUser) {
         telegramService.notifyNewUser(profile.email, profile.name || profile.email, 'github');
+      }
+
+      // Background sync of KSeF contractors on OAuth login
+      const githubOAuthUser = await prisma.user.findUnique({ where: { email: profile.email }, select: { id: true } });
+      if (githubOAuthUser) {
+        credentialsService.hasWFirmaEnabled(githubOAuthUser.id).then(enabled => {
+          if (enabled) {
+            ksefContractorService.syncFromWFirma(githubOAuthUser.id)
+              .catch(err => logger.warn('KSeF contractor sync failed (non-fatal)', { userId: githubOAuthUser.id, error: (err as Error).message }));
+          }
+        }).catch(() => {});
       }
 
       res.status(200).json({
@@ -867,6 +897,17 @@ export class AuthController {
 
       if (tokens.isNewUser) {
         telegramService.notifyNewUser(profile.email, profile.name || profile.email, 'github');
+      }
+
+      // Background sync of KSeF contractors on OAuth login
+      const githubCallbackUser = await prisma.user.findUnique({ where: { email: profile.email }, select: { id: true } });
+      if (githubCallbackUser) {
+        credentialsService.hasWFirmaEnabled(githubCallbackUser.id).then(enabled => {
+          if (enabled) {
+            ksefContractorService.syncFromWFirma(githubCallbackUser.id)
+              .catch(err => logger.warn('KSeF contractor sync failed (non-fatal)', { userId: githubCallbackUser.id, error: (err as Error).message }));
+          }
+        }).catch(() => {});
       }
 
       res.status(200).json({

@@ -38,6 +38,8 @@ import { createAllTools } from './tools';
 import { TTSIntegration } from './tts-integration';
 import { ttsService } from '../tts.instance';
 import { hrService } from '../hr/hr.instance';
+import { ksefService } from '../ksef/ksef.instance';
+import { ksefContractorService } from '../ksef/contractor.instance';
 
 export class AIChatService {
   private readonly prisma: PrismaClient;
@@ -336,7 +338,7 @@ export class AIChatService {
     const systemPrompt = getSystemPrompt(locale);
 
     // Create tools with userId, locale, and subscription tracking
-    const tools = createAllTools(wfirmaService, this.cacheService, this.fileStorageService, userId, locale, subscriptionService, hrService);
+    const tools = createAllTools(wfirmaService, this.cacheService, this.fileStorageService, userId, locale, subscriptionService, hrService, ksefService, ksefContractorService);
 
     logger.info('Created tools for agent', {
       toolCount: tools.length,

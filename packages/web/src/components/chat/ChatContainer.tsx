@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { MessageSquarePlus, X, DollarSign, Crown, AlertTriangle } from 'lucide-react';
+import { MessageSquarePlus, X, DollarSign, Crown, AlertTriangle, FileCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { AppVersion } from '@/components/ui/app-version';
 import Link from 'next/link';
@@ -239,6 +239,16 @@ function ChatContainerInner() {
             {/* Usage Widget - shows wFirma (Free) or AI messages (Pro with app key) */}
             <div className="py-2 border-b border-gray-200 dark:border-gray-700">
               <UsageWidget compact />
+            </div>
+            {/* KSeF link */}
+            <div className="py-2 border-b border-gray-200 dark:border-gray-700">
+              <Link
+                href="/ksef"
+                className="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+              >
+                <FileCheck className="w-4 h-4" />
+                <span>KSeF</span>
+              </Link>
             </div>
             {/* AI Costs and Version */}
             <div className="py-3 flex items-center justify-between">

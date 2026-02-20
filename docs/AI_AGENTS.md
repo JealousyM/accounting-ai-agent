@@ -389,8 +389,65 @@ try {
 }
 ```
 
+## KSeF Tools
+
+KSeF tools are available in the AI agent when the user has KSeF configured. They are registered alongside wFirma tools in `createAllTools()`.
+
+### Available KSeF Tools (9)
+
+| Tool | Description | Key Parameters |
+|------|-------------|----------------|
+| `create_and_send_to_ksef` | Create FA(3) invoice from chat and submit to KSeF | sellerName, buyerName, items, totals (NIP/address auto-filled from DB) |
+| `send_invoice_to_ksef` | Submit existing wFirma invoice to KSeF | invoiceId |
+| `check_ksef_status` | Get invoice status by reference number | referenceNumber |
+| `download_ksef_upo` | Download UPO (official confirmation) | referenceNumber |
+| `query_ksef_invoices` | List invoices with filters | dateFrom?, dateTo?, status?, direction? |
+| `get_incoming_ksef_invoices` | Fetch received invoices from KSeF API | dateFrom?, dateTo?, status? |
+| `match_incoming_ksef_invoice` | Match incoming invoice to wFirma records | referenceNumber |
+| `get_ksef_statistics` | Statistics: totals by status, monthly breakdown | — |
+| `bulk_send_to_ksef` | Batch-send multiple invoices | invoiceIds[], continueOnError? |
+
+### Contractor Auto-fill in `create_and_send_to_ksef`
+
+When the user provides only a company name (without NIP or address), the tool automatically:
+
+1. Calls `KSeFContractorService.listContractors(userId, partyName)`
+2. Finds a match by name (substring match in both directions)
+3. Fills in missing NIP, street, city, zip from the matched record
+4. Source priority: `company` > `wfirma` > `local`
+5. If NIP is still unresolved → returns an error asking the user to provide it explicitly
+
+**Example flow:**
+```
+User: "Wyślij fakturę KSeF: Sprzedawca: Micode Sp. z o. o. ..."
+        │
+        ▼
+create_and_send_to_ksef({ sellerName: "Micode Sp. z o. o.", sellerNip: undefined, ... })
+        │
+        ▼
+KSeFContractorService.listContractors(userId, "Micode Sp. z o. o.")
+  → finds { source: 'company', nip: '1234567890', street: 'ul. Przykładowa 1', ... }
+        │
+        ▼
+FA3InvoiceData populated with resolved NIP + address → XML generated → KSeF submitted
+```
+
+### KSeF Tool Response Format
+
+Tools return localized markdown responses via `ksef.formatter.ts`:
+
+```markdown
+## ✅ Invoice Sent to KSeF
+
+- **Reference:** 1234567890-20260219-ABCD1234
+- **Invoice Number:** FV/2026/02/001
+- **Status:** accepted
+- **Sent:** 2026-02-19 10:00:05
+```
+
 ## Related Documentation
 
 - [Architecture](./ARCHITECTURE.md)
 - [wFirma Integration](./WFIRMA_INTEGRATION.md)
+- [KSeF Integration](./KSEF_INTEGRATION.md)
 - [API Reference](./API_REFERENCE.md)

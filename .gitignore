@@ -28,6 +28,9 @@ out/
 
 # OS
 .DS_Store
+
+# PDF fonts (commercial — copy from system or install via Dockerfile)
+packages/api/fonts/*.ttf
 Thumbs.db
 
 # Turbo

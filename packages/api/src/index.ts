@@ -16,10 +16,12 @@ import subscriptionRoutes from './routes/subscription.routes';
 import webhookRoutes from './routes/webhook.routes';
 import ttsRoutes from './routes/tts.routes';
 import hrRoutes from './routes/hr.routes';
+import ksefRoutes from './routes/ksef.routes';
 import { globalRateLimiter } from './middleware/rate-limiter.middleware';
 import { errorHandler, notFoundHandler } from './middleware/error-handler.middleware';
 import { logger } from './utils/logger';
 import { seedHelpTopicsIfEmpty } from './services/help-seed.service';
+import { ksefStatusPoller } from './services/ksef';
 
 const app: Application = express();
 const PORT = process.env.PORT || 3011;
@@ -93,6 +95,9 @@ app.use('/api/tts', ttsRoutes);
 // HR routes (employees, contracts, payroll, absences)
 app.use('/api/hr', hrRoutes);
 
+// KSeF routes (Polish National e-Invoice System)
+app.use('/api/ksef', ksefRoutes);
+
 // 404 handler
 app.use(notFoundHandler);
 
@@ -100,12 +105,28 @@ app.use(notFoundHandler);
 app.use(errorHandler);
 
 // Start server
-app.listen(PORT, async () => {
+const server = app.listen(PORT, async () => {
   logger.info(`🚀 API Server running on port ${PORT}`);
   logger.info(`📝 Environment: ${process.env.NODE_ENV}`);
 
   // Auto-seed help topics if table is empty
   await seedHelpTopicsIfEmpty();
+
+  // Start KSeF status poller for background invoice status updates
+  ksefStatusPoller.start();
 });
+
+// Graceful shutdown
+const shutdown = () => {
+  logger.info('Shutting down gracefully...');
+  ksefStatusPoller.stop();
+  server.close(() => {
+    logger.info('Server closed');
+    process.exit(0);
+  });
+};
+
+process.on('SIGTERM', shutdown);
+process.on('SIGINT', shutdown);
 
 export default app;

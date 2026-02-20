@@ -990,6 +990,8 @@ export class WFirmaInvoiceService {
       notes: inv.notes,
       createdAt: new Date(inv.created || Date.now()),
       updatedAt: new Date(inv.modified || Date.now()),
+      ksefReferenceNumber: inv.ksef_number || inv.ksef_reference_number || undefined,
+      ksefStatus: inv.ksef_status || undefined,
     };
   }
 }

@@ -10,6 +10,8 @@ import { WFirmaCacheService } from '../../wfirma-cache.service';
 import { FileStorageService } from '../../file-storage.service';
 import { SubscriptionService } from '../../subscription.service';
 import { HRService } from '../../hr';
+import { KSeFService } from '../../ksef';
+import { KSeFContractorService } from '../../ksef/contractor.service';
 
 // Import tool creators
 import {
@@ -104,6 +106,17 @@ import {
   createGetAbsencesTool,
   createGetHRSummaryTool,
 } from './hr.tools';
+import {
+  createSendToKSeFTool,
+  createCheckKSeFStatusTool,
+  createDownloadKSeFUPOTool,
+  createQueryKSeFInvoicesTool,
+  createGetKSeFStatisticsTool,
+  createBulkSendToKSeFTool,
+  createGetIncomingKSeFInvoicesTool,
+  createMatchIncomingInvoiceTool,
+  createDirectSendToKSeFTool,
+} from './ksef.tools';
 
 // Re-export individual tool creators
 export {
@@ -198,6 +211,17 @@ export {
   createGetAbsencesTool,
   createGetHRSummaryTool,
 } from './hr.tools';
+export {
+  createSendToKSeFTool,
+  createCheckKSeFStatusTool,
+  createDownloadKSeFUPOTool,
+  createQueryKSeFInvoicesTool,
+  createGetKSeFStatisticsTool,
+  createBulkSendToKSeFTool,
+  createGetIncomingKSeFInvoicesTool,
+  createMatchIncomingInvoiceTool,
+  createDirectSendToKSeFTool,
+} from './ksef.tools';
 
 /**
  * Create all AI chat tools for wFirma integration
@@ -210,6 +234,8 @@ export function createAllTools(
   locale: Locale,
   subscriptionService?: SubscriptionService,
   hrService?: HRService,
+  ksefService?: KSeFService,
+  ksefContractorService?: KSeFContractorService,
 ): StructuredToolInterface[] {
   return [
     // Company tools
@@ -308,6 +334,19 @@ export function createAllTools(
       createAddAbsenceTool(hrService, userId, locale),
       createGetAbsencesTool(hrService, userId, locale),
       createGetHRSummaryTool(hrService, userId, locale),
+    ] : []),
+
+    // KSeF tools (if ksefService is available)
+    ...(ksefService ? [
+      createSendToKSeFTool(ksefService, locale, userId, subscriptionService),
+      createDirectSendToKSeFTool(ksefService, locale, userId, subscriptionService, ksefContractorService),
+      createCheckKSeFStatusTool(ksefService, locale, userId, subscriptionService),
+      createDownloadKSeFUPOTool(ksefService, locale, userId, subscriptionService),
+      createQueryKSeFInvoicesTool(ksefService, locale, userId, subscriptionService),
+      createGetKSeFStatisticsTool(ksefService, locale, userId, subscriptionService),
+      createBulkSendToKSeFTool(ksefService, locale, userId, subscriptionService),
+      createGetIncomingKSeFInvoicesTool(ksefService, locale, userId, subscriptionService),
+      createMatchIncomingInvoiceTool(ksefService, locale, userId, subscriptionService),
     ] : []),
   ];
 }
