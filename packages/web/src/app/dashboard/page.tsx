@@ -1,7 +1,27 @@
 'use client';
 
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
-import { useAuth } from '@/contexts/AuthContext';
+import { useDashboard } from '@/hooks/useDashboard';
+import { useLocale } from '@/contexts/LocaleContext';
+import {
+  SummaryCards,
+  RevenueExpenseChart,
+  UnpaidInvoicesCard,
+  TaxDeadlines,
+  HRSummaryCard,
+  KSeFStatusCard,
+} from '@/components/dashboard';
+import { RefreshCw, ArrowLeft } from 'lucide-react';
+import Link from 'next/link';
+import enTranslations from '@/i18n/locales/en.json';
+import plTranslations from '@/i18n/locales/pl.json';
+import ruTranslations from '@/i18n/locales/ru.json';
+
+const translations = {
+  en: enTranslations,
+  pl: plTranslations,
+  ru: ruTranslations,
+};
 
 export default function DashboardPage() {
   return (
@@ -12,42 +32,97 @@ export default function DashboardPage() {
 }
 
 function DashboardContent() {
-  const { user, logout } = useAuth();
+  const { locale } = useLocale();
+  const t = translations[locale].dashboard;
+
+  const {
+    financial,
+    invoices,
+    deadlines,
+    hr,
+    ksef,
+    isLoading,
+    refetch,
+  } = useDashboard();
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+    <div className="h-dvh flex flex-col bg-gray-50 dark:bg-gray-900">
+      {/* Compact Header */}
+      <header className="flex-shrink-0 bg-white dark:bg-gray-800 shadow-sm">
+        <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-2">
           <div className="flex items-center justify-between">
-            <h1 className="text-2xl font-bold text-gray-900">
-              eKsięgowy AI
-            </h1>
-            <div className="flex items-center gap-4">
-              <div className="text-sm text-gray-600">
-                {user?.firstName} {user?.lastName}
-              </div>
-              <button
-                onClick={logout}
-                className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors"
+            <div className="flex items-center gap-3">
+              <Link
+                href="/chat"
+                className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                title={t.backToChat}
               >
-                Logout
-              </button>
+                <ArrowLeft className="h-4 w-4 text-gray-600 dark:text-gray-400" />
+              </Link>
+              <h1 className="text-lg font-bold text-gray-900 dark:text-gray-100">
+                {t.title}
+              </h1>
             </div>
+            <button
+              onClick={() => refetch()}
+              disabled={isLoading}
+              className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors disabled:opacity-50"
+              title={t.refresh}
+            >
+              <RefreshCw
+                className={`h-4 w-4 text-gray-600 dark:text-gray-400 ${isLoading ? 'animate-spin' : ''}`}
+              />
+            </button>
           </div>
         </div>
       </header>
 
-      {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">
-            Welcome, {user?.firstName}!
-          </h2>
-          <div className="space-y-2 text-gray-600">
-            <p>Email: {user?.email}</p>
-            <p>Language: {user?.locale === 'pl' ? 'Polski' : 'English'}</p>
-            <p>Account created: {user?.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'N/A'}</p>
+      {/* Scrollable Content */}
+      <main className="flex-1 min-h-0 overflow-auto">
+        <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-2 space-y-2">
+          {/* Row 1: Summary Cards */}
+          <SummaryCards
+            financial={financial}
+            invoices={invoices}
+            hr={hr}
+            ksef={ksef}
+            isLoading={isLoading}
+            translations={t.summary}
+          />
+
+          {/* Row 2: Revenue Chart + Unpaid Invoices */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-2">
+            <div className="lg:col-span-2">
+              <RevenueExpenseChart
+                data={financial?.monthlyBreakdown ?? []}
+                isLoading={isLoading}
+                translations={t.charts}
+              />
+            </div>
+            <UnpaidInvoicesCard
+              data={invoices}
+              isLoading={isLoading}
+              translations={t.invoices}
+            />
+          </div>
+
+          {/* Row 3: Deadlines + HR + KSeF */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-2">
+            <TaxDeadlines
+              deadlines={deadlines}
+              isLoading={isLoading}
+              translations={t.deadlines}
+            />
+            <HRSummaryCard
+              data={hr}
+              isLoading={isLoading}
+              translations={t.hr}
+            />
+            <KSeFStatusCard
+              data={ksef}
+              isLoading={isLoading}
+              translations={t.ksef}
+            />
           </div>
         </div>
       </main>

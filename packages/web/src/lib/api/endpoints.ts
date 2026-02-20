@@ -66,4 +66,9 @@ export const API_ENDPOINTS = {
     CONVERSATION_DETAIL: (id: string) => `/api/ai/costs/conversations/${id}`,
     CONVERSATION_RUNS: (id: string) => `/api/ai/costs/conversations/${id}/runs`,
   },
+
+  // Dashboard
+  DASHBOARD: {
+    SUMMARY: '/api/dashboard/summary',
+  },
 } as const;

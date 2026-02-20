@@ -954,5 +954,67 @@
       "errItemQtyInvalid": "Позиция {n}: количество должно быть больше 0",
       "errSendFailed": "Не удалось отправить счёт"
     }
+  },
+  "dashboard": {
+    "title": "Панель управления",
+    "backToChat": "Назад к чату",
+    "refresh": "Обновить данные",
+    "summary": {
+      "revenue": "Доходы",
+      "expenses": "Расходы",
+      "profit": "Прибыль",
+      "unpaidInvoices": "Неоплаченные",
+      "employees": "Сотрудники",
+      "ksefSent": "KSeF отправлено"
+    },
+    "charts": {
+      "revenueExpenses": "Доходы и Расходы",
+      "noData": "Финансовые данные недоступны",
+      "revenue": "Доходы",
+      "expenses": "Расходы",
+      "profit": "Прибыль"
+    },
+    "invoices": {
+      "title": "Неоплаченные счета",
+      "unpaidCount": "Неоплаченные",
+      "unpaidTotal": "Сумма неоплаченных",
+      "overdueCount": "Просроченные",
+      "overdueTotal": "Сумма просроченных",
+      "noData": "Нет данных о счетах",
+      "notConnected": "wFirma не подключена"
+    },
+    "deadlines": {
+      "title": "Предстоящие сроки",
+      "noDeadlines": "Нет предстоящих сроков",
+      "notConnected": "wFirma не подключена",
+      "daysLeft": "дней осталось",
+      "today": "Сегодня",
+      "overdue": "Просрочено",
+      "daysOverdue": "дней просрочки"
+    },
+    "hr": {
+      "title": "Сотрудники",
+      "totalEmployees": "Всего сотрудников",
+      "activeContracts": "Активные договоры",
+      "monthlyPayroll": "Ежемесячный ФОТ",
+      "noData": "Нет данных о сотрудниках",
+      "contractTypes": {
+        "employment": "Трудовой договор",
+        "mandate_contract": "Договор поручения",
+        "work_contract": "Договор подряда",
+        "board_resolution": "Решение правления",
+        "dividend": "Дивиденды"
+      }
+    },
+    "ksef": {
+      "title": "Статус KSeF",
+      "totalSent": "Отправлено",
+      "totalReceived": "Получено",
+      "accepted": "Принято",
+      "rejected": "Отклонено",
+      "pending": "В ожидании",
+      "acceptanceRate": "Уровень принятия",
+      "noData": "Нет данных KSeF"
+    }
   }
 }
