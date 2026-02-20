@@ -954,5 +954,67 @@
       "errItemQtyInvalid": "Pozycja {n}: ilość musi być większa od 0",
       "errSendFailed": "Nie udało się wysłać faktury"
     }
+  },
+  "dashboard": {
+    "title": "Panel główny",
+    "backToChat": "Powrót do czatu",
+    "refresh": "Odśwież dane",
+    "summary": {
+      "revenue": "Przychody",
+      "expenses": "Wydatki",
+      "profit": "Zysk",
+      "unpaidInvoices": "Nieopłacone",
+      "employees": "Pracownicy",
+      "ksefSent": "KSeF wysłane"
+    },
+    "charts": {
+      "revenueExpenses": "Przychody vs Wydatki",
+      "noData": "Brak danych finansowych",
+      "revenue": "Przychody",
+      "expenses": "Wydatki",
+      "profit": "Zysk"
+    },
+    "invoices": {
+      "title": "Nieopłacone faktury",
+      "unpaidCount": "Nieopłacone",
+      "unpaidTotal": "Suma nieopłaconych",
+      "overdueCount": "Przeterminowane",
+      "overdueTotal": "Suma przeterminowanych",
+      "noData": "Brak danych o fakturach",
+      "notConnected": "wFirma nie jest połączona"
+    },
+    "deadlines": {
+      "title": "Nadchodzące terminy",
+      "noDeadlines": "Brak nadchodzących terminów",
+      "notConnected": "wFirma nie jest połączona",
+      "daysLeft": "dni pozostało",
+      "today": "Dzisiaj",
+      "overdue": "Po terminie",
+      "daysOverdue": "dni po terminie"
+    },
+    "hr": {
+      "title": "Pracownicy",
+      "totalEmployees": "Łącznie pracowników",
+      "activeContracts": "Aktywne umowy",
+      "monthlyPayroll": "Miesięczna płaca",
+      "noData": "Brak danych o pracownikach",
+      "contractTypes": {
+        "employment": "Umowa o pracę",
+        "mandate_contract": "Umowa zlecenie",
+        "work_contract": "Umowa o dzieło",
+        "board_resolution": "Uchwała zarządu",
+        "dividend": "Dywidenda"
+      }
+    },
+    "ksef": {
+      "title": "Status KSeF",
+      "totalSent": "Wysłane",
+      "totalReceived": "Odebrane",
+      "accepted": "Zaakceptowane",
+      "rejected": "Odrzucone",
+      "pending": "Oczekujące",
+      "acceptanceRate": "Wskaźnik akceptacji",
+      "noData": "Brak danych KSeF"
+    }
   }
 }

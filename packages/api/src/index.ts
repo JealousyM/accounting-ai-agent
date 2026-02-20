@@ -17,6 +17,7 @@ import webhookRoutes from './routes/webhook.routes';
 import ttsRoutes from './routes/tts.routes';
 import hrRoutes from './routes/hr.routes';
 import ksefRoutes from './routes/ksef.routes';
+import dashboardRoutes from './routes/dashboard.routes';
 import { globalRateLimiter } from './middleware/rate-limiter.middleware';
 import { errorHandler, notFoundHandler } from './middleware/error-handler.middleware';
 import { logger } from './utils/logger';
@@ -97,6 +98,9 @@ app.use('/api/hr', hrRoutes);
 
 // KSeF routes (Polish National e-Invoice System)
 app.use('/api/ksef', ksefRoutes);
+
+// Dashboard routes (aggregated KPI data)
+app.use('/api/dashboard', dashboardRoutes);
 
 // 404 handler
 app.use(notFoundHandler);

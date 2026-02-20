@@ -41,7 +41,8 @@ export function RegistrationForm() {
   const [githubVisible, setGithubVisible] = useState(false);
   const [showTermsModal, setShowTermsModal] = useState(false);
   const [showPrivacyModal, setShowPrivacyModal] = useState(false);
-  const legalLinks = (translations[selectedLocale] as Record<string, Record<string, Record<string, Record<string, string>>>>).legal?.footer?.links;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const legalLinks = (translations[selectedLocale] as any)?.legal?.footer?.links;
   const [availableModels, setAvailableModels] = useState<LLMModelInfo[]>([]);
   const [isLoadingModels, setIsLoadingModels] = useState(false);
 

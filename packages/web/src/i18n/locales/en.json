@@ -954,5 +954,67 @@
       "errItemQtyInvalid": "Item {n}: quantity must be greater than 0",
       "errSendFailed": "Failed to send invoice"
     }
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "backToChat": "Back to Chat",
+    "refresh": "Refresh data",
+    "summary": {
+      "revenue": "Revenue",
+      "expenses": "Expenses",
+      "profit": "Profit",
+      "unpaidInvoices": "Unpaid Invoices",
+      "employees": "Employees",
+      "ksefSent": "KSeF Sent"
+    },
+    "charts": {
+      "revenueExpenses": "Revenue vs Expenses",
+      "noData": "No financial data available",
+      "revenue": "Revenue",
+      "expenses": "Expenses",
+      "profit": "Profit"
+    },
+    "invoices": {
+      "title": "Unpaid Invoices",
+      "unpaidCount": "Unpaid",
+      "unpaidTotal": "Total Unpaid",
+      "overdueCount": "Overdue",
+      "overdueTotal": "Total Overdue",
+      "noData": "No invoice data available",
+      "notConnected": "wFirma not connected"
+    },
+    "deadlines": {
+      "title": "Upcoming Deadlines",
+      "noDeadlines": "No upcoming deadlines",
+      "notConnected": "wFirma not connected",
+      "daysLeft": "days left",
+      "today": "Today",
+      "overdue": "Overdue",
+      "daysOverdue": "days overdue"
+    },
+    "hr": {
+      "title": "Employees",
+      "totalEmployees": "Total Employees",
+      "activeContracts": "Active Contracts",
+      "monthlyPayroll": "Monthly Payroll",
+      "noData": "No employee data",
+      "contractTypes": {
+        "employment": "Employment",
+        "mandate_contract": "Mandate",
+        "work_contract": "Work Contract",
+        "board_resolution": "Board Resolution",
+        "dividend": "Dividend"
+      }
+    },
+    "ksef": {
+      "title": "KSeF Status",
+      "totalSent": "Sent",
+      "totalReceived": "Received",
+      "accepted": "Accepted",
+      "rejected": "Rejected",
+      "pending": "Pending",
+      "acceptanceRate": "Acceptance Rate",
+      "noData": "No KSeF data"
+    }
   }
 }

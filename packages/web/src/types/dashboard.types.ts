@@ -1,0 +1,64 @@
+/**
+ * Dashboard Types
+ * Frontend types for the KPI dashboard
+ */
+
+export interface DashboardFinancialSummary {
+  year: number;
+  revenue: number;
+  expenses: number;
+  profit: number;
+  vatPaid: number;
+  pitPaid: number;
+  zusPaid: number;
+  currency: string;
+  monthlyBreakdown: MonthlyFinancialData[];
+}
+
+export interface MonthlyFinancialData {
+  month: string;
+  revenue: number;
+  expenses: number;
+}
+
+export interface DashboardInvoiceSummary {
+  unpaidCount: number;
+  unpaidTotal: number;
+  overdueCount: number;
+  overdueTotal: number;
+  currency: string;
+}
+
+export interface DashboardDeadline {
+  id: string;
+  date: string;
+  description: string;
+  groupName?: string;
+  daysUntil: number;
+  urgency: 'overdue' | 'urgent' | 'soon' | 'normal';
+}
+
+export interface DashboardHRSummary {
+  employeeCount: number;
+  activeContractsByType: Record<string, number>;
+  latestPeriod: string | null;
+  totalMonthlyPayroll: number;
+}
+
+export interface DashboardKSeFSummary {
+  totalSent: number;
+  totalReceived: number;
+  acceptedCount: number;
+  rejectedCount: number;
+  pendingCount: number;
+  acceptanceRate: number;
+}
+
+export interface DashboardSummaryResponse {
+  financial: DashboardFinancialSummary | null;
+  invoices: DashboardInvoiceSummary | null;
+  deadlines: DashboardDeadline[] | null;
+  hr: DashboardHRSummary | null;
+  ksef: DashboardKSeFSummary | null;
+  generatedAt: string;
+}
