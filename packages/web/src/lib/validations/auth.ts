@@ -41,7 +41,7 @@ export const registrationSchema = z
       .max(50, 'Last name is too long')
       .trim(),
     companyName: z.string().max(100, 'Company name is too long').trim().optional(),
-    locale: z.enum(['en', 'pl']).default('en'),
+    locale: z.enum(['en', 'pl', 'ru']).default('en'),
     agreeToTerms: z.boolean().refine((val) => val === true, {
       message: 'You must agree to the terms and conditions',
     }),

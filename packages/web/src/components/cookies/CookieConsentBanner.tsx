@@ -11,6 +11,7 @@ const translations: Record<Locale, {
   title: string;
   description: string;
   privacyPolicyLink: string;
+  cookiePolicyLink: string;
   acceptAll: string;
   rejectAll: string;
   customize: string;
@@ -18,7 +19,8 @@ const translations: Record<Locale, {
   en: {
     title: 'We value your privacy',
     description: 'We use cookies to enhance your browsing experience and analyze our traffic. By clicking "Accept All", you consent to our use of cookies.',
-    privacyPolicyLink: 'Learn more in our Privacy Policy',
+    privacyPolicyLink: 'Privacy Policy',
+    cookiePolicyLink: 'Cookie Policy',
     acceptAll: 'Accept All',
     rejectAll: 'Reject All',
     customize: 'Customize',
@@ -26,7 +28,8 @@ const translations: Record<Locale, {
   pl: {
     title: 'Cenimy Twoj\u0105 prywatno\u015b\u0107',
     description: 'U\u017cywamy plik\u00f3w cookie, aby ulepszy\u0107 przegl\u0105danie i analizowa\u0107 ruch. Klikaj\u0105c "Akceptuj wszystkie", wyra\u017casz zgod\u0119 na u\u017cywanie plik\u00f3w cookie.',
-    privacyPolicyLink: 'Dowiedz si\u0119 wi\u0119cej w naszej Polityce Prywatno\u015bci',
+    privacyPolicyLink: 'Polityka Prywatno\u015bci',
+    cookiePolicyLink: 'Polityka Cookies',
     acceptAll: 'Akceptuj wszystkie',
     rejectAll: 'Odrzu\u0107 wszystkie',
     customize: 'Dostosuj',
@@ -34,7 +37,8 @@ const translations: Record<Locale, {
   ru: {
     title: '\u041c\u044b \u0446\u0435\u043d\u0438\u043c \u0432\u0430\u0448\u0443 \u043a\u043e\u043d\u0444\u0438\u0434\u0435\u043d\u0446\u0438\u0430\u043b\u044c\u043d\u043e\u0441\u0442\u044c',
     description: '\u041c\u044b \u0438\u0441\u043f\u043e\u043b\u044c\u0437\u0443\u0435\u043c \u0444\u0430\u0439\u043b\u044b cookie \u0434\u043b\u044f \u0443\u043b\u0443\u0447\u0448\u0435\u043d\u0438\u044f \u043f\u0440\u043e\u0441\u043c\u043e\u0442\u0440\u0430 \u0438 \u0430\u043d\u0430\u043b\u0438\u0437\u0430 \u0442\u0440\u0430\u0444\u0438\u043a\u0430. \u041d\u0430\u0436\u0438\u043c\u0430\u044f "\u041f\u0440\u0438\u043d\u044f\u0442\u044c \u0432\u0441\u0435", \u0432\u044b \u0441\u043e\u0433\u043b\u0430\u0448\u0430\u0435\u0442\u0435\u0441\u044c \u043d\u0430 \u0438\u0441\u043f\u043e\u043b\u044c\u0437\u043e\u0432\u0430\u043d\u0438\u0435 \u0444\u0430\u0439\u043b\u043e\u0432 cookie.',
-    privacyPolicyLink: '\u0423\u0437\u043d\u0430\u0439\u0442\u0435 \u0431\u043e\u043b\u044c\u0448\u0435 \u0432 \u043d\u0430\u0448\u0435\u0439 \u041f\u043e\u043b\u0438\u0442\u0438\u043a\u0435 \u043a\u043e\u043d\u0444\u0438\u0434\u0435\u043d\u0446\u0438\u0430\u043b\u044c\u043d\u043e\u0441\u0442\u0438',
+    privacyPolicyLink: '\u041f\u043e\u043b\u0438\u0442\u0438\u043a\u0430 \u043a\u043e\u043d\u0444\u0438\u0434\u0435\u043d\u0446\u0438\u0430\u043b\u044c\u043d\u043e\u0441\u0442\u0438',
+    cookiePolicyLink: '\u041f\u043e\u043b\u0438\u0442\u0438\u043a\u0430 cookies',
     acceptAll: '\u041f\u0440\u0438\u043d\u044f\u0442\u044c \u0432\u0441\u0435',
     rejectAll: '\u041e\u0442\u043a\u043b\u043e\u043d\u0438\u0442\u044c \u0432\u0441\u0435',
     customize: '\u041d\u0430\u0441\u0442\u0440\u043e\u0438\u0442\u044c',
@@ -82,6 +86,13 @@ export function CookieConsentBanner() {
                   className="text-blue-600 dark:text-blue-400 hover:underline"
                 >
                   {t.privacyPolicyLink}
+                </a>
+                {' · '}
+                <a
+                  href="/cookies"
+                  className="text-blue-600 dark:text-blue-400 hover:underline"
+                >
+                  {t.cookiePolicyLink}
                 </a>
               </p>
             </div>

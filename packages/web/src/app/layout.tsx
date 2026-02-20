@@ -9,8 +9,8 @@ import { QueryProvider } from '@/components/providers/QueryProvider';
 import { CookieConsentBanner, CookiePreferencesModal } from '@/components/cookies';
 
 export const metadata: Metadata = {
-  title: 'Accounting AI Agent',
-  description: 'AI-powered accounting agent',
+  title: 'eKsięgowy AI',
+  description: 'AI-powered accounting assistant for Polish businesses',
 };
 
 const themeScript = `

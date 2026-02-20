@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Admin Dashboard - Accounting AI Agent',
+  title: 'Admin Dashboard - eKsięgowy AI',
   description: 'Administration panel for managing users and monitoring costs',
 };
 
