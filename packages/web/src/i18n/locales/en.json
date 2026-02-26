@@ -670,6 +670,38 @@
       "recentConversations": "Recent Conversations",
       "changeRole": "Change Role",
       "confirmRoleChange": "Are you sure you want to change this user's role?"
+    },
+    "auditLog": {
+      "pageTitle": "Audit Log",
+      "title": "System Audit Log",
+      "loading": "Loading audit log...",
+      "noLogs": "No audit log entries found",
+      "navLink": "Audit Log",
+      "filters": {
+        "allEntities": "All Entities",
+        "allActions": "All Actions",
+        "dateFrom": "From date",
+        "dateTo": "To date",
+        "reset": "Reset filters"
+      },
+      "table": {
+        "timestamp": "Timestamp",
+        "user": "User",
+        "action": "Action",
+        "entity": "Entity",
+        "ip": "IP Address",
+        "changes": "Changes",
+        "showChanges": "Show",
+        "hideChanges": "Hide",
+        "system": "System"
+      },
+      "pagination": {
+        "page": "Page",
+        "of": "of",
+        "entries": "entries",
+        "previous": "Previous",
+        "next": "Next"
+      }
     }
   },
   "subscription": {

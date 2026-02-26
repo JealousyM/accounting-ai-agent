@@ -670,6 +670,38 @@
       "recentConversations": "Последние разговоры",
       "changeRole": "Изменить роль",
       "confirmRoleChange": "Вы уверены, что хотите изменить роль этого пользователя?"
+    },
+    "auditLog": {
+      "pageTitle": "Журнал Аудита",
+      "title": "Системный журнал аудита",
+      "loading": "Загрузка журнала...",
+      "noLogs": "Записи в журнале аудита отсутствуют",
+      "navLink": "Журнал Аудита",
+      "filters": {
+        "allEntities": "Все сущности",
+        "allActions": "Все действия",
+        "dateFrom": "С даты",
+        "dateTo": "По дату",
+        "reset": "Сбросить фильтры"
+      },
+      "table": {
+        "timestamp": "Время",
+        "user": "Пользователь",
+        "action": "Действие",
+        "entity": "Сущность",
+        "ip": "IP-адрес",
+        "changes": "Изменения",
+        "showChanges": "Показать",
+        "hideChanges": "Скрыть",
+        "system": "Система"
+      },
+      "pagination": {
+        "page": "Страница",
+        "of": "из",
+        "entries": "записей",
+        "previous": "Назад",
+        "next": "Вперёд"
+      }
     }
   },
   "subscription": {

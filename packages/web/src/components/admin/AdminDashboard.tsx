@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useLocale } from '@/contexts/LocaleContext';
 import { adminApi } from '@/lib/api/admin';
-import { ArrowLeft, RefreshCw, Search, Users, DollarSign, MessageSquare, Shield, Volume2 } from 'lucide-react';
+import { ArrowLeft, RefreshCw, Search, Users, DollarSign, MessageSquare, Shield, Volume2, ClipboardList } from 'lucide-react';
 import Link from 'next/link';
 import enTranslations from '@/i18n/locales/en.json';
 import plTranslations from '@/i18n/locales/pl.json';
@@ -110,13 +110,22 @@ export function AdminDashboard() {
                 {t.title}
               </h1>
             </div>
-            <button
-              onClick={handleRefresh}
-              className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-              title={t.refresh}
-            >
-              <RefreshCw className="h-5 w-5 text-gray-600 dark:text-gray-400" />
-            </button>
+            <div className="flex items-center gap-2">
+              <Link
+                href="/admin/audit-log"
+                className="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+              >
+                <ClipboardList className="h-4 w-4" />
+                {t.auditLog.navLink}
+              </Link>
+              <button
+                onClick={handleRefresh}
+                className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                title={t.refresh}
+              >
+                <RefreshCw className="h-5 w-5 text-gray-600 dark:text-gray-400" />
+              </button>
+            </div>
           </div>
         </div>
       </header>

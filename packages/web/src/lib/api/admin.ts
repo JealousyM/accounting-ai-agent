@@ -96,9 +96,67 @@ export async function updateUserRole(userId: string, role: 'user' | 'admin'): Pr
   await apiClient.patch(`/api/admin/users/${userId}/role`, { role });
 }
 
+// ============================================
+// AUDIT LOG TYPES
+// ============================================
+
+export interface AuditLogUser {
+  email: string;
+  firstName: string | null;
+  lastName: string | null;
+}
+
+export interface AuditLogEntry {
+  id: string;
+  userId: string | null;
+  action: string;
+  entity: string;
+  entityId: string | null;
+  changes: unknown;
+  ip: string | null;
+  userAgent: string | null;
+  createdAt: string;
+  user: AuditLogUser | null;
+}
+
+export interface AuditLogResponse {
+  logs: AuditLogEntry[];
+  total: number;
+}
+
+export interface GetAuditLogParams {
+  page?: number;
+  limit?: number;
+  userId?: string;
+  action?: string;
+  entity?: string;
+  dateFrom?: string;
+  dateTo?: string;
+}
+
+// ============================================
+// AUDIT LOG API FUNCTION
+// ============================================
+
+export async function fetchAuditLog(params: GetAuditLogParams = {}): Promise<AuditLogResponse> {
+  const query = new URLSearchParams();
+  if (params.page) query.set('page', params.page.toString());
+  if (params.limit) query.set('limit', params.limit.toString());
+  if (params.userId) query.set('userId', params.userId);
+  if (params.action) query.set('action', params.action);
+  if (params.entity) query.set('entity', params.entity);
+  if (params.dateFrom) query.set('dateFrom', params.dateFrom);
+  if (params.dateTo) query.set('dateTo', params.dateTo);
+
+  const queryString = query.toString();
+  const url = queryString ? `/api/admin/audit-log?${queryString}` : '/api/admin/audit-log';
+  return apiClient.get<AuditLogResponse>(url);
+}
+
 export const adminApi = {
   fetchDashboard: fetchAdminDashboard,
   fetchUsers,
   fetchUserDetail,
   updateUserRole,
+  fetchAuditLog,
 };
