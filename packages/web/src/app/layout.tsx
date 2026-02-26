@@ -10,8 +10,48 @@ import { CookieConsentBanner, CookiePreferencesModal } from '@/components/cookie
 import { GoogleAnalytics } from '@/components/analytics';
 
 export const metadata: Metadata = {
-  title: 'eKsięgowy AI',
-  description: 'AI-powered accounting assistant for Polish businesses',
+  title: {
+    default: 'eKsięgowy AI — AI Accounting for Polish Businesses',
+    template: '%s | eKsięgowy AI',
+  },
+  description:
+    'AI-powered accounting assistant for Polish businesses. Integrates with wFirma, supports KSeF e-invoices, and answers your tax questions about VAT, PIT, CIT, and ZUS.',
+  keywords: [
+    'accounting',
+    'AI',
+    'Poland',
+    'wFirma',
+    'KSeF',
+    'VAT',
+    'PIT',
+    'CIT',
+    'ZUS',
+    'invoices',
+    'eKsięgowy',
+    'księgowość',
+  ],
+  authors: [{ name: 'MICODE sp. z o.o.' }],
+  metadataBase: new URL('https://eksiegowyai.pl'),
+  openGraph: {
+    type: 'website',
+    locale: 'pl_PL',
+    alternateLocale: ['en_US', 'ru_RU'],
+    url: 'https://eksiegowyai.pl',
+    siteName: 'eKsięgowy AI',
+    title: 'eKsięgowy AI — AI Accounting for Polish Businesses',
+    description:
+      'Your intelligent accounting assistant that integrates with wFirma. Ask about VAT, PIT, CIT, ZUS, invoices, and more.',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'eKsięgowy AI — AI Accounting for Polish Businesses',
+    description:
+      'Your intelligent accounting assistant that integrates with wFirma. Ask about VAT, PIT, CIT, ZUS, invoices, and more.',
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 const themeScript = `

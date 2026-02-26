@@ -705,6 +705,8 @@
       "wfirmaUnlimited": "Unlimited wFirma requests",
       "prioritySupport": "Priority support"
     },
+    "registerToPurchase": "Sign up to get started",
+    "registerForFree": "Sign up free",
     "faq": {
       "title": "Questions?",
       "description": "Free plan requires your own API key from OpenAI or Anthropic. Pro plan includes API credits so you can start immediately."
@@ -1015,6 +1017,87 @@
       "pending": "Pending",
       "acceptanceRate": "Acceptance Rate",
       "noData": "No KSeF data"
+    }
+  },
+  "landing": {
+    "nav": {
+      "features": "Features",
+      "pricing": "Pricing",
+      "login": "Sign in",
+      "register": "Get Started"
+    },
+    "hero": {
+      "title": "AI-Powered Accounting for Polish Businesses",
+      "subtitle": "Your intelligent accounting assistant that integrates with wFirma. Ask about VAT, PIT, CIT, ZUS, invoices, and more — in Polish, English, or Russian.",
+      "ctaRegister": "Start Free",
+      "ctaLogin": "Sign in"
+    },
+    "features": {
+      "title": "Everything You Need",
+      "subtitle": "Powerful AI tools designed for Polish accounting and tax compliance.",
+      "aiChat": {
+        "title": "AI Accounting Chat",
+        "description": "Ask questions about Polish taxes, VAT rates, ZUS contributions, invoicing, and get instant expert answers."
+      },
+      "wfirma": {
+        "title": "wFirma Integration",
+        "description": "Connect your wFirma account to view invoices, contractors, and financial data directly through the AI assistant."
+      },
+      "ksef": {
+        "title": "KSeF Ready",
+        "description": "Send and receive e-invoices via Poland's national KSeF system. Supports both wFirma and direct API submission."
+      },
+      "multilingual": {
+        "title": "Multilingual Support",
+        "description": "Works in Polish, English, and Russian. The AI adapts its responses to your preferred language."
+      },
+      "voice": {
+        "title": "Voice Input & Output",
+        "description": "Speak your questions and listen to AI responses with built-in voice dictation and text-to-speech."
+      },
+      "security": {
+        "title": "Secure & Private",
+        "description": "Your data is encrypted, API keys are stored securely, and you can bring your own AI provider key."
+      }
+    },
+    "howItWorks": {
+      "title": "How It Works",
+      "step1": {
+        "title": "Create an Account",
+        "description": "Sign up free with your own OpenAI or Anthropic API key, or choose Pro for included credits."
+      },
+      "step2": {
+        "title": "Connect wFirma",
+        "description": "Optionally link your wFirma account to access invoices, contractors, and financial data."
+      },
+      "step3": {
+        "title": "Ask Anything",
+        "description": "Chat with the AI about Polish accounting, taxes, or let it analyze your financial data."
+      }
+    },
+    "pricingPreview": {
+      "title": "Simple, Transparent Pricing",
+      "subtitle": "Start free with your own API key, or upgrade for included credits.",
+      "viewAll": "View All Plans"
+    },
+    "cta": {
+      "title": "Ready to Simplify Your Accounting?",
+      "subtitle": "Join Polish businesses using AI to manage their finances smarter.",
+      "button": "Get Started Free"
+    },
+    "footer": {
+      "description": "AI-powered accounting assistant for Polish businesses. Integrates with wFirma, supports KSeF, and answers your tax questions.",
+      "product": "Product",
+      "legal": "Legal",
+      "links": {
+        "features": "Features",
+        "pricing": "Pricing",
+        "terms": "Terms of Service",
+        "privacy": "Privacy Policy",
+        "cookies": "Cookie Policy",
+        "rodo": "GDPR"
+      },
+      "allRightsReserved": "All rights reserved"
     }
   }
 }

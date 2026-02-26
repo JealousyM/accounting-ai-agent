@@ -705,6 +705,8 @@
       "wfirmaUnlimited": "Nieograniczone żądania wFirma",
       "prioritySupport": "Priorytetowe wsparcie"
     },
+    "registerToPurchase": "Zarejestruj się, aby zacząć",
+    "registerForFree": "Zarejestruj się za darmo",
     "faq": {
       "title": "Pytania?",
       "description": "Plan darmowy wymaga własnego klucza API z OpenAI lub Anthropic. Plan Pro zawiera kredyty API, więc możesz zacząć natychmiast."
@@ -1015,6 +1017,87 @@
       "pending": "Oczekujące",
       "acceptanceRate": "Wskaźnik akceptacji",
       "noData": "Brak danych KSeF"
+    }
+  },
+  "landing": {
+    "nav": {
+      "features": "Funkcje",
+      "pricing": "Cennik",
+      "login": "Zaloguj się",
+      "register": "Rozpocznij"
+    },
+    "hero": {
+      "title": "Księgowość AI dla polskich firm",
+      "subtitle": "Twój inteligentny asystent księgowy zintegrowany z wFirma. Pytaj o VAT, PIT, CIT, ZUS, faktury i więcej — po polsku, angielsku lub rosyjsku.",
+      "ctaRegister": "Zacznij za darmo",
+      "ctaLogin": "Zaloguj się"
+    },
+    "features": {
+      "title": "Wszystko, czego potrzebujesz",
+      "subtitle": "Zaawansowane narzędzia AI zaprojektowane dla polskiej księgowości i zgodności podatkowej.",
+      "aiChat": {
+        "title": "Chat AI Księgowy",
+        "description": "Pytaj o polskie podatki, stawki VAT, składki ZUS, fakturowanie i otrzymuj natychmiastowe eksperckie odpowiedzi."
+      },
+      "wfirma": {
+        "title": "Integracja z wFirma",
+        "description": "Połącz swoje konto wFirma, aby przeglądać faktury, kontrahentów i dane finansowe bezpośrednio przez asystenta AI."
+      },
+      "ksef": {
+        "title": "Gotowy na KSeF",
+        "description": "Wysyłaj i odbieraj e-faktury przez krajowy system KSeF. Obsługa zarówno przez wFirma, jak i bezpośrednie API."
+      },
+      "multilingual": {
+        "title": "Obsługa wielu języków",
+        "description": "Działa po polsku, angielsku i rosyjsku. AI dostosowuje odpowiedzi do preferowanego języka."
+      },
+      "voice": {
+        "title": "Głosowe wejście i wyjście",
+        "description": "Mów swoje pytania i słuchaj odpowiedzi AI z wbudowanym dyktowaniem głosowym i syntezą mowy."
+      },
+      "security": {
+        "title": "Bezpieczny i prywatny",
+        "description": "Twoje dane są szyfrowane, klucze API przechowywane bezpiecznie, a Ty możesz używać własnego klucza AI."
+      }
+    },
+    "howItWorks": {
+      "title": "Jak to działa",
+      "step1": {
+        "title": "Załóż konto",
+        "description": "Zarejestruj się za darmo z własnym kluczem API OpenAI lub Anthropic, albo wybierz Pro z kredytami."
+      },
+      "step2": {
+        "title": "Połącz wFirma",
+        "description": "Opcjonalnie połącz swoje konto wFirma, aby uzyskać dostęp do faktur, kontrahentów i danych finansowych."
+      },
+      "step3": {
+        "title": "Pytaj o wszystko",
+        "description": "Rozmawiaj z AI o polskiej księgowości, podatkach lub pozwól przeanalizować Twoje dane finansowe."
+      }
+    },
+    "pricingPreview": {
+      "title": "Prosty, przejrzysty cennik",
+      "subtitle": "Zacznij za darmo z własnym kluczem API lub ulepsz, aby otrzymać kredyty.",
+      "viewAll": "Zobacz wszystkie plany"
+    },
+    "cta": {
+      "title": "Gotowy uprościć swoją księgowość?",
+      "subtitle": "Dołącz do polskich firm korzystających z AI do mądrzejszego zarządzania finansami.",
+      "button": "Zacznij za darmo"
+    },
+    "footer": {
+      "description": "Asystent księgowy AI dla polskich firm. Integracja z wFirma, obsługa KSeF i odpowiedzi na pytania podatkowe.",
+      "product": "Produkt",
+      "legal": "Prawne",
+      "links": {
+        "features": "Funkcje",
+        "pricing": "Cennik",
+        "terms": "Regulamin",
+        "privacy": "Polityka prywatności",
+        "cookies": "Polityka cookies",
+        "rodo": "RODO"
+      },
+      "allRightsReserved": "Wszelkie prawa zastrzeżone"
     }
   }
 }
