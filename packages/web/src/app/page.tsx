@@ -1,12 +1,20 @@
 'use client';
 
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
+import { ChatContainer } from '@/components/chat';
+import {
+  LandingHeader,
+  HeroSection,
+  FeaturesSection,
+  HowItWorksSection,
+  PricingPreviewSection,
+  CTASection,
+  LandingFooter,
+} from '@/components/landing';
 
 function LoadingScreen() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-blue-50">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800">
       <div className="text-center">
         <div className="inline-block">
           <svg
@@ -30,25 +38,38 @@ function LoadingScreen() {
             />
           </svg>
         </div>
-        <p className="mt-4 text-gray-600 font-medium">Loading...</p>
+        <p className="mt-4 text-gray-600 dark:text-gray-400 font-medium">Loading...</p>
       </div>
+    </div>
+  );
+}
+
+function LandingPage() {
+  return (
+    <div className="min-h-screen bg-white dark:bg-gray-900">
+      <LandingHeader />
+      <main>
+        <HeroSection />
+        <FeaturesSection />
+        <HowItWorksSection />
+        <PricingPreviewSection />
+        <CTASection />
+      </main>
+      <LandingFooter />
     </div>
   );
 }
 
 export default function Home() {
   const { isLoading, isAuthenticated } = useAuth();
-  const router = useRouter();
 
-  useEffect(() => {
-    if (isLoading) return;
+  if (isLoading) {
+    return <LoadingScreen />;
+  }
 
-    if (isAuthenticated) {
-      router.replace('/chat');
-    } else {
-      router.replace('/login');
-    }
-  }, [isLoading, isAuthenticated, router]);
+  if (isAuthenticated) {
+    return <ChatContainer />;
+  }
 
-  return <LoadingScreen />;
+  return <LandingPage />;
 }

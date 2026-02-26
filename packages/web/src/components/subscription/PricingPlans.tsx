@@ -20,13 +20,16 @@ type BillingInterval = 'monthly' | 'yearly';
 
 interface PricingPlansProps {
   showHeader?: boolean;
+  isPublic?: boolean;
 }
 
-export function PricingPlans({ showHeader = true }: PricingPlansProps) {
+export function PricingPlans({ showHeader = true, isPublic = false }: PricingPlansProps) {
   const { locale } = useLocale();
   const t = translations[locale].subscription;
   const [billingInterval, setBillingInterval] = useState<BillingInterval>('monthly');
-  const { subscription, plans, isLoading, isCheckingOut, checkout, isPro } = useSubscription();
+  const { subscription, plans, isLoading, isCheckingOut, checkout, isPro } = useSubscription({
+    skipSubscription: isPublic,
+  });
   const searchParams = useSearchParams();
 
   // Get Pro plan data
@@ -61,8 +64,9 @@ export function PricingPlans({ showHeader = true }: PricingPlansProps) {
     }
   }, [searchParams]);
 
-  // Auto-checkout if coming from registration
+  // Auto-checkout if coming from registration (skip for public pages)
   useEffect(() => {
+    if (isPublic) return;
     const autoCheckout = searchParams.get('autoCheckout');
     if (autoCheckout === 'true' && !isPro && !isCheckingOut && !isLoading) {
       // Small delay to ensure everything is loaded
@@ -72,7 +76,7 @@ export function PricingPlans({ showHeader = true }: PricingPlansProps) {
       return () => clearTimeout(timer);
     }
     return undefined;
-  }, [searchParams, isPro, isCheckingOut, isLoading, billingInterval, handleUpgrade]);
+  }, [searchParams, isPro, isCheckingOut, isLoading, billingInterval, handleUpgrade, isPublic]);
 
   // Format price for display
   const formatPrice = (cents: number) => {
@@ -155,7 +159,14 @@ export function PricingPlans({ showHeader = true }: PricingPlansProps) {
             <span className="text-gray-600 dark:text-gray-400">/{t?.perMonth || 'month'}</span>
           </div>
 
-          {subscription?.plan === 'free' ? (
+          {isPublic ? (
+            <Link
+              href="/register"
+              className="block w-full py-3 px-4 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white text-center rounded-lg font-medium hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+            >
+              {t?.registerForFree || 'Sign up free'}
+            </Link>
+          ) : subscription?.plan === 'free' ? (
             <div className="w-full py-3 px-4 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 text-center rounded-lg font-medium">
               {t?.currentPlan}
             </div>
@@ -211,7 +222,14 @@ export function PricingPlans({ showHeader = true }: PricingPlansProps) {
             )}
           </div>
 
-          {isPro ? (
+          {isPublic ? (
+            <Link
+              href="/register?plan=pro"
+              className="block w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white text-center rounded-lg font-medium transition-colors"
+            >
+              {t?.registerToPurchase || 'Sign up to get started'}
+            </Link>
+          ) : isPro ? (
             <div className="w-full py-3 px-4 bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 text-center rounded-lg font-medium">
               {t?.currentPlan}
             </div>

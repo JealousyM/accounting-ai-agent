@@ -43,10 +43,15 @@ interface UseSubscriptionReturn {
   refetch: () => void;
 }
 
-export function useSubscription(): UseSubscriptionReturn {
-  const queryClient = useQueryClient();
+interface UseSubscriptionOptions {
+  skipSubscription?: boolean;
+}
 
-  // Fetch subscription details
+export function useSubscription(options?: UseSubscriptionOptions): UseSubscriptionReturn {
+  const queryClient = useQueryClient();
+  const skipSubscription = options?.skipSubscription ?? false;
+
+  // Fetch subscription details (only for authenticated users)
   const {
     data: subscription,
     isLoading,
@@ -57,6 +62,7 @@ export function useSubscription(): UseSubscriptionReturn {
     queryFn: getSubscription,
     staleTime: 5 * 60 * 1000, // 5 minutes
     retry: 2,
+    enabled: !skipSubscription,
   });
 
   // Fetch available plans (public endpoint, cached longer)
@@ -72,7 +78,7 @@ export function useSubscription(): UseSubscriptionReturn {
     queryKey: ['subscription-usage'],
     queryFn: getUsage,
     staleTime: 1 * 60 * 1000, // 1 minute
-    enabled: !!subscription, // Only fetch if we have subscription
+    enabled: !!subscription && !skipSubscription,
   });
 
   // Checkout mutation
@@ -130,7 +136,7 @@ export function useSubscription(): UseSubscriptionReturn {
     useOwnLLMKey,
 
     // Loading states
-    isLoading,
+    isLoading: skipSubscription ? isLoadingPlans : isLoading,
     isLoadingPlans,
     isCheckingOut: checkoutMutation.isPending,
 
