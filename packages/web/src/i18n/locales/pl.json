@@ -670,6 +670,38 @@
       "recentConversations": "Ostatnie rozmowy",
       "changeRole": "Zmień rolę",
       "confirmRoleChange": "Czy na pewno chcesz zmienić rolę tego użytkownika?"
+    },
+    "auditLog": {
+      "pageTitle": "Dziennik Audytu",
+      "title": "Systemowy Dziennik Audytu",
+      "loading": "Ładowanie dziennika...",
+      "noLogs": "Brak wpisów w dzienniku audytu",
+      "navLink": "Dziennik Audytu",
+      "filters": {
+        "allEntities": "Wszystkie encje",
+        "allActions": "Wszystkie akcje",
+        "dateFrom": "Od daty",
+        "dateTo": "Do daty",
+        "reset": "Resetuj filtry"
+      },
+      "table": {
+        "timestamp": "Czas",
+        "user": "Użytkownik",
+        "action": "Akcja",
+        "entity": "Encja",
+        "ip": "Adres IP",
+        "changes": "Zmiany",
+        "showChanges": "Pokaż",
+        "hideChanges": "Ukryj",
+        "system": "System"
+      },
+      "pagination": {
+        "page": "Strona",
+        "of": "z",
+        "entries": "wpisów",
+        "previous": "Poprzednia",
+        "next": "Następna"
+      }
     }
   },
   "subscription": {

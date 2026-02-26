@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { adminService } from '../services/admin.instance';
+import { auditLogService } from '../services/audit-log.instance';
 import { logger } from '../utils/logger';
 
 export class AdminController {
@@ -101,6 +102,34 @@ export class AdminController {
         success: false,
         error: 'Internal Server Error',
         message: 'Failed to update user role',
+      });
+    }
+  }
+  /**
+   * GET /api/admin/audit-log
+   * Paginated audit log with filters
+   */
+  async getAuditLog(req: Request, res: Response): Promise<void> {
+    try {
+      const { page, limit, userId, action, entity, dateFrom, dateTo } = req.query;
+
+      const result = await auditLogService.getAll({
+        page: page ? parseInt(page as string, 10) : undefined,
+        limit: limit ? parseInt(limit as string, 10) : undefined,
+        userId: userId as string | undefined,
+        action: action as string | undefined,
+        entity: entity as string | undefined,
+        dateFrom: dateFrom as string | undefined,
+        dateTo: dateTo as string | undefined,
+      });
+
+      res.status(200).json({ success: true, data: result });
+    } catch (error) {
+      logger.error('Failed to get audit log', { error });
+      res.status(500).json({
+        success: false,
+        error: 'Internal Server Error',
+        message: 'Failed to fetch audit log',
       });
     }
   }

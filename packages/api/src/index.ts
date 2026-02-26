@@ -19,6 +19,7 @@ import hrRoutes from './routes/hr.routes';
 import ksefRoutes from './routes/ksef.routes';
 import dashboardRoutes from './routes/dashboard.routes';
 import { globalRateLimiter } from './middleware/rate-limiter.middleware';
+import { auditLogMiddleware } from './middleware/audit-log.middleware';
 import { errorHandler, notFoundHandler } from './middleware/error-handler.middleware';
 import { logger } from './utils/logger';
 import { seedHelpTopicsIfEmpty } from './services/help-seed.service';
@@ -52,6 +53,9 @@ app.use(express.urlencoded({ extended: true, limit: '100kb' }));
 
 // Global rate limiter
 app.use('/api', globalRateLimiter);
+
+// Audit log middleware (fire-and-forget, logs POST/PUT/PATCH/DELETE)
+app.use('/api', auditLogMiddleware);
 
 // Health check
 app.get('/health', (_req: Request, res: Response) => {

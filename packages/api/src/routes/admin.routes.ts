@@ -25,6 +25,11 @@ const updateLimiter = rateLimiter({
   max: 30,
 });
 
+const auditLogLimiter = rateLimiter({
+  windowMs: 15 * 60 * 1000,
+  max: 60,
+});
+
 /**
  * GET /api/admin/dashboard
  * Get admin dashboard statistics
@@ -48,5 +53,11 @@ router.get('/users/:id', usersLimiter, adminController.getUserDetail.bind(adminC
  * Update user role
  */
 router.patch('/users/:id/role', updateLimiter, adminController.updateUserRole.bind(adminController));
+
+/**
+ * GET /api/admin/audit-log
+ * Get paginated audit log with filters
+ */
+router.get('/audit-log', auditLogLimiter, adminController.getAuditLog.bind(adminController));
 
 export default router;

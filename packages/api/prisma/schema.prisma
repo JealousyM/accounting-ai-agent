@@ -139,6 +139,7 @@ model User {
   ksefSessions      KSeFSession[]
   ksefInvoices      KSeFInvoiceStatus[]
   ksefContractors   KSeFContractor[]
+  auditLogs         AuditLog[]
 
   @@index([email])
   @@index([googleId])
@@ -546,4 +547,30 @@ model HelpTopic {
   @@index([isPublished])
   @@index([slug])
   @@map("help_topics")
+}
+
+// ============================================
+// AUDIT LOG
+// ============================================
+
+model AuditLog {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String?  @db.Uuid
+  action    String
+  entity    String
+  entityId  String?
+  changes   Json?    @db.JsonB
+  ip        String?
+  userAgent String?  @db.Text
+  createdAt DateTime @default(now())
+
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([entity])
+  @@index([action])
+  @@index([createdAt])
+  @@index([userId, createdAt])
+  @@index([entity, createdAt])
+  @@map("audit_logs")
 }
