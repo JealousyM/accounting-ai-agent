@@ -40,6 +40,8 @@ import { ttsService } from '../tts.instance';
 import { hrService } from '../hr/hr.instance';
 import { ksefService } from '../ksef/ksef.instance';
 import { ksefContractorService } from '../ksef/contractor.instance';
+import { AIMemoryService } from '../ai-memory/ai-memory.service';
+import { AIMemoryExtractionService } from '../ai-memory/memory-extraction.service';
 
 export class AIChatService {
   private readonly prisma: PrismaClient;
@@ -50,6 +52,8 @@ export class AIChatService {
   private readonly credentialsService: CredentialsService;
   private readonly defaultProvider: LLMProvider;
   private readonly ttsIntegration: TTSIntegration;
+  private readonly memoryService?: AIMemoryService;
+  private readonly memoryExtractionService?: AIMemoryExtractionService;
 
   constructor(
     prisma: PrismaClient,
@@ -57,7 +61,9 @@ export class AIChatService {
     cacheService: WFirmaCacheService,
     fileStorageService: FileStorageService,
     wfirmaFactory?: WFirmaServiceFactory,
-    credentialsService?: CredentialsService
+    credentialsService?: CredentialsService,
+    memoryService?: AIMemoryService,
+    memoryExtractionService?: AIMemoryExtractionService
   ) {
     this.prisma = prisma;
     this.wfirmaService = wfirmaService;
@@ -65,6 +71,8 @@ export class AIChatService {
     this.fileStorageService = fileStorageService;
     this.wfirmaFactory = wfirmaFactory!;
     this.credentialsService = credentialsService!;
+    this.memoryService = memoryService;
+    this.memoryExtractionService = memoryExtractionService;
     this.ttsIntegration = new TTSIntegration(ttsService, prisma);
 
     // Set default provider (used only as fallback, credentials come from DB)
@@ -187,6 +195,13 @@ export class AIChatService {
           processingTimeMs,
           toolsUsed,
         });
+
+        // Extract memories from conversation (fire-and-forget, no latency impact)
+        if (this.memoryExtractionService) {
+          this.memoryExtractionService.extractFromConversation(
+            userId, conversationId, content, response, toolsUsed, locale
+          ).catch(err => logger.warn('Memory extraction failed', { err, conversationId }));
+        }
 
         // Generate TTS for AI response (within same trace context)
         let tts: TTSMetadata | undefined;
@@ -334,8 +349,18 @@ export class AIChatService {
     // Detect user's language for localized tool responses
     const locale = detectLocale(userMessage);
 
-    // Get system prompt with user's language
-    const systemPrompt = getSystemPrompt(locale);
+    // Load user's context memory for prompt injection
+    let memoryContext: string | undefined;
+    if (this.memoryService) {
+      try {
+        memoryContext = await this.memoryService.buildMemoryPromptFragment(userId, locale);
+      } catch (err) {
+        logger.warn('Failed to load memory context', { err, userId });
+      }
+    }
+
+    // Get system prompt with user's language and memory context
+    const systemPrompt = getSystemPrompt(locale, memoryContext);
 
     // Create tools with userId, locale, and subscription tracking
     const tools = createAllTools(wfirmaService, this.cacheService, this.fileStorageService, userId, locale, subscriptionService, hrService, ksefService, ksefContractorService);

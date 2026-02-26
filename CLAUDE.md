@@ -53,7 +53,9 @@ routes/      → controllers/      → services/      → Prisma/Redis
 ### Key Services
 - **WFirmaIntegrationService** - wFirma API calls with retry logic
 - **WFirmaCacheService** - PostgreSQL caching layer (TTL-based)
-- **AIChatService** - LangChain/LangGraph AI with tool calling
+- **AIChatService** - LangChain/LangGraph single agent with 50+ domain tools
+- **AIMemoryService** - Persistent cross-session AI context memory (CRUD + prompt injection)
+- **AIMemoryExtractionService** - Fire-and-forget memory extraction from conversations (pattern-based, zero LLM cost)
 - **AuthService** - JWT + OAuth (Google, GitHub)
 - **TTSService** - Text-to-speech via OpenAI TTS API
 
@@ -66,7 +68,7 @@ routes/      → controllers/      → services/      → Prisma/Redis
 - `lib/api/` - Axios API client
 
 ### Database
-PostgreSQL with Prisma ORM. Key models: User, AIConversation, WFirmaCache, WFirmaInvoice, WFirmaCustomer.
+PostgreSQL with Prisma ORM. Key models: User, AIConversation, WFirmaCache, WFirmaInvoice, WFirmaCustomer, AIMemory, AIToolUsage.
 
 ## Tech Stack
 
@@ -89,6 +91,8 @@ Web requires `.env.local` with: NEXT_PUBLIC_API_URL
 - Text-to-speech via Web Speech API or OpenAI TTS (TTSContext, useTextToSpeech hook)
 - Voice input via Web Speech Recognition API (useVoiceDictation hook)
 - OpenAI TTS: higher quality voices (Nova, Alloy, Echo, etc.) when user has OpenAI key
+- AI Context Memory: persistent cross-session memory injected into system prompt (categories: business_fact, frequent_entity, user_preference, workflow_pattern)
+- Memory extraction is fire-and-forget after each AI response (zero LLM cost — pattern-based only)
 
 ## Documentation
 

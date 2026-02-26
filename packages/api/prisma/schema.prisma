@@ -76,6 +76,19 @@ enum KSeFAdapterType {
   direct
 }
 
+enum AIMemoryCategory {
+  user_preference
+  business_fact
+  frequent_entity
+  workflow_pattern
+}
+
+enum AIMemorySource {
+  explicit
+  implicit
+  tool_usage
+}
+
 // ============================================
 // USER MANAGEMENT
 // ============================================
@@ -140,6 +153,8 @@ model User {
   ksefInvoices      KSeFInvoiceStatus[]
   ksefContractors   KSeFContractor[]
   auditLogs         AuditLog[]
+  aiMemories        AIMemory[]
+  aiToolUsage       AIToolUsage[]
 
   @@index([email])
   @@index([googleId])
@@ -573,4 +588,62 @@ model AuditLog {
   @@index([userId, createdAt])
   @@index([entity, createdAt])
   @@map("audit_logs")
+}
+
+// ============================================
+// AI CONTEXT MEMORY
+// ============================================
+
+model AIMemory {
+  id              String           @id @default(uuid()) @db.Uuid
+  userId          String           @db.Uuid
+
+  // Memory content
+  category        AIMemoryCategory
+  source          AIMemorySource   @default(implicit)
+  key             String           // e.g. "frequent_contractor:12345"
+  value           String           @db.Text
+  metadata        Json?            @db.JsonB
+
+  // Confidence and lifecycle
+  confidence      Float            @default(0.5)
+  accessCount     Int              @default(1)
+  lastAccessedAt  DateTime         @default(now())
+
+  // Source tracking
+  conversationId  String?          @db.Uuid
+
+  // User control
+  isPinned        Boolean          @default(false)
+  isHidden        Boolean          @default(false)
+
+  // Timestamps
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  // Relations
+  user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, category, key])
+  @@index([userId, category])
+  @@index([userId, isHidden])
+  @@map("ai_memories")
+}
+
+model AIToolUsage {
+  id              String   @id @default(uuid()) @db.Uuid
+  userId          String   @db.Uuid
+
+  toolName        String
+  arguments       Json?    @db.JsonB
+  conversationId  String?  @db.Uuid
+
+  createdAt       DateTime @default(now())
+
+  // Relations
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, toolName])
+  @@index([userId, createdAt])
+  @@map("ai_tool_usage")
 }

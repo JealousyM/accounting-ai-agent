@@ -625,6 +625,168 @@ Get own company entry (`source='company'`).
 
 ---
 
+## AI Context Memory Endpoints
+
+All memory endpoints require `Authorization: Bearer <token>`.
+
+### GET /api/ai/memory
+
+List user's AI memories with optional filters.
+
+**Headers:**
+```
+Authorization: Bearer <token>
+```
+
+**Query Parameters:**
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| category | string | - | Filter by: user_preference, business_fact, frequent_entity, workflow_pattern |
+| page | number | 1 | Page number |
+| limit | number | 50 | Results per page (max 100) |
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": "uuid",
+      "category": "frequent_entity",
+      "source": "tool_usage",
+      "key": "contractor:ABC Corp",
+      "value": "Contractor 'ABC Corp' (NIP: 1234567890) — queried 12 times",
+      "confidence": 0.85,
+      "accessCount": 12,
+      "isPinned": false,
+      "isHidden": false,
+      "lastAccessedAt": "2026-02-26T10:00:00.000Z",
+      "createdAt": "2026-02-20T08:00:00.000Z"
+    }
+  ]
+}
+```
+
+---
+
+### GET /api/ai/memory/summary
+
+Get memory statistics.
+
+**Headers:**
+```
+Authorization: Bearer <token>
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "total": 15,
+    "byCategory": {
+      "business_fact": 3,
+      "frequent_entity": 5,
+      "user_preference": 4,
+      "workflow_pattern": 3
+    },
+    "pinned": 2,
+    "hidden": 1
+  }
+}
+```
+
+---
+
+### PUT /api/ai/memory/:id
+
+Update a memory item (pin, hide, edit value).
+
+**Headers:**
+```
+Authorization: Bearer <token>
+```
+
+**Request Body:**
+```json
+{
+  "isPinned": true,
+  "isHidden": false,
+  "value": "Updated memory text"
+}
+```
+
+All fields are optional. Response returns the updated memory item.
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "id": "uuid",
+    "category": "frequent_entity",
+    "source": "tool_usage",
+    "key": "contractor:ABC Corp",
+    "value": "Updated memory text",
+    "confidence": 0.85,
+    "accessCount": 12,
+    "isPinned": true,
+    "isHidden": false,
+    "lastAccessedAt": "2026-02-26T10:00:00.000Z",
+    "createdAt": "2026-02-20T08:00:00.000Z"
+  }
+}
+```
+
+---
+
+### DELETE /api/ai/memory/:id
+
+Delete a single memory item.
+
+**Headers:**
+```
+Authorization: Bearer <token>
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "Memory deleted"
+}
+```
+
+---
+
+### POST /api/ai/memory/clear
+
+Clear all memories or by category.
+
+**Headers:**
+```
+Authorization: Bearer <token>
+```
+
+**Request Body:**
+```json
+{
+  "category": "workflow_pattern"
+}
+```
+
+Category is optional. If omitted, clears ALL memories.
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": { "deleted": 5 }
+}
+```
+
+---
+
 ## Admin Endpoints
 
 All admin endpoints require `Authorization: Bearer <token>` from a user with `role: "admin"`.
@@ -876,6 +1038,7 @@ All endpoints are rate limited:
 | Admin Users | 100 requests | 15 minutes |
 | Admin Role Update | 30 requests | 15 minutes |
 | Admin Audit Log | 60 requests | 15 minutes |
+| AI Memory | 60 requests | 15 minutes |
 | General | 100 requests | 15 minutes |
 
 **Rate Limit Headers:**
