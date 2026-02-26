@@ -908,6 +908,126 @@ AI voice requires OpenAI key in settings or Pro plan.
     order: 2,
     isFeatured: false,
   },
+  {
+    slug: 'dashboard-overview',
+    category: 'dashboard',
+    titlePl: 'Panel KPI - przegląd wskaźników',
+    titleEn: 'KPI Dashboard Overview',
+    titleRu: 'Обзор KPI-панели',
+    contentPl: `Panel KPI wyświetla najważniejsze wskaźniki finansowe i operacyjne Twojej firmy w jednym miejscu.
+
+## Co pokazuje panel?
+
+### Podsumowanie finansowe
+- **Przychody, koszty i zysk** za bieżący rok
+- **Zapłacony VAT, PIT i ZUS**
+- **Wykres miesięczny** przychodów i kosztów
+
+### Faktury
+- Liczba i wartość faktur **nieopłaconych**
+- Liczba i wartość faktur **przeterminowanych**
+
+### Terminy podatkowe i ZUS
+- Najbliższe terminy płatności z kodowaniem kolorami:
+  - Czerwony — po terminie
+  - Pomarańczowy — do 3 dni
+  - Żółty — do 7 dni
+  - Zielony — powyżej 7 dni
+
+### Pracownicy (HR)
+- Liczba aktywnych pracowników
+- Aktywne umowy według typu
+- Łączny koszt pracodawcy za ostatni okres
+
+### KSeF
+- Faktury wysłane, zaakceptowane, odrzucone i oczekujące
+- Wskaźnik akceptacji (%)
+
+## Źródła danych
+
+Panel agreguje dane z wFirma, modułu HR i KSeF. Sekcje bez skonfigurowanej integracji wyświetlają "Brak danych".
+
+## Odświeżanie
+
+Dane są automatycznie odświeżane co 10 minut. Możesz też odświeżyć ręcznie klikając ikonę odświeżania.`,
+    contentEn: `The KPI Dashboard displays the most important financial and operational metrics for your company in one place.
+
+## What does the dashboard show?
+
+### Financial Summary
+- **Revenue, expenses, and profit** for the current year
+- **VAT, PIT, and ZUS paid**
+- **Monthly chart** of revenue and expenses
+
+### Invoices
+- Count and total of **unpaid** invoices
+- Count and total of **overdue** invoices
+
+### Tax and ZUS Deadlines
+- Upcoming payment deadlines with color coding:
+  - Red — past due
+  - Orange — within 3 days
+  - Yellow — within 7 days
+  - Green — more than 7 days away
+
+### Employees (HR)
+- Number of active employees
+- Active contracts by type
+- Total employer cost for the last payroll period
+
+### KSeF
+- Invoices sent, accepted, rejected, and pending
+- Acceptance rate (%)
+
+## Data Sources
+
+The dashboard aggregates data from wFirma, the HR module, and KSeF. Sections without a configured integration show "No data".
+
+## Refresh
+
+Data is automatically refreshed every 10 minutes. You can also refresh manually by clicking the refresh icon.`,
+    contentRu: `KPI-панель отображает наиболее важные финансовые и операционные показатели вашей компании в одном месте.
+
+## Что показывает панель?
+
+### Финансовая сводка
+- **Доходы, расходы и прибыль** за текущий год
+- **Уплаченные VAT, PIT и ZUS**
+- **Помесячный график** доходов и расходов
+
+### Счета
+- Количество и сумма **неоплаченных** счетов
+- Количество и сумма **просроченных** счетов
+
+### Налоговые сроки и ZUS
+- Ближайшие сроки платежей с цветовой кодировкой:
+  - Красный — просрочено
+  - Оранжевый — в течение 3 дней
+  - Жёлтый — в течение 7 дней
+  - Зелёный — более 7 дней
+
+### Сотрудники (HR)
+- Количество активных сотрудников
+- Активные договоры по типу
+- Общие затраты работодателя за последний период
+
+### KSeF
+- Счета отправленные, принятые, отклонённые и ожидающие
+- Процент принятия (%)
+
+## Источники данных
+
+Панель агрегирует данные из wFirma, модуля HR и KSeF. Секции без настроенной интеграции отображают "Нет данных".
+
+## Обновление
+
+Данные автоматически обновляются каждые 10 минут. Можно также обновить вручную, нажав значок обновления.`,
+    searchKeywordsPl: ['dashboard', 'panel', 'kpi', 'wskaźniki', 'podsumowanie', 'przychody', 'koszty'],
+    searchKeywordsEn: ['dashboard', 'panel', 'kpi', 'metrics', 'summary', 'revenue', 'expenses'],
+    searchKeywordsRu: ['дашборд', 'панель', 'кпи', 'показатели', 'сводка', 'доходы', 'расходы'],
+    order: 1,
+    isFeatured: true,
+  },
 ];
 
 export async function seedHelpTopicsIfEmpty(): Promise<void> {

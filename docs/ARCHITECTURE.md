@@ -14,6 +14,7 @@ The Accounting AI Agent is a full-stack monorepo application designed for AI-pow
 │  │  • Internationalization (EN, PL, RU)                                │   │
 │  │  • Zustand state management                                          │   │
 │  │  • React Query for data fetching                                     │   │
+│  │  • Google Analytics 4 (consent-aware)                                │   │
 │  └─────────────────────────────────────────────────────────────────────┘   │
 └─────────────────────────────────────────────────────────────────────────────┘
                                       │
@@ -156,6 +157,10 @@ async register(data: RegisterInput) {
 ### 4. Data Layer
 Prisma ORM for database operations, Redis for caching.
 
+### 5. Cross-Cutting Middleware
+
+**Audit Log Middleware** (`middleware/audit-log.middleware.ts`) automatically records all mutating requests (POST, PUT, PATCH, DELETE) to the `audit_logs` table after a successful response. It derives action and entity from the URL path, redacts sensitive fields (`password`, `apiKey`, `secretKey`, etc.) in the request body, and skips auth, TTS, webhooks, and health endpoints.
+
 ## AI Agent Architecture
 
 The system uses a multi-agent architecture with LangGraph for orchestration.
@@ -166,7 +171,8 @@ User Message → Router Agent → Domain Agent → Tools → Response
                    ├── Contractor Agent (CRUD operations)
                    ├── Financial Agent (Reports & analysis)
                    ├── Invoice Agent (Invoice management)
-                   └── Tax Agent (Tax calculations)
+                   ├── Tax Agent (Tax calculations)
+                   └── HR Agent (Employees, contracts, payroll)
 ```
 
 See [AI Agents Documentation](./AI_AGENTS.md) for details.
@@ -263,6 +269,13 @@ Language detection is automatic based on:
 1. User preference (stored in profile)
 2. Browser locale
 3. Message content analysis (for AI responses)
+
+## Notable Services
+
+| Service | File | Description |
+|---------|------|-------------|
+| DashboardService | `services/dashboard/dashboard.service.ts` | Aggregates financial, invoice, deadline, HR, and KSeF KPIs via `Promise.allSettled`; partial failures return `null` per section |
+| AuditLogService | `services/audit-log.service.ts` | Writes to `audit_logs` table; sanitizes sensitive fields; exposes paginated `getAll()` for admin queries |
 
 ## KSeF Integration Layer
 
