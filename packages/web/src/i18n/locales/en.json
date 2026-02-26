@@ -1132,5 +1132,41 @@
       },
       "allRightsReserved": "All rights reserved"
     }
+  },
+  "aiMemory": {
+    "title": "AI Memory",
+    "description": "Preferences and context learned from your conversations",
+    "empty": "No memories yet",
+    "emptyHint": "As you chat, the AI will remember your preferences and frequently used data",
+    "sidebarLink": "AI Memory",
+    "categories": {
+      "all": "All",
+      "user_preference": "Preferences",
+      "business_fact": "Business Facts",
+      "frequent_entity": "Frequent Contacts",
+      "workflow_pattern": "Workflows"
+    },
+    "actions": {
+      "pin": "Pin",
+      "unpin": "Unpin",
+      "hide": "Hide",
+      "show": "Show",
+      "delete": "Delete",
+      "clearAll": "Clear All",
+      "clearCategory": "Clear Category",
+      "confirmClear": "Are you sure? This cannot be undone.",
+      "cancel": "Cancel"
+    },
+    "confidence": "Confidence",
+    "source": {
+      "explicit": "You said",
+      "implicit": "Learned",
+      "tool_usage": "From usage"
+    },
+    "stats": {
+      "total": "Total",
+      "pinned": "Pinned",
+      "hidden": "Hidden"
+    }
   }
 }

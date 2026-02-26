@@ -1132,5 +1132,41 @@
       },
       "allRightsReserved": "Wszelkie prawa zastrzeżone"
     }
+  },
+  "aiMemory": {
+    "title": "Pamięć AI",
+    "description": "Preferencje i kontekst zapamiętane z Twoich rozmów",
+    "empty": "Brak zapamiętanych informacji",
+    "emptyHint": "W trakcie rozmów AI zapamięta Twoje preferencje i często używane dane",
+    "sidebarLink": "Pamięć AI",
+    "categories": {
+      "all": "Wszystkie",
+      "user_preference": "Preferencje",
+      "business_fact": "Fakty o firmie",
+      "frequent_entity": "Częste kontakty",
+      "workflow_pattern": "Wzorce pracy"
+    },
+    "actions": {
+      "pin": "Przypnij",
+      "unpin": "Odepnij",
+      "hide": "Ukryj",
+      "show": "Pokaż",
+      "delete": "Usuń",
+      "clearAll": "Wyczyść wszystko",
+      "clearCategory": "Wyczyść kategorię",
+      "confirmClear": "Czy na pewno? Tej operacji nie można cofnąć.",
+      "cancel": "Anuluj"
+    },
+    "confidence": "Pewność",
+    "source": {
+      "explicit": "Powiedziałeś",
+      "implicit": "Nauczone",
+      "tool_usage": "Z użycia"
+    },
+    "stats": {
+      "total": "Razem",
+      "pinned": "Przypięte",
+      "hidden": "Ukryte"
+    }
   }
 }

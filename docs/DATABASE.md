@@ -34,66 +34,135 @@ npm run prisma:reset
 
 ## Entity Relationship Diagram
 
-```
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                              DATABASE SCHEMA                                 │
-└─────────────────────────────────────────────────────────────────────────────┘
+```mermaid
+erDiagram
+    User ||--o{ WFirmaInvoice : "has many"
+    User ||--o{ WFirmaCustomer : "has many"
+    User ||--o{ AIConversation : "has many"
+    User ||--o{ AIRecommendation : "has many"
+    User ||--o{ WFirmaCache : "has many"
+    User ||--o{ AIMemory : "has many"
+    User ||--o{ AIToolUsage : "has many"
+    WFirmaCustomer ||--o{ WFirmaInvoice : "has many"
+    AIConversation ||--o{ AIRecommendation : "has many"
 
-┌───────────────────┐       ┌───────────────────┐       ┌───────────────────┐
-│       User        │       │   WFirmaInvoice   │       │  WFirmaCustomer   │
-├───────────────────┤       ├───────────────────┤       ├───────────────────┤
-│ id (PK)           │──┐    │ id (PK)           │       │ id (PK)           │
-│ email             │  │    │ userId (FK)       │──┐    │ userId (FK)       │
-│ password          │  │    │ customerId (FK)   │──│────│ wfirmaId          │
-│ firstName         │  │    │ wfirmaId          │  │    │ name              │
-│ lastName          │  │    │ number            │  │    │ nip               │
-│ googleId          │  │    │ issueDate         │  │    │ email             │
-│ githubId          │  │    │ dueDate           │  │    │ phone             │
-│ wfirmaConfig      │  │    │ totalNet          │  │    │ address           │
-│ createdAt         │  │    │ totalVat          │  │    │ totalRevenue      │
-│ updatedAt         │  │    │ totalGross        │  │    │ invoiceCount      │
-│ deletedAt         │  │    │ status            │  │    │ lastInvoiceDate   │
-└───────────────────┘  │    │ items             │  │    │ createdAt         │
-         │             │    │ metadata          │  │    │ updatedAt         │
-         │             │    │ createdAt         │  │    │ deletedAt         │
-         │             │    │ updatedAt         │  │    └───────────────────┘
-         │             │    │ deletedAt         │  │
-         │             │    └───────────────────┘  │
-         │             │                           │
-         │             └───────────────────────────┘
-         │
-         │    ┌───────────────────┐       ┌───────────────────┐
-         │    │  AIConversation   │       │  AIRecommendation │
-         │    ├───────────────────┤       ├───────────────────┤
-         │    │ id (PK)           │       │ id (PK)           │
-         └────│ userId (FK)       │──┐    │ userId (FK)       │
-              │ title             │  │    │ conversationId(FK)│──┐
-              │ messages          │  │    │ type              │  │
-              │ graphState        │  │    │ title             │  │
-              │ locale            │  │    │ description       │  │
-              │ lastAgentType     │  │    │ impact            │  │
-              │ metadata          │  │    │ confidence        │  │
-              │ createdAt         │  │    │ status            │  │
-              │ updatedAt         │  │    │ metadata          │  │
-              │ deletedAt         │  │    │ createdAt         │  │
-              └───────────────────┘  │    │ updatedAt         │  │
-                                     │    │ deletedAt         │  │
-                                     │    └───────────────────┘  │
-                                     │                           │
-                                     └───────────────────────────┘
+    User {
+        uuid id PK
+        string email UK
+        string password
+        string firstName
+        string lastName
+        string googleId UK
+        string githubId UK
+        json wfirmaConfig
+        datetime createdAt
+        datetime updatedAt
+        datetime deletedAt
+    }
 
-┌───────────────────┐
-│    WFirmaCache    │
-├───────────────────┤
-│ id (PK)           │
-│ userId (FK)       │
-│ dataType          │
-│ wfirmaId          │
-│ data              │
-│ cachedAt          │
-│ expiresAt         │
-│ isValid           │
-└───────────────────┘
+    WFirmaInvoice {
+        uuid id PK
+        uuid userId FK
+        uuid customerId FK
+        string wfirmaId
+        string number
+        datetime issueDate
+        datetime dueDate
+        decimal totalNet
+        decimal totalVat
+        decimal totalGross
+        string status
+        json items
+        json metadata
+        datetime createdAt
+        datetime updatedAt
+        datetime deletedAt
+    }
+
+    WFirmaCustomer {
+        uuid id PK
+        uuid userId FK
+        string wfirmaId
+        string name
+        string nip
+        string email
+        string phone
+        json address
+        decimal totalRevenue
+        int invoiceCount
+        datetime lastInvoiceDate
+        datetime createdAt
+        datetime updatedAt
+        datetime deletedAt
+    }
+
+    AIConversation {
+        uuid id PK
+        uuid userId FK
+        string title
+        json messages
+        json graphState
+        string locale
+        string lastAgentType
+        json metadata
+        datetime createdAt
+        datetime updatedAt
+        datetime deletedAt
+    }
+
+    AIRecommendation {
+        uuid id PK
+        uuid userId FK
+        uuid conversationId FK
+        string type
+        string title
+        string description
+        string impact
+        float confidence
+        string status
+        json metadata
+        datetime createdAt
+        datetime updatedAt
+        datetime deletedAt
+    }
+
+    WFirmaCache {
+        uuid id PK
+        uuid userId FK
+        string dataType
+        string wfirmaId
+        json data
+        datetime cachedAt
+        datetime expiresAt
+        boolean isValid
+    }
+
+    AIMemory {
+        uuid id PK
+        uuid userId FK
+        string category
+        string source
+        string key
+        text value
+        jsonb metadata
+        float confidence
+        int accessCount
+        datetime lastAccessedAt
+        uuid conversationId
+        boolean isPinned
+        boolean isHidden
+        datetime createdAt
+        datetime updatedAt
+    }
+
+    AIToolUsage {
+        uuid id PK
+        uuid userId FK
+        string toolName
+        jsonb arguments
+        uuid conversationId
+        datetime createdAt
+    }
 ```
 
 ## Models
@@ -120,6 +189,8 @@ model User {
   conversations  AIConversation[]
   recommendations AIRecommendation[]
   cache          WFirmaCache[]
+  aiMemories     AIMemory[]
+  aiToolUsage    AIToolUsage[]
 
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
@@ -366,6 +437,80 @@ enum CacheDataType {
 }
 ```
 
+### AIMemory
+
+Persistent AI context memory items. Each memory is a single fact or preference learned from user conversations. Deduplicated via unique constraint on (userId, category, key).
+
+```prisma
+model AIMemory {
+  id              String           @id @default(uuid()) @db.Uuid
+  userId          String           @db.Uuid
+  category        AIMemoryCategory
+  source          AIMemorySource   @default(implicit)
+  key             String
+  value           String           @db.Text
+  metadata        Json?            @db.JsonB
+  confidence      Float            @default(0.5)
+  accessCount     Int              @default(1)
+  lastAccessedAt  DateTime         @default(now())
+  conversationId  String?          @db.Uuid
+  isPinned        Boolean          @default(false)
+  isHidden        Boolean          @default(false)
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@unique([userId, category, key])
+  @@index([userId, category])
+  @@index([userId, isHidden])
+  @@map("ai_memories")
+}
+```
+
+**Enums:**
+```prisma
+enum AIMemoryCategory {
+  user_preference
+  business_fact
+  frequent_entity
+  workflow_pattern
+}
+
+enum AIMemorySource {
+  explicit
+  implicit
+  tool_usage
+}
+```
+
+**Confidence system:**
+
+| Event | Change | Details |
+|-------|--------|---------|
+| Initial (implicit) | 0.5 | Default for memories extracted from conversation |
+| Initial (explicit) | 0.8 | User explicitly states a preference |
+| Reinforcement | +0.1 | Per access (memory retrieved and used) |
+| Decay | -0.1 | After 30 days without access (lazy evaluation, max 1x per 24h) |
+| Auto-hide | threshold | Memory is hidden when confidence drops below 0.1 |
+
+### AIToolUsage
+
+Tracks every AI tool call for pattern analysis. Used by AIMemoryExtractionService to detect frequently used tools and frequent contractors.
+
+```prisma
+model AIToolUsage {
+  id              String   @id @default(uuid()) @db.Uuid
+  userId          String   @db.Uuid
+  toolName        String
+  arguments       Json?    @db.JsonB
+  conversationId  String?  @db.Uuid
+  createdAt       DateTime @default(now())
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@index([userId, toolName])
+  @@index([userId, createdAt])
+  @@map("ai_tool_usage")
+}
+```
+
 ## Cache TTL Configuration
 
 | Data Type | TTL | Reason |
@@ -392,6 +537,8 @@ All tables are optimized with indexes for:
 | User | AIConversation | Cascade |
 | User | AIRecommendation | Cascade |
 | User | WFirmaCache | Cascade |
+| User | AIMemory | Cascade |
+| User | AIToolUsage | Cascade |
 | WFirmaCustomer | WFirmaInvoice | Set Null |
 | AIConversation | AIRecommendation | Set Null |
 

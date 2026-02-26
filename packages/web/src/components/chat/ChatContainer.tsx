@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { MessageSquarePlus, X, DollarSign, Crown, AlertTriangle, FileCheck, LayoutDashboard } from 'lucide-react';
+import { MessageSquarePlus, X, DollarSign, Crown, AlertTriangle, FileCheck, LayoutDashboard, Brain } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { AppVersion } from '@/components/ui/app-version';
 import Link from 'next/link';
@@ -16,6 +16,7 @@ import { markFirstLoginComplete } from '@/lib/api/auth';
 import { CurrentPlanBadge, UsageWidget } from '@/components/subscription';
 import { useSubscription } from '@/hooks/useSubscription';
 import { TTSProvider, useAutoSpeak } from '@/contexts/TTSContext';
+import { AIMemoryPanel } from './AIMemoryPanel';
 import enTranslations from '@/i18n/locales/en.json';
 import plTranslations from '@/i18n/locales/pl.json';
 import ruTranslations from '@/i18n/locales/ru.json';
@@ -49,6 +50,7 @@ function ChatContainerInner() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [showWfirmaWelcome, setShowWfirmaWelcome] = useState(false);
   const [showSubscriptionWelcome, setShowSubscriptionWelcome] = useState(false);
+  const [showMemoryPanel, setShowMemoryPanel] = useState(false);
   const { locale, setLocale } = useLocale();
   const t = translations[locale].chat;
   const onboardingTranslations = translations[locale].onboarding;
@@ -260,6 +262,16 @@ function ChatContainerInner() {
                 <span>KSeF</span>
               </Link>
             </div>
+            {/* AI Memory link */}
+            <div className="py-2 border-b border-gray-200 dark:border-gray-700">
+              <button
+                onClick={() => setShowMemoryPanel(true)}
+                className="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors w-full text-left"
+              >
+                <Brain className="w-4 h-4" />
+                <span>{translations[locale].aiMemory.sidebarLink}</span>
+              </button>
+            </div>
             {/* AI Costs and Version */}
             <div className="py-3 flex items-center justify-between">
               <Link
@@ -382,6 +394,13 @@ function ChatContainerInner() {
         open={showWfirmaWelcome}
         onClose={handleWfirmaWelcomeClose}
         translations={onboardingTranslations.wfirmaWelcome}
+      />
+
+      {/* AI Memory Panel */}
+      <AIMemoryPanel
+        open={showMemoryPanel}
+        onClose={() => setShowMemoryPanel(false)}
+        translations={translations[locale].aiMemory}
       />
     </div>
   );

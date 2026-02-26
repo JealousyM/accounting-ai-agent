@@ -177,12 +177,14 @@ export function buildSystemPrompt(
     includeToolGuidelines?: boolean;
     includeTaxData?: boolean;
     includeSecurityGuidelines?: boolean;
+    memoryContext?: string;
   } = {}
 ): string {
   const {
     includeToolGuidelines = true,
     includeTaxData = false,
     includeSecurityGuidelines = false,
+    memoryContext,
   } = options;
 
   const fragments: string[] = [
@@ -212,6 +214,10 @@ export function buildSystemPrompt(
 
   if (includeTaxData) {
     fragments.push('', SHARED_FRAGMENTS.polishTaxData2026);
+  }
+
+  if (memoryContext) {
+    fragments.push('', memoryContext);
   }
 
   return fragments.join('\n');

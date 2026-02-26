@@ -4,56 +4,44 @@ The Accounting AI Agent is a full-stack monorepo application designed for AI-pow
 
 ## System Architecture
 
-```
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                              CLIENT LAYER                                    │
-│  ┌─────────────────────────────────────────────────────────────────────┐   │
-│  │                     Next.js 15 Web Application                       │   │
-│  │  • React 19 with Server Components                                   │   │
-│  │  • Tailwind CSS v4 styling                                          │   │
-│  │  • Internationalization (EN, PL, RU)                                │   │
-│  │  • Zustand state management                                          │   │
-│  │  • React Query for data fetching                                     │   │
-│  │  • Google Analytics 4 (consent-aware)                                │   │
-│  └─────────────────────────────────────────────────────────────────────┘   │
-└─────────────────────────────────────────────────────────────────────────────┘
-                                      │
-                                      │ HTTP/REST
-                                      ▼
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                              API LAYER                                       │
-│  ┌─────────────────────────────────────────────────────────────────────┐   │
-│  │                     Express.js Backend                               │   │
-│  │  • TypeScript with strict mode                                       │   │
-│  │  • JWT + OAuth authentication                                        │   │
-│  │  • Zod request validation                                            │   │
-│  │  • Winston logging                                                   │   │
-│  │  • Redis rate limiting                                               │   │
-│  └─────────────────────────────────────────────────────────────────────┘   │
-└─────────────────────────────────────────────────────────────────────────────┘
-                    │                    │                    │
-                    ▼                    ▼                    ▼
-┌──────────────────────┐ ┌──────────────────────┐ ┌──────────────────────┐
-│    AI LAYER          │ │   INTEGRATION LAYER  │ │   DATA LAYER         │
-│  ┌────────────────┐  │ │  ┌────────────────┐  │ │  ┌────────────────┐  │
-│  │   LangGraph    │  │ │  │    wFirma      │  │ │  │   PostgreSQL   │  │
-│  │   Multi-Agent  │  │ │  │   API Client   │  │ │  │   + Prisma     │  │
-│  │   System       │  │ │  │                │  │ │  │                │  │
-│  │  ┌──────────┐  │  │ │  │  ┌──────────┐  │  │ │  │  ┌──────────┐  │  │
-│  │  │ Router   │  │  │ │  │  │ Company  │  │  │ │  │  │  Users   │  │  │
-│  │  │ Agent    │  │  │ │  │  │ Invoices │  │  │ │  │  │ Invoices │  │  │
-│  │  └────┬─────┘  │  │ │  │  │ Payments │  │  │ │  │  │ Customers│  │  │
-│  │       │        │  │ │  │  │ Expenses │  │  │ │  │  │  Cache   │  │  │
-│  │  ┌────┴────┐   │  │ │  │  └──────────┘  │  │ │  │  └──────────┘  │  │
-│  │  │ Domain  │   │  │ │  └────────────────┘  │ │  └────────────────┘  │
-│  │  │ Agents  │   │  │ │                      │ │                      │
-│  │  └─────────┘   │  │ │  ┌────────────────┐  │ │  ┌────────────────┐  │
-│  │  • Contractor  │  │ │  │    Cache       │  │ │  │     Redis      │  │
-│  │  • Financial   │  │ │  │    Service     │  │ │  │   Sessions     │  │
-│  │  • Invoice     │  │ │  │   (TTL-based)  │  │ │  │   Rate Limit   │  │
-│  │  • Tax         │  │ │  └────────────────┘  │ │  └────────────────┘  │
-│  └────────────────┘  │ └──────────────────────┘ └──────────────────────┘
-└──────────────────────┘
+```mermaid
+graph TD
+    subgraph CLIENT["Client Layer"]
+        WEB["Next.js 15 Web Application<br/>React 19 &bull; Tailwind CSS v4<br/>i18n (EN, PL, RU) &bull; Zustand<br/>React Query &bull; GA4"]
+    end
+
+    subgraph API["API Layer"]
+        EXPRESS["Express.js Backend<br/>TypeScript &bull; JWT + OAuth<br/>Zod Validation &bull; Winston<br/>Redis Rate Limiting"]
+    end
+
+    subgraph AI["AI Layer"]
+        LANGGRAPH["LangGraph Single Agent<br/>50+ Domain Tools"]
+        MEMORY["AI Context Memory<br/>AIMemoryService<br/>AIMemoryExtractionService"]
+        LANGGRAPH <--> MEMORY
+    end
+
+    subgraph INTEGRATION["Integration Layer"]
+        WFIRMA["wFirma API Client<br/>Company &bull; Invoices<br/>Payments &bull; Expenses"]
+        KSEF["KSeF Integration<br/>e-Invoice System<br/>FA(3) XML Generation"]
+        CACHE["Cache Service<br/>TTL-based"]
+    end
+
+    subgraph DATA["Data Layer"]
+        PG["PostgreSQL + Prisma<br/>Users &bull; Invoices<br/>Customers &bull; Cache<br/>AI Memories"]
+        REDIS["Redis<br/>Sessions &bull; Rate Limiting"]
+    end
+
+    WEB -- "HTTP / REST" --> EXPRESS
+    EXPRESS --> LANGGRAPH
+    EXPRESS --> WFIRMA
+    EXPRESS --> KSEF
+    LANGGRAPH --> WFIRMA
+    LANGGRAPH --> KSEF
+    WFIRMA --> CACHE
+    CACHE --> PG
+    EXPRESS --> PG
+    EXPRESS --> REDIS
+    MEMORY --> PG
 ```
 
 ## Monorepo Structure
@@ -163,16 +151,28 @@ Prisma ORM for database operations, Redis for caching.
 
 ## AI Agent Architecture
 
-The system uses a multi-agent architecture with LangGraph for orchestration.
+The system uses a single LangGraph agent with 50+ domain tools. There is no multi-agent router -- one agent receives the user message, decides which tools to call, and composes the final response. AI Context Memory is loaded into the system prompt so the agent has long-term awareness of user preferences, business facts, and frequently referenced entities.
 
-```
-User Message → Router Agent → Domain Agent → Tools → Response
-                   │
-                   ├── Contractor Agent (CRUD operations)
-                   ├── Financial Agent (Reports & analysis)
-                   ├── Invoice Agent (Invoice management)
-                   ├── Tax Agent (Tax calculations)
-                   └── HR Agent (Employees, contracts, payroll)
+```mermaid
+graph LR
+    USER["User Message"] --> AGENT["LangGraph Agent<br/>(single ReAct loop)"]
+
+    AGENT --> TOOLS["50+ Domain Tools"]
+
+    subgraph TOOLS["Domain Tools"]
+        direction TB
+        CONTRACTOR["Contractor Tools"]
+        FINANCIAL["Financial Tools"]
+        INVOICE["Invoice Tools"]
+        TAX["Tax Tools"]
+        HR["HR Tools"]
+        KSEF_T["KSeF Tools"]
+        EXPENSE["Expense Tools"]
+    end
+
+    TOOLS --> RESPONSE["Formatted Response<br/>(Markdown, localized)"]
+
+    MEMORY["AI Context Memory<br/>(injected into system prompt)"] -.-> AGENT
 ```
 
 See [AI Agents Documentation](./AI_AGENTS.md) for details.
@@ -205,18 +205,33 @@ Response
 ```
 
 ### AI Chat Flow
-```
-User Message
-     ↓
-AI Chat Controller
-     ↓
-Router Agent (classify intent)
-     ↓
-Domain Agent (process request)
-     ↓
-Tools (wFirma API calls)
-     ↓
-Formatted Response (Markdown)
+
+```mermaid
+sequenceDiagram
+    actor User
+    participant Controller as AI Chat Controller
+    participant Memory as AIMemoryService
+    participant Prompt as System Prompt Builder
+    participant Agent as LangGraph Agent
+    participant Tools as Domain Tools (50+)
+    participant Extraction as AIMemoryExtractionService
+
+    User->>Controller: Send message
+    Controller->>Memory: Load user context memories
+    Memory-->>Controller: Memory fragments
+    Controller->>Prompt: Build system prompt (locale + memory)
+    Prompt-->>Controller: System prompt
+    Controller->>Agent: Invoke agent with messages + tools
+
+    loop ReAct loop (until done)
+        Agent->>Tools: Call tool (e.g. wFirma, KSeF)
+        Tools-->>Agent: Tool result
+    end
+
+    Agent-->>Controller: Final response (Markdown)
+    Controller-->>User: Formatted response
+    Controller-)Extraction: Extract memories (fire-and-forget)
+    Extraction-)Memory: Upsert preferences, facts, entities
 ```
 
 ## Key Design Patterns
@@ -276,6 +291,8 @@ Language detection is automatic based on:
 |---------|------|-------------|
 | DashboardService | `services/dashboard/dashboard.service.ts` | Aggregates financial, invoice, deadline, HR, and KSeF KPIs via `Promise.allSettled`; partial failures return `null` per section |
 | AuditLogService | `services/audit-log.service.ts` | Writes to `audit_logs` table; sanitizes sensitive fields; exposes paginated `getAll()` for admin queries |
+| AIMemoryService | `services/ai-memory/ai-memory.service.ts` | CRUD for per-user AI context memories (preferences, business facts, frequent entities); builds a prompt fragment injected into the system prompt so the agent retains long-term context |
+| AIMemoryExtractionService | `services/ai-memory/memory-extraction.service.ts` | Runs after each chat turn (fire-and-forget); extracts user preferences, business facts, and frequently referenced entities from messages and tool calls via pattern matching; upserts into `AIMemory` table |
 
 ## KSeF Integration Layer
 

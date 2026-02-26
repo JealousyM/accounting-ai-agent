@@ -118,6 +118,225 @@ const helpTopics = [
     isFeatured: true,
   },
 
+  {
+    slug: 'ai-chat-context-memory',
+    category: 'aiChat',
+    titlePl: 'Pamięć kontekstowa AI',
+    titleEn: 'AI Context Memory',
+    titleRu: 'Контекстная память AI',
+    contentPl: `AI zapamiętuje Twoje preferencje i najczęściej używane dane pomiędzy sesjami czatu. Dzięki temu z czasem staje się coraz bardziej pomocny.
+
+## Co AI zapamiętuje
+
+**Fakty o firmie:**
+- Informacje o Twojej firmie, formie opodatkowania, branży
+- Automatycznie wyciągane z Twoich wiadomości (np. "Moja firma stosuje ryczałt")
+
+**Częste kontakty:**
+- Kontrahenci, których często wyszukujesz
+- AI rozpoznaje wzorce: jeśli pytasz o tego samego kontrahenta 3+ razy, zapamięta go
+
+**Twoje preferencje:**
+- Preferowany format wyświetlania danych
+- Stałe ustawienia (np. "zawsze pokazuj faktury w tabeli")
+- Wyciągane z fraz typu "wolę", "zawsze", "domyślnie"
+
+**Wzorce pracy:**
+- Często używane funkcje i narzędzia
+- Typowe sekwencje działań
+
+## Jak to działa
+
+- AI automatycznie uczy się z każdej rozmowy — bez dodatkowych kosztów
+- Zapamiętane informacje są wstrzykiwane do kontekstu następnych rozmów
+- Nieużywane wspomnienia tracą na ważności po 30 dniach i są automatycznie ukrywane
+- Przypięte wspomnienia nigdy nie wygasają
+
+## Jak pisać, żeby AI zapamiętał
+
+AI rozpoznaje specjalne frazy w Twoich wiadomościach i automatycznie tworzy wpisy w pamięci. Oto przykłady:
+
+**Preferencje (użyj tych fraz):**
+- "Zawsze pokazuj mi faktury w formie tabeli"
+- "Preferuję podsumowania w formacie listy"
+- "Domyślnie szukaj faktur za ostatni miesiąc"
+- "Zwykle pracuję z fakturami sprzedażowymi"
+- "Wolę widzieć kwoty netto"
+
+**Fakty o firmie (użyj tych fraz):**
+- "Moja firma stosuje ryczałt"
+- "Nasza firma zajmuje się IT konsultingiem"
+- "Używamy stawki VAT 23%"
+- "Nasz NIP to 1234567890"
+
+**Częste kontakty (automatycznie):**
+- Wystarczy pytać o tego samego kontrahenta 3 lub więcej razy — AI sam go zapamięta
+
+**Wzorce pracy (automatycznie):**
+- AI śledzi, z jakich narzędzi korzystasz najczęściej i zapamiętuje Twoje typowe sekwencje działań
+
+## Zarządzanie pamięcią
+
+Kliknij ikonę mózgu 🧠 w pasku bocznym czatu, aby otworzyć panel pamięci:
+
+- **Przeglądaj** wspomnienia pogrupowane według kategorii
+- **Przypnij** ważne wpisy, aby nigdy nie wygasły
+- **Ukryj** wpisy, które nie są istotne
+- **Usuń** pojedyncze wpisy lub wyczyść całą kategorię
+- Każdy wpis pokazuje poziom pewności (%) i źródło
+
+## Prywatność
+
+- Wspomnienia są przypisane wyłącznie do Twojego konta
+- Możesz w każdej chwili usunąć wszystkie wspomnienia
+- Dane są przechowywane w bezpiecznej bazie danych
+- AI nie udostępnia Twoich danych innym użytkownikom`,
+
+    contentEn: `AI remembers your preferences and frequently used data between chat sessions. This makes it progressively more helpful over time.
+
+## What AI remembers
+
+**Business facts:**
+- Information about your company, tax form, industry
+- Automatically extracted from your messages (e.g. "My company uses flat tax")
+
+**Frequent contacts:**
+- Contractors you search for frequently
+- AI recognizes patterns: if you query the same contractor 3+ times, it remembers them
+
+**Your preferences:**
+- Preferred data display format
+- Persistent settings (e.g. "always show invoices in table format")
+- Extracted from phrases like "I prefer", "always", "by default"
+
+**Workflow patterns:**
+- Frequently used features and tools
+- Typical action sequences
+
+## How it works
+
+- AI automatically learns from every conversation — at no extra cost
+- Remembered information is injected into the context of future conversations
+- Unused memories lose importance after 30 days and are automatically hidden
+- Pinned memories never expire
+
+## How to write so AI remembers
+
+AI recognizes special phrases in your messages and automatically creates memory entries. Here are examples:
+
+**Preferences (use these phrases):**
+- "I always prefer invoices displayed as a table"
+- "I prefer summaries in list format"
+- "By default search invoices for the last month"
+- "I typically work with sales invoices"
+- "I normally want to see net amounts"
+
+**Business facts (use these phrases):**
+- "My company uses flat-rate taxation"
+- "Our company specializes in IT consulting"
+- "We use 23% VAT rate"
+- "My NIP is 1234567890"
+- "Our business is software development"
+
+**Frequent contacts (automatic):**
+- Simply query the same contractor 3 or more times — AI will remember them automatically
+
+**Workflow patterns (automatic):**
+- AI tracks which tools you use most often and remembers your typical action sequences
+
+## Managing memory
+
+Click the brain icon 🧠 in the chat sidebar to open the memory panel:
+
+- **Browse** memories grouped by category
+- **Pin** important entries so they never expire
+- **Hide** entries that are not relevant
+- **Delete** individual entries or clear an entire category
+- Each entry shows confidence level (%) and source
+
+## Privacy
+
+- Memories are assigned exclusively to your account
+- You can delete all memories at any time
+- Data is stored in a secure database
+- AI does not share your data with other users`,
+
+    contentRu: `AI запоминает ваши предпочтения и часто используемые данные между сеансами чата. Благодаря этому он становится всё более полезным со временем.
+
+## Что AI запоминает
+
+**Факты о бизнесе:**
+- Информацию о вашей компании, форме налогообложения, отрасли
+- Автоматически извлекается из ваших сообщений (напр. "Моя компания использует рычалт")
+
+**Частые контакты:**
+- Контрагенты, которых вы часто ищете
+- AI распознаёт паттерны: если вы запрашиваете одного контрагента 3+ раз, он его запомнит
+
+**Ваши предпочтения:**
+- Предпочтительный формат отображения данных
+- Постоянные настройки (напр. "всегда показывай счета в таблице")
+- Извлекаются из фраз типа "я предпочитаю", "всегда", "по умолчанию"
+
+**Шаблоны работы:**
+- Часто используемые функции и инструменты
+- Типичные последовательности действий
+
+## Как это работает
+
+- AI автоматически учится из каждого разговора — без дополнительных затрат
+- Запомненная информация встраивается в контекст следующих разговоров
+- Неиспользуемые воспоминания теряют важность через 30 дней и автоматически скрываются
+- Закреплённые воспоминания никогда не истекают
+
+## Как писать, чтобы AI запомнил
+
+AI распознаёт специальные фразы в ваших сообщениях и автоматически создаёт записи в памяти. Вот примеры:
+
+**Предпочтения (используйте эти фразы):**
+- "Я всегда предпочитаю таблицы для отображения счетов"
+- "Я предпочитаю видеть данные в виде списка"
+- "По умолчанию ищи счета за последний месяц"
+- "Обычно я работаю с исходящими счетами"
+- "Как правило мне нужны суммы нетто"
+
+**Факты о бизнесе (используйте эти фразы):**
+- "Моя компания использует рычалт"
+- "Наша компания занимается IT консалтингом"
+- "Мы используем ставку НДС 23%"
+- "Наш НИП 1234567890"
+- "Мой бизнес — разработка ПО"
+
+**Частые контакты (автоматически):**
+- Просто запрашивайте одного и того же контрагента 3 и более раз — AI запомнит его автоматически
+
+**Шаблоны работы (автоматически):**
+- AI отслеживает, какие инструменты вы используете чаще всего, и запоминает ваши типичные последовательности действий
+
+## Управление памятью
+
+Нажмите на иконку мозга 🧠 в боковой панели чата, чтобы открыть панель памяти:
+
+- **Просматривайте** воспоминания, сгруппированные по категориям
+- **Закрепите** важные записи, чтобы они никогда не истекали
+- **Скройте** записи, которые не актуальны
+- **Удалите** отдельные записи или очистите целую категорию
+- Каждая запись показывает уровень уверенности (%) и источник
+
+## Конфиденциальность
+
+- Воспоминания привязаны исключительно к вашему аккаунту
+- Вы можете удалить все воспоминания в любой момент
+- Данные хранятся в защищённой базе данных
+- AI не передаёт ваши данные другим пользователям`,
+
+    searchKeywordsPl: ['pamięć', 'zapamiętywanie', 'preferencje', 'kontekst', 'historia', 'uczenie', 'personalizacja', 'memory'],
+    searchKeywordsEn: ['memory', 'remember', 'preferences', 'context', 'history', 'learning', 'personalization'],
+    searchKeywordsRu: ['память', 'запоминание', 'предпочтения', 'контекст', 'история', 'обучение', 'персонализация'],
+    order: 2,
+    isFeatured: true,
+  },
+
   // ========================================
   // FAQ Category
   // ========================================

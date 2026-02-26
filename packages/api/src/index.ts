@@ -18,6 +18,7 @@ import ttsRoutes from './routes/tts.routes';
 import hrRoutes from './routes/hr.routes';
 import ksefRoutes from './routes/ksef.routes';
 import dashboardRoutes from './routes/dashboard.routes';
+import aiMemoryRoutes from './routes/ai-memory.routes';
 import { globalRateLimiter } from './middleware/rate-limiter.middleware';
 import { auditLogMiddleware } from './middleware/audit-log.middleware';
 import { errorHandler, notFoundHandler } from './middleware/error-handler.middleware';
@@ -105,6 +106,9 @@ app.use('/api/ksef', ksefRoutes);
 
 // Dashboard routes (aggregated KPI data)
 app.use('/api/dashboard', dashboardRoutes);
+
+// AI Memory routes (context memory management)
+app.use('/api/ai/memory', aiMemoryRoutes);
 
 // 404 handler
 app.use(notFoundHandler);
