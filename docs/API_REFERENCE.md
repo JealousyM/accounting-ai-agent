@@ -625,6 +625,242 @@ Get own company entry (`source='company'`).
 
 ---
 
+## Admin Endpoints
+
+All admin endpoints require `Authorization: Bearer <token>` from a user with `role: "admin"`.
+
+### GET /api/admin/dashboard
+
+Get platform-wide statistics.
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "totalUsers": 150,
+    "activeSubscriptions": 42,
+    "totalConversations": 1200,
+    "newUsersToday": 3
+  }
+}
+```
+
+**Rate Limit:** 60 requests / 15 minutes
+
+---
+
+### GET /api/admin/users
+
+Get all users with pagination and search.
+
+**Query Parameters:**
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| page | number | 1 | Page number |
+| limit | number | 20 | Results per page |
+| search | string | - | Filter by name or email |
+| role | string | - | Filter by role: `"user"` or `"admin"` |
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "users": [
+      {
+        "id": "uuid",
+        "email": "user@example.com",
+        "firstName": "John",
+        "lastName": "Doe",
+        "role": "user",
+        "createdAt": "2026-01-01T00:00:00.000Z"
+      }
+    ],
+    "total": 150,
+    "page": 1,
+    "limit": 20
+  }
+}
+```
+
+**Rate Limit:** 100 requests / 15 minutes
+
+---
+
+### GET /api/admin/users/:id
+
+Get detailed information about a specific user.
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "id": "uuid",
+    "email": "user@example.com",
+    "firstName": "John",
+    "lastName": "Doe",
+    "role": "user",
+    "company": { "companyName": "Acme Corp" },
+    "conversationCount": 45,
+    "createdAt": "2026-01-01T00:00:00.000Z"
+  }
+}
+```
+
+**Errors:**
+- `404` - User not found
+
+---
+
+### PATCH /api/admin/users/:id/role
+
+Update a user's role.
+
+**Request Body:**
+```json
+{ "role": "admin" }
+```
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| role | string | Yes | `"user"` or `"admin"` |
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "User role updated successfully"
+}
+```
+
+**Rate Limit:** 30 requests / 15 minutes
+
+---
+
+### GET /api/admin/audit-log
+
+Get paginated audit log with filters. Sensitive fields (`password`, `secretKey`, `apiKey`, etc.) are automatically redacted to `"[REDACTED]"` in the `changes` object.
+
+**Query Parameters:**
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| page | number | 1 | Page number |
+| limit | number | 50 | Results per page (max 100) |
+| userId | string | - | Filter by user UUID |
+| action | string | - | Filter by action (partial match) |
+| entity | string | - | Filter by entity type (e.g. `employees`, `invoices`) |
+| dateFrom | ISO string | - | Filter entries from this date |
+| dateTo | ISO string | - | Filter entries up to this date |
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "logs": [
+      {
+        "id": "uuid",
+        "userId": "uuid",
+        "action": "CREATE_EMPLOYEES",
+        "entity": "employees",
+        "entityId": "uuid",
+        "changes": { "firstName": "Jan", "lastName": "Kowalski" },
+        "ip": "127.0.0.1",
+        "userAgent": "Mozilla/5.0...",
+        "createdAt": "2026-02-01T10:00:00.000Z",
+        "user": {
+          "email": "user@example.com",
+          "firstName": "John",
+          "lastName": "Doe"
+        }
+      }
+    ],
+    "total": 320
+  }
+}
+```
+
+**Notes:**
+- Auth endpoints (`/api/auth/*`), TTS, webhooks, and health checks are not logged.
+- Actions are derived from HTTP method + entity: `CREATE_EMPLOYEES`, `UPDATE_INVOICES`, `DELETE_CONTRACTORS`.
+
+**Rate Limit:** 60 requests / 15 minutes
+
+---
+
+## Dashboard Endpoints
+
+### GET /api/dashboard/summary
+
+Get aggregated KPI data from all sources for the authenticated user.
+
+**Headers:**
+```
+Authorization: Bearer <token>
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "financial": {
+      "year": 2026,
+      "revenue": 450000.00,
+      "expenses": 120000.00,
+      "profit": 330000.00,
+      "vatPaid": 45000.00,
+      "pitPaid": 12000.00,
+      "zusPaid": 8400.00,
+      "currency": "PLN",
+      "monthlyBreakdown": [
+        { "month": "2026-01", "revenue": 38000.00, "expenses": 9500.00 }
+      ]
+    },
+    "invoices": {
+      "unpaidCount": 5,
+      "unpaidTotal": 23500.00,
+      "overdueCount": 2,
+      "overdueTotal": 8200.00,
+      "currency": "PLN"
+    },
+    "deadlines": [
+      {
+        "date": "2026-02-25T00:00:00.000Z",
+        "description": "ZUS payment",
+        "groupName": "ZUS",
+        "daysUntil": -1,
+        "urgency": "overdue"
+      }
+    ],
+    "hr": {
+      "employeeCount": 3,
+      "activeContractsByType": { "employment": 2, "mandate_contract": 1 },
+      "latestPeriod": "2026-01",
+      "totalMonthlyPayroll": 18500.00
+    },
+    "ksef": {
+      "totalSent": 120,
+      "totalReceived": 45,
+      "acceptedCount": 118,
+      "rejectedCount": 2,
+      "pendingCount": 5,
+      "acceptanceRate": 98
+    },
+    "generatedAt": "2026-02-26T10:00:00.000Z"
+  }
+}
+```
+
+**Notes:**
+- Sections with missing credentials return `null` for that key.
+- Deadline urgency values: `"overdue"` (past due), `"urgent"` (within 3 days), `"soon"` (within 7 days), `"normal"`.
+- Data is aggregated in parallel; one section failing returns `null` rather than failing the whole request.
+
+---
+
 ## Rate Limiting
 
 All endpoints are rate limited:
@@ -636,6 +872,10 @@ All endpoints are rate limited:
 | Refresh | 20 requests | 15 minutes |
 | OAuth | 10 requests | 15 minutes |
 | AI Chat | 30 requests | 15 minutes |
+| Admin Dashboard | 60 requests | 15 minutes |
+| Admin Users | 100 requests | 15 minutes |
+| Admin Role Update | 30 requests | 15 minutes |
+| Admin Audit Log | 60 requests | 15 minutes |
 | General | 100 requests | 15 minutes |
 
 **Rate Limit Headers:**

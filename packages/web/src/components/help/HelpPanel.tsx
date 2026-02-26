@@ -24,6 +24,7 @@ export interface HelpPanelTranslations {
   categories: {
     gettingStarted: string;
     aiChat: string;
+    dashboard: string;
     invoices: string;
     contractors: string;
     taxes: string;
@@ -83,6 +84,7 @@ export function HelpPanel({ open, onClose, initialCategory, translations }: Help
   const categories = [
     { id: 'gettingStarted', label: translations.categories.gettingStarted },
     { id: 'aiChat', label: translations.categories.aiChat },
+    { id: 'dashboard', label: translations.categories.dashboard },
     { id: 'invoices', label: translations.categories.invoices },
     { id: 'contractors', label: translations.categories.contractors },
     { id: 'taxes', label: translations.categories.taxes },
