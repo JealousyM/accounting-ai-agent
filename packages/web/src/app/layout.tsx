@@ -7,7 +7,7 @@ import { CookieConsentProvider } from '@/contexts/CookieConsentContext';
 import { GoogleOAuthProvider } from '@/components/providers/GoogleOAuthProvider';
 import { QueryProvider } from '@/components/providers/QueryProvider';
 import { CookieConsentBanner, CookiePreferencesModal } from '@/components/cookies';
-import { GoogleAnalytics } from '@/components/analytics';
+import { GoogleAnalytics, MarketingAITracking } from '@/components/analytics';
 
 export const metadata: Metadata = {
   title: {
@@ -88,6 +88,7 @@ export default function RootLayout({
           <ThemeProvider>
             <CookieConsentProvider>
               <GoogleAnalytics />
+              <MarketingAITracking />
               <GoogleOAuthProvider>
                 <AuthProvider>
                   <LocaleProvider>
