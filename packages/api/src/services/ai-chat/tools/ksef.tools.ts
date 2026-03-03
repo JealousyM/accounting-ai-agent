@@ -22,6 +22,7 @@ import {
 } from '../formatters/ksef.formatter';
 import { SubscriptionService } from '../../subscription.service';
 import { checkWFirmaLimit, incrementWFirmaUsage } from './usage-tracking';
+import { sanitizeForPrompt } from '../utils';
 
 export function createSendToKSeFTool(
   ksefService: KSeFService,
@@ -46,7 +47,7 @@ export function createSendToKSeFTool(
         logger.error('Failed to send invoice to KSeF', { error, invoiceId });
         const t = getKSeFTranslations(locale);
         if (error instanceof Error) {
-          return `## ${t.sendFailed}\n\n**${t.errorReason}:** ${error.message}`;
+          return `## ${t.sendFailed}\n\n**${t.errorReason}:** ${sanitizeForPrompt(error.message)}`;
         }
         return `Error: ${t.errorSend}`;
       }
@@ -84,7 +85,7 @@ export function createCheckKSeFStatusTool(
         logger.error('Failed to check KSeF status', { error, referenceNumber });
         const t = getKSeFTranslations(locale);
         if (error instanceof Error) {
-          return `## ${t.statusTitle}\n\n**${t.errorReason}:** ${error.message}`;
+          return `## ${t.statusTitle}\n\n**${t.errorReason}:** ${sanitizeForPrompt(error.message)}`;
         }
         return `Error: ${t.errorStatus}`;
       }
@@ -122,7 +123,7 @@ export function createDownloadKSeFUPOTool(
         logger.error('Failed to download KSeF UPO', { error, referenceNumber });
         const t = getKSeFTranslations(locale);
         if (error instanceof Error) {
-          return `## ${t.upoDownloaded}\n\n**${t.errorReason}:** ${error.message}`;
+          return `## ${t.upoDownloaded}\n\n**${t.errorReason}:** ${sanitizeForPrompt(error.message)}`;
         }
         return `Error: ${t.errorUPO}`;
       }
@@ -176,7 +177,7 @@ export function createQueryKSeFInvoicesTool(
         logger.error('Failed to query KSeF invoices', { error });
         const t = getKSeFTranslations(locale);
         if (error instanceof Error) {
-          return `## ${t.invoicesTitle}\n\n**${t.errorReason}:** ${error.message}`;
+          return `## ${t.invoicesTitle}\n\n**${t.errorReason}:** ${sanitizeForPrompt(error.message)}`;
         }
         return `Error: ${t.errorQuery}`;
       }
@@ -220,7 +221,7 @@ export function createGetKSeFStatisticsTool(
         logger.error('Failed to get KSeF statistics', { error });
         const t = getKSeFTranslations(locale);
         if (error instanceof Error) {
-          return `## ${t.statisticsTitle}\n\n**${t.errorReason}:** ${error.message}`;
+          return `## ${t.statisticsTitle}\n\n**${t.errorReason}:** ${sanitizeForPrompt(error.message)}`;
         }
         return `Error: ${t.errorStatistics}`;
       }
@@ -269,7 +270,7 @@ export function createBulkSendToKSeFTool(
         logger.error('Failed to bulk send to KSeF', { error, invoiceIds });
         const t = getKSeFTranslations(locale);
         if (error instanceof Error) {
-          return `## ${t.bulkSendTitle}\n\n**${t.errorReason}:** ${error.message}`;
+          return `## ${t.bulkSendTitle}\n\n**${t.errorReason}:** ${sanitizeForPrompt(error.message)}`;
         }
         return `Error: ${t.errorBulkSend}`;
       }
@@ -321,7 +322,7 @@ export function createGetIncomingKSeFInvoicesTool(
         logger.error('Failed to query incoming KSeF invoices', { error });
         const t = getKSeFTranslations(locale);
         if (error instanceof Error) {
-          return `## ${t.invoicesTitle}\n\n**${t.errorReason}:** ${error.message}`;
+          return `## ${t.invoicesTitle}\n\n**${t.errorReason}:** ${sanitizeForPrompt(error.message)}`;
         }
         return `Error: ${t.errorQueryIncoming}`;
       }
@@ -365,7 +366,7 @@ export function createMatchIncomingInvoiceTool(
         logger.error('Failed to match incoming KSeF invoice', { error, referenceNumber });
         const t = getKSeFTranslations(locale);
         if (error instanceof Error) {
-          return `## ${t.incomingMatchTitle}\n\n**${t.errorReason}:** ${error.message}`;
+          return `## ${t.incomingMatchTitle}\n\n**${t.errorReason}:** ${sanitizeForPrompt(error.message)}`;
         }
         return `Error: ${t.errorMatchIncoming}`;
       }
@@ -554,7 +555,7 @@ export function createDirectSendToKSeFTool(
         logger.error('Failed to send direct invoice to KSeF', { error, invoiceNumber });
         const t = getKSeFTranslations(locale);
         if (error instanceof Error) {
-          return `## ${t.sendFailed}\n\n**${t.errorReason}:** ${error.message}`;
+          return `## ${t.sendFailed}\n\n**${t.errorReason}:** ${sanitizeForPrompt(error.message)}`;
         }
         return `Error: ${t.errorDirectSend}`;
       }

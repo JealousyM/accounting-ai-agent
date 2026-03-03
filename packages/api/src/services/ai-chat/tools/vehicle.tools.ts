@@ -18,6 +18,7 @@ import {
   formatVehicleUpdated,
   formatVehicleDeleted,
 } from '../formatters';
+import { sanitizeForPrompt } from '../utils';
 
 /**
  * Tool to get list of vehicles from wFirma
@@ -229,7 +230,7 @@ export function createAddVehicleTool(
         if (error instanceof Error) {
           return `## ❌ ${t.errorCreateTitle}
 
-**${t.errorReason}:** ${error.message}
+**${t.errorReason}:** ${sanitizeForPrompt(error.message)}
 
 **${t.requiredFields}:**
 - name (Vehicle name)
@@ -380,7 +381,7 @@ export function createUpdateVehicleTool(
         if (error instanceof Error) {
           return `## ❌ ${t.errorUpdate}
 
-**${t.errorReason}:** ${error.message}
+**${t.errorReason}:** ${sanitizeForPrompt(error.message)}
 
 ${t.tryAgain}`;
         }
@@ -490,7 +491,7 @@ export function createDeleteVehicleTool(
         if (error instanceof Error) {
           return `## ❌ ${t.errorDelete}
 
-**${t.errorReason}:** ${error.message}`;
+**${t.errorReason}:** ${sanitizeForPrompt(error.message)}`;
         }
         return `Error: ${t.errorDelete}`;
       }

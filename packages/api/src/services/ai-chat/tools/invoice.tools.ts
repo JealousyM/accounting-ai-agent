@@ -29,6 +29,7 @@ import {
   WFirmaInvoiceDocumentType,
   PaymentMethod,
 } from '../../../types/wfirma.types';
+import { sanitizeForPrompt } from '../utils';
 
 export function createGetInvoicesTool(
   wfirmaService: WFirmaIntegrationService,
@@ -178,7 +179,7 @@ export function createSendInvoiceTool(
         return `✅ **${t.invoiceSent}**\n\n- Invoice: ${invoice.invoiceNumber}\n- Contractor: ${invoice.contractorName}\n- Email: ${result.email || 'contractor email'}`;
       } catch (error) {
         logger.error('Failed to send invoice', { error, userId, invoiceNumber });
-        const reason = error instanceof Error ? error.message : String(error);
+        const reason = error instanceof Error ? sanitizeForPrompt(error.message) : sanitizeForPrompt(String(error));
         return `Error: ${getInvoiceTranslations(locale).errorSend}\n\n${reason}`;
       }
     },
@@ -388,7 +389,7 @@ export function createDownloadInvoiceTool(
         logger.error('Failed to download invoice', { error, userId, invoiceNumber });
         const t = getInvoiceTranslations(locale);
         if (error instanceof WFirmaError || error instanceof Error) {
-          return `❌ **${t.errorDownload}**\n\n${t.errorReason}: ${error.message}`;
+          return `❌ **${t.errorDownload}**\n\n${t.errorReason}: ${sanitizeForPrompt(error.message)}`;
         }
         return `Error: ${t.errorDownload}`;
       }
@@ -541,10 +542,10 @@ export function createCreateInvoiceTool(
         const t = getInvoiceTranslations(locale);
         // Show actual wFirma error message to user
         if (error instanceof WFirmaError) {
-          return `❌ **${t.errorCreateTitle || t.errorCreate}**\n\n${t.errorReason || 'Причина'}: ${error.message}`;
+          return `❌ **${t.errorCreateTitle || t.errorCreate}**\n\n${t.errorReason || 'Причина'}: ${sanitizeForPrompt(error.message)}`;
         }
         if (error instanceof Error) {
-          return `❌ **${t.errorCreateTitle || t.errorCreate}**\n\n${t.errorReason || 'Причина'}: ${error.message}`;
+          return `❌ **${t.errorCreateTitle || t.errorCreate}**\n\n${t.errorReason || 'Причина'}: ${sanitizeForPrompt(error.message)}`;
         }
         return `Error: ${t.errorCreate}`;
       }
@@ -640,7 +641,7 @@ export function createUpdateInvoiceTool(
         logger.error('Failed to update invoice', { error, userId, invoiceNumber });
         const t = getInvoiceTranslations(locale);
         if (error instanceof WFirmaError || error instanceof Error) {
-          return `❌ **${t.errorUpdate}**\n\n${t.errorReason}: ${error.message}`;
+          return `❌ **${t.errorUpdate}**\n\n${t.errorReason}: ${sanitizeForPrompt(error.message)}`;
         }
         return `Error: ${t.errorUpdate}`;
       }
@@ -706,7 +707,7 @@ export function createDeleteInvoiceTool(
         logger.error('Failed to delete invoice', { error, userId, invoiceNumber });
         const t = getInvoiceTranslations(locale);
         if (error instanceof WFirmaError || error instanceof Error) {
-          return `❌ **${t.errorDelete}**\n\n${t.errorReason}: ${error.message}`;
+          return `❌ **${t.errorDelete}**\n\n${t.errorReason}: ${sanitizeForPrompt(error.message)}`;
         }
         return `Error: ${t.errorDelete}`;
       }

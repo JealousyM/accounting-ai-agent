@@ -10,6 +10,7 @@ import { emailService } from '../email.service';
 
 export class KSeFStatusPoller {
   private intervalId?: ReturnType<typeof setInterval>;
+  private dbUnavailable = false;
 
   constructor(
     private readonly prisma: PrismaClient,
@@ -27,7 +28,16 @@ export class KSeFStatusPoller {
 
     this.intervalId = setInterval(() => {
       this.pollPendingInvoices().catch((error) => {
-        logger.error('KSeF status poller error', { error: error instanceof Error ? error.message : 'Unknown' });
+        const msg = error instanceof Error ? error.message : 'Unknown';
+        // Suppress repeated DB connectivity errors — log only on state change
+        if (msg.includes("Can't reach database server")) {
+          if (!this.dbUnavailable) {
+            this.dbUnavailable = true;
+            logger.warn('KSeF status poller: database unavailable, pausing polls until reconnected');
+          }
+          return;
+        }
+        logger.error('KSeF status poller error', { error: msg });
       });
     }, this.pollIntervalMs);
   }
@@ -41,6 +51,14 @@ export class KSeFStatusPoller {
   }
 
   private async pollPendingInvoices(): Promise<void> {
+    // Quick connectivity check — avoids noisy Prisma errors when DB is down
+    if (this.dbUnavailable) {
+      await this.prisma.$queryRaw`SELECT 1`;
+      // If we reach here, DB is back
+      this.dbUnavailable = false;
+      logger.info('KSeF status poller: database reconnected, resuming polls');
+    }
+
     // Find invoices that need status check (sent/sending) or UPO download (accepted)
     const pending = await this.prisma.kSeFInvoiceStatus.findMany({
       where: {

@@ -2,6 +2,7 @@ import { PrismaClient } from '@prisma/client';
 import { logger } from '../../utils/logger';
 import { Locale } from '../../i18n';
 import { AIMemoryService } from './ai-memory.service';
+import { sanitizeForPrompt } from '../ai-chat/utils';
 
 // ============================================
 // TYPES
@@ -130,7 +131,8 @@ export class AIMemoryExtractionService {
     for (const { pattern, category } of PREFERENCE_PATTERNS) {
       const match = userMessage.match(pattern);
       if (match && match[1]) {
-        const extracted = match[1].trim();
+        const extracted = sanitizeForPrompt(match[1].trim(), 200);
+        if (!extracted) continue;
         // Create a stable key from the first 50 chars
         const key = `${category}:${extracted.slice(0, 50).toLowerCase().replace(/[^a-zа-яёąćęłńóśźż0-9]+/gi, '_')}`;
 

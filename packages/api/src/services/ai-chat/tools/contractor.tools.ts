@@ -15,6 +15,7 @@ import {
   formatContractorUpdated,
   formatContractorDeleted,
 } from '../formatters';
+import { sanitizeForPrompt } from '../utils';
 import { SubscriptionService } from '../../subscription.service';
 import { checkWFirmaLimit, incrementWFirmaUsage } from './usage-tracking';
 
@@ -130,7 +131,7 @@ export function createCreateContractorTool(
         if (error instanceof Error) {
           return `## ❌ ${t.errorCreateTitle}
 
-**${t.errorReason}:** ${error.message}
+**${t.errorReason}:** ${sanitizeForPrompt(error.message)}
 
 **${t.requiredFields}:**
 - name
@@ -250,7 +251,7 @@ export function createUpdateContractorTool(
         logger.error('Failed to update contractor', { error, contractorName });
         const t = getContractorTranslations(locale);
         if (error instanceof Error) {
-          return `Error: ${t.errorUpdate} - ${error.message}`;
+          return `Error: ${t.errorUpdate} - ${sanitizeForPrompt(error.message)}`;
         }
         return `Error: ${t.errorUpdate}`;
       }
@@ -316,7 +317,7 @@ export function createDeleteContractorTool(
         logger.error('Failed to delete contractor', { error, contractorName: name });
         const t = getContractorTranslations(locale);
         if (error instanceof Error) {
-          return `Error: ${t.errorDelete} - ${error.message}`;
+          return `Error: ${t.errorDelete} - ${sanitizeForPrompt(error.message)}`;
         }
         return `Error: ${t.errorDelete}`;
       }

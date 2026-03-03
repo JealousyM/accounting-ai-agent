@@ -5,6 +5,7 @@
 
 import { WFirmaInvoice, WFirmaNote } from '../../../types/wfirma.types';
 import { getInvoiceTranslations, Locale } from '../../../i18n';
+import { sanitizeForPrompt } from '../utils';
 
 function formatNumber(num: number): string {
   return new Intl.NumberFormat('pl-PL', {
@@ -65,7 +66,7 @@ export function formatInvoicesList(invoices: WFirmaInvoice[], locale: Locale): s
     const statusIcon = getStatusIcon(inv.status);
     const statusText = getStatusLabel(inv.status, locale);
 
-    result += `| ${inv.invoiceNumber} | ${inv.contractorName} | ${formatDate(inv.issueDate)} | ${formatDate(inv.dueDate)} | ${formatNumber(inv.total)} ${inv.currency} | ${statusIcon} ${statusText} |\n`;
+    result += `| ${sanitizeForPrompt(inv.invoiceNumber)} | ${sanitizeForPrompt(inv.contractorName)} | ${formatDate(inv.issueDate)} | ${formatDate(inv.dueDate)} | ${formatNumber(inv.total)} ${inv.currency} | ${statusIcon} ${statusText} |\n`;
   });
 
   result += `\n**${t.total}:** ${formatNumber(totalGross)} PLN`;
@@ -80,14 +81,14 @@ export function formatInvoicesList(invoices: WFirmaInvoice[], locale: Locale): s
 export function formatInvoiceDetails(invoice: WFirmaInvoice, locale: Locale): string {
   const t = getInvoiceTranslations(locale);
 
-  let result = `## ${t.invoiceNumber}: ${invoice.invoiceNumber}\n\n`;
+  let result = `## ${t.invoiceNumber}: ${sanitizeForPrompt(invoice.invoiceNumber)}\n\n`;
 
   result += `| Field | Value |\n`;
   result += '|-------|-------|\n';
-  result += `| ${t.invoiceNumber} | ${invoice.invoiceNumber} |\n`;
-  result += `| ${t.contractor} | ${invoice.contractorName} |\n`;
+  result += `| ${t.invoiceNumber} | ${sanitizeForPrompt(invoice.invoiceNumber)} |\n`;
+  result += `| ${t.contractor} | ${sanitizeForPrompt(invoice.contractorName)} |\n`;
   if (invoice.contractorNip) {
-    result += `| NIP | ${invoice.contractorNip} |\n`;
+    result += `| NIP | ${sanitizeForPrompt(invoice.contractorNip)} |\n`;
   }
   result += `| ${t.date} | ${formatDate(invoice.issueDate)} |\n`;
   result += `| ${t.dueDate} | ${formatDate(invoice.dueDate)} |\n`;
@@ -99,7 +100,7 @@ export function formatInvoiceDetails(invoice: WFirmaInvoice, locale: Locale): st
     result += '|---|------|---------|------|----------|---------|--------|\n';
 
     invoice.items.forEach((item, idx) => {
-      result += `| ${idx + 1} | ${item.name} | ${item.quantity} | ${item.unit} | ${formatNumber(item.priceNet)} | ${item.vatRate}% | ${formatNumber(item.totalGross)} |\n`;
+      result += `| ${idx + 1} | ${sanitizeForPrompt(item.name)} | ${item.quantity} | ${item.unit} | ${formatNumber(item.priceNet)} | ${item.vatRate}% | ${formatNumber(item.totalGross)} |\n`;
     });
   }
 
@@ -116,12 +117,13 @@ export function formatInvoiceDetails(invoice: WFirmaInvoice, locale: Locale): st
 export function formatNotesList(notes: WFirmaNote[], invoiceNumber: string, locale: Locale): string {
   const t = getInvoiceTranslations(locale);
 
-  let result = `## ${t.notesTitle} - ${invoiceNumber} (${notes.length})\n\n`;
+  let result = `## ${t.notesTitle} - ${sanitizeForPrompt(invoiceNumber)} (${notes.length})\n\n`;
   result += `| ID | ${t.noteText} | ${t.noteDate} |\n`;
   result += '|----|---------|------|\n';
 
   notes.forEach(note => {
-    const text = note.text.length > 50 ? note.text.substring(0, 50) + '...' : note.text;
+    const rawText = note.text.length > 50 ? note.text.substring(0, 50) + '...' : note.text;
+    const text = sanitizeForPrompt(rawText);
     result += `| ${note.id} | ${text} | ${formatDate(note.created)} |\n`;
   });
 
@@ -134,8 +136,8 @@ export function formatInvoiceCreated(invoice: WFirmaInvoice, locale: Locale): st
   let result = `## ✅ ${t.invoiceCreated}\n\n`;
   result += `| ${t.field} | ${t.value} |\n`;
   result += '|------|------|\n';
-  result += `| **${t.invoiceNumber}** | ${invoice.invoiceNumber} |\n`;
-  result += `| **${t.contractor}** | ${invoice.contractorName} |\n`;
+  result += `| **${t.invoiceNumber}** | ${sanitizeForPrompt(invoice.invoiceNumber)} |\n`;
+  result += `| **${t.contractor}** | ${sanitizeForPrompt(invoice.contractorName)} |\n`;
   result += `| **${t.date}** | ${formatDate(invoice.issueDate)} |\n`;
   result += `| **${t.dueDate}** | ${formatDate(invoice.dueDate)} |\n`;
   result += `| **${t.grossAmount}** | ${formatNumber(invoice.total)} ${invoice.currency} |\n`;
@@ -150,8 +152,8 @@ export function formatInvoiceUpdated(invoice: WFirmaInvoice, locale: Locale): st
   const t = getInvoiceTranslations(locale);
 
   let result = `## ✅ ${t.invoiceUpdated}\n\n`;
-  result += `- **${t.invoiceNumber}:** ${invoice.invoiceNumber}\n`;
-  result += `- **${t.contractor}:** ${invoice.contractorName}\n`;
+  result += `- **${t.invoiceNumber}:** ${sanitizeForPrompt(invoice.invoiceNumber)}\n`;
+  result += `- **${t.contractor}:** ${sanitizeForPrompt(invoice.contractorName)}\n`;
   result += `- **${t.dueDate}:** ${formatDate(invoice.dueDate)}\n`;
   result += `- **${t.grossAmount}:** ${formatNumber(invoice.total)} ${invoice.currency}\n`;
 
@@ -164,7 +166,7 @@ export function formatInvoiceDeleted(invoiceNumber: string, locale: Locale): str
   const t = getInvoiceTranslations(locale);
 
   let result = `## ⚠️ ${t.invoiceDeleted}\n\n`;
-  result += `- **${t.invoiceNumber}:** ${invoiceNumber}\n`;
+  result += `- **${t.invoiceNumber}:** ${sanitizeForPrompt(invoiceNumber)}\n`;
   result += `\n> ${t.invoiceDeletedWarning}`;
 
   return result;

@@ -22,6 +22,7 @@ import {
   formatAbsencesList,
   formatHRSummary,
 } from '../formatters';
+import { sanitizeForPrompt } from '../utils';
 
 // ============================================
 // 1. GET EMPLOYEES
@@ -172,7 +173,7 @@ export function createAddEmployeeTool(
         if (error instanceof Error) {
           return `## ${t.errorCreateTitle}
 
-**${t.errorReason}:** ${error.message}
+**${t.errorReason}:** ${sanitizeForPrompt(error.message)}
 
 **${t.requiredFields}:**
 - firstName
@@ -287,7 +288,7 @@ export function createUpdateEmployeeTool(
         logger.error('Failed to update employee', { error, id });
         const t = getHRTranslations(locale);
         if (error instanceof Error) {
-          return `Error: ${t.errorUpdate} - ${error.message}`;
+          return `Error: ${t.errorUpdate} - ${sanitizeForPrompt(error.message)}`;
         }
         return `Error: ${t.errorUpdate}`;
       }
@@ -342,7 +343,7 @@ export function createDeleteEmployeeTool(
         logger.error('Failed to delete employee', { error, id });
         const t = getHRTranslations(locale);
         if (error instanceof Error) {
-          return `Error: ${t.errorDelete} - ${error.message}`;
+          return `Error: ${t.errorDelete} - ${sanitizeForPrompt(error.message)}`;
         }
         return `Error: ${t.errorDelete}`;
       }
@@ -472,7 +473,7 @@ ${contractsList}
         if (error instanceof Error) {
           return `## ${t.errorCreateTitle}
 
-**${t.errorReason}:** ${error.message}
+**${t.errorReason}:** ${sanitizeForPrompt(error.message)}
 
 **${t.requiredFields}:**
 - employeeId
@@ -535,7 +536,7 @@ ${contractsList}
         logger.error('Failed to terminate HR contract', { error, id });
         const t = getHRTranslations(locale);
         if (error instanceof Error) {
-          return `Error: ${t.errorUpdate} - ${error.message}`;
+          return `Error: ${t.errorUpdate} - ${sanitizeForPrompt(error.message)}`;
         }
         return `Error: ${t.errorUpdate}`;
       }
@@ -632,7 +633,7 @@ export function createCalculatePayrollTool(
         logger.error('Failed to calculate payroll', { error, contractId, period });
         const t = getHRTranslations(locale);
         if (error instanceof Error) {
-          return `Error: ${t.errorFetch} - ${error.message}`;
+          return `Error: ${t.errorFetch} - ${sanitizeForPrompt(error.message)}`;
         }
         return `Error: ${t.errorFetch}`;
       }
@@ -729,7 +730,7 @@ export function createSavePayrollRecordTool(
         logger.error('Failed to save payroll record', { error, contractId, period });
         const t = getHRTranslations(locale);
         if (error instanceof Error) {
-          return `Error: ${t.errorCreate} - ${error.message}`;
+          return `Error: ${t.errorCreate} - ${sanitizeForPrompt(error.message)}`;
         }
         return `Error: ${t.errorCreate}`;
       }
@@ -778,7 +779,7 @@ export function createDeletePayrollRecordTool(
         logger.error('Failed to delete payroll record', { error, id });
         const t = getHRTranslations(locale);
         if (error instanceof Error) {
-          return `Error: ${t.errorDelete} - ${error.message}`;
+          return `Error: ${t.errorDelete} - ${sanitizeForPrompt(error.message)}`;
         }
         return `Error: ${t.errorDelete}`;
       }
@@ -905,7 +906,7 @@ ${absencesList}
         if (error instanceof Error) {
           return `## ${t.errorCreateTitle}
 
-**${t.errorReason}:** ${error.message}
+**${t.errorReason}:** ${sanitizeForPrompt(error.message)}
 
 **${t.requiredFields}:**
 - employeeId
