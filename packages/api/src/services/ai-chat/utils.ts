@@ -41,3 +41,19 @@ export function generateTitleFromMessage(message: string): string {
   const truncated = message.substring(0, 50);
   return truncated.length < message.length ? `${truncated}...` : truncated;
 }
+
+/**
+ * Sanitize user-controlled or external data before embedding in AI prompts.
+ * Strips markdown structural elements (headings, bold, italic) that could be
+ * interpreted as prompt instructions rather than data content.
+ */
+export function sanitizeForPrompt(value: string, maxLength = 500): string {
+  return value
+    .slice(0, maxLength)
+    .replace(/^#{1,6}\s+/gm, '')       // strip markdown headings
+    .replace(/\*\*(.*?)\*\*/g, '$1')   // strip bold (**)
+    .replace(/__(.*?)__/g, '$1')       // strip bold (__)
+    .replace(/\*(.*?)\*/g, '$1')       // strip italic (*)
+    .replace(/_(.*?)_/g, '$1')         // strip italic (_)
+    .trim();
+}

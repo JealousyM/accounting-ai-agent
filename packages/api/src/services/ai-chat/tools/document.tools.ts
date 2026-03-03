@@ -12,6 +12,7 @@ import { WFirmaCacheService } from '../../wfirma-cache.service';
 import { fileStorageService } from '../../file-storage.instance';
 import { SubscriptionService } from '../../subscription.service';
 import { checkWFirmaLimit, incrementWFirmaUsage } from './usage-tracking';
+import { sanitizeForPrompt } from '../utils';
 import {
   formatDocumentsList,
   formatDocumentDetails,
@@ -242,7 +243,7 @@ export function createDownloadDocumentTool(
         logger.error('Failed to download document', { error });
         const t = getDocumentTranslations(locale);
         if (error instanceof Error) {
-          return `## ${t.errorDownload}\n\n**${t.errorReason}:** ${error.message}`;
+          return `## ${t.errorDownload}\n\n**${t.errorReason}:** ${sanitizeForPrompt(error.message)}`;
         }
         return `Error: ${t.errorDownload}`;
       }
@@ -296,7 +297,7 @@ export function createDeleteDocumentTool(
         logger.error('Failed to delete document', { error });
         const t = getDocumentTranslations(locale);
         if (error instanceof Error) {
-          return `## ${t.errorDelete}\n\n**${t.errorReason}:** ${error.message}`;
+          return `## ${t.errorDelete}\n\n**${t.errorReason}:** ${sanitizeForPrompt(error.message)}`;
         }
         return `Error: ${t.errorDelete}`;
       }

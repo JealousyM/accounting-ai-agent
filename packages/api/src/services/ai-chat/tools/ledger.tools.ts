@@ -16,6 +16,7 @@ import {
   formatOperationSchemasList,
   formatOperationSchemaDetails,
 } from '../formatters';
+import { sanitizeForPrompt } from '../utils';
 
 // ============================================
 // FISCAL YEAR TOOLS
@@ -56,7 +57,7 @@ export function createGetFiscalYearsTool(
         logger.error('Failed to get fiscal years', { error });
         const t = getLedgerTranslations(locale);
         const wfirmaMessage = error instanceof WFirmaError ? (error.details?.message || error.message) : '';
-        return `Error: ${t.errorFetchFiscalYears}${wfirmaMessage ? ` - ${wfirmaMessage}` : ''}`;
+        return `Error: ${t.errorFetchFiscalYears}${wfirmaMessage ? ` - ${sanitizeForPrompt(wfirmaMessage)}` : ''}`;
       }
     },
     {
@@ -107,7 +108,7 @@ export function createGetFiscalYearDetailsTool(
         logger.error('Failed to get fiscal year details', { error });
         const t = getLedgerTranslations(locale);
         const wfirmaMessage = error instanceof WFirmaError ? (error.details?.message || error.message) : '';
-        return `Error: ${t.errorFetchFiscalYearDetails}${wfirmaMessage ? ` - ${wfirmaMessage}` : ''}`;
+        return `Error: ${t.errorFetchFiscalYearDetails}${wfirmaMessage ? ` - ${sanitizeForPrompt(wfirmaMessage)}` : ''}`;
       }
     },
     {
@@ -166,7 +167,7 @@ export function createGetAccountingSchemasTool(
         logger.error('Failed to get accounting schemas', { error });
         const t = getLedgerTranslations(locale);
         const wfirmaMessage = error instanceof WFirmaError ? (error.details?.message || error.message) : '';
-        return `Error: ${t.errorFetchSchemas}${wfirmaMessage ? ` - ${wfirmaMessage}` : ''}`;
+        return `Error: ${t.errorFetchSchemas}${wfirmaMessage ? ` - ${sanitizeForPrompt(wfirmaMessage)}` : ''}`;
       }
     },
     {
@@ -219,7 +220,7 @@ export function createGetAccountingSchemaDetailsTool(
         logger.error('Failed to get accounting schema details', { error });
         const t = getLedgerTranslations(locale);
         const wfirmaMessage = error instanceof WFirmaError ? (error.details?.message || error.message) : '';
-        return `Error: ${t.errorFetchSchemaDetails}${wfirmaMessage ? ` - ${wfirmaMessage}` : ''}`;
+        return `Error: ${t.errorFetchSchemaDetails}${wfirmaMessage ? ` - ${sanitizeForPrompt(wfirmaMessage)}` : ''}`;
       }
     },
     {

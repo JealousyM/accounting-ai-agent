@@ -5,6 +5,7 @@
 
 import { WFirmaContractor } from '../../../types/wfirma.types';
 import { getContractorTranslations, Locale } from '../../../i18n';
+import { sanitizeForPrompt } from '../utils';
 
 export function formatContractorsList(contractors: WFirmaContractor[], locale: Locale = 'pl'): string {
   const t = getContractorTranslations(locale);
@@ -18,7 +19,7 @@ export function formatContractorsList(contractors: WFirmaContractor[], locale: L
   result += '|---|----------|-----|-------|--------|\n';
 
   contractors.forEach((c, i) => {
-    result += `| ${i + 1} | **${c.name}** | ${c.nip || '-'} | ${c.email || '-'} | ${c.phone || '-'} |\n`;
+    result += `| ${i + 1} | ${sanitizeForPrompt(c.name)} | ${c.nip ? sanitizeForPrompt(c.nip) : '-'} | ${c.email ? sanitizeForPrompt(c.email) : '-'} | ${c.phone ? sanitizeForPrompt(c.phone) : '-'} |\n`;
   });
 
   result += `\n> ${t.updateDeleteHint}`;
@@ -29,22 +30,24 @@ export function formatContractorsList(contractors: WFirmaContractor[], locale: L
 export function formatContractorDetails(contractor: WFirmaContractor, locale: Locale = 'pl'): string {
   const t = getContractorTranslations(locale);
   const addressStr = contractor.address
-    ? `${contractor.address.street}, ${contractor.address.zip} ${contractor.address.city}`
+    ? `${sanitizeForPrompt(contractor.address.street)}, ${sanitizeForPrompt(contractor.address.zip)} ${sanitizeForPrompt(contractor.address.city)}`
     : '-';
 
-  return `## ${t.contractorTitle}: ${contractor.name}
+  const name = sanitizeForPrompt(contractor.name);
+
+  return `## ${t.contractorTitle}: ${name}
 
 | ${t.field} | ${t.value} |
 |------|----------|
 | **${t.id}** | \`${contractor.id}\` |
-| **${t.name}** | ${contractor.name} |
-| **${t.nip}** | ${contractor.nip || '-'} |
-| **${t.regon}** | ${contractor.regon || '-'} |
-| **${t.email}** | ${contractor.email || '-'} |
-| **${t.phone}** | ${contractor.phone || '-'} |
+| **${t.name}** | ${name} |
+| **${t.nip}** | ${contractor.nip ? sanitizeForPrompt(contractor.nip) : '-'} |
+| **${t.regon}** | ${contractor.regon ? sanitizeForPrompt(contractor.regon) : '-'} |
+| **${t.email}** | ${contractor.email ? sanitizeForPrompt(contractor.email) : '-'} |
+| **${t.phone}** | ${contractor.phone ? sanitizeForPrompt(contractor.phone) : '-'} |
 | **${t.address}** | ${addressStr} |
-| **${t.bankAccount}** | ${contractor.bankAccount || '-'} |
-| **${t.notes}** | ${contractor.notes || '-'} |`;
+| **${t.bankAccount}** | ${contractor.bankAccount ? sanitizeForPrompt(contractor.bankAccount) : '-'} |
+| **${t.notes}** | ${contractor.notes ? sanitizeForPrompt(contractor.notes) : '-'} |`;
 }
 
 export function formatContractorCreated(contractor: WFirmaContractor, locale: Locale = 'pl'): string {
@@ -70,8 +73,8 @@ export function formatContractorDeleted(contractor: WFirmaContractor, locale: Lo
   return `## ❌ ${t.deleted}
 
 - **${t.id}:** \`${contractor.id}\`
-- **${t.name}:** ${contractor.name}
-- **${t.nip}:** ${contractor.nip || '-'}
+- **${t.name}:** ${sanitizeForPrompt(contractor.name)}
+- **${t.nip}:** ${contractor.nip ? sanitizeForPrompt(contractor.nip) : '-'}
 
 > ⚠️ ${t.deletedWarning}`;
 }
