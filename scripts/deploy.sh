@@ -29,6 +29,11 @@ echo "=== Restarting nginx to pick up new container IPs ==="
 $DC -f "$COMPOSE_FILE" --env-file "$ENV_FILE" restart nginx
 sleep 3
 
+echo "=== Reconnecting nginx to marketing-ai network ==="
+docker network connect marketing-ai_marketing-network accounting-nginx 2>/dev/null || true
+docker exec accounting-nginx nginx -s reload 2>/dev/null || true
+echo "accounting-nginx reconnected to marketing-ai network."
+
 echo "=== Running database migrations ==="
 $DC -f "$COMPOSE_FILE" --env-file "$ENV_FILE" exec -T api npx prisma migrate deploy
 

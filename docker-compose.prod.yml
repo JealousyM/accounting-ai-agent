@@ -127,6 +127,7 @@ services:
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
       - /etc/letsencrypt:/etc/letsencrypt:ro
+      - /opt/certbot-webroot:/var/www/certbot:ro
     depends_on:
       - web
       - api
@@ -137,6 +138,7 @@ services:
           memory: 128M
     networks:
       - accounting-network
+      - marketing-network
 
 volumes:
   postgres_data_prod:
@@ -144,3 +146,6 @@ volumes:
 networks:
   accounting-network:
     driver: bridge
+  marketing-network:
+    external: true
+    name: marketing-ai_marketing-network
