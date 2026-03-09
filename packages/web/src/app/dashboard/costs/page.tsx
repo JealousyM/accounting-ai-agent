@@ -59,7 +59,7 @@ function AICostsDashboardContent() {
               >
                 <ArrowLeft className="h-5 w-5 text-gray-600 dark:text-gray-400" />
               </Link>
-              <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">{t.title}</h1>
+              <h1 className="text-lg sm:text-2xl font-bold text-gray-900 dark:text-gray-100">{t.title}</h1>
             </div>
             <button
               onClick={() => refetch()}

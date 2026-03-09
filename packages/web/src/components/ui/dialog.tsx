@@ -99,11 +99,12 @@ export function DialogContent({
       <DialogOverlay />
       <div
         className={cn(
-          'fixed left-[50%] top-[50%] z-50 w-full max-w-lg',
+          'fixed left-[50%] top-[50%] z-50 w-[calc(100%-2rem)] sm:w-full max-w-lg max-h-[calc(100dvh-2rem)]',
           'translate-x-[-50%] translate-y-[-50%]',
           'bg-white rounded-xl shadow-xl border border-gray-200',
           'dark:bg-gray-800 dark:border-gray-700',
           'animate-in fade-in-0 zoom-in-95 duration-200',
+          'overflow-y-auto',
           className
         )}
         onClick={(e) => e.stopPropagation()}

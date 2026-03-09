@@ -69,7 +69,7 @@ export function MessageBubble({ message, translations, toolsTranslations, ttsTra
       </div>
 
       {/* Message content */}
-      <div className={`max-w-[80%] ${isUser ? 'items-end' : 'items-start'}`}>
+      <div className={`max-w-[85%] sm:max-w-[80%] min-w-0 ${isUser ? 'items-end' : 'items-start'}`}>
         <div
           className={`
             rounded-2xl px-4 py-3 shadow-sm

@@ -113,7 +113,7 @@ export function CostSummaryCard({ summary, isLoading, translations = DEFAULT_TRA
                 <Icon className={`h-4 w-4 ${stat.color.split(' ')[0]} ${stat.color.split(' ')[1]}`} />
               </div>
             </div>
-            <p className="text-2xl font-semibold text-gray-900 dark:text-gray-100">{stat.value}</p>
+            <p className="text-lg sm:text-2xl font-semibold text-gray-900 dark:text-gray-100 truncate">{stat.value}</p>
           </div>
         );
       })}

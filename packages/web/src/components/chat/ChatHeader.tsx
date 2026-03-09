@@ -109,32 +109,47 @@ export function ChatHeader({
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
-          {/* Current plan badge */}
+        <div className="flex items-center gap-1 sm:gap-2">
+          {/* Current plan badge - desktop only */}
           <CurrentPlanBadge className="hidden sm:flex" />
 
-          {/* Help button */}
-          <HelpButton onClick={() => setIsHelpPanelOpen(true)} />
+          {/* Help button - desktop only */}
+          <div className="hidden sm:block">
+            <HelpButton onClick={() => setIsHelpPanelOpen(true)} />
+          </div>
 
-          {/* TTS Settings */}
-          <TTSSettingsButton translations={ttsTranslations} />
+          {/* TTS Settings - desktop only */}
+          <div className="hidden sm:block">
+            <TTSSettingsButton translations={ttsTranslations} />
+          </div>
 
           {/* Theme toggle */}
           <ThemeToggle />
+
+          {/* Language switcher */}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={cycleLocale}
+            className="flex items-center gap-1 text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100 px-1.5 sm:px-3"
+          >
+            <Globe className="w-4 h-4" />
+            <span className="text-xs font-medium">{localeLabels[locale]}</span>
+          </Button>
 
           {/* Profile button */}
           <Button
             variant="ghost"
             size="sm"
             onClick={() => setIsProfileModalOpen(true)}
-            className="flex items-center gap-1 text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100"
+            className="flex items-center gap-1 text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100 px-1.5 sm:px-3"
           >
             <User className="w-4 h-4" />
           </Button>
 
-          {/* Admin button (only for admins) */}
+          {/* Admin button (only for admins) - desktop only */}
           {isAdmin && (
-            <Link href="/admin">
+            <Link href="/admin" className="hidden sm:block">
               <Button
                 variant="ghost"
                 size="sm"
@@ -145,17 +160,6 @@ export function ChatHeader({
               </Button>
             </Link>
           )}
-
-          {/* Language switcher */}
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={cycleLocale}
-            className="flex items-center gap-1 text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100"
-          >
-            <Globe className="w-4 h-4" />
-            <span className="text-xs font-medium">{localeLabels[locale]}</span>
-          </Button>
 
           {/* New chat button (desktop) */}
           <Button
@@ -174,7 +178,7 @@ export function ChatHeader({
             variant="ghost"
             size="sm"
             onClick={logout}
-            className="flex items-center gap-1 text-gray-600 hover:text-red-600 dark:text-gray-400 dark:hover:text-red-400"
+            className="flex items-center gap-1 text-gray-600 hover:text-red-600 dark:text-gray-400 dark:hover:text-red-400 px-1.5 sm:px-3"
             title={translations.logout}
           >
             <LogOut className="w-4 h-4" />

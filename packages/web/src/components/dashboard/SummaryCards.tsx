@@ -122,7 +122,7 @@ export function SummaryCards({
                 <Icon className={`h-3.5 w-3.5 ${stat.iconColor}`} />
               </div>
             </div>
-            <p className="text-2xl font-semibold text-gray-900 dark:text-gray-100">{stat.value}</p>
+            <p className="text-lg sm:text-2xl font-semibold text-gray-900 dark:text-gray-100 truncate">{stat.value}</p>
           </div>
         );
       })}
