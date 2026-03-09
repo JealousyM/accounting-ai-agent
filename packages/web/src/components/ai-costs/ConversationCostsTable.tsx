@@ -116,22 +116,22 @@ export function ConversationCostsTable({
           <table className="min-w-full divide-y divide-gray-100 dark:divide-gray-700">
             <thead className="bg-gray-50 dark:bg-gray-700">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   {t.table.title}
                 </th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                <th className="px-3 sm:px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   {t.table.cost}
                 </th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                <th className="px-3 sm:px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   {t.table.tokens}
                 </th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                <th className="px-3 sm:px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   {t.table.messages}
                 </th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                <th className="px-3 sm:px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   {t.table.runs}
                 </th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                <th className="px-3 sm:px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   {t.table.lastActive}
                 </th>
               </tr>
@@ -142,33 +142,33 @@ export function ConversationCostsTable({
                   key={conv.conversationId}
                   className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors cursor-pointer"
                 >
-                  <td className="px-6 py-4">
+                  <td className="px-3 sm:px-6 py-3 sm:py-4">
                     <Link
                       href={`/dashboard/costs/conversations/${conv.conversationId}`}
                       className="flex items-center gap-2 text-gray-900 dark:text-gray-100 hover:text-blue-600 dark:hover:text-blue-400"
                     >
-                      <MessageSquare className="h-4 w-4 text-gray-400 dark:text-gray-500" />
-                      <span className="font-medium truncate max-w-xs">
+                      <MessageSquare className="h-4 w-4 text-gray-400 dark:text-gray-500 flex-shrink-0" />
+                      <span className="font-medium truncate max-w-[120px] sm:max-w-xs">
                         {conv.title || 'Untitled'}
                       </span>
-                      <ChevronRight className="h-4 w-4 text-gray-400 dark:text-gray-500" />
+                      <ChevronRight className="h-4 w-4 text-gray-400 dark:text-gray-500 flex-shrink-0" />
                     </Link>
                   </td>
-                  <td className="px-6 py-4 text-right text-sm font-medium text-gray-900 dark:text-gray-100">
+                  <td className="px-3 sm:px-6 py-3 sm:py-4 text-right text-sm font-medium text-gray-900 dark:text-gray-100">
                     {formatCost(conv.cost)}
                   </td>
-                  <td className="px-6 py-4 text-right text-sm text-gray-600 dark:text-gray-400">
+                  <td className="px-3 sm:px-6 py-3 sm:py-4 text-right text-sm text-gray-600 dark:text-gray-400">
                     {formatNumber(conv.tokens)}
                   </td>
-                  <td className="px-6 py-4 text-right text-sm text-gray-600 dark:text-gray-400">
+                  <td className="px-3 sm:px-6 py-3 sm:py-4 text-right text-sm text-gray-600 dark:text-gray-400">
                     {conv.messageCount}
                   </td>
-                  <td className="px-6 py-4 text-right">
+                  <td className="px-3 sm:px-6 py-3 sm:py-4 text-right">
                     <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300">
                       {conv.primaryModel || 'N/A'}
                     </span>
                   </td>
-                  <td className="px-6 py-4 text-right text-sm text-gray-500 dark:text-gray-400">
+                  <td className="px-3 sm:px-6 py-3 sm:py-4 text-right text-sm text-gray-500 dark:text-gray-400 whitespace-nowrap">
                     {formatTimeAgo(conv.lastActive)}
                   </td>
                 </tr>
