@@ -30,7 +30,6 @@
       "signIn": "Zaloguj się",
       "orContinueWith": "Lub kontynuuj z",
       "googleButton": "Kontynuuj z Google",
-      "githubButton": "Kontynuuj z GitHub",
       "passwordRequirements": {
         "title": "Wymagania hasła:",
         "length": "Minimum 8 znaków",
@@ -103,7 +102,6 @@
       "signUp": "Zarejestruj się",
       "orContinueWith": "Lub kontynuuj z",
       "googleButton": "Kontynuuj z Google",
-      "githubButton": "Kontynuuj z GitHub",
       "errors": {
         "invalidCredentials": "Nieprawidłowy email lub hasło",
         "oauthRequired": "Zaloguj się przez OAuth",

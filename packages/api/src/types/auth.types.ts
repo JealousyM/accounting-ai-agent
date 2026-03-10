@@ -52,7 +52,6 @@ export interface AuthUser {
  */
 export interface UserProfile extends AuthUser {
   hasGoogleAuth: boolean;
-  hasGithubAuth: boolean;
   company: any;
   createdAt: Date;
   updatedAt: Date;
@@ -113,7 +112,7 @@ export interface ErrorResponse {
 /**
  * OAuth provider
  */
-export type OAuthProvider = 'google' | 'github';
+export type OAuthProvider = 'google';
 
 /**
  * OAuth profile

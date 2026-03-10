@@ -206,7 +206,6 @@ Authorization: Bearer <token>
     "firstName": "John",
     "lastName": "Doe",
     "hasGoogleAuth": false,
-    "hasGithubAuth": false,
     "company": {
       "companyName": "Acme Corp"
     },
@@ -227,35 +226,6 @@ Authenticate with Google OAuth.
 {
   "id": "google-user-id",
   "email": "user@gmail.com",
-  "name": "John Doe",
-  "picture": "https://..."
-}
-```
-
-**Response (200):**
-```json
-{
-  "success": true,
-  "message": "OAuth authentication successful",
-  "data": {
-    "token": "eyJhbGc...",
-    "refreshToken": "eyJhbGc...",
-    "expiresIn": 900
-  }
-}
-```
-
----
-
-### POST /api/auth/oauth/github
-
-Authenticate with GitHub OAuth.
-
-**Request Body:**
-```json
-{
-  "id": "github-user-id",
-  "email": "user@github.com",
   "name": "John Doe",
   "picture": "https://..."
 }

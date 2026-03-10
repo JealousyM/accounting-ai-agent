@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import React from 'react';
-import { Eye, EyeOff, Check, X, Github, Globe, Crown, Zap } from 'lucide-react';
+import { Eye, EyeOff, Check, X, Globe, Crown, Zap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 
@@ -79,11 +79,6 @@ export const LoginFormPreview: Story = {
         <Button type="button" variant="outline" className="w-full">
           <GoogleIcon />
           Continue with Google
-        </Button>
-
-        <Button type="button" variant="outline" className="w-full">
-          <Github className="w-5 h-5 mr-2" />
-          Continue with GitHub
         </Button>
       </div>
 
@@ -293,11 +288,6 @@ export const RegistrationFormPreview: Story = {
         <Button type="button" variant="outline" className="w-full">
           <GoogleIcon />
           Continue with Google
-        </Button>
-
-        <Button type="button" variant="outline" className="w-full">
-          <Github className="w-5 h-5 mr-2" />
-          Continue with GitHub
         </Button>
       </div>
 
@@ -835,10 +825,6 @@ export const LoadingStates: Story = {
           <Button type="button" variant="outline" className="w-full" disabled>
             <div className="w-5 h-5 mr-2 animate-spin rounded-full border-2 border-gray-300 border-t-gray-600" />
             Connecting...
-          </Button>
-          <Button type="button" variant="outline" className="w-full" disabled>
-            <Github className="w-5 h-5 mr-2" />
-            Continue with GitHub
           </Button>
         </div>
       </div>

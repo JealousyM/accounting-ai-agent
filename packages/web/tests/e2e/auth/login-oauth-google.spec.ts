@@ -35,7 +35,6 @@ test.describe('Login - Google OAuth', () => {
 
   test.skip('should handle OAuth errors gracefully', async ({ page }) => {
     // SKIPPED: Google OAuth is handled via useGoogleAuth hook, not a callback route
-    // There's no /auth/google/callback page - only /auth/github/callback exists
     // Google OAuth errors are handled inline by the hook
     await page.goto('/auth/google/callback?error=access_denied');
 

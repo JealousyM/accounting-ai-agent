@@ -19,8 +19,7 @@ Comprehensive test checklist for pre-deployment verification.
 | 1.9 | Login with incorrect password | Error: "Invalid credentials" | |
 | 1.10 | Login with non-existent email | Error: "Invalid credentials" | |
 | 1.11 | Login via Google OAuth | Account created/linked, redirect to /chat or /auth/complete-profile | |
-| 1.12 | Login via GitHub OAuth | Account created/linked, redirect to /chat or /auth/complete-profile | |
-| 1.13 | Complete profile after OAuth | LLM provider selection, optional wFirma data, redirect to /chat | |
+| 1.12 | Complete profile after OAuth | LLM provider selection, optional wFirma data, redirect to /chat | |
 | 1.14 | Logout | Session ended, redirect to /login | |
 | 1.15 | Password recovery — send email | Reset link email sent | |
 | 1.16 | Reset password with valid token | Password changed, login with new password works | |

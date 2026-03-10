@@ -131,7 +131,6 @@ export interface UserProfile {
   lastName: string | null;
   locale: string;
   hasGoogleAuth: boolean;
-  hasGithubAuth: boolean;
   company: unknown;
   createdAt: string;
   updatedAt: string;
@@ -172,31 +171,6 @@ export const getUserLocale = async (email: string): Promise<{ locale: string }> 
  */
 export const googleOAuth = async (accessToken: string, locale?: string): Promise<AuthData> => {
   return apiClient.post<AuthData>(API_ENDPOINTS.AUTH.OAUTH_GOOGLE, { access_token: accessToken, locale }, {
-    skipAuth: true,
-  });
-};
-
-/**
- * GitHub OAuth
- * Note: apiClient unwraps the response, returning data directly
- */
-export const githubOAuth = async (profile: {
-  id: string;
-  email: string;
-  name?: string;
-  picture?: string;
-}): Promise<AuthData> => {
-  return apiClient.post<AuthData>(API_ENDPOINTS.AUTH.OAUTH_GITHUB, profile, {
-    skipAuth: true,
-  });
-};
-
-/**
- * GitHub OAuth callback - exchange code for tokens
- * Note: apiClient unwraps the response, returning data directly
- */
-export const githubOAuthCallback = async (code: string, locale?: string): Promise<AuthData> => {
-  return apiClient.post<AuthData>(API_ENDPOINTS.AUTH.OAUTH_GITHUB_CALLBACK, { code, locale }, {
     skipAuth: true,
   });
 };

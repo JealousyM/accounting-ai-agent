@@ -1,11 +1,11 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Eye, EyeOff, X, Github, AlertTriangle } from 'lucide-react';
+import { Eye, EyeOff, X, AlertTriangle } from 'lucide-react';
 import { z } from 'zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -13,7 +13,6 @@ import { AppVersion } from '@/components/ui/app-version';
 import { LoadingScreen } from '@/components/ui/loading-screen';
 import { useAuth } from '@/contexts/AuthContext';
 import { useGoogleAuth } from '@/hooks/useGoogleAuth';
-import { useGithubAuth } from '@/hooks/useGithubAuth';
 import axios from 'axios';
 import enTranslations from '@/i18n/locales/en.json';
 import plTranslations from '@/i18n/locales/pl.json';
@@ -36,35 +35,12 @@ export function LoginForm() {
   const [isRedirecting, setIsRedirecting] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
   const [userLocale, setUserLocale] = useState<'en' | 'pl' | 'ru'>('en');
-  const [githubVisible, setGithubVisible] = useState(false);
 
   // OAuth hooks
-  const { login: googleLogin, isLoading: googleLoading, error: googleError, clearError: clearGoogleError } = useGoogleAuth();
-  const { login: githubLogin, isLoading: githubLoading, error: githubError, clearError: clearGithubError } = useGithubAuth();
-
-  // Fetch auth config to check OAuth visibility
-  useEffect(() => {
-    const fetchAuthConfig = async () => {
-      try {
-        const response = await axios.get(`${API_URL}/api/auth/config`);
-        if (response.data?.data?.github?.visible) {
-          setGithubVisible(true);
-        }
-      } catch (error) {
-        console.log('Could not fetch auth config');
-      }
-    };
-    fetchAuthConfig();
-  }, []);
+  const { login: googleLogin, isLoading: googleLoading, error: googleError } = useGoogleAuth();
 
   // Show OAuth errors
-  const oauthError = googleError || githubError;
-
-  // Clear OAuth errors when switching providers
-  useEffect(() => {
-    if (googleError) clearGithubError();
-    if (githubError) clearGoogleError();
-  }, [googleError, githubError, clearGoogleError, clearGithubError]);
+  const oauthError = googleError;
 
   // Get translations based on user's saved locale
   const t = userLocale === 'pl'
@@ -151,11 +127,6 @@ export function LoginForm() {
     googleLogin();
   };
 
-  const handleGithubOAuth = () => {
-    setApiError(null);
-    githubLogin();
-  };
-
   // Show loading screen during redirect
   if (isRedirecting) {
     return <LoadingScreen message={tCommon.redirecting} />;
@@ -203,7 +174,7 @@ export function LoginForm() {
           variant="outline"
           className="w-full"
           onClick={handleGoogleOAuth}
-          disabled={googleLoading || githubLoading || isSubmitting}
+          disabled={googleLoading || isSubmitting}
         >
           {googleLoading ? (
             <div className="w-5 h-5 mr-2 animate-spin rounded-full border-2 border-gray-300 border-t-gray-600" />
@@ -229,23 +200,6 @@ export function LoginForm() {
           )}
           {googleLoading ? 'Connecting...' : t.googleButton}
         </Button>
-
-        {githubVisible && (
-          <Button
-            type="button"
-            variant="outline"
-            className="w-full"
-            onClick={handleGithubOAuth}
-            disabled={googleLoading || githubLoading || isSubmitting}
-          >
-            {githubLoading ? (
-              <div className="w-5 h-5 mr-2 animate-spin rounded-full border-2 border-gray-300 border-t-gray-600" />
-            ) : (
-              <Github className="w-5 h-5 mr-2" />
-            )}
-            {githubLoading ? 'Connecting...' : t.githubButton}
-          </Button>
-        )}
       </div>
 
       {/* Divider */}

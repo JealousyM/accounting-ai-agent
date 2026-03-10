@@ -6,7 +6,7 @@ This document describes the authentication system for the Accounting AI Agent.
 
 The application uses JWT (JSON Web Tokens) for authentication with support for:
 - Email/password registration and login
-- OAuth providers (Google, GitHub)
+- OAuth providers (Google)
 - Token refresh mechanism
 - Session management
 
@@ -91,7 +91,7 @@ The application uses JWT (JSON Web Tokens) for authentication with support for:
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
 
-### OAuth Flow (Google/GitHub)
+### OAuth Flow (Google)
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
@@ -283,18 +283,6 @@ X-RateLimit-Reset: 2026-01-23T10:15:00.000Z
 ```env
 GOOGLE_CLIENT_ID=your-client-id.apps.googleusercontent.com
 GOOGLE_CLIENT_SECRET=your-client-secret
-```
-
-### GitHub OAuth
-
-1. Create OAuth App in [GitHub Developer Settings](https://github.com/settings/developers)
-2. Set authorization callback URL
-3. Copy Client ID and Client Secret
-
-**Environment variables:**
-```env
-GITHUB_CLIENT_ID=your-client-id
-GITHUB_CLIENT_SECRET=your-client-secret
 ```
 
 ## Security Best Practices

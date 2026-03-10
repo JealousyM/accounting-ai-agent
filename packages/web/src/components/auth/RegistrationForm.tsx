@@ -5,8 +5,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Eye, EyeOff, Check, X, Github, Globe, Crown, Zap, AlertTriangle } from 'lucide-react';
-import axios from 'axios';
+import { Eye, EyeOff, Check, X, Globe, Crown, Zap, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { AppVersion } from '@/components/ui/app-version';
@@ -15,13 +14,12 @@ import { registerUser, type ErrorResponse, getPublicLLMModels, type LLMModelInfo
 import { ApiError } from '@/lib/api/api-client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useGoogleAuth } from '@/hooks/useGoogleAuth';
-import { useGithubAuth } from '@/hooks/useGithubAuth';
 import { cn } from '@/lib/utils';
 import { LegalModal } from '@/components/legal/LegalModal';
 import enTranslations from '@/i18n/locales/en.json';
 import plTranslations from '@/i18n/locales/pl.json';
 import ruTranslations from '@/i18n/locales/ru.json';
-import { API_URL } from '@/lib/config';
+
 
 const translations = {
   en: enTranslations,
@@ -38,7 +36,6 @@ export function RegistrationForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
-  const [githubVisible, setGithubVisible] = useState(false);
   const [showTermsModal, setShowTermsModal] = useState(false);
   const [showPrivacyModal, setShowPrivacyModal] = useState(false);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -47,32 +44,10 @@ export function RegistrationForm() {
   const [isLoadingModels, setIsLoadingModels] = useState(false);
 
   // OAuth hooks
-  const { login: googleLogin, isLoading: googleLoading, error: googleError, clearError: clearGoogleError } = useGoogleAuth();
-  const { login: githubLogin, isLoading: githubLoading, error: githubError, clearError: clearGithubError } = useGithubAuth();
+  const { login: googleLogin, isLoading: googleLoading, error: googleError } = useGoogleAuth();
 
   // Show OAuth errors
-  const oauthError = googleError || githubError;
-
-  // Fetch auth config to check OAuth visibility
-  useEffect(() => {
-    const fetchAuthConfig = async () => {
-      try {
-        const response = await axios.get(`${API_URL}/api/auth/config`);
-        if (response.data?.data?.github?.visible) {
-          setGithubVisible(true);
-        }
-      } catch (error) {
-        console.log('Could not fetch auth config');
-      }
-    };
-    fetchAuthConfig();
-  }, []);
-
-  // Clear OAuth errors when switching providers
-  useEffect(() => {
-    if (googleError) clearGithubError();
-    if (githubError) clearGoogleError();
-  }, [googleError, githubError, clearGoogleError, clearGithubError]);
+  const oauthError = googleError;
 
   // Get translations based on selected locale
   const t = translations[selectedLocale].auth.register;
@@ -211,11 +186,6 @@ export function RegistrationForm() {
     googleLogin(selectedLocale);
   };
 
-  const handleGithubOAuth = () => {
-    setApiError(null);
-    githubLogin(selectedLocale);
-  };
-
   return (
     <div className="w-full max-w-md mx-auto relative">
       {/* Loading Overlay */}
@@ -326,7 +296,7 @@ export function RegistrationForm() {
           variant="outline"
           className="w-full"
           onClick={handleGoogleOAuth}
-          disabled={googleLoading || githubLoading || isSubmitting}
+          disabled={googleLoading || isSubmitting}
         >
           {googleLoading ? (
             <div className="w-5 h-5 mr-2 animate-spin rounded-full border-2 border-gray-300 border-t-gray-600" />
@@ -352,23 +322,6 @@ export function RegistrationForm() {
           )}
           {googleLoading ? t.connecting : t.googleButton}
         </Button>
-
-        {githubVisible && (
-          <Button
-            type="button"
-            variant="outline"
-            className="w-full"
-            onClick={handleGithubOAuth}
-            disabled={googleLoading || githubLoading || isSubmitting}
-          >
-            {githubLoading ? (
-              <div className="w-5 h-5 mr-2 animate-spin rounded-full border-2 border-gray-300 border-t-gray-600" />
-            ) : (
-              <Github className="w-5 h-5 mr-2" />
-            )}
-            {githubLoading ? t.connecting : t.githubButton}
-          </Button>
-        )}
       </div>
 
       {/* Divider */}
