@@ -137,26 +137,28 @@ export function ChatHeader({
             <TTSSettingsButton translations={ttsTranslations} />
           </div>
 
-          {/* Theme toggle */}
-          <ThemeToggle />
+          {/* Theme toggle - desktop only */}
+          <div className="hidden sm:block">
+            <ThemeToggle />
+          </div>
 
-          {/* Language switcher */}
+          {/* Language switcher - desktop only */}
           <Button
             variant="ghost"
             size="sm"
             onClick={cycleLocale}
-            className="flex items-center gap-1 text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100 px-1.5 sm:px-3"
+            className="hidden sm:flex items-center gap-1 text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100 px-3"
           >
             <Globe className="w-4 h-4" />
             <span className="text-xs font-medium">{localeLabels[locale]}</span>
           </Button>
 
-          {/* Profile button */}
+          {/* Profile button - desktop only */}
           <Button
             variant="ghost"
             size="sm"
             onClick={() => setIsProfileModalOpen(true)}
-            className="flex items-center gap-1 text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100 px-1.5 sm:px-3"
+            className="hidden sm:flex items-center gap-1 text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100 px-3"
           >
             <User className="w-4 h-4" />
           </Button>
@@ -187,7 +189,18 @@ export function ChatHeader({
             <span className="hidden sm:inline">{translations.newChat}</span>
           </Button>
 
-          {/* Mobile more menu */}
+          {/* Desktop logout button */}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={logout}
+            className="hidden sm:flex items-center gap-1 text-gray-600 hover:text-red-600 dark:text-gray-400 dark:hover:text-red-400 px-3"
+            title={translations.logout}
+          >
+            <LogOut className="w-4 h-4" />
+          </Button>
+
+          {/* Mobile more menu — contains all actions hidden on mobile */}
           <div className="relative sm:hidden" ref={mobileMenuRef}>
             <Button
               variant="ghost"
@@ -199,7 +212,36 @@ export function ChatHeader({
             </Button>
 
             {isMobileMenuOpen && (
-              <div className="absolute right-0 top-full mt-1 w-48 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-50 py-1">
+              <div className="absolute right-0 top-full mt-1 w-56 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-50 py-1">
+                {/* Profile */}
+                <button
+                  onClick={() => { setIsProfileModalOpen(true); setIsMobileMenuOpen(false); }}
+                  className="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                >
+                  <User className="w-4 h-4" />
+                  {profileTranslations.title}
+                </button>
+
+                {/* Language */}
+                <button
+                  onClick={() => { cycleLocale(); setIsMobileMenuOpen(false); }}
+                  className="flex items-center justify-between w-full px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                >
+                  <span className="flex items-center gap-3">
+                    <Globe className="w-4 h-4" />
+                    {localeLabels[locale]}
+                  </span>
+                </button>
+
+                {/* Theme */}
+                <div className="flex items-center justify-between px-4 py-2.5">
+                  <span className="text-sm text-gray-700 dark:text-gray-300">Theme</span>
+                  <ThemeToggle />
+                </div>
+
+                <div className="border-t border-gray-200 dark:border-gray-700 my-1" />
+
+                {/* Help */}
                 <button
                   onClick={() => { setIsHelpPanelOpen(true); setIsMobileMenuOpen(false); }}
                   className="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
@@ -207,9 +249,13 @@ export function ChatHeader({
                   <HelpCircle className="w-4 h-4" />
                   {helpTranslations.title}
                 </button>
-                <div className="px-4 py-2.5">
+
+                {/* TTS */}
+                <div className="px-4 py-1">
                   <TTSSettingsButton translations={ttsTranslations} />
                 </div>
+
+                {/* Admin */}
                 {isAdmin && (
                   <Link
                     href="/admin"
@@ -220,7 +266,10 @@ export function ChatHeader({
                     Admin
                   </Link>
                 )}
+
                 <div className="border-t border-gray-200 dark:border-gray-700 my-1" />
+
+                {/* Logout */}
                 <button
                   onClick={() => { logout(); setIsMobileMenuOpen(false); }}
                   className="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700"
@@ -231,17 +280,6 @@ export function ChatHeader({
               </div>
             )}
           </div>
-
-          {/* Logout button - desktop only */}
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={logout}
-            className="hidden sm:flex items-center gap-1 text-gray-600 hover:text-red-600 dark:text-gray-400 dark:hover:text-red-400 px-1.5 sm:px-3"
-            title={translations.logout}
-          >
-            <LogOut className="w-4 h-4" />
-          </Button>
         </div>
       </div>
 
