@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
-import { Menu, MessageSquarePlus, Bot, Globe, User, LogOut, Shield } from 'lucide-react';
+import React, { useState, useRef, useEffect } from 'react';
+import { Menu, MessageSquarePlus, Bot, Globe, User, LogOut, Shield, MoreVertical, HelpCircle } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
@@ -70,7 +70,21 @@ export function ChatHeader({
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [isApiCredentialsModalOpen, setIsApiCredentialsModalOpen] = useState(false);
   const [isHelpPanelOpen, setIsHelpPanelOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const mobileMenuRef = useRef<HTMLDivElement>(null);
   const { logout, isAdmin } = useAuth();
+
+  // Close mobile menu on outside click
+  useEffect(() => {
+    if (!isMobileMenuOpen) return;
+    const handleClick = (e: MouseEvent) => {
+      if (mobileMenuRef.current && !mobileMenuRef.current.contains(e.target as Node)) {
+        setIsMobileMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, [isMobileMenuOpen]);
 
   const cycleLocale = () => {
     const locales: Locale[] = ['en', 'pl', 'ru'];
@@ -161,24 +175,69 @@ export function ChatHeader({
             </Link>
           )}
 
-          {/* New chat button (desktop) */}
+          {/* New chat button - icon only on mobile, with text on desktop */}
           <Button
             variant="outline"
             size="sm"
             onClick={onNewChat}
             disabled={isCreatingConversation}
-            className="hidden sm:flex items-center gap-2"
+            className="flex items-center gap-2 px-2 sm:px-3"
           >
             <MessageSquarePlus className="w-4 h-4" />
-            {translations.newChat}
+            <span className="hidden sm:inline">{translations.newChat}</span>
           </Button>
 
-          {/* Logout button */}
+          {/* Mobile more menu */}
+          <div className="relative sm:hidden" ref={mobileMenuRef}>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="px-1.5 text-gray-600 dark:text-gray-400"
+            >
+              <MoreVertical className="w-4 h-4" />
+            </Button>
+
+            {isMobileMenuOpen && (
+              <div className="absolute right-0 top-full mt-1 w-48 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-50 py-1">
+                <button
+                  onClick={() => { setIsHelpPanelOpen(true); setIsMobileMenuOpen(false); }}
+                  className="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                >
+                  <HelpCircle className="w-4 h-4" />
+                  {helpTranslations.title}
+                </button>
+                <div className="px-4 py-2.5">
+                  <TTSSettingsButton translations={ttsTranslations} />
+                </div>
+                {isAdmin && (
+                  <Link
+                    href="/admin"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-purple-600 dark:text-purple-400 hover:bg-gray-100 dark:hover:bg-gray-700"
+                  >
+                    <Shield className="w-4 h-4" />
+                    Admin
+                  </Link>
+                )}
+                <div className="border-t border-gray-200 dark:border-gray-700 my-1" />
+                <button
+                  onClick={() => { logout(); setIsMobileMenuOpen(false); }}
+                  className="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700"
+                >
+                  <LogOut className="w-4 h-4" />
+                  {translations.logout}
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* Logout button - desktop only */}
           <Button
             variant="ghost"
             size="sm"
             onClick={logout}
-            className="flex items-center gap-1 text-gray-600 hover:text-red-600 dark:text-gray-400 dark:hover:text-red-400 px-1.5 sm:px-3"
+            className="hidden sm:flex items-center gap-1 text-gray-600 hover:text-red-600 dark:text-gray-400 dark:hover:text-red-400 px-1.5 sm:px-3"
             title={translations.logout}
           >
             <LogOut className="w-4 h-4" />
