@@ -29,25 +29,25 @@ function KSeFPageContent() {
   const t = translations[locale].ksef;
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-white shadow-sm">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <header className="bg-white dark:bg-gray-800 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2 sm:gap-3 min-w-0">
-              <h1 className="text-lg sm:text-2xl font-bold text-gray-900 truncate">{t.title}</h1>
+              <h1 className="text-lg sm:text-2xl font-bold text-gray-900 dark:text-white truncate">{t.title}</h1>
               <KSeFEnvironmentBadge />
             </div>
             <div className="flex items-center gap-1.5 sm:gap-3">
               <Link
                 href="/ksef/invoices"
-                className="flex items-center gap-2 px-2 sm:px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
+                className="flex items-center gap-2 px-2 sm:px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600"
               >
                 <FileText className="h-4 w-4" />
                 <span className="hidden sm:inline">{t.invoices}</span>
               </Link>
               <Link
                 href="/ksef/settings"
-                className="flex items-center gap-2 px-2 sm:px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
+                className="flex items-center gap-2 px-2 sm:px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600"
               >
                 <Settings className="h-4 w-4" />
                 <span className="hidden sm:inline">{t.settings}</span>
