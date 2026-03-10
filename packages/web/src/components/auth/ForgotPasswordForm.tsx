@@ -96,7 +96,7 @@ export function ForgotPasswordForm() {
             {emailNotSent ? t.successTitle : t.successTitle}
           </h1>
           <p className="text-gray-600 dark:text-gray-400">
-            {emailNotSent ? (t as any).emailNotSent || t.successMessage : t.successMessage}
+            {emailNotSent ? t.emailNotSent : t.successMessage}
           </p>
         </div>
 
@@ -116,9 +116,9 @@ export function ForgotPasswordForm() {
             <div className="flex items-start gap-2 text-amber-800 dark:text-amber-400">
               <AlertTriangle className="h-5 w-5 mt-0.5 shrink-0" />
               <div>
-                <p className="text-sm font-medium">{(t as any).emailNotSent || 'Email could not be sent.'}</p>
+                <p className="text-sm font-medium">{t.emailNotSent}</p>
                 {emailError && (
-                  <p className="text-xs mt-1 opacity-80">{(t as any).emailError || 'Reason'}: {emailError}</p>
+                  <p className="text-xs mt-1 opacity-80">{t.emailError}: {emailError}</p>
                 )}
               </div>
             </div>
