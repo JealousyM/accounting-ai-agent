@@ -120,7 +120,9 @@
       "successTitle": "Sprawdź email",
       "successMessage": "Wysłaliśmy link do resetowania hasła",
       "checkEmail": "Sprawdź swoją skrzynkę i postępuj zgodnie z instrukcjami",
-      "errorMessage": "Nie udało się wysłać linku. Spróbuj ponownie."
+      "errorMessage": "Nie udało się wysłać linku. Spróbuj ponownie.",
+      "emailNotSent": "Nie udało się wysłać e-maila. Użyj poniższego linku, aby zresetować hasło.",
+      "emailError": "Powód"
     },
     "resetPassword": {
       "title": "Resetuj hasło",

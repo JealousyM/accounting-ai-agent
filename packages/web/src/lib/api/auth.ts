@@ -181,13 +181,16 @@ export const googleOAuth = async (accessToken: string, locale?: string): Promise
 export interface ForgotPasswordResponse {
   success: boolean;
   message: string;
+  emailSent?: boolean;
+  resetLink?: string;  // dev mode only
+  emailError?: string; // dev mode only
 }
 
-export const forgotPassword = async (email: string): Promise<ForgotPasswordResponse> => {
+export const forgotPassword = async (email: string, locale?: string): Promise<ForgotPasswordResponse> => {
   try {
     return await apiClient.post<ForgotPasswordResponse>(
       API_ENDPOINTS.AUTH.FORGOT_PASSWORD,
-      { email },
+      { email, locale },
       { skipAuth: true }
     );
   } catch (error) {

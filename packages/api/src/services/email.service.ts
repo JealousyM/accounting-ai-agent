@@ -517,20 +517,21 @@ export class EmailService {
 
   /**
    * Send password reset email
+   * Returns { sent, reason? } — reason is only set on failure
    */
   async sendPasswordResetEmail(
     email: string,
     resetToken: string,
     locale: string = 'en'
-  ): Promise<boolean> {
+  ): Promise<{ sent: boolean; reason?: string }> {
     if (!this.transporter) {
-      logger.warn('Email service not configured. Cannot send password reset email.', { email });
-      // In development, log the reset link instead
+      const reason = 'SMTP not configured — check SMTP_HOST, SMTP_USER, SMTP_PASS env vars';
+      logger.warn(reason, { email });
       if (process.env.NODE_ENV !== 'production') {
         const resetLink = `${this.frontendUrl}/reset-password?token=${resetToken}`;
         logger.info('Password reset link (dev mode)', { email, resetLink });
       }
-      return false;
+      return { sent: false, reason };
     }
 
     try {
@@ -551,13 +552,11 @@ export class EmailService {
         messageId: result.messageId,
       });
 
-      return true;
+      return { sent: true };
     } catch (error) {
-      logger.error('Failed to send password reset email', {
-        email,
-        error: error instanceof Error ? error.message : 'Unknown error',
-      });
-      return false;
+      const reason = error instanceof Error ? error.message : 'Unknown SMTP error';
+      logger.error('Failed to send password reset email', { email, error: reason });
+      return { sent: false, reason };
     }
   }
 
