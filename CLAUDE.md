@@ -56,7 +56,7 @@ routes/      → controllers/      → services/      → Prisma/Redis
 - **AIChatService** - LangChain/LangGraph single agent with 50+ domain tools
 - **AIMemoryService** - Persistent cross-session AI context memory (CRUD + prompt injection)
 - **AIMemoryExtractionService** - Fire-and-forget memory extraction from conversations (pattern-based, zero LLM cost)
-- **AuthService** - JWT + OAuth (Google, GitHub)
+- **AuthService** - JWT + OAuth (Google)
 - **TTSService** - Text-to-speech via OpenAI TTS API
 
 ### Frontend Structure (packages/web/src/)

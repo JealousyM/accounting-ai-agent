@@ -53,7 +53,6 @@ erDiagram
         string firstName
         string lastName
         string googleId UK
-        string githubId UK
         json wfirmaConfig
         datetime createdAt
         datetime updatedAt
@@ -179,7 +178,6 @@ model User {
   firstName      String?
   lastName       String?
   googleId       String?   @unique
-  githubId       String?   @unique
   tokenVersion   Int       @default(0)
   wfirmaConfig   Json?
 
@@ -198,7 +196,6 @@ model User {
 
   @@index([email])
   @@index([googleId])
-  @@index([githubId])
 }
 ```
 

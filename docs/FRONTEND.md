@@ -805,7 +805,6 @@ NEXT_PUBLIC_APP_NAME=Accounting AI Agent
 
 # OAuth (for frontend redirect)
 NEXT_PUBLIC_GOOGLE_CLIENT_ID=your-google-client-id
-NEXT_PUBLIC_GITHUB_CLIENT_ID=your-github-client-id
 
 # Google Analytics 4
 NEXT_PUBLIC_GA_MEASUREMENT_ID=G-XXXXXXXXXX

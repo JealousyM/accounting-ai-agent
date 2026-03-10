@@ -7,7 +7,6 @@ import {
   registerSchema,
   loginSchema,
   refreshTokenSchema,
-  oauthSchema,
   googleOAuthSchema,
   updateProfileSchema,
   forgotPasswordSchema,
@@ -105,27 +104,6 @@ router.post(
   rateLimiter({ windowMs: 15 * 60 * 1000, max: 10 }),
   validateRequest(googleOAuthSchema),
   authController.googleOAuth.bind(authController)
-);
-
-/**
- * POST /api/auth/oauth/github
- * GitHub OAuth authentication
- */
-router.post(
-  '/oauth/github',
-  rateLimiter({ windowMs: 15 * 60 * 1000, max: 10 }),
-  validateRequest(oauthSchema),
-  authController.githubOAuth.bind(authController)
-);
-
-/**
- * POST /api/auth/oauth/github/callback
- * GitHub OAuth callback - exchange code for tokens
- */
-router.post(
-  '/oauth/github/callback',
-  rateLimiter({ windowMs: 15 * 60 * 1000, max: 10 }),
-  authController.githubOAuthCallback.bind(authController)
 );
 
 // ============================================

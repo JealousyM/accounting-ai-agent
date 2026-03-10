@@ -20,7 +20,6 @@ export interface User {
   locale: string;
   role: UserRole;
   hasGoogleAuth: boolean;
-  hasGithubAuth: boolean;
   company: any;
   createdAt: string;
   updatedAt: string;

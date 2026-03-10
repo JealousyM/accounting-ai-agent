@@ -7,26 +7,6 @@ import { ksefContractorService } from '../services/ksef/contractor.instance';
 import { prisma } from '../lib/prisma';
 import { logger } from '../utils/logger';
 
-interface GitHubTokenResponse {
-  access_token?: string;
-  error?: string;
-  error_description?: string;
-}
-
-interface GitHubUserResponse {
-  id: number;
-  email: string | null;
-  name: string | null;
-  login: string;
-  avatar_url: string;
-}
-
-interface GitHubEmail {
-  email: string;
-  primary: boolean;
-  verified: boolean;
-}
-
 interface GoogleUserInfo {
   id: string;
   email: string;
@@ -43,9 +23,6 @@ export class AuthController {
   async getConfig(_req: Request, res: Response): Promise<void> {
     try {
       const config = {
-        github: {
-          visible: process.env.GITHUB_CLIENT_VISIBLE === 'true',
-        },
         google: {
           visible: !!process.env.GOOGLE_CLIENT_ID,
         },
@@ -309,7 +286,6 @@ export class AuthController {
           locale: true,
           role: true,
           googleId: true,
-          githubId: true,
           wfirmaConfig: true,
           createdAt: true,
           updatedAt: true,
@@ -336,7 +312,6 @@ export class AuthController {
           locale: user.locale,
           role: user.role,
           hasGoogleAuth: !!user.googleId,
-          hasGithubAuth: !!user.githubId,
           company: user.wfirmaConfig,
           createdAt: user.createdAt,
           updatedAt: user.updatedAt,
@@ -386,7 +361,6 @@ export class AuthController {
           locale: true,
           role: true,
           googleId: true,
-          githubId: true,
           wfirmaConfig: true,
           createdAt: true,
           updatedAt: true,
@@ -406,7 +380,6 @@ export class AuthController {
           locale: updatedUser.locale,
           role: updatedUser.role,
           hasGoogleAuth: !!updatedUser.googleId,
-          hasGithubAuth: !!updatedUser.githubId,
           company: updatedUser.wfirmaConfig,
           createdAt: updatedUser.createdAt,
           updatedAt: updatedUser.updatedAt,
@@ -548,61 +521,6 @@ export class AuthController {
       }
 
       logger.error('Unexpected error during Google OAuth', { error });
-      res.status(500).json({
-        success: false,
-        error: 'Internal Server Error',
-        message: 'An unexpected error occurred',
-      });
-    }
-  }
-
-  /**
-   * POST /api/auth/oauth/github
-   * GitHub OAuth authentication
-   */
-  async githubOAuth(req: Request, res: Response): Promise<void> {
-    try {
-      const profile = {
-        ...req.body,
-        provider: 'github' as const,
-      };
-
-      const tokens = await authService.findOrCreateOAuthUser(profile);
-
-      logger.info('GitHub OAuth successful', { email: profile.email });
-
-      if (tokens.isNewUser) {
-        telegramService.notifyNewUser(profile.email, profile.name || profile.email, 'github');
-      }
-
-      // Background sync of KSeF contractors on OAuth login
-      const githubOAuthUser = await prisma.user.findUnique({ where: { email: profile.email }, select: { id: true } });
-      if (githubOAuthUser) {
-        credentialsService.hasWFirmaEnabled(githubOAuthUser.id).then(enabled => {
-          if (enabled) {
-            ksefContractorService.syncFromWFirma(githubOAuthUser.id)
-              .catch(err => logger.warn('KSeF contractor sync failed (non-fatal)', { userId: githubOAuthUser.id, error: (err as Error).message }));
-          }
-        }).catch(() => {});
-      }
-
-      res.status(200).json({
-        success: true,
-        message: 'OAuth authentication successful',
-        data: tokens,
-      });
-    } catch (error) {
-      if (error instanceof Error) {
-        logger.error('GitHub OAuth failed', { error: error.message });
-        res.status(400).json({
-          success: false,
-          error: 'OAuth Failed',
-          message: error.message,
-        });
-        return;
-      }
-
-      logger.error('Unexpected error during GitHub OAuth', { error });
       res.status(500).json({
         success: false,
         error: 'Internal Server Error',
@@ -807,133 +725,6 @@ export class AuthController {
     }
   }
 
-  /**
-   * POST /api/auth/oauth/github/callback
-   * Exchange GitHub authorization code for access token and authenticate user
-   */
-  async githubOAuthCallback(req: Request, res: Response): Promise<void> {
-    try {
-      const { code, locale } = req.body;
-
-      if (!code) {
-        res.status(400).json({
-          success: false,
-          error: 'Bad Request',
-          message: 'Authorization code is required',
-        });
-        return;
-      }
-
-      // Exchange code for access token
-      const tokenResponse = await fetch('https://github.com/login/oauth/access_token', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Accept: 'application/json',
-        },
-        body: JSON.stringify({
-          client_id: process.env.GITHUB_CLIENT_ID,
-          client_secret: process.env.GITHUB_CLIENT_SECRET,
-          code,
-        }),
-      });
-
-      const tokenData = (await tokenResponse.json()) as GitHubTokenResponse;
-
-      if (tokenData.error) {
-        logger.error('GitHub token exchange failed', { error: tokenData.error });
-        res.status(400).json({
-          success: false,
-          error: 'OAuth Failed',
-          message: tokenData.error_description || 'Failed to exchange authorization code',
-        });
-        return;
-      }
-
-      // Fetch user profile from GitHub
-      const userResponse = await fetch('https://api.github.com/user', {
-        headers: {
-          Authorization: `Bearer ${tokenData.access_token}`,
-          Accept: 'application/vnd.github.v3+json',
-        },
-      });
-
-      const userData = (await userResponse.json()) as GitHubUserResponse;
-
-      // Fetch user email (may be private)
-      let email = userData.email;
-      if (!email) {
-        const emailsResponse = await fetch('https://api.github.com/user/emails', {
-          headers: {
-            Authorization: `Bearer ${tokenData.access_token}`,
-            Accept: 'application/vnd.github.v3+json',
-          },
-        });
-        const emails = (await emailsResponse.json()) as GitHubEmail[];
-        const primaryEmail = emails.find((e) => e.primary && e.verified);
-        email = primaryEmail?.email ?? null;
-      }
-
-      if (!email) {
-        res.status(400).json({
-          success: false,
-          error: 'OAuth Failed',
-          message: 'Could not retrieve email from GitHub. Please ensure your email is verified.',
-        });
-        return;
-      }
-
-      const profile = {
-        id: String(userData.id),
-        email,
-        name: userData.name || userData.login,
-        picture: userData.avatar_url,
-        provider: 'github' as const,
-      };
-
-      const tokens = await authService.findOrCreateOAuthUser(profile, locale);
-
-      logger.info('GitHub OAuth callback successful', { email: profile.email });
-
-      if (tokens.isNewUser) {
-        telegramService.notifyNewUser(profile.email, profile.name || profile.email, 'github');
-      }
-
-      // Background sync of KSeF contractors on OAuth login
-      const githubCallbackUser = await prisma.user.findUnique({ where: { email: profile.email }, select: { id: true } });
-      if (githubCallbackUser) {
-        credentialsService.hasWFirmaEnabled(githubCallbackUser.id).then(enabled => {
-          if (enabled) {
-            ksefContractorService.syncFromWFirma(githubCallbackUser.id)
-              .catch(err => logger.warn('KSeF contractor sync failed (non-fatal)', { userId: githubCallbackUser.id, error: (err as Error).message }));
-          }
-        }).catch(() => {});
-      }
-
-      res.status(200).json({
-        success: true,
-        message: 'OAuth authentication successful',
-        data: tokens,
-      });
-    } catch (error) {
-      if (error instanceof Error) {
-        logger.error('GitHub OAuth callback failed', { error: error.message });
-        res.status(400).json({
-          success: false,
-          error: 'OAuth Failed',
-          message: error.message,
-        });
-        return;
-      }
-
-      logger.error('Unexpected error during GitHub OAuth callback', { error });
-      res.status(500).json({
-        success: false,
-        error: 'Internal Server Error',
-        message: 'An unexpected error occurred',
-      });
-    }
-  }
 }
 
 export const authController = new AuthController();

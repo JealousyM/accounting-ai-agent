@@ -35,7 +35,7 @@ const oauthProfileSchema = z.object({
   email: z.string().email(),
   name: z.string().optional(),
   picture: z.string().url().optional(),
-  provider: z.enum(['google', 'github']),
+  provider: z.enum(['google']),
 });
 
 // ============================================
@@ -90,7 +90,7 @@ export interface OAuthProfile {
   email: string;
   name?: string;
   picture?: string;
-  provider: 'google' | 'github';
+  provider: 'google';
 }
 
 // ============================================
@@ -255,15 +255,11 @@ export class AuthService {
     // Validate profile
     const validated = oauthProfileSchema.parse(profile);
 
-    const oauthIdField = validated.provider === 'google' ? 'googleId' : 'githubId';
+    const oauthIdField = 'googleId';
 
     // Try to find user by OAuth ID
-    const whereClause = validated.provider === 'google'
-      ? { googleId: validated.id }
-      : { githubId: validated.id };
-
     let user = await prisma.user.findUnique({
-      where: whereClause,
+      where: { googleId: validated.id },
     });
 
     let isNewUser = false;
@@ -293,8 +289,7 @@ export class AuthService {
       user = await prisma.user.create({
         data: {
           email: validated.email,
-          googleId: validated.provider === 'google' ? validated.id : undefined,
-          githubId: validated.provider === 'github' ? validated.id : undefined,
+          googleId: validated.id,
           firstName,
           lastName,
           locale: locale || 'en',

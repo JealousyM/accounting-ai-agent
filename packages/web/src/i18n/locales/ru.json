@@ -30,7 +30,6 @@
       "signIn": "Войти",
       "orContinueWith": "Или продолжить с",
       "googleButton": "Продолжить с Google",
-      "githubButton": "Продолжить с GitHub",
       "passwordRequirements": {
         "title": "Требования к паролю:",
         "length": "Минимум 8 символов",
@@ -103,7 +102,6 @@
       "signUp": "Зарегистрироваться",
       "orContinueWith": "Или продолжить с",
       "googleButton": "Продолжить с Google",
-      "githubButton": "Продолжить с GitHub",
       "errors": {
         "invalidCredentials": "Неверный email или пароль",
         "oauthRequired": "Пожалуйста, войдите через OAuth провайдер",

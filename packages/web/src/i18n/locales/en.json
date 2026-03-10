@@ -30,7 +30,6 @@
       "signIn": "Sign in",
       "orContinueWith": "Or continue with",
       "googleButton": "Continue with Google",
-      "githubButton": "Continue with GitHub",
       "passwordRequirements": {
         "title": "Password requirements:",
         "length": "At least 8 characters",
@@ -103,7 +102,6 @@
       "signUp": "Sign up",
       "orContinueWith": "Or continue with",
       "googleButton": "Continue with Google",
-      "githubButton": "Continue with GitHub",
       "errors": {
         "invalidCredentials": "Invalid email or password",
         "oauthRequired": "Please login with OAuth provider",
