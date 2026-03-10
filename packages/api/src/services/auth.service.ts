@@ -441,7 +441,7 @@ export class AuthService {
   /**
    * Request password reset - generates token and sends email
    */
-  async requestPasswordReset(email: string, locale: string = 'en'): Promise<void> {
+  async requestPasswordReset(email: string, locale: string = 'en'): Promise<{ resetLink?: string; emailSent: boolean; emailError?: string }> {
     // Find user by email
     const user = await prisma.user.findUnique({
       where: { email: email.toLowerCase() },
@@ -450,13 +450,13 @@ export class AuthService {
     // Always return success to prevent email enumeration
     if (!user) {
       logger.info('Password reset requested for non-existent email', { email });
-      return;
+      return { emailSent: false, emailError: 'User not found' };
     }
 
     // Check if user has a password (not OAuth-only)
     if (!user.passwordHash) {
       logger.info('Password reset requested for OAuth-only account', { email });
-      return;
+      return { emailSent: false, emailError: 'OAuth-only account (no password set)' };
     }
 
     // Generate secure random token
@@ -470,11 +470,18 @@ export class AuthService {
     logger.info('Password reset token generated', { userId: user.id, email });
 
     // Send email with reset link
-    const emailSent = await emailService.sendPasswordResetEmail(email, resetToken, locale);
+    const { sent, reason } = await emailService.sendPasswordResetEmail(email, resetToken, locale);
 
-    if (!emailSent && process.env.NODE_ENV === 'production') {
-      logger.error('Failed to send password reset email', { email });
+    if (!sent && process.env.NODE_ENV === 'production') {
+      logger.error('Failed to send password reset email', { email, reason });
     }
+
+    // In development, return reset link for easier testing
+    const resetLink = process.env.NODE_ENV !== 'production'
+      ? `${process.env.FRONTEND_URL || 'http://localhost:3000'}/reset-password?token=${resetToken}`
+      : undefined;
+
+    return { resetLink, emailSent: sent, emailError: sent ? undefined : reason };
   }
 
   /**

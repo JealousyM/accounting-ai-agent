@@ -120,7 +120,9 @@
       "successTitle": "Check your email",
       "successMessage": "We've sent you a password reset link",
       "checkEmail": "Please check your inbox and follow the instructions",
-      "errorMessage": "Failed to send reset link. Please try again."
+      "errorMessage": "Failed to send reset link. Please try again.",
+      "emailNotSent": "Email could not be sent. Use the link below to reset your password.",
+      "emailError": "Reason"
     },
     "resetPassword": {
       "title": "Reset password",

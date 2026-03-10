@@ -537,14 +537,19 @@ export class AuthController {
     try {
       const { email, locale } = req.body;
 
-      await authService.requestPasswordReset(email, locale || 'en');
+      const result = await authService.requestPasswordReset(email, locale || 'en');
 
-      // Always return success to prevent email enumeration
-      logger.info('Password reset requested', { email });
+      logger.info('Password reset requested', { email, emailSent: result.emailSent });
+
+      const isDev = process.env.NODE_ENV !== 'production';
 
       res.status(200).json({
         success: true,
         message: 'If an account with that email exists, a password reset link has been sent.',
+        emailSent: result.emailSent,
+        // In development, include detailed error and reset link
+        ...(isDev && result.resetLink && { resetLink: result.resetLink }),
+        ...(isDev && result.emailError && { emailError: result.emailError }),
       });
     } catch (error) {
       logger.error('Error processing password reset request', { error });
