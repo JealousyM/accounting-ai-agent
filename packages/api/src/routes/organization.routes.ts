@@ -44,6 +44,16 @@ router.put(
 );
 
 /**
+ * POST /api/organization/withdraw
+ * Cancel a pending join request
+ */
+router.post(
+  '/withdraw',
+  rateLimiter({ windowMs: 15 * 60 * 1000, max: 10 }),
+  organizationController.withdrawRequest.bind(organizationController)
+);
+
+/**
  * POST /api/organization/leave
  * Leave organization
  */

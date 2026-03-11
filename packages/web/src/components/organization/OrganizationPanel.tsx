@@ -24,6 +24,7 @@ import {
   getOrganization,
   updateOrgName,
   leaveOrganization,
+  withdrawRequest,
   approveMember,
   rejectMember,
   removeMember,
@@ -37,6 +38,8 @@ export interface OrganizationTranslations {
   title: string;
   noOrganization: string;
   pendingApproval: string;
+  pendingAdminInfo: string;
+  withdrawRequest: string;
   members: string;
   pendingMembers: string;
   admin: string;
@@ -117,6 +120,11 @@ export function OrganizationPanel({ open, onClose, translations: t }: Organizati
       invalidate();
       setJoinName('');
     },
+  });
+
+  const withdrawMutation = useMutation({
+    mutationFn: withdrawRequest,
+    onSuccess: invalidate,
   });
 
   const approveMutation = useMutation({ mutationFn: approveMember, onSuccess: invalidate });
@@ -214,6 +222,21 @@ export function OrganizationPanel({ open, onClose, translations: t }: Organizati
               </div>
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">{org.name}</h3>
               <p className="text-gray-500 dark:text-gray-400">{t.pendingApproval}</p>
+              {org.adminNames && (
+                <p className="text-sm text-gray-400 dark:text-gray-500 mt-2">
+                  {t.pendingAdminInfo.replace('{admins}', org.adminNames)}
+                </p>
+              )}
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => withdrawMutation.mutate()}
+                disabled={withdrawMutation.isPending}
+                className="mt-6 text-red-600 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:text-red-300 dark:hover:bg-red-900/20"
+              >
+                <X className="w-4 h-4 mr-1" />
+                {t.withdrawRequest}
+              </Button>
             </div>
           ) : (
             /* Active member / admin */

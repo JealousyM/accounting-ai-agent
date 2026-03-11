@@ -1194,6 +1194,8 @@
     "sidebarLink": "Organization",
     "noOrganization": "You don't belong to any organization",
     "pendingApproval": "Waiting for admin approval",
+    "pendingAdminInfo": "Admin: {admins}",
+    "withdrawRequest": "Cancel request",
     "members": "Members",
     "pendingMembers": "Pending Members",
     "admin": "Admin",

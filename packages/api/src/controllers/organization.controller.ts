@@ -167,6 +167,26 @@ export class OrganizationController {
   }
 
   /**
+   * POST /api/organization/withdraw
+   * Cancel a pending join request
+   */
+  async withdrawRequest(req: Request, res: Response): Promise<void> {
+    try {
+      const userId = req.user?.userId;
+
+      if (!userId) {
+        res.status(401).json({ success: false, error: 'Unauthorized', message: 'User not authenticated' });
+        return;
+      }
+
+      await organizationService.withdrawRequest(userId);
+      res.status(200).json({ success: true, message: 'Request withdrawn' });
+    } catch (error) {
+      this.handleOrgError(res, error, 'withdraw request');
+    }
+  }
+
+  /**
    * POST /api/organization/leave
    */
   async leaveOrganization(req: Request, res: Response): Promise<void> {
