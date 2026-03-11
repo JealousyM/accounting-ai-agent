@@ -8,7 +8,7 @@
  * notifications to a hardcoded chat.
  */
 
-import { Telegraf, Context } from 'telegraf';
+import { Telegraf, Context, Markup } from 'telegraf';
 import crypto from 'crypto';
 import { prisma } from '../../lib/prisma';
 import { redis } from '../../lib/redis';
@@ -53,7 +53,11 @@ export class TelegramBotService {
     this.bot.command('link', (ctx) => this.handleLink(ctx));
     this.bot.command('unlink', (ctx) => this.handleUnlink(ctx));
     this.bot.command('new', (ctx) => this.handleNew(ctx));
+    this.bot.command('chats', (ctx) => this.handleChats(ctx));
     this.bot.command('help', (ctx) => this.handleHelp(ctx));
+
+    // Callback queries for inline keyboard (chat switching)
+    this.bot.on('callback_query', (ctx) => this.handleCallbackQuery(ctx));
   }
 
   private async handleStart(ctx: Context): Promise<void> {
@@ -156,6 +160,117 @@ export class TelegramBotService {
     }
   }
 
+  private async handleChats(ctx: Context): Promise<void> {
+    try {
+      const telegramUserId = String(ctx.from?.id);
+
+      const link = await prisma.telegramLink.findUnique({
+        where: { telegramUserId },
+      });
+
+      if (!link) {
+        await ctx.reply('Please link your account first with /link');
+        return;
+      }
+
+      const conversations = await this.aiChatService.getConversations(link.userId, 10);
+
+      if (conversations.length === 0) {
+        await ctx.reply('No conversations yet. Send a message to start one.');
+        return;
+      }
+
+      const buttons = conversations.map((conv) => {
+        const isActive = conv.id === link.activeConversationId;
+        const title = conv.title || 'Untitled';
+        const label = isActive
+          ? `✓ ${title.substring(0, 38)}`
+          : title.substring(0, 40);
+        return [Markup.button.callback(label, `chat:${conv.id}`)];
+      });
+
+      await ctx.reply(
+        'Your recent conversations:',
+        Markup.inlineKeyboard(buttons)
+      );
+    } catch (error) {
+      logger.error('[TelegramBot] Error in /chats', { error: (error as Error).message });
+      await ctx.reply('An error occurred. Please try again later.');
+    }
+  }
+
+  private async handleCallbackQuery(ctx: Context): Promise<void> {
+    try {
+      const data = (ctx.callbackQuery as any)?.data as string | undefined;
+      if (!data || !data.startsWith('chat:')) return;
+
+      const conversationId = data.substring(5);
+      const telegramUserId = String(ctx.from?.id);
+
+      const link = await prisma.telegramLink.findUnique({
+        where: { telegramUserId },
+      });
+
+      if (!link) {
+        await ctx.answerCbQuery('Account not linked.');
+        return;
+      }
+
+      // Update active conversation
+      await prisma.telegramLink.update({
+        where: { id: link.id },
+        data: { activeConversationId: conversationId },
+      });
+
+      // Get conversations to find title and rebuild keyboard
+      const conversations = await this.aiChatService.getConversations(link.userId, 10);
+      const selected = conversations.find((c) => c.id === conversationId);
+      const title = selected?.title || 'Untitled';
+
+      await ctx.answerCbQuery(`Switched to: ${title.substring(0, 50)}`);
+
+      // Update the inline keyboard to reflect new active chat
+      const buttons = conversations.map((conv) => {
+        const isActive = conv.id === conversationId;
+        const convTitle = conv.title || 'Untitled';
+        const label = isActive
+          ? `✓ ${convTitle.substring(0, 38)}`
+          : convTitle.substring(0, 40);
+        return [Markup.button.callback(label, `chat:${conv.id}`)];
+      });
+
+      await ctx.editMessageReplyMarkup(
+        Markup.inlineKeyboard(buttons).reply_markup
+      );
+
+      // Show recent messages from the selected conversation
+      const conversation = await this.aiChatService.getConversation(conversationId, link.userId);
+      if (conversation && conversation.messages.length > 0) {
+        const recent = conversation.messages
+          .filter((m) => m.role === 'user' || m.role === 'assistant')
+          .slice(-6); // last 3 pairs
+
+        if (recent.length > 0) {
+          const lines = recent.map((m) => {
+            const prefix = m.role === 'user' ? '👤' : '🤖';
+            const text = typeof m.content === 'string' ? m.content : '';
+            return `${prefix} ${text.substring(0, 200)}${text.length > 200 ? '...' : ''}`;
+          });
+
+          await ctx.reply(
+            `📋 *${title.substring(0, 50)}*\n\nRecent messages:\n\n${lines.join('\n\n')}`,
+            { parse_mode: 'Markdown' }
+          );
+        }
+      }
+    } catch (error) {
+      logger.error('[TelegramBot] Error in callback query', { error: (error as Error).message });
+      try {
+        await ctx.answerCbQuery('An error occurred.');
+      } catch { /* ignore */ }
+    }
+  }
+
   private async handleHelp(ctx: Context): Promise<void> {
     try {
       await ctx.reply(
@@ -164,6 +279,7 @@ export class TelegramBotService {
           '/link - Get a code to link your account\n' +
           '/unlink - Unlink your Telegram account\n' +
           '/new - Start a new conversation\n' +
+          '/chats - Switch between conversations\n' +
           '/help - Show this help message\n\n' +
           'Just send any text message to chat with the AI accountant.'
       );
