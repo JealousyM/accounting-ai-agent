@@ -1194,6 +1194,8 @@
     "sidebarLink": "Организация",
     "noOrganization": "Вы не состоите в организации",
     "pendingApproval": "Ожидание одобрения администратора",
+    "pendingAdminInfo": "Администратор: {admins}",
+    "withdrawRequest": "Отменить запрос",
     "members": "Участники",
     "pendingMembers": "Ожидающие",
     "admin": "Администратор",

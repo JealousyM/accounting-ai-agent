@@ -25,6 +25,7 @@ export interface OrganizationData {
   members: OrganizationMember[];
   pendingMembers: OrganizationMember[];
   currentUserRole: OrgRole | null;
+  adminNames?: string;
 }
 
 export class OrganizationService {
@@ -46,17 +47,40 @@ export class OrganizationService {
 
     if (existingOrg) {
       logger.info('Found existing organization', { orgId: existingOrg.id, nameNorm });
-      // Existing org: user joins as pending member (needs admin approval)
+
       if (userId) {
-        await prisma.user.update({
-          where: { id: userId },
-          data: {
+        // Check if org has any active members
+        const activeMemberCount = await prisma.user.count({
+          where: {
             organizationId: existingOrg.id,
-            orgRole: 'member',
-            orgMembershipStatus: 'pending',
+            orgMembershipStatus: 'active',
+            deletedAt: null,
           },
         });
-        logger.info('User set as pending member of existing organization', { userId, orgId: existingOrg.id });
+
+        if (activeMemberCount === 0) {
+          // Orphaned org — user becomes admin directly
+          await prisma.user.update({
+            where: { id: userId },
+            data: {
+              organizationId: existingOrg.id,
+              orgRole: 'admin',
+              orgMembershipStatus: 'active',
+            },
+          });
+          logger.info('User became admin of orphaned organization', { userId, orgId: existingOrg.id });
+        } else {
+          // Active org — user joins as pending member (needs admin approval)
+          await prisma.user.update({
+            where: { id: userId },
+            data: {
+              organizationId: existingOrg.id,
+              orgRole: 'member',
+              orgMembershipStatus: 'pending',
+            },
+          });
+          logger.info('User set as pending member of existing organization', { userId, orgId: existingOrg.id });
+        }
       }
       return existingOrg;
     }
@@ -148,12 +172,27 @@ export class OrganizationService {
       return null;
     }
 
-    // If user is pending/rejected, they can see org name but not members
+    // If user is pending/rejected, they can see org name and admin names
     if (user.orgMembershipStatus !== 'active') {
       const org = await prisma.organization.findUnique({
         where: { id: user.organizationId },
       });
       if (!org) return null;
+
+      // Fetch admin names so user knows who to contact
+      const admins = await prisma.user.findMany({
+        where: {
+          organizationId: user.organizationId,
+          orgRole: 'admin',
+          orgMembershipStatus: 'active',
+          deletedAt: null,
+        },
+        select: { firstName: true, lastName: true, email: true },
+      });
+
+      const adminNames = admins
+        .map((a) => [a.firstName, a.lastName].filter(Boolean).join(' ') || a.email)
+        .join(', ');
 
       return {
         id: org.id,
@@ -162,6 +201,7 @@ export class OrganizationService {
         members: [],
         pendingMembers: [],
         currentUserRole: null,
+        adminNames: adminNames || undefined,
       };
     }
 
@@ -289,6 +329,31 @@ export class OrganizationService {
     });
 
     logger.info('Admin demoted to member', { adminUserId, targetUserId });
+  }
+
+  /**
+   * Withdraw a pending join request.
+   */
+  async withdrawRequest(userId: string): Promise<void> {
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { organizationId: true, orgMembershipStatus: true },
+    });
+
+    if (!user?.organizationId || user.orgMembershipStatus !== 'pending') {
+      throw new Error('No pending request to withdraw');
+    }
+
+    await prisma.user.update({
+      where: { id: userId },
+      data: {
+        organizationId: null,
+        orgRole: 'member',
+        orgMembershipStatus: 'active',
+      },
+    });
+
+    logger.info('User withdrew join request', { userId });
   }
 
   /**

@@ -22,6 +22,7 @@ export interface OrganizationData {
   members: OrgMember[];
   pendingMembers: OrgMember[];
   currentUserRole: 'admin' | 'member' | null;
+  adminNames?: string;
 }
 
 export const getOrganization = async (): Promise<OrganizationData | null> => {
@@ -35,6 +36,14 @@ export const updateOrgName = async (name: string): Promise<void> => {
   await axios.put(
     `${API_URL}/api/organization/name`,
     { name },
+    { headers: getAuthHeaders() }
+  );
+};
+
+export const withdrawRequest = async (): Promise<void> => {
+  await axios.post(
+    `${API_URL}/api/organization/withdraw`,
+    {},
     { headers: getAuthHeaders() }
   );
 };

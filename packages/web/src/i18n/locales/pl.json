@@ -1194,6 +1194,8 @@
     "sidebarLink": "Organizacja",
     "noOrganization": "Nie należysz do żadnej organizacji",
     "pendingApproval": "Oczekiwanie na akceptację administratora",
+    "pendingAdminInfo": "Administrator: {admins}",
+    "withdrawRequest": "Anuluj prośbę",
     "members": "Członkowie",
     "pendingMembers": "Oczekujący",
     "admin": "Administrator",
