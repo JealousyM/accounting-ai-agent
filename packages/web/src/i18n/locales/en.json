@@ -258,6 +258,14 @@
         "shimmer": "Shimmer (Soft)"
       }
     },
+    "shared": {
+      "section": "Shared",
+      "sharedBy": "by {name}",
+      "share": "Share with organization",
+      "unshare": "Stop sharing",
+      "sharedBadge": "Shared",
+      "noOrganization": "Join an organization to share conversations"
+    },
     "aiCosts": "AI Costs"
   },
   "profile": {
@@ -316,6 +324,16 @@
     "errorRemoveWfirma": "Failed to remove wFirma credentials",
     "errorSaveLlm": "Failed to save LLM credentials",
     "errorRemoveLlm": "Failed to remove LLM credentials"
+  },
+  "telegram": {
+    "title": "Telegram Bot",
+    "description": "Link your Telegram account to chat with AI via Telegram",
+    "codePlaceholder": "Enter 6-digit code",
+    "linkButton": "Link",
+    "unlinkButton": "Unlink",
+    "linked": "Linked as",
+    "notLinked": "Not linked",
+    "instructions": "Send /link to @eKsiegowyAIBot in Telegram to get a code"
   },
   "onboarding": {
     "wfirmaWelcome": {
@@ -560,6 +578,8 @@
       "taxes": "Taxes",
       "wfirma": "wFirma",
       "settings": "Settings",
+      "organization": "Organization",
+      "telegram": "Telegram",
       "faq": "FAQ"
     },
     "searchMatch": {
@@ -1168,5 +1188,31 @@
       "pinned": "Pinned",
       "hidden": "Hidden"
     }
+  },
+  "organization": {
+    "title": "Organization",
+    "sidebarLink": "Organization",
+    "noOrganization": "You don't belong to any organization",
+    "pendingApproval": "Waiting for admin approval",
+    "members": "Members",
+    "pendingMembers": "Pending Members",
+    "admin": "Admin",
+    "member": "Member",
+    "promote": "Promote to Admin",
+    "demote": "Demote to Member",
+    "remove": "Remove",
+    "approve": "Approve",
+    "reject": "Reject",
+    "leave": "Leave Organization",
+    "leaveConfirm": "Leave this organization?",
+    "leaveWarning": "You will lose access to shared conversations. You can rejoin, but will need admin approval.",
+    "editName": "Edit name",
+    "save": "Save",
+    "cancel": "Cancel",
+    "createOrJoin": "Create or Join Organization",
+    "companyNamePlaceholder": "Enter company name",
+    "joinButton": "Continue",
+    "createInfo": "If no organization with this name exists, a new one will be created and you'll become its admin.",
+    "joinInfo": "If the organization already exists, a join request will be sent to its admin for approval."
   }
 }

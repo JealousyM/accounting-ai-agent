@@ -30,6 +30,8 @@ export interface HelpPanelTranslations {
     taxes: string;
     wfirma: string;
     settings: string;
+    organization: string;
+    telegram: string;
     faq: string;
   };
   searchMatch: {
@@ -90,6 +92,8 @@ export function HelpPanel({ open, onClose, initialCategory, translations }: Help
     { id: 'taxes', label: translations.categories.taxes },
     { id: 'wfirma', label: translations.categories.wfirma },
     { id: 'settings', label: translations.categories.settings },
+    { id: 'organization', label: translations.categories.organization },
+    { id: 'telegram', label: translations.categories.telegram },
     { id: 'faq', label: translations.categories.faq },
   ];
 

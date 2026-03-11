@@ -26,6 +26,7 @@ import {
   type CredentialsSummary,
   type LLMModelInfo,
 } from '@/lib/api/credentials';
+import { TelegramLinkSection, type TelegramLinkTranslations } from './TelegramLinkSection';
 
 // ============================================
 // VALIDATION SCHEMAS
@@ -96,12 +97,14 @@ interface ApiCredentialsModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   translations: ApiCredentialsTranslations;
+  telegramTranslations?: TelegramLinkTranslations;
 }
 
 export function ApiCredentialsModal({
   open,
   onOpenChange,
   translations: t,
+  telegramTranslations,
 }: ApiCredentialsModalProps) {
   const [credentials, setCredentials] = useState<CredentialsSummary | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -517,6 +520,11 @@ export function ApiCredentialsModal({
                   </form>
                 )}
               </div>
+
+              {/* Telegram Section */}
+              {telegramTranslations && (
+                <TelegramLinkSection translations={telegramTranslations} />
+              )}
             </>
           )}
         </DialogBody>

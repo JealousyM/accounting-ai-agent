@@ -258,6 +258,14 @@
         "shimmer": "Shimmer (Delikatny)"
       }
     },
+    "shared": {
+      "section": "Udostępnione",
+      "sharedBy": "od {name}",
+      "share": "Udostępnij organizacji",
+      "unshare": "Przestań udostępniać",
+      "sharedBadge": "Udostępniony",
+      "noOrganization": "Dołącz do organizacji, aby udostępniać rozmowy"
+    },
     "aiCosts": "Koszty AI"
   },
   "profile": {
@@ -316,6 +324,16 @@
     "errorRemoveWfirma": "Nie udało się usunąć danych wFirma",
     "errorSaveLlm": "Nie udało się zapisać klucza LLM",
     "errorRemoveLlm": "Nie udało się usunąć klucza LLM"
+  },
+  "telegram": {
+    "title": "Bot Telegram",
+    "description": "Połącz konto Telegram, aby rozmawiać z AI przez Telegram",
+    "codePlaceholder": "Wpisz 6-cyfrowy kod",
+    "linkButton": "Połącz",
+    "unlinkButton": "Odłącz",
+    "linked": "Połączono jako",
+    "notLinked": "Niepołączony",
+    "instructions": "Wyślij /link do @eKsiegowyAIBot w Telegram, aby otrzymać kod"
   },
   "onboarding": {
     "wfirmaWelcome": {
@@ -560,6 +578,8 @@
       "taxes": "Podatki",
       "wfirma": "wFirma",
       "settings": "Ustawienia",
+      "organization": "Organizacja",
+      "telegram": "Telegram",
       "faq": "FAQ"
     },
     "searchMatch": {
@@ -1168,5 +1188,31 @@
       "pinned": "Przypięte",
       "hidden": "Ukryte"
     }
+  },
+  "organization": {
+    "title": "Organizacja",
+    "sidebarLink": "Organizacja",
+    "noOrganization": "Nie należysz do żadnej organizacji",
+    "pendingApproval": "Oczekiwanie na akceptację administratora",
+    "members": "Członkowie",
+    "pendingMembers": "Oczekujący",
+    "admin": "Administrator",
+    "member": "Członek",
+    "promote": "Awansuj na administratora",
+    "demote": "Degraduj do członka",
+    "remove": "Usuń",
+    "approve": "Akceptuj",
+    "reject": "Odrzuć",
+    "leave": "Opuść organizację",
+    "leaveConfirm": "Opuścić organizację?",
+    "leaveWarning": "Stracisz dostęp do udostępnionych czatów. Możesz dołączyć ponownie, ale potrzebujesz akceptacji administratora.",
+    "editName": "Edytuj nazwę",
+    "save": "Zapisz",
+    "cancel": "Anuluj",
+    "createOrJoin": "Utwórz lub dołącz do organizacji",
+    "companyNamePlaceholder": "Wprowadź nazwę firmy",
+    "joinButton": "Kontynuuj",
+    "createInfo": "Jeśli organizacja o tej nazwie nie istnieje, zostanie utworzona nowa, a Ty zostaniesz jej administratorem.",
+    "joinInfo": "Jeśli organizacja już istnieje, zostanie wysłana prośba o dołączenie do zatwierdzenia przez administratora."
   }
 }

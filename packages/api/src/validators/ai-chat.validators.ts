@@ -89,6 +89,26 @@ export const sendMessageSchema = z.object({
   }),
 });
 
+/**
+ * Share conversation validation schema
+ * POST /api/ai/conversations/:id/share
+ */
+export const shareConversationSchema = z.object({
+  params: z.object({
+    id: uuidParam,
+  }),
+});
+
+/**
+ * Unshare conversation validation schema
+ * POST /api/ai/conversations/:id/unshare
+ */
+export const unshareConversationSchema = z.object({
+  params: z.object({
+    id: uuidParam,
+  }),
+});
+
 // ============================================
 // TYPE EXPORTS
 // ============================================

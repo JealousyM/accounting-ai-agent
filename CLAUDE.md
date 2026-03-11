@@ -58,6 +58,8 @@ routes/      → controllers/      → services/      → Prisma/Redis
 - **AIMemoryExtractionService** - Fire-and-forget memory extraction from conversations (pattern-based, zero LLM cost)
 - **AuthService** - JWT + OAuth (Google)
 - **TTSService** - Text-to-speech via OpenAI TTS API
+- **OrganizationService** - Company grouping with admin/member roles and membership approval
+- **TelegramBotService** - Telegraf-based AI chatbot with account linking via 6-digit codes
 
 ### Frontend Structure (packages/web/src/)
 - `app/` - Next.js App Router pages
@@ -68,17 +70,17 @@ routes/      → controllers/      → services/      → Prisma/Redis
 - `lib/api/` - Axios API client
 
 ### Database
-PostgreSQL with Prisma ORM. Key models: User, AIConversation, WFirmaCache, WFirmaInvoice, WFirmaCustomer, AIMemory, AIToolUsage.
+PostgreSQL with Prisma ORM. Key models: User, AIConversation, Organization, TelegramLink, WFirmaCache, WFirmaInvoice, WFirmaCustomer, AIMemory, AIToolUsage.
 
 ## Tech Stack
 
-**Backend:** Node.js 18+, Express, TypeScript, Prisma, Redis, LangChain/LangGraph, Zod, Winston
+**Backend:** Node.js 18+, Express, TypeScript, Prisma, Redis, LangChain/LangGraph, Telegraf, Zod, Winston
 **Frontend:** Next.js 15, React 19, Tailwind CSS, React Query, Zustand, next-intl
 **Infrastructure:** Docker Compose, Turbo, GitHub Actions
 
 ## Environment
 
-API requires `.env` with: DATABASE_URL, REDIS_URL, JWT_SECRET, WFIRMA_* credentials
+API requires `.env` with: DATABASE_URL, REDIS_URL, JWT_SECRET, WFIRMA_* credentials, TELEGRAM_CHATBOT_TOKEN (optional)
 Web requires `.env.local` with: NEXT_PUBLIC_API_URL
 
 ## Key Patterns
@@ -93,10 +95,14 @@ Web requires `.env.local` with: NEXT_PUBLIC_API_URL
 - OpenAI TTS: higher quality voices (Nova, Alloy, Echo, etc.) when user has OpenAI key
 - AI Context Memory: persistent cross-session memory injected into system prompt (categories: business_fact, frequent_entity, user_preference, workflow_pattern)
 - Memory extraction is fire-and-forget after each AI response (zero LLM cost — pattern-based only)
+- Organizations: users grouped by company name, org-level roles (admin/member), membership approval flow
+- Shared conversations: org members share AI chats, real-time polling (5s messages, 10s list)
+- Telegram bot: AI chat via Telegraf, account linking via 6-digit Redis codes
 
 ## Documentation
 
 Detailed docs in `packages/api/docs/` (API.md, ARCHITECTURE.md, AUTH_API.md)
+Feature docs: `docs/ORGANIZATIONS_AND_SHARING.md`, `docs/WFIRMA_INTEGRATION.md`, `docs/STRIPE_SETUP.md`
 Service docs: `packages/api/src/services/README.wfirma.md`, `README.cache.md`, `README.tts.md`
 
 ## Claude Code Subagents

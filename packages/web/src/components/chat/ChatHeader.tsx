@@ -1,11 +1,11 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import { Menu, MessageSquarePlus, Bot, Globe, User, LogOut, Shield, MoreVertical, HelpCircle } from 'lucide-react';
+import { Menu, MessageSquarePlus, Bot, Globe, User, LogOut, Shield, MoreVertical, HelpCircle, Share2 } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
-import { ProfileEditModal, type ProfileTranslations, ApiCredentialsModal, type ApiCredentialsTranslations } from '@/components/profile';
+import { ProfileEditModal, type ProfileTranslations, ApiCredentialsModal, type ApiCredentialsTranslations, type TelegramLinkTranslations } from '@/components/profile';
 import { HelpButton, HelpPanel, type HelpPanelTranslations } from '@/components/help';
 import { ConversationDetail } from '@/hooks/useChat';
 import { useAuth } from '@/contexts/AuthContext';
@@ -34,6 +34,13 @@ interface TTSTranslations {
   notSupported: string;
 }
 
+interface SharedTranslations {
+  share: string;
+  unshare: string;
+  sharedBadge: string;
+  noOrganization: string;
+}
+
 interface ChatHeaderProps {
   conversation: ConversationDetail | undefined;
   onMenuClick: () => void;
@@ -44,8 +51,13 @@ interface ChatHeaderProps {
   apiCredentialsTranslations: ApiCredentialsTranslations;
   helpTranslations: HelpPanelTranslations;
   ttsTranslations: TTSTranslations;
+  sharedTranslations?: SharedTranslations;
+  telegramTranslations?: TelegramLinkTranslations;
   locale: Locale;
   onLocaleChange: (locale: Locale) => void;
+  onShareToggle?: () => void;
+  isShared?: boolean;
+  isOwner?: boolean;
 }
 
 const localeLabels: Record<Locale, string> = {
@@ -64,8 +76,13 @@ export function ChatHeader({
   apiCredentialsTranslations,
   helpTranslations,
   ttsTranslations,
+  sharedTranslations,
+  telegramTranslations,
   locale,
   onLocaleChange,
+  onShareToggle,
+  isShared,
+  isOwner,
 }: ChatHeaderProps) {
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [isApiCredentialsModalOpen, setIsApiCredentialsModalOpen] = useState(false);
@@ -113,13 +130,36 @@ export function ChatHeader({
               <Bot className="w-5 h-5 text-blue-600 dark:text-blue-400" />
             </div>
             <div>
-              <h1 className="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate max-w-[200px] sm:max-w-none">
-                {conversation?.title || translations.defaultTitle}
-              </h1>
+              <div className="flex items-center gap-1.5">
+                <h1 className="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate max-w-[200px] sm:max-w-none">
+                  {conversation?.title || translations.defaultTitle}
+                </h1>
+                {isShared && (
+                  <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400">
+                    {sharedTranslations?.sharedBadge || 'Shared'}
+                  </span>
+                )}
+              </div>
               <p className="text-xs text-gray-500 dark:text-gray-400">
                 {translations.subtitle}
               </p>
             </div>
+            {/* Share toggle button (only for conversation owner) */}
+            {isOwner && conversation && onShareToggle && sharedTranslations && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={onShareToggle}
+                className={`ml-1 px-2 ${
+                  isShared
+                    ? 'text-purple-600 hover:text-purple-700 dark:text-purple-400 dark:hover:text-purple-300'
+                    : 'text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300'
+                }`}
+                title={isShared ? sharedTranslations.unshare : sharedTranslations.share}
+              >
+                <Share2 className={`w-4 h-4 ${isShared ? 'fill-current' : ''}`} />
+              </Button>
+            )}
           </div>
         </div>
 
@@ -296,6 +336,7 @@ export function ChatHeader({
         open={isApiCredentialsModalOpen}
         onOpenChange={setIsApiCredentialsModalOpen}
         translations={apiCredentialsTranslations}
+        telegramTranslations={telegramTranslations}
       />
 
       {/* Help Panel */}

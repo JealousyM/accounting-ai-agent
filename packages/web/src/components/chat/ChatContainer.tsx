@@ -1,11 +1,12 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { MessageSquarePlus, X, DollarSign, Crown, AlertTriangle, FileCheck, LayoutDashboard, Brain } from 'lucide-react';
+import { MessageSquarePlus, X, DollarSign, Crown, AlertTriangle, FileCheck, LayoutDashboard, Brain, Building2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { AppVersion } from '@/components/ui/app-version';
 import Link from 'next/link';
 import { useChat } from '@/hooks/useChat';
+import { useAuth } from '@/contexts/AuthContext';
 import { useLocale } from '@/contexts/LocaleContext';
 import { ConversationList } from './ConversationList';
 import { MessageList } from './MessageList';
@@ -17,6 +18,7 @@ import { CurrentPlanBadge, UsageWidget } from '@/components/subscription';
 import { useSubscription } from '@/hooks/useSubscription';
 import { TTSProvider, useAutoSpeak } from '@/contexts/TTSContext';
 import { AIMemoryPanel } from './AIMemoryPanel';
+import { OrganizationPanel } from '@/components/organization/OrganizationPanel';
 import enTranslations from '@/i18n/locales/en.json';
 import plTranslations from '@/i18n/locales/pl.json';
 import ruTranslations from '@/i18n/locales/ru.json';
@@ -43,14 +45,20 @@ function ChatContainerInner() {
     createConversation,
     selectConversation,
     deleteConversation,
+    sharedConversations,
     latestTTS,
     clearTTS,
+    shareConversation,
+    unshareConversation,
   } = useChat();
+
+  const { user } = useAuth();
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [showWfirmaWelcome, setShowWfirmaWelcome] = useState(false);
   const [showSubscriptionWelcome, setShowSubscriptionWelcome] = useState(false);
   const [showMemoryPanel, setShowMemoryPanel] = useState(false);
+  const [showOrgPanel, setShowOrgPanel] = useState(false);
   const { locale, setLocale } = useLocale();
   const t = translations[locale].chat;
   const onboardingTranslations = translations[locale].onboarding;
@@ -219,11 +227,13 @@ function ChatContainerInner() {
           <div className="flex-1 overflow-y-auto">
             <ConversationList
               conversations={conversations}
+              sharedConversations={sharedConversations}
               currentId={currentConversationId}
               onSelect={handleSelectConversation}
               onDelete={deleteConversation}
               isLoading={isLoadingConversations}
               translations={t.sidebar}
+              sharedTranslations={t.shared}
             />
           </div>
 
@@ -272,6 +282,16 @@ function ChatContainerInner() {
                 <span>{translations[locale].aiMemory.sidebarLink}</span>
               </button>
             </div>
+            {/* Organization link */}
+            <div className="py-2 border-b border-gray-200 dark:border-gray-700">
+              <button
+                onClick={() => setShowOrgPanel(true)}
+                className="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors w-full text-left"
+              >
+                <Building2 className="w-4 h-4" />
+                <span>{translations[locale].organization.sidebarLink}</span>
+              </button>
+            </div>
             {/* AI Costs and Version */}
             <div className="py-3 flex items-center justify-between">
               <Link
@@ -300,8 +320,23 @@ function ChatContainerInner() {
           apiCredentialsTranslations={translations[locale].apiCredentials}
           helpTranslations={translations[locale].help}
           ttsTranslations={t.tts}
+          sharedTranslations={t.shared}
+          telegramTranslations={translations[locale].telegram}
           locale={locale}
           onLocaleChange={setLocale}
+          onShareToggle={
+            currentConversation && currentConversation.userId === user?.id
+              ? () => {
+                  if (currentConversation.isShared) {
+                    unshareConversation(currentConversation.id);
+                  } else {
+                    shareConversation(currentConversation.id);
+                  }
+                }
+              : undefined
+          }
+          isShared={currentConversation?.isShared}
+          isOwner={currentConversation?.userId === user?.id}
         />
 
         {/* Subscription Welcome Banner */}
@@ -401,6 +436,13 @@ function ChatContainerInner() {
         open={showMemoryPanel}
         onClose={() => setShowMemoryPanel(false)}
         translations={translations[locale].aiMemory}
+      />
+
+      {/* Organization Panel */}
+      <OrganizationPanel
+        open={showOrgPanel}
+        onClose={() => setShowOrgPanel(false)}
+        translations={translations[locale].organization}
       />
     </div>
   );
