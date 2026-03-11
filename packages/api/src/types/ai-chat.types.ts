@@ -45,6 +45,8 @@ export interface ChatMessage {
   toolCalls?: ToolCall[];
   toolCallId?: string;
   metadata?: MessageMetadata;
+  authorId?: string;
+  authorName?: string;
 }
 
 export interface ToolCall {
@@ -74,6 +76,9 @@ export interface AIConversationData {
   topic?: string;
   messages: ChatMessage[];
   graphState?: ConversationGraphState;
+  isShared?: boolean;
+  organizationId?: string;
+  ownerName?: string;
   createdAt: Date;
   updatedAt: Date;
   deletedAt?: Date;
@@ -115,6 +120,8 @@ export interface ConversationListItem {
   topic?: string;
   lastMessage?: string;
   messageCount: number;
+  isShared?: boolean;
+  ownerName?: string;
   createdAt: Date;
   updatedAt: Date;
 }

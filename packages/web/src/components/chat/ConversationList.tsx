@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { MessageSquare, Trash2, Loader2, AlertTriangle } from 'lucide-react';
+import { MessageSquare, Trash2, Loader2, AlertTriangle, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -26,22 +26,31 @@ interface SidebarTranslations {
   messages: string;
 }
 
+interface SharedTranslations {
+  section: string;
+  sharedBy: string;
+}
+
 interface ConversationListProps {
   conversations: Conversation[];
+  sharedConversations?: Conversation[];
   currentId: string | null;
   onSelect: (id: string) => void;
   onDelete: (id: string) => void;
   isLoading: boolean;
   translations: SidebarTranslations;
+  sharedTranslations?: SharedTranslations;
 }
 
 export function ConversationList({
   conversations,
+  sharedConversations = [],
   currentId,
   onSelect,
   onDelete,
   isLoading,
   translations,
+  sharedTranslations,
 }: ConversationListProps) {
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
   const [pendingDeleteId, setPendingDeleteId] = React.useState<string | null>(null);
@@ -72,7 +81,7 @@ export function ConversationList({
     );
   }
 
-  if (conversations.length === 0) {
+  if (conversations.length === 0 && sharedConversations.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-8 px-4 text-center">
         <MessageSquare className="w-10 h-10 text-gray-300 dark:text-gray-600 mb-3" />
@@ -98,6 +107,29 @@ export function ConversationList({
           />
         ))}
       </div>
+
+      {/* Shared conversations section */}
+      {sharedConversations.length > 0 && sharedTranslations && (
+        <div className="py-2">
+          <div className="mx-4 my-2 border-t border-gray-200 dark:border-gray-700" />
+          <div className="flex items-center gap-2 px-4 py-1.5">
+            <Users className="w-4 h-4 text-gray-400 dark:text-gray-500" />
+            <span className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+              {sharedTranslations.section}
+            </span>
+          </div>
+          {sharedConversations.map((conversation) => (
+            <SharedConversationItem
+              key={conversation.id}
+              conversation={conversation}
+              isActive={conversation.id === currentId}
+              onSelect={() => onSelect(conversation.id)}
+              translations={translations}
+              sharedByLabel={sharedTranslations.sharedBy}
+            />
+          ))}
+        </div>
+      )}
 
       <Dialog open={deleteDialogOpen} onOpenChange={handleDeleteCancel}>
         <DialogContent showCloseButton={false} className="max-w-sm">
@@ -228,6 +260,83 @@ function ConversationItem({
             <Trash2 className="w-4 h-4" />
           </Button>
         )}
+      </div>
+    </div>
+  );
+}
+
+interface SharedConversationItemProps {
+  conversation: Conversation;
+  isActive: boolean;
+  onSelect: () => void;
+  translations: SidebarTranslations;
+  sharedByLabel: string;
+}
+
+function SharedConversationItem({
+  conversation,
+  isActive,
+  onSelect,
+  translations,
+  sharedByLabel,
+}: SharedConversationItemProps) {
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffDays = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24));
+
+    if (diffDays === 0) {
+      return date.toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' });
+    } else if (diffDays === 1) {
+      return translations.yesterday;
+    } else if (diffDays < 7) {
+      return date.toLocaleDateString('pl-PL', { weekday: 'short' });
+    } else {
+      return date.toLocaleDateString('pl-PL', { day: 'numeric', month: 'short' });
+    }
+  };
+
+  return (
+    <div
+      className={`
+        group px-3 py-2 mx-2 rounded-lg cursor-pointer
+        transition-colors duration-150
+        ${isActive
+          ? 'bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800'
+          : 'hover:bg-gray-50 dark:hover:bg-gray-700 border border-transparent'
+        }
+      `}
+      onClick={onSelect}
+    >
+      <div className="flex items-start justify-between gap-2">
+        <div className="flex-1 min-w-0">
+          <h3
+            className={`
+              text-sm font-medium truncate
+              ${isActive ? 'text-blue-900 dark:text-blue-300' : 'text-gray-900 dark:text-gray-100'}
+            `}
+          >
+            {conversation.title}
+          </h3>
+          {conversation.ownerName && (
+            <p className="text-xs text-purple-500 dark:text-purple-400 mt-0.5">
+              {sharedByLabel.replace('{name}', conversation.ownerName)}
+            </p>
+          )}
+          {conversation.lastMessage && (
+            <p className="text-xs text-gray-500 dark:text-gray-400 truncate mt-0.5">
+              {conversation.lastMessage}
+            </p>
+          )}
+          <div className="flex items-center gap-2 mt-1">
+            <span className="text-xs text-gray-400 dark:text-gray-500">
+              {formatDate(conversation.updatedAt)}
+            </span>
+            <span className="text-xs text-gray-300 dark:text-gray-600">
+              {conversation.messageCount} {translations.messages}
+            </span>
+          </div>
+        </div>
       </div>
     </div>
   );

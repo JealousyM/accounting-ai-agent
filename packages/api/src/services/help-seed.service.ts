@@ -1240,6 +1240,339 @@ Data is automatically refreshed every 10 minutes. You can also refresh manually 
     order: 1,
     isFeatured: true,
   },
+  {
+    slug: 'settings-organization',
+    category: 'settings',
+    titlePl: 'Organizacja',
+    titleEn: 'Organization',
+    titleRu: 'Организация',
+    contentPl: `Organizacja pozwala grupować użytkowników jednej firmy, aby współdzielić konwersacje AI.
+
+## Czym jest organizacja?
+
+Organizacja to grupa użytkowników powiązanych z jedną firmą. Członkowie organizacji mogą udostępniać sobie konwersacje AI i wspólnie z nich korzystać.
+
+## Tworzenie organizacji
+
+1. Kliknij **Organizacja** w panelu bocznym
+2. Wpisz nazwę firmy
+3. Kliknij **Utwórz**
+
+Jako twórca organizacji automatycznie stajesz się jej **administratorem**.
+
+## Dołączanie do istniejącej organizacji
+
+1. Kliknij **Organizacja** w panelu bocznym
+2. Wpisz dokładnie taką samą nazwę firmy jak istniejąca organizacja
+3. Twoja prośba o dołączenie zostanie wysłana do administratora
+4. Po zatwierdzeniu przez administratora staniesz się członkiem organizacji
+
+## Role w organizacji
+
+- **Administrator** - może zatwierdzać/odrzucać prośby o dołączenie, awansować i degradować członków, usuwać członków, zmieniać nazwę organizacji
+- **Członek** - może przeglądać i uczestniczyć w udostępnionych konwersacjach
+
+## Zarządzanie członkami (administrator)
+
+- **Zatwierdzanie** - akceptuj oczekujące prośby o dołączenie
+- **Odrzucanie** - odrzucaj prośby o dołączenie
+- **Awansowanie** - nadaj członkowi rolę administratora
+- **Degradowanie** - zmień administratora na zwykłego członka
+- **Usuwanie** - usuń członka z organizacji
+
+## Opuszczenie organizacji
+
+Możesz opuścić organizację w dowolnym momencie klikając przycisk **Opuść organizację** w ustawieniach organizacji.`,
+    contentEn: `Organization allows grouping users of one company to share AI conversations.
+
+## What is an organization?
+
+An organization is a group of users associated with one company. Organization members can share AI conversations and collaborate on them.
+
+## Creating an organization
+
+1. Click **Organization** in the sidebar
+2. Enter your company name
+3. Click **Create**
+
+As the organization creator, you automatically become its **admin**.
+
+## Joining an existing organization
+
+1. Click **Organization** in the sidebar
+2. Enter the exact same company name as the existing organization
+3. Your join request will be sent to the admin
+4. Once approved by the admin, you will become a member of the organization
+
+## Organization roles
+
+- **Admin** - can approve/reject join requests, promote and demote members, remove members, rename the organization
+- **Member** - can view and participate in shared conversations
+
+## Managing members (admin)
+
+- **Approve** - accept pending join requests
+- **Reject** - decline join requests
+- **Promote** - grant a member the admin role
+- **Demote** - change an admin to a regular member
+- **Remove** - remove a member from the organization
+
+## Leaving an organization
+
+You can leave an organization at any time by clicking the **Leave organization** button in organization settings.`,
+    contentRu: `Организация позволяет группировать пользователей одной компании для совместного использования AI-разговоров.
+
+## Что такое организация?
+
+Организация - это группа пользователей, связанных с одной компанией. Участники организации могут делиться AI-разговорами и совместно в них участвовать.
+
+## Создание организации
+
+1. Нажмите **Организация** в боковой панели
+2. Введите название компании
+3. Нажмите **Создать**
+
+Как создатель организации, вы автоматически становитесь её **администратором**.
+
+## Присоединение к существующей организации
+
+1. Нажмите **Организация** в боковой панели
+2. Введите точно такое же название компании, как у существующей организации
+3. Ваш запрос на вступление будет отправлен администратору
+4. После одобрения администратором вы станете участником организации
+
+## Роли в организации
+
+- **Администратор** - может одобрять/отклонять запросы на вступление, повышать и понижать участников, удалять участников, переименовывать организацию
+- **Участник** - может просматривать и участвовать в общих разговорах
+
+## Управление участниками (администратор)
+
+- **Одобрить** - принять ожидающие запросы на вступление
+- **Отклонить** - отказать в запросе на вступление
+- **Повысить** - назначить участнику роль администратора
+- **Понизить** - изменить роль администратора на обычного участника
+- **Удалить** - удалить участника из организации
+
+## Выход из организации
+
+Вы можете покинуть организацию в любое время, нажав кнопку **Покинуть организацию** в настройках организации.`,
+    searchKeywordsPl: ['organizacja', 'firma', 'grupa', 'zespół', 'członkowie', 'administrator', 'dołącz'],
+    searchKeywordsEn: ['organization', 'company', 'group', 'team', 'members', 'admin', 'join'],
+    searchKeywordsRu: ['организация', 'компания', 'группа', 'команда', 'участники', 'администратор', 'вступить'],
+    order: 2,
+    isFeatured: false,
+  },
+  {
+    slug: 'ai-chat-shared-conversations',
+    category: 'aiChat',
+    titlePl: 'Udostępnione konwersacje',
+    titleEn: 'Shared Conversations',
+    titleRu: 'Общие разговоры',
+    contentPl: `Udostępnione konwersacje pozwalają członkom organizacji wspólnie korzystać z czatów AI.
+
+## Czym są udostępnione konwersacje?
+
+Udostępnione konwersacje to czaty AI widoczne dla wszystkich aktywnych członków Twojej organizacji. Każdy członek może je przeglądać i wysyłać w nich wiadomości.
+
+## Jak udostępnić konwersację
+
+1. Otwórz konwersację, którą chcesz udostępnić
+2. Kliknij **ikonę udostępniania** w nagłówku czatu
+3. Konwersacja zostanie oznaczona jako udostępniona
+
+Tylko **właściciel konwersacji** może ją udostępnić lub cofnąć udostępnienie.
+
+## Gdzie znajdę udostępnione konwersacje?
+
+Udostępnione konwersacje pojawiają się w sekcji **"Udostępnione"** w panelu bocznym. Są oddzielone od Twoich prywatnych rozmów.
+
+## Wspólna praca
+
+- Wszyscy członkowie organizacji mogą **przeglądać** udostępnione konwersacje
+- Każdy członek może **wysyłać wiadomości** w udostępnionych czatach
+- Wiadomości wyświetlają **imię autora**, aby odróżnić kto co napisał
+- Udostępnione czaty **automatycznie odświeżają się** co 5 sekund, aby pokazać nowe wiadomości
+
+## Kto widzi udostępnione konwersacje?
+
+Tylko **aktywni członkowie** organizacji widzą udostępnione konwersacje. Użytkownicy spoza organizacji nie mają do nich dostępu.`,
+    contentEn: `Shared conversations allow organization members to collaborate on AI chats.
+
+## What are shared conversations?
+
+Shared conversations are AI chats visible to all active members of your organization. Every member can view them and send messages in them.
+
+## How to share a conversation
+
+1. Open the conversation you want to share
+2. Click the **share icon** in the chat header
+3. The conversation will be marked as shared
+
+Only the **conversation owner** can share or unshare it.
+
+## Where do I find shared conversations?
+
+Shared conversations appear in the **"Shared"** section in the sidebar. They are separated from your private conversations.
+
+## Collaboration
+
+- All organization members can **view** shared conversations
+- Every member can **send messages** in shared chats
+- Messages display the **author's name** to distinguish who wrote what
+- Shared chats **auto-refresh** every 5 seconds to show new messages
+
+## Who can see shared conversations?
+
+Only **active members** of the organization can see shared conversations. Users outside the organization have no access to them.`,
+    contentRu: `Общие разговоры позволяют участникам организации совместно использовать AI-чаты.
+
+## Что такое общие разговоры?
+
+Общие разговоры - это AI-чаты, видимые всем активным участникам вашей организации. Каждый участник может их просматривать и отправлять в них сообщения.
+
+## Как поделиться разговором
+
+1. Откройте разговор, которым хотите поделиться
+2. Нажмите **иконку общего доступа** в заголовке чата
+3. Разговор будет отмечен как общий
+
+Только **владелец разговора** может сделать его общим или отменить общий доступ.
+
+## Где найти общие разговоры?
+
+Общие разговоры отображаются в секции **"Общие"** в боковой панели. Они отделены от ваших личных разговоров.
+
+## Совместная работа
+
+- Все участники организации могут **просматривать** общие разговоры
+- Каждый участник может **отправлять сообщения** в общих чатах
+- Сообщения отображают **имя автора**, чтобы различать кто что написал
+- Общие чаты **автоматически обновляются** каждые 5 секунд для отображения новых сообщений
+
+## Кто видит общие разговоры?
+
+Только **активные участники** организации видят общие разговоры. Пользователи вне организации не имеют к ним доступа.`,
+    searchKeywordsPl: ['udostępnione', 'wspólne', 'organizacja', 'zespół', 'współpraca', 'czat'],
+    searchKeywordsEn: ['shared', 'conversations', 'organization', 'team', 'collaboration', 'chat'],
+    searchKeywordsRu: ['общие', 'разговоры', 'организация', 'команда', 'совместная', 'чат'],
+    order: 3,
+    isFeatured: false,
+  },
+  {
+    slug: 'settings-telegram',
+    category: 'settings',
+    titlePl: 'Bot Telegram',
+    titleEn: 'Telegram Bot',
+    titleRu: 'Telegram-бот',
+    contentPl: `Bot Telegram pozwala rozmawiać z asystentem AI bezpośrednio w komunikatorze Telegram.
+
+## Co robi bot?
+
+Bot Telegram umożliwia korzystanie z asystenta AI z poziomu Telegrama. Wiadomości są synchronizowane z aplikacją webową - możesz kontynuować rozmowę w dowolnym miejscu.
+
+## Łączenie konta
+
+1. Znajdź bota **@eKsiegowyAIBot** w Telegramie i wyślij mu komendę **/link**
+2. Bot wyśle Ci **6-cyfrowy kod**
+3. Otwórz ustawienia w aplikacji webowej (ikona użytkownika w prawym górnym rogu)
+4. W sekcji **Telegram** wpisz otrzymany kod
+5. Kliknij **Połącz**
+
+Twoje konto Telegram zostanie połączone z kontem w aplikacji.
+
+## Dostępne komendy
+
+- **/start** - rozpocznij interakcję z botem
+- **/link** - wygeneruj kod do połączenia konta
+- **/unlink** - odłącz konto Telegram
+- **/new** - rozpocznij nową konwersację
+- **/help** - wyświetl listę dostępnych komend
+
+## Synchronizacja wiadomości
+
+Wiadomości wysłane przez Telegram są zapisywane w Twoich konwersacjach w aplikacji webowej. Możesz kontynuować rozmowę w dowolnym miejscu - w przeglądarce lub w Telegramie.
+
+## Odłączanie konta
+
+Możesz odłączyć konto na dwa sposoby:
+
+- Wyślij komendę **/unlink** w Telegramie
+- Kliknij przycisk **Odłącz** w sekcji Telegram w ustawieniach aplikacji webowej`,
+    contentEn: `Telegram Bot allows you to chat with the AI assistant directly in the Telegram messenger.
+
+## What does the bot do?
+
+The Telegram bot lets you use the AI assistant from Telegram. Messages are synced with the web app - you can continue your conversation from anywhere.
+
+## Linking your account
+
+1. Find the bot **@eKsiegowyAIBot** in Telegram and send the **/link** command
+2. The bot will send you a **6-digit code**
+3. Open settings in the web app (user icon in the top right corner)
+4. In the **Telegram** section, enter the received code
+5. Click **Link**
+
+Your Telegram account will be linked to your app account.
+
+## Available commands
+
+- **/start** - start interacting with the bot
+- **/link** - generate a code to link your account
+- **/unlink** - unlink your Telegram account
+- **/new** - start a new conversation
+- **/help** - show the list of available commands
+
+## Message synchronization
+
+Messages sent via Telegram are saved in your conversations in the web app. You can continue the conversation from anywhere - in the browser or in Telegram.
+
+## Unlinking your account
+
+You can unlink your account in two ways:
+
+- Send the **/unlink** command in Telegram
+- Click the **Unlink** button in the Telegram section in web app settings`,
+    contentRu: `Telegram-бот позволяет общаться с AI-ассистентом напрямую в мессенджере Telegram.
+
+## Что делает бот?
+
+Telegram-бот позволяет использовать AI-ассистента из Telegram. Сообщения синхронизируются с веб-приложением - вы можете продолжить разговор откуда угодно.
+
+## Привязка аккаунта
+
+1. Найдите бота **@eKsiegowyAIBot** в Telegram и отправьте команду **/link**
+2. Бот пришлёт вам **6-значный код**
+3. Откройте настройки в веб-приложении (иконка пользователя в правом верхнем углу)
+4. В секции **Telegram** введите полученный код
+5. Нажмите **Привязать**
+
+Ваш аккаунт Telegram будет привязан к аккаунту в приложении.
+
+## Доступные команды
+
+- **/start** - начать взаимодействие с ботом
+- **/link** - сгенерировать код для привязки аккаунта
+- **/unlink** - отвязать аккаунт Telegram
+- **/new** - начать новый разговор
+- **/help** - показать список доступных команд
+
+## Синхронизация сообщений
+
+Сообщения, отправленные через Telegram, сохраняются в ваших разговорах в веб-приложении. Вы можете продолжить разговор откуда угодно - в браузере или в Telegram.
+
+## Отвязка аккаунта
+
+Отвязать аккаунт можно двумя способами:
+
+- Отправьте команду **/unlink** в Telegram
+- Нажмите кнопку **Отвязать** в секции Telegram в настройках веб-приложения`,
+    searchKeywordsPl: ['telegram', 'bot', 'czat', 'komunikator', 'link', 'kod', 'połącz'],
+    searchKeywordsEn: ['telegram', 'bot', 'chat', 'messenger', 'link', 'code', 'connect'],
+    searchKeywordsRu: ['телеграм', 'бот', 'чат', 'мессенджер', 'привязка', 'код', 'подключить'],
+    order: 3,
+    isFeatured: false,
+  },
 ];
 
 export async function seedHelpTopicsIfEmpty(): Promise<void> {

@@ -79,6 +79,11 @@ export function MessageBubble({ message, translations, toolsTranslations, ttsTra
             }
           `}
         >
+          {/* Author name for shared conversations */}
+          {message.authorName && isUser && (
+            <p className="text-xs font-medium text-blue-200 mb-1">{message.authorName}</p>
+          )}
+
           {/* Tool calls indicator */}
           {message.toolCalls && message.toolCalls.length > 0 && (
             <div className="flex items-center gap-2 mb-2 pb-2 border-b border-gray-200 dark:border-gray-600">

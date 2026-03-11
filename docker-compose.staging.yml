@@ -51,6 +51,9 @@ services:
       - CORS_ORIGIN=${CORS_ORIGIN:-https://staging.your-domain.com}
       - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN:-}
       - TELEGRAM_CHAT_ID=${TELEGRAM_CHAT_ID:-}
+      - TELEGRAM_CHATBOT_TOKEN=${TELEGRAM_CHATBOT_TOKEN:-}
+      - TELEGRAM_WEBHOOK_URL=${TELEGRAM_WEBHOOK_URL:-}
+      - TELEGRAM_WEBHOOK_SECRET=${TELEGRAM_WEBHOOK_SECRET:-}
     ports:
       - "3002:3001"
     depends_on:

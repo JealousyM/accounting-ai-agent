@@ -89,6 +89,35 @@ enum AIMemorySource {
   tool_usage
 }
 
+enum OrgRole {
+  admin
+  member
+}
+
+enum OrgMembershipStatus {
+  active
+  pending
+  rejected
+}
+
+// ============================================
+// ORGANIZATIONS
+// ============================================
+
+model Organization {
+  id        String   @id @default(uuid()) @db.Uuid
+  name      String   // original companyName
+  nameNorm  String   @unique // lowercase trimmed for matching
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  members       User[]
+  conversations AIConversation[]
+
+  @@index([nameNorm])
+  @@map("organizations")
+}
+
 // ============================================
 // USER MANAGEMENT
 // ============================================
@@ -103,6 +132,11 @@ model User {
   // OAuth providers
   googleId     String?  @unique
   githubId     String?  @unique
+
+  // Organization membership
+  organizationId     String?             @db.Uuid
+  orgRole            OrgRole             @default(member)
+  orgMembershipStatus OrgMembershipStatus @default(active)
 
   // User preferences
   locale       String   @default("en") // User's preferred language (en, pl)
@@ -143,6 +177,7 @@ model User {
   deletedAt    DateTime?
 
   // Relations
+  organization    Organization?      @relation(fields: [organizationId], references: [id], onDelete: SetNull)
   conversations   AIConversation[]
   wfirmaCache     WFirmaCache[]
   apiCredentials  UserApiCredentials?
@@ -155,6 +190,7 @@ model User {
   auditLogs         AuditLog[]
   aiMemories        AIMemory[]
   aiToolUsage       AIToolUsage[]
+  telegramLink      TelegramLink?
 
   @@index([email])
   @@index([googleId])
@@ -162,6 +198,7 @@ model User {
   @@index([createdAt])
   @@index([stripeCustomerId])
   @@index([subscriptionPlan])
+  @@index([organizationId])
   @@map("users")
 }
 
@@ -217,18 +254,44 @@ model AIConversation {
   // LangGraph state
   graphState  Json?    @db.JsonB
 
+  // Shared conversation support
+  organizationId String?  @db.Uuid
+  isShared       Boolean  @default(false)
+  sharedAt       DateTime?
+
   // Timestamps
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   deletedAt   DateTime?
 
   // Relations
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization Organization? @relation(fields: [organizationId], references: [id], onDelete: SetNull)
 
   @@index([userId])
   @@index([createdAt])
   @@index([userId, createdAt])
+  @@index([organizationId, isShared, createdAt])
   @@map("ai_conversations")
+}
+
+// ============================================
+// TELEGRAM LINK
+// ============================================
+
+model TelegramLink {
+  id                   String   @id @default(uuid()) @db.Uuid
+  userId               String   @unique @db.Uuid
+  telegramUserId       String   @unique // Telegram numeric ID
+  telegramUsername      String?
+  telegramFirstName    String?
+  activeConversationId String?  @db.Uuid // current conversation
+  linkedAt             DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([telegramUserId])
+  @@map("telegram_links")
 }
 
 // ============================================

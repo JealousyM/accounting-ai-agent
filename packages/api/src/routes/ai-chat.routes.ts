@@ -14,6 +14,8 @@ import {
   getConversationSchema,
   deleteConversationSchema,
   sendMessageSchema,
+  shareConversationSchema,
+  unshareConversationSchema,
 } from '../validators/ai-chat.validators';
 
 const router = Router();
@@ -47,8 +49,19 @@ router.get(
 );
 
 /**
+ * GET /api/ai/conversations/shared
+ * Get shared conversations for user's organization
+ * IMPORTANT: Must be before /conversations/:id to avoid matching "shared" as an id
+ */
+router.get(
+  '/conversations/shared',
+  rateLimiter({ windowMs: 15 * 60 * 1000, max: 100 }),
+  aiChatController.getSharedConversations.bind(aiChatController)
+);
+
+/**
  * GET /api/ai/conversations/:id
- * Get single conversation with messages
+ * Get single conversation with messages (supports shared access)
  */
 router.get(
   '/conversations/:id',
@@ -66,6 +79,32 @@ router.delete(
   rateLimiter({ windowMs: 15 * 60 * 1000, max: 30 }),
   validateRequest(deleteConversationSchema),
   aiChatController.deleteConversation.bind(aiChatController)
+);
+
+// ============================================
+// SHARING ROUTES
+// ============================================
+
+/**
+ * POST /api/ai/conversations/:id/share
+ * Share conversation with organization
+ */
+router.post(
+  '/conversations/:id/share',
+  rateLimiter({ windowMs: 15 * 60 * 1000, max: 30 }),
+  validateRequest(shareConversationSchema),
+  aiChatController.shareConversation.bind(aiChatController)
+);
+
+/**
+ * POST /api/ai/conversations/:id/unshare
+ * Unshare conversation
+ */
+router.post(
+  '/conversations/:id/unshare',
+  rateLimiter({ windowMs: 15 * 60 * 1000, max: 30 }),
+  validateRequest(unshareConversationSchema),
+  aiChatController.unshareConversation.bind(aiChatController)
 );
 
 // ============================================

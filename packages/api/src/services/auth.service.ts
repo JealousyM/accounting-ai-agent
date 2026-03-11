@@ -6,6 +6,7 @@ import { prisma } from '../lib/prisma';
 import { redis } from '../lib/redis';
 import { emailService } from './email.service';
 import { credentialsService } from './credentials.instance';
+import { organizationService } from './organization.instance';
 import { logger } from '../utils/logger';
 
 // ============================================
@@ -154,6 +155,17 @@ export class AuthService {
           : undefined,
       },
     });
+
+    // Link user to organization if companyName is provided
+    // New org: user becomes admin (active). Existing org: user becomes pending member (needs admin approval).
+    if (validated.companyName) {
+      try {
+        await organizationService.findOrCreateByName(validated.companyName, user.id);
+      } catch (error) {
+        // Log error but don't fail registration
+        logger.warn('Failed to link user to organization during registration', { userId: user.id, error: (error as Error).message });
+      }
+    }
 
     // Save API credentials if provided
     // wFirma credentials - check if all credentials provided (regardless of checkbox)

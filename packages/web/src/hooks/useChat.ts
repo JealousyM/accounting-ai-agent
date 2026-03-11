@@ -34,6 +34,8 @@ export interface ChatMessage {
   role: 'user' | 'assistant' | 'system' | 'tool';
   content: string;
   timestamp: string;
+  authorId?: string;
+  authorName?: string;
   toolCalls?: {
     id: string;
     name: string;
@@ -64,6 +66,8 @@ export interface Conversation {
   messageCount: number;
   createdAt: string;
   updatedAt: string;
+  isShared?: boolean;
+  ownerName?: string;
 }
 
 export interface ConversationDetail {
@@ -74,6 +78,9 @@ export interface ConversationDetail {
   messages: ChatMessage[];
   createdAt: string;
   updatedAt: string;
+  isShared?: boolean;
+  organizationId?: string;
+  ownerName?: string;
 }
 
 // ============================================
@@ -134,6 +141,25 @@ const deleteConversation = async (id: string): Promise<void> => {
   });
 };
 
+const fetchSharedConversations = async (): Promise<Conversation[]> => {
+  const response = await axios.get(`${API_URL}/api/ai/conversations/shared`, {
+    headers: getAuthHeaders(),
+  });
+  return response.data.data;
+};
+
+const shareConversation = async (id: string): Promise<void> => {
+  await axios.post(`${API_URL}/api/ai/conversations/${id}/share`, {}, {
+    headers: getAuthHeaders(),
+  });
+};
+
+const unshareConversation = async (id: string): Promise<void> => {
+  await axios.post(`${API_URL}/api/ai/conversations/${id}/unshare`, {}, {
+    headers: getAuthHeaders(),
+  });
+};
+
 // ============================================
 // HOOK
 // ============================================
@@ -156,6 +182,7 @@ export function useChat() {
   });
 
   // Fetch current conversation details
+  // Poll shared conversations every 5s so other members see new messages in real time
   const {
     data: currentConversation,
     isLoading: isLoadingConversation,
@@ -163,6 +190,10 @@ export function useChat() {
     queryKey: ['conversation', currentConversationId],
     queryFn: () => fetchConversation(currentConversationId!),
     enabled: !!currentConversationId,
+    refetchInterval: (query) => {
+      const data = query.state.data;
+      return data?.isShared ? 5000 : false;
+    },
   });
 
   // Create conversation mutation
@@ -205,6 +236,35 @@ export function useChat() {
     onError: (error) => {
       setPendingMessage(null);
       setErrorMessage(extractErrorMessage(error));
+    },
+  });
+
+  // Fetch shared conversations (poll every 10s to show new shared chats)
+  const {
+    data: sharedConversations = [],
+  } = useQuery({
+    queryKey: ['shared-conversations'],
+    queryFn: fetchSharedConversations,
+    refetchInterval: 10000,
+  });
+
+  // Share conversation mutation
+  const shareConversationMutation = useMutation({
+    mutationFn: shareConversation,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['conversations'] });
+      queryClient.invalidateQueries({ queryKey: ['shared-conversations'] });
+      queryClient.invalidateQueries({ queryKey: ['conversation', currentConversationId] });
+    },
+  });
+
+  // Unshare conversation mutation
+  const unshareConversationMutation = useMutation({
+    mutationFn: unshareConversation,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['conversations'] });
+      queryClient.invalidateQueries({ queryKey: ['shared-conversations'] });
+      queryClient.invalidateQueries({ queryKey: ['conversation', currentConversationId] });
     },
   });
 
@@ -270,6 +330,22 @@ export function useChat() {
     [deleteConversationMutation]
   );
 
+  // Share conversation handler
+  const handleShareConversation = useCallback(
+    async (id: string) => {
+      await shareConversationMutation.mutateAsync(id);
+    },
+    [shareConversationMutation]
+  );
+
+  // Unshare conversation handler
+  const handleUnshareConversation = useCallback(
+    async (id: string) => {
+      await unshareConversationMutation.mutateAsync(id);
+    },
+    [unshareConversationMutation]
+  );
+
   // Get messages with pending message (empty when no conversation selected)
   const messages = currentConversationId ? (currentConversation?.messages || []) : [];
   const allMessages = pendingMessage
@@ -290,6 +366,7 @@ export function useChat() {
     currentConversation,
     currentConversationId,
     messages: allMessages,
+    sharedConversations,
 
     // Loading states
     isLoading: sendMessageMutation.isPending,
@@ -311,6 +388,8 @@ export function useChat() {
     createConversation: handleCreateConversation,
     selectConversation: handleSelectConversation,
     deleteConversation: handleDeleteConversation,
+    shareConversation: handleShareConversation,
+    unshareConversation: handleUnshareConversation,
     refetchConversations,
   };
 }

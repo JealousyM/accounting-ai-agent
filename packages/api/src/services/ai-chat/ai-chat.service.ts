@@ -138,13 +138,24 @@ export class AIChatService {
         // Parse existing messages
         const existingMessages = (conversation.messages as any[]) as ChatMessage[];
 
-        // Create user message
+        // Create user message (include author info for shared conversations)
         const userMessage: ChatMessage = {
           id: uuidv4(),
           role: 'user',
           content,
           timestamp: new Date(),
         };
+
+        if (conversation.isShared) {
+          const sender = await this.prisma.user.findUnique({
+            where: { id: userId },
+            select: { firstName: true, lastName: true },
+          });
+          userMessage.authorId = userId;
+          userMessage.authorName = sender
+            ? [sender.firstName, sender.lastName].filter(Boolean).join(' ') || undefined
+            : undefined;
+        }
 
         // Build LangGraph agent and run
         const { response, toolsUsed, actualProvider, actualModel, locale } = await this.runAgent(
@@ -263,13 +274,26 @@ export class AIChatService {
   }
 
   /**
-   * Get single conversation with messages
+   * Get single conversation with messages.
+   * Includes shared conversation metadata (isShared, organizationId, ownerName).
    */
   async getConversation(conversationId: string, userId: string): Promise<AIConversationData | null> {
     const conversation = await this.getConversationById(conversationId, userId);
     if (!conversation) return null;
 
     const messages = (conversation.messages as any[]) as ChatMessage[];
+
+    // Get owner name from user relation
+    let ownerName: string | undefined;
+    if (conversation.isShared) {
+      const owner = await this.prisma.user.findUnique({
+        where: { id: conversation.userId },
+        select: { firstName: true, lastName: true },
+      });
+      if (owner) {
+        ownerName = [owner.firstName, owner.lastName].filter(Boolean).join(' ') || undefined;
+      }
+    }
 
     return {
       id: conversation.id,
@@ -278,10 +302,128 @@ export class AIChatService {
       topic: conversation.topic || undefined,
       messages,
       graphState: conversation.graphState as ConversationGraphState,
+      isShared: conversation.isShared || undefined,
+      organizationId: conversation.organizationId || undefined,
+      ownerName,
       createdAt: conversation.createdAt,
       updatedAt: conversation.updatedAt,
       deletedAt: conversation.deletedAt || undefined,
     };
+  }
+
+  /**
+   * Get shared conversations for the user's organization.
+   */
+  async getSharedConversations(userId: string, limit: number = 50): Promise<ConversationListItem[]> {
+    // Get user's organizationId (only active members can see shared conversations)
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: { organizationId: true, orgMembershipStatus: true },
+    });
+
+    if (!user?.organizationId || user.orgMembershipStatus !== 'active') {
+      return [];
+    }
+
+    const conversations = await this.prisma.aIConversation.findMany({
+      where: {
+        organizationId: user.organizationId,
+        isShared: true,
+        deletedAt: null,
+      },
+      orderBy: { updatedAt: 'desc' },
+      take: limit,
+      include: {
+        user: {
+          select: { firstName: true, lastName: true },
+        },
+      },
+    });
+
+    return conversations.map(conv => {
+      const messages = (conv.messages as any[]) as ChatMessage[];
+      const lastUserMessage = [...messages].reverse().find(m => m.role === 'user');
+      const ownerName = [conv.user.firstName, conv.user.lastName].filter(Boolean).join(' ') || undefined;
+
+      return {
+        id: conv.id,
+        title: conv.title,
+        topic: conv.topic || undefined,
+        lastMessage: lastUserMessage?.content?.substring(0, 100),
+        messageCount: messages.filter(m => m.role !== 'system').length,
+        isShared: true,
+        ownerName,
+        createdAt: conv.createdAt,
+        updatedAt: conv.updatedAt,
+      };
+    });
+  }
+
+  /**
+   * Share a conversation with the user's organization.
+   */
+  async shareConversation(conversationId: string, userId: string): Promise<void> {
+    // Verify ownership
+    const conversation = await this.prisma.aIConversation.findFirst({
+      where: {
+        id: conversationId,
+        userId,
+        deletedAt: null,
+      },
+    });
+
+    if (!conversation) {
+      throw new Error('Conversation not found');
+    }
+
+    // Get user's organizationId (must be active member)
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: { organizationId: true, orgMembershipStatus: true },
+    });
+
+    if (!user?.organizationId || user.orgMembershipStatus !== 'active') {
+      throw new Error('User does not belong to an organization');
+    }
+
+    await this.prisma.aIConversation.update({
+      where: { id: conversationId },
+      data: {
+        isShared: true,
+        organizationId: user.organizationId,
+        sharedAt: new Date(),
+      },
+    });
+
+    logger.info('Conversation shared', { conversationId, userId, orgId: user.organizationId });
+  }
+
+  /**
+   * Unshare a conversation (remove from organization sharing).
+   */
+  async unshareConversation(conversationId: string, userId: string): Promise<void> {
+    // Verify ownership
+    const conversation = await this.prisma.aIConversation.findFirst({
+      where: {
+        id: conversationId,
+        userId,
+        deletedAt: null,
+      },
+    });
+
+    if (!conversation) {
+      throw new Error('Conversation not found');
+    }
+
+    await this.prisma.aIConversation.update({
+      where: { id: conversationId },
+      data: {
+        isShared: false,
+        sharedAt: null,
+      },
+    });
+
+    logger.info('Conversation unshared', { conversationId, userId });
   }
 
   /**
@@ -529,18 +671,49 @@ export class AIChatService {
   // ============================================
 
   /**
-   * Get conversation by ID with user authorization
+   * Get conversation by ID with user authorization.
+   * Supports both owner access and shared access (same organization).
    */
   private async getConversationById(
     conversationId: string,
     userId: string
   ): Promise<AIConversation | null> {
-    return this.prisma.aIConversation.findFirst({
+    // First try: owner access
+    const ownConversation = await this.prisma.aIConversation.findFirst({
       where: {
         id: conversationId,
         userId,
         deletedAt: null,
       },
     });
+
+    if (ownConversation) {
+      return ownConversation;
+    }
+
+    // Second try: shared access (same organization)
+    const sharedConversation = await this.prisma.aIConversation.findFirst({
+      where: {
+        id: conversationId,
+        isShared: true,
+        deletedAt: null,
+      },
+    });
+
+    if (!sharedConversation || !sharedConversation.organizationId) {
+      return null;
+    }
+
+    // Check if user belongs to the same organization and is an active member
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: { organizationId: true, orgMembershipStatus: true },
+    });
+
+    if (user?.organizationId === sharedConversation.organizationId && user.orgMembershipStatus === 'active') {
+      return sharedConversation;
+    }
+
+    return null;
   }
 }

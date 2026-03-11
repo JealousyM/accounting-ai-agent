@@ -259,6 +259,145 @@ export class AIChatController {
       });
     }
   }
+  /**
+   * GET /api/ai/conversations/shared
+   * Get shared conversations for user's organization
+   */
+  async getSharedConversations(req: Request, res: Response): Promise<void> {
+    try {
+      const userId = req.user?.userId;
+
+      if (!userId) {
+        res.status(401).json({
+          success: false,
+          error: 'Unauthorized',
+          message: 'User not authenticated',
+        });
+        return;
+      }
+
+      const limit = req.query.limit ? parseInt(req.query.limit as string, 10) : 50;
+
+      const conversations = await aiChatService.getSharedConversations(userId, limit);
+
+      res.status(200).json({
+        success: true,
+        data: conversations,
+      });
+    } catch (error) {
+      logger.error('Failed to get shared conversations', { error, userId: req.user?.userId });
+      res.status(500).json({
+        success: false,
+        error: 'Internal Server Error',
+        message: 'Failed to fetch shared conversations',
+      });
+    }
+  }
+
+  /**
+   * POST /api/ai/conversations/:id/share
+   * Share a conversation with the user's organization
+   */
+  async shareConversation(req: Request, res: Response): Promise<void> {
+    try {
+      const userId = req.user?.userId;
+      const { id } = req.params;
+
+      if (!userId) {
+        res.status(401).json({
+          success: false,
+          error: 'Unauthorized',
+          message: 'User not authenticated',
+        });
+        return;
+      }
+
+      await aiChatService.shareConversation(id, userId);
+
+      res.status(200).json({
+        success: true,
+        message: 'Conversation shared successfully',
+      });
+    } catch (error) {
+      const msg = (error as Error).message;
+
+      if (msg === 'Conversation not found') {
+        res.status(404).json({
+          success: false,
+          error: 'Not Found',
+          message: 'Conversation not found',
+        });
+        return;
+      }
+
+      if (msg === 'User does not belong to an organization') {
+        res.status(400).json({
+          success: false,
+          error: 'Bad Request',
+          message: msg,
+        });
+        return;
+      }
+
+      logger.error('Failed to share conversation', {
+        error,
+        conversationId: req.params.id,
+        userId: req.user?.userId,
+      });
+      res.status(500).json({
+        success: false,
+        error: 'Internal Server Error',
+        message: 'Failed to share conversation',
+      });
+    }
+  }
+
+  /**
+   * POST /api/ai/conversations/:id/unshare
+   * Unshare a conversation
+   */
+  async unshareConversation(req: Request, res: Response): Promise<void> {
+    try {
+      const userId = req.user?.userId;
+      const { id } = req.params;
+
+      if (!userId) {
+        res.status(401).json({
+          success: false,
+          error: 'Unauthorized',
+          message: 'User not authenticated',
+        });
+        return;
+      }
+
+      await aiChatService.unshareConversation(id, userId);
+
+      res.status(200).json({
+        success: true,
+        message: 'Conversation unshared successfully',
+      });
+    } catch (error) {
+      if ((error as Error).message === 'Conversation not found') {
+        res.status(404).json({
+          success: false,
+          error: 'Not Found',
+          message: 'Conversation not found',
+        });
+        return;
+      }
+
+      logger.error('Failed to unshare conversation', {
+        error,
+        conversationId: req.params.id,
+        userId: req.user?.userId,
+      });
+      res.status(500).json({
+        success: false,
+        error: 'Internal Server Error',
+        message: 'Failed to unshare conversation',
+      });
+    }
+  }
 }
 
 export const aiChatController = new AIChatController();

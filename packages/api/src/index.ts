@@ -19,6 +19,9 @@ import hrRoutes from './routes/hr.routes';
 import ksefRoutes from './routes/ksef.routes';
 import dashboardRoutes from './routes/dashboard.routes';
 import aiMemoryRoutes from './routes/ai-memory.routes';
+import organizationRoutes from './routes/organization.routes';
+import telegramBotRoutes from './routes/telegram-bot.routes';
+import { telegramBotService } from './services/telegram-bot';
 import { globalRateLimiter } from './middleware/rate-limiter.middleware';
 import { auditLogMiddleware } from './middleware/audit-log.middleware';
 import { errorHandler, notFoundHandler } from './middleware/error-handler.middleware';
@@ -110,6 +113,12 @@ app.use('/api/dashboard', dashboardRoutes);
 // AI Memory routes (context memory management)
 app.use('/api/ai/memory', aiMemoryRoutes);
 
+// Organization routes
+app.use('/api/organization', organizationRoutes);
+
+// Telegram bot routes (account linking)
+app.use('/api/telegram', telegramBotRoutes);
+
 // 404 handler
 app.use(notFoundHandler);
 
@@ -126,12 +135,33 @@ const server = app.listen(PORT, async () => {
 
   // Start KSeF status poller for background invoice status updates
   ksefStatusPoller.start();
+
+  // Start Telegram chatbot
+  if (telegramBotService.isInitialized()) {
+    const webhookUrl = process.env.TELEGRAM_WEBHOOK_URL;
+    const webhookSecret = process.env.TELEGRAM_WEBHOOK_SECRET;
+
+    if (webhookUrl && webhookSecret) {
+      // Production: use webhook
+      await telegramBotService.setupWebhook(webhookUrl, webhookSecret);
+      const webhookCb = telegramBotService.getWebhookCallback(webhookSecret);
+      if (webhookCb) {
+        app.use('/api/telegram/webhook', webhookCb);
+      }
+      logger.info('[TelegramBot] Webhook mode enabled');
+    } else {
+      // Development: use polling
+      await telegramBotService.startPolling();
+      logger.info('[TelegramBot] Polling mode enabled');
+    }
+  }
 });
 
 // Graceful shutdown
 const shutdown = () => {
   logger.info('Shutting down gracefully...');
   ksefStatusPoller.stop();
+  telegramBotService.stop();
   server.close(() => {
     logger.info('Server closed');
     process.exit(0);

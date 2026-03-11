@@ -258,6 +258,14 @@
         "shimmer": "Shimmer (Мягкий)"
       }
     },
+    "shared": {
+      "section": "Общие",
+      "sharedBy": "от {name}",
+      "share": "Поделиться с организацией",
+      "unshare": "Прекратить совместный доступ",
+      "sharedBadge": "Общий",
+      "noOrganization": "Присоединитесь к организации, чтобы делиться чатами"
+    },
     "aiCosts": "Затраты ИИ"
   },
   "profile": {
@@ -316,6 +324,16 @@
     "errorRemoveWfirma": "Не удалось удалить данные wFirma",
     "errorSaveLlm": "Не удалось сохранить ключ LLM",
     "errorRemoveLlm": "Не удалось удалить ключ LLM"
+  },
+  "telegram": {
+    "title": "Telegram Бот",
+    "description": "Свяжите аккаунт Telegram для общения с ИИ через Telegram",
+    "codePlaceholder": "Введите 6-значный код",
+    "linkButton": "Связать",
+    "unlinkButton": "Отвязать",
+    "linked": "Связан как",
+    "notLinked": "Не связан",
+    "instructions": "Отправьте /link боту @eKsiegowyAIBot в Telegram, чтобы получить код"
   },
   "onboarding": {
     "wfirmaWelcome": {
@@ -560,6 +578,8 @@
       "taxes": "Налоги",
       "wfirma": "wFirma",
       "settings": "Настройки",
+      "organization": "Организация",
+      "telegram": "Telegram",
       "faq": "FAQ"
     },
     "searchMatch": {
@@ -1168,5 +1188,31 @@
       "pinned": "Закреплено",
       "hidden": "Скрыто"
     }
+  },
+  "organization": {
+    "title": "Организация",
+    "sidebarLink": "Организация",
+    "noOrganization": "Вы не состоите в организации",
+    "pendingApproval": "Ожидание одобрения администратора",
+    "members": "Участники",
+    "pendingMembers": "Ожидающие",
+    "admin": "Администратор",
+    "member": "Участник",
+    "promote": "Повысить до администратора",
+    "demote": "Понизить до участника",
+    "remove": "Удалить",
+    "approve": "Принять",
+    "reject": "Отклонить",
+    "leave": "Покинуть организацию",
+    "leaveConfirm": "Покинуть организацию?",
+    "leaveWarning": "Вы потеряете доступ к общим чатам. Вы можете присоединиться снова, но потребуется одобрение администратора.",
+    "editName": "Изменить название",
+    "save": "Сохранить",
+    "cancel": "Отмена",
+    "createOrJoin": "Создать или присоединиться к организации",
+    "companyNamePlaceholder": "Введите название компании",
+    "joinButton": "Продолжить",
+    "createInfo": "Если организации с таким названием не существует, будет создана новая, и вы станете её администратором.",
+    "joinInfo": "Если организация уже существует, запрос на вступление будет отправлен администратору на одобрение."
   }
 }
