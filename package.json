@@ -1,38 +1,39 @@
 {
-  "name": "accounting-ai-agent",
-  "version": "1.0.0",
-  "private": true,
-  "description": "AI Agent for automation accounting",
-  "workspaces": [
-    "packages/*"
-  ],
-  "scripts": {
-    "dev": "turbo run dev",
-    "dev:check": "node scripts/check-env.js && npm run dev",
-    "build": "turbo run build",
-    "test": "turbo run test",
-    "test:ci": "turbo run test --force",
-    "lint": "turbo run lint",
-    "clean": "turbo run clean",
-    "docker:up": "docker-compose up -d",
-    "docker:down": "docker-compose down",
-    "docker:logs": "docker-compose logs -f",
-    "docker:build": "docker-compose build",
-    "prisma:generate": "cd packages/api && npx prisma generate",
-    "prisma:migrate": "cd packages/api && npx prisma migrate deploy",
-    "prisma:migrate:dev": "cd packages/api && npx prisma migrate dev",
-    "prisma:seed": "cd packages/api && npx prisma db seed",
-    "prisma:studio": "cd packages/api && npx prisma studio"
-  },
-  "devDependencies": {
-    "turbo": "^1.11.0",
-    "typescript": "^5.3.3"
-  },
-  "engines": {
-    "node": ">=18.0.0",
-    "npm": ">=9.0.0"
-  },
-  "dependencies": {
-    "recharts": "^3.6.0"
-  }
+    "name": "accounting-ai-agent",
+    "version": "1.0.0",
+    "private": true,
+    "description": "AI Agent for automation accounting",
+    "workspaces": [
+        "packages/*"
+    ],
+    "scripts": {
+        "dev": "turbo run dev",
+        "dev:check": "node scripts/check-env.js && npm run dev",
+        "build": "turbo run build",
+        "test": "turbo run test",
+        "test:coverage": "turbo run test:coverage",
+        "test:ci": "turbo run test --force",
+        "lint": "turbo run lint",
+        "clean": "turbo run clean",
+        "docker:up": "docker-compose up -d",
+        "docker:down": "docker-compose down",
+        "docker:logs": "docker-compose logs -f",
+        "docker:build": "docker-compose build",
+        "prisma:generate": "cd packages/api && npx prisma generate",
+        "prisma:migrate": "cd packages/api && npx prisma migrate deploy",
+        "prisma:migrate:dev": "cd packages/api && npx prisma migrate dev",
+        "prisma:seed": "cd packages/api && npx prisma db seed",
+        "prisma:studio": "cd packages/api && npx prisma studio"
+    },
+    "devDependencies": {
+        "turbo": "^1.11.0",
+        "typescript": "^5.3.3"
+    },
+    "engines": {
+        "node": ">=18.0.0",
+        "npm": ">=9.0.0"
+    },
+    "dependencies": {
+        "recharts": "^3.6.0"
+    }
 }
