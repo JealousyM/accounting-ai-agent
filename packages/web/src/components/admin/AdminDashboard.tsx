@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useLocale } from '@/contexts/LocaleContext';
+import { useRouter } from 'next/navigation';
 import { adminApi } from '@/lib/api/admin';
 import { ArrowLeft, RefreshCw, Search, Users, DollarSign, MessageSquare, Shield, Volume2, ClipboardList } from 'lucide-react';
 import Link from 'next/link';
@@ -41,6 +42,7 @@ export function AdminDashboard() {
   const { locale } = useLocale();
   const t = translations[locale].admin;
   const queryClient = useQueryClient();
+  const router = useRouter();
   const [searchTerm, setSearchTerm] = useState('');
   const [page, setPage] = useState(1);
     const [roleFilter, setRoleFilter] = useState<'all' | 'user' | 'admin'>('all');
@@ -250,7 +252,11 @@ export function AdminDashboard() {
                   </tr>
                 ) : (
                   usersData?.users.map((user) => (
-                    <tr key={user.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50">
+                    <tr
+                      key={user.id}
+                      className="hover:bg-gray-50 dark:hover:bg-gray-700/50 cursor-pointer"
+                      onClick={() => router.push(`/admin/users/${user.id}`)}
+                    >
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
                         {user.email}
                       </td>
@@ -282,7 +288,10 @@ export function AdminDashboard() {
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-300">
                         {new Date(user.createdAt).toLocaleDateString()}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-right">
+                      <td
+                        className="px-6 py-4 whitespace-nowrap text-right"
+                        onClick={(e) => e.stopPropagation()}
+                      >
                         <button
                           onClick={() =>
                             handleRoleChange(
