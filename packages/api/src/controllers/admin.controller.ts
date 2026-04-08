@@ -2,6 +2,17 @@ import { Request, Response } from 'express';
 import { adminService } from '../services/admin.instance';
 import { auditLogService } from '../services/audit-log.instance';
 import { logger } from '../utils/logger';
+import { subscriptionPlanSchema, limitsSchema, resetUsageSchema, statsRangeSchema } from '../types/admin.types';
+
+function handleServiceError(res: Response, error: any, fallbackMessage: string, ctx: object): void {
+  const status = error?.statusCode ?? 500;
+  if (status >= 500) logger.error(fallbackMessage, { error, ...ctx });
+  res.status(status).json({
+    success: false,
+    error: status === 400 ? 'Validation Error' : status === 404 ? 'Not Found' : 'Internal Server Error',
+    message: error?.message ?? fallbackMessage,
+  });
+}
 
 export class AdminController {
   /**
@@ -91,20 +102,16 @@ export class AdminController {
         return;
       }
 
-      await adminService.updateUserRole(id, role);
+      await adminService.updateUserRole(id, role, { actorId: req.user!.userId });
       res.status(200).json({
         success: true,
         message: 'User role updated successfully',
       });
-    } catch (error) {
-      logger.error('Failed to update user role', { error, userId: req.params.id });
-      res.status(500).json({
-        success: false,
-        error: 'Internal Server Error',
-        message: 'Failed to update user role',
-      });
+    } catch (e) {
+      handleServiceError(res, e, 'Failed to update user role', { id: req.params.id });
     }
   }
+
   /**
    * GET /api/admin/audit-log
    * Paginated audit log with filters
@@ -131,6 +138,94 @@ export class AdminController {
         error: 'Internal Server Error',
         message: 'Failed to fetch audit log',
       });
+    }
+  }
+
+  /**
+   * DELETE /api/admin/users/:id
+   * Soft-delete user
+   */
+  async softDeleteUser(req: Request, res: Response): Promise<void> {
+    try {
+      await adminService.softDeleteUser({ actorId: req.user!.userId, targetUserId: req.params.id });
+      res.status(200).json({ success: true, data: { ok: true, mode: 'soft' } });
+    } catch (e) { handleServiceError(res, e, 'Failed to soft-delete user', { id: req.params.id }); }
+  }
+
+  /**
+   * DELETE /api/admin/users/:id/hard
+   * Hard-delete user (irreversible)
+   */
+  async hardDeleteUser(req: Request, res: Response): Promise<void> {
+    try {
+      await adminService.hardDeleteUser({ actorId: req.user!.userId, targetUserId: req.params.id });
+      res.status(200).json({ success: true, data: { ok: true, mode: 'hard' } });
+    } catch (e) { handleServiceError(res, e, 'Failed to hard-delete user', { id: req.params.id }); }
+  }
+
+  /**
+   * PATCH /api/admin/users/:id/subscription
+   * Change subscription plan
+   */
+  async updateSubscription(req: Request, res: Response): Promise<void> {
+    try {
+      const { plan } = subscriptionPlanSchema.parse(req.body);
+      const data = await adminService.updateSubscriptionPlan({
+        actorId: req.user!.userId, targetUserId: req.params.id, plan,
+      });
+      res.status(200).json({ success: true, data });
+    } catch (e: any) {
+      if (e?.name === 'ZodError') return handleServiceError(res, { statusCode: 400, message: e.errors?.[0]?.message ?? 'Invalid payload' }, 'Invalid payload', {});
+      handleServiceError(res, e, 'Failed to update subscription', { id: req.params.id });
+    }
+  }
+
+  /**
+   * PATCH /api/admin/users/:id/limits
+   * Update usage limits
+   */
+  async updateLimits(req: Request, res: Response): Promise<void> {
+    try {
+      const body = limitsSchema.parse(req.body);
+      const data = await adminService.updateUserLimits({
+        actorId: req.user!.userId, targetUserId: req.params.id, ...body,
+      });
+      res.status(200).json({ success: true, data });
+    } catch (e: any) {
+      if (e?.name === 'ZodError') return handleServiceError(res, { statusCode: 400, message: e.errors?.[0]?.message ?? 'Invalid payload' }, 'Invalid payload', {});
+      handleServiceError(res, e, 'Failed to update limits', { id: req.params.id });
+    }
+  }
+
+  /**
+   * POST /api/admin/users/:id/reset-usage
+   * Reset usage counters
+   */
+  async resetUsage(req: Request, res: Response): Promise<void> {
+    try {
+      const { type } = resetUsageSchema.parse(req.body);
+      const data = await adminService.resetUsageCounter({
+        actorId: req.user!.userId, targetUserId: req.params.id, type,
+      });
+      res.status(200).json({ success: true, data });
+    } catch (e: any) {
+      if (e?.name === 'ZodError') return handleServiceError(res, { statusCode: 400, message: e.errors?.[0]?.message ?? 'Invalid payload' }, 'Invalid payload', {});
+      handleServiceError(res, e, 'Failed to reset usage', { id: req.params.id });
+    }
+  }
+
+  /**
+   * GET /api/admin/users/:id/stats
+   * Get deep stats for a user
+   */
+  async getUserStats(req: Request, res: Response): Promise<void> {
+    try {
+      const { range } = statsRangeSchema.parse({ range: req.query.range });
+      const data = await adminService.getUserDeepStats(req.params.id, range);
+      res.status(200).json({ success: true, data });
+    } catch (e: any) {
+      if (e?.name === 'ZodError') return handleServiceError(res, { statusCode: 400, message: 'Invalid range' }, 'Invalid range', {});
+      handleServiceError(res, e, 'Failed to fetch user stats', { id: req.params.id });
     }
   }
 }

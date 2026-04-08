@@ -58,14 +58,17 @@ export interface UserDetailResponse {
     locale: string;
     createdAt: string;
     updatedAt: string;
+    deletedAt: string | null;
+    subscriptionPlan: string;
+    subscriptionStatus: string;
+    subscriptionEndDate: string | null;
+    aiMessagesLimit: number;
+    aiMessagesUsed: number;
+    wfirmaRequestsLimit: number;
+    wfirmaRequestsUsed: number;
+    ttsCharactersUsed: number;
+    ttsCostUsd: number;
   };
-  conversations: Array<{
-    id: string;
-    title: string;
-    createdAt: string;
-    updatedAt: string;
-  }>;
-  costData: any;
 }
 
 // ============================================
@@ -94,6 +97,41 @@ export async function fetchUserDetail(userId: string): Promise<UserDetailRespons
 
 export async function updateUserRole(userId: string, role: 'user' | 'admin'): Promise<void> {
   await apiClient.patch(`/api/admin/users/${userId}/role`, { role });
+}
+
+// ============================================
+// USER STATS TYPES
+// ============================================
+
+export type StatsRange = 'week' | 'month' | 'year';
+
+export type ToolCategory = 'wfirma' | 'ksef' | 'memory' | 'hr' | 'org' | 'other';
+
+export interface UserDeepStats {
+  range: StatsRange;
+  cost: {
+    totalUsd: number;
+    totalTokens: number;
+    promptTokens: number;
+    completionTokens: number;
+    runCount: number;
+    langsmithConversationCount: number;
+    avgCostPerLangsmithConversation: number;
+  };
+  activityByDay: Array<{ date: string; toolCalls: number; conversations: number }>;
+  conversations: { totalInRange: number };
+  toolUsage: {
+    totalCalls: number;
+    topTools: Array<{ toolName: string; count: number }>;
+    byCategory: Array<{ category: ToolCategory; count: number }>;
+  };
+  channels: {
+    web: { active: true };
+    telegram: { active: boolean; linkedAt: string | null };
+  };
+  tts: { charactersUsed: number; costUsd: number };
+  memories: { total: number; byCategory: Array<{ category: string; count: number }> };
+  lastActivity: { lastConversationAt: string | null; lastToolCallAt: string | null };
 }
 
 // ============================================
@@ -153,10 +191,58 @@ export async function fetchAuditLog(params: GetAuditLogParams = {}): Promise<Aud
   return apiClient.get<AuditLogResponse>(url);
 }
 
+export async function fetchUserStats(userId: string, range: StatsRange): Promise<UserDeepStats> {
+  return apiClient.get<UserDeepStats>(`/api/admin/users/${userId}/stats?range=${range}`);
+}
+
+export async function softDeleteUser(userId: string): Promise<void> {
+  await apiClient.delete(`/api/admin/users/${userId}`);
+}
+
+export async function hardDeleteUser(userId: string): Promise<void> {
+  await apiClient.delete(`/api/admin/users/${userId}/hard`);
+}
+
+export async function updateUserSubscription(
+  userId: string,
+  plan: 'free' | 'pro'
+): Promise<{ id: string; subscriptionPlan: 'free' | 'pro' }> {
+  return apiClient.patch<{ id: string; subscriptionPlan: 'free' | 'pro' }>(
+    `/api/admin/users/${userId}/subscription`,
+    { plan }
+  );
+}
+
+export async function updateUserLimits(
+  userId: string,
+  body: { aiMessagesLimit?: number; wfirmaRequestsLimit?: number }
+): Promise<{ id: string; aiMessagesLimit: number; wfirmaRequestsLimit: number }> {
+  return apiClient.patch<{ id: string; aiMessagesLimit: number; wfirmaRequestsLimit: number }>(
+    `/api/admin/users/${userId}/limits`,
+    body
+  );
+}
+
+export async function resetUserUsage(
+  userId: string,
+  type: 'ai' | 'wfirma' | 'both'
+): Promise<{ id: string; aiMessagesUsed: number; wfirmaRequestsUsed: number }> {
+  return apiClient.post<{ id: string; aiMessagesUsed: number; wfirmaRequestsUsed: number }>(
+    `/api/admin/users/${userId}/reset-usage`,
+    { type }
+  );
+}
+
 export const adminApi = {
   fetchDashboard: fetchAdminDashboard,
   fetchUsers,
   fetchUserDetail,
   updateUserRole,
   fetchAuditLog,
+  fetchUserStats,
+  softDeleteUser,
+  hardDeleteUser,
+  updateUserSubscription,
+  updateUserLimits,
+  resetUserUsage,
 };
