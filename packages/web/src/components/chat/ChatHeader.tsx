@@ -103,13 +103,6 @@ export function ChatHeader({
     return () => document.removeEventListener('mousedown', handleClick);
   }, [isMobileMenuOpen]);
 
-  const cycleLocale = () => {
-    const locales: Locale[] = ['en', 'pl', 'ru'];
-    const currentIndex = locales.indexOf(locale);
-    const nextIndex = (currentIndex + 1) % locales.length;
-    onLocaleChange(locales[nextIndex]);
-  };
-
   return (
     <>
       <div className="flex items-center justify-between px-4 py-3 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
@@ -183,15 +176,18 @@ export function ChatHeader({
           </div>
 
           {/* Language switcher - desktop only */}
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={cycleLocale}
-            className="hidden sm:flex items-center gap-1 text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100 px-3"
-          >
+          <div className="hidden sm:flex items-center gap-1 text-gray-600 dark:text-gray-400 px-1">
             <Globe className="w-4 h-4" />
-            <span className="text-xs font-medium">{localeLabels[locale]}</span>
-          </Button>
+            <select
+              value={locale}
+              onChange={(e) => onLocaleChange(e.target.value as Locale)}
+              className="text-xs font-medium bg-transparent border-none cursor-pointer focus:ring-0 focus:outline-none text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 py-1"
+            >
+              {Object.entries(localeLabels).map(([val, label]) => (
+                <option key={val} value={val}>{label}</option>
+              ))}
+            </select>
+          </div>
 
           {/* Profile button - desktop only */}
           <Button
@@ -263,15 +259,18 @@ export function ChatHeader({
                 </button>
 
                 {/* Language */}
-                <button
-                  onClick={() => { cycleLocale(); setIsMobileMenuOpen(false); }}
-                  className="flex items-center justify-between w-full px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
-                >
-                  <span className="flex items-center gap-3">
-                    <Globe className="w-4 h-4" />
-                    {localeLabels[locale]}
-                  </span>
-                </button>
+                <div className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300">
+                  <Globe className="w-4 h-4" />
+                  <select
+                    value={locale}
+                    onChange={(e) => { onLocaleChange(e.target.value as Locale); setIsMobileMenuOpen(false); }}
+                    className="text-sm bg-transparent border-none cursor-pointer focus:ring-0 focus:outline-none text-gray-700 dark:text-gray-300 py-0"
+                  >
+                    {Object.entries(localeLabels).map(([val, label]) => (
+                      <option key={val} value={val}>{label}</option>
+                    ))}
+                  </select>
+                </div>
 
                 {/* Theme */}
                 <div className="flex items-center justify-between px-4 py-2.5">
