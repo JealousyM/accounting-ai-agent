@@ -120,7 +120,8 @@ const createConversation = async (title?: string): Promise<{ id: string; title: 
 const sendMessage = async (
   conversationId: string,
   content: string,
-  provider?: 'openai' | 'google'
+  provider?: 'openai' | 'google',
+  ttsEnabled?: boolean
 ): Promise<{
   userMessage: ChatMessage;
   assistantMessage: ChatMessage;
@@ -129,7 +130,7 @@ const sendMessage = async (
 }> => {
   const response = await axios.post(
     `${API_URL}/api/ai/conversations/${conversationId}/messages`,
-    { content, provider },
+    { content, provider, ttsEnabled },
     { headers: getAuthHeaders() }
   );
   return response.data.data;
@@ -211,11 +212,13 @@ export function useChat() {
       conversationId,
       content,
       provider,
+      ttsEnabled,
     }: {
       conversationId: string;
       content: string;
       provider?: 'openai' | 'google';
-    }) => sendMessage(conversationId, content, provider),
+      ttsEnabled?: boolean;
+    }) => sendMessage(conversationId, content, provider, ttsEnabled),
     onMutate: async ({ content }) => {
       // Optimistic update: show user message immediately
       setPendingMessage(content);
@@ -290,7 +293,7 @@ export function useChat() {
 
   // Send message handler
   const handleSendMessage = useCallback(
-    async (content: string, provider?: 'openai' | 'google') => {
+    async (content: string, provider?: 'openai' | 'google', ttsEnabled?: boolean) => {
       if (!content.trim()) return;
 
       // If no conversation, create one first
@@ -300,12 +303,14 @@ export function useChat() {
           conversationId: newConv.id,
           content,
           provider,
+          ttsEnabled,
         });
       } else {
         sendMessageMutation.mutate({
           conversationId: currentConversationId,
           content,
           provider,
+          ttsEnabled,
         });
       }
     },

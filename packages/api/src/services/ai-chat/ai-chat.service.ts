@@ -121,7 +121,8 @@ export class AIChatService {
     conversationId: string,
     userId: string,
     content: string,
-    provider?: LLMProvider
+    provider?: LLMProvider,
+    options?: { ttsEnabled?: boolean }
   ): Promise<ProcessMessageResult> {
     // Wrap entire message processing in traceable for unified LangSmith trace
     const processMessage = traceable(
@@ -214,12 +215,15 @@ export class AIChatService {
           ).catch(err => logger.warn('Memory extraction failed', { err, conversationId }));
         }
 
-        // Generate TTS for AI response (within same trace context)
+        // Generate TTS for AI response only if client has TTS enabled
+        // When ttsEnabled is undefined (old clients), default to true for backward compat
         let tts: TTSMetadata | undefined;
-        try {
-          tts = await this.ttsIntegration.generateForResponse(userId, response, locale);
-        } catch (error) {
-          logger.warn('TTS integration failed', { error, conversationId, userId });
+        if (options?.ttsEnabled !== false) {
+          try {
+            tts = await this.ttsIntegration.generateForResponse(userId, response, locale);
+          } catch (error) {
+            logger.warn('TTS integration failed', { error, conversationId, userId });
+          }
         }
 
         return {
