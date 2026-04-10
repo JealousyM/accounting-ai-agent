@@ -64,7 +64,7 @@ interface TTSContextType {
 
 const TTS_STORAGE_KEY = 'tts-settings';
 const DEFAULT_SETTINGS: TTSSettings = {
-  enabled: true,
+  enabled: false,
   autoSpeak: true,
   rate: 1.0,
   useAI: false,

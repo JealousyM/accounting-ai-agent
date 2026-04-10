@@ -12,7 +12,11 @@ import ruTranslations from '@/i18n/locales/ru.json';
 
 const translations = { en: enTranslations, pl: plTranslations, ru: ruTranslations };
 
-const locales: Locale[] = ['en', 'pl', 'ru'];
+const localeOptions: { value: Locale; label: string }[] = [
+  { value: 'en', label: 'EN' },
+  { value: 'pl', label: 'PL' },
+  { value: 'ru', label: 'RU' },
+];
 
 export function LandingHeader() {
   const { locale, setLocale } = useLocale();
@@ -49,21 +53,15 @@ export function LandingHeader() {
         {/* Desktop right */}
         <div className="hidden md:flex items-center gap-2">
           {/* Locale switcher */}
-          <div className="flex items-center gap-1 mr-1">
-            {locales.map((l) => (
-              <button
-                key={l}
-                onClick={() => setLocale(l)}
-                className={`px-2 py-1 text-xs rounded uppercase font-medium transition-colors ${
-                  locale === l
-                    ? 'bg-blue-600 text-white'
-                    : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700'
-                }`}
-              >
-                {l}
-              </button>
+          <select
+            value={locale}
+            onChange={(e) => setLocale(e.target.value as Locale)}
+            className="px-2 py-1 text-xs font-medium rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent cursor-pointer mr-1"
+          >
+            {localeOptions.map((l) => (
+              <option key={l.value} value={l.value}>{l.label}</option>
             ))}
-          </div>
+          </select>
 
           <ThemeToggle />
 
@@ -129,21 +127,15 @@ export function LandingHeader() {
 
             {/* Locale + Theme */}
             <div className="flex items-center justify-between pt-2 border-t border-gray-200 dark:border-gray-700">
-              <div className="flex items-center gap-1">
-                {locales.map((l) => (
-                  <button
-                    key={l}
-                    onClick={() => setLocale(l)}
-                    className={`px-2 py-1 text-xs rounded uppercase font-medium transition-colors ${
-                      locale === l
-                        ? 'bg-blue-600 text-white'
-                        : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700'
-                    }`}
-                  >
-                    {l}
-                  </button>
+              <select
+                value={locale}
+                onChange={(e) => setLocale(e.target.value as Locale)}
+                className="px-2 py-1 text-xs font-medium rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent cursor-pointer"
+              >
+                {localeOptions.map((l) => (
+                  <option key={l.value} value={l.value}>{l.label}</option>
                 ))}
-              </div>
+              </select>
               <ThemeToggle />
             </div>
           </div>
