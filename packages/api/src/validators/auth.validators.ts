@@ -70,6 +70,7 @@ export const registerSchema = z.object({
     llmProvider: z.enum(['openai', 'google', 'none']).optional(),
     llmApiKey: z.string().max(500).trim().optional(),
     llmModel: z.string().max(100).trim().optional(),
+    referredByCode: z.string().length(8).optional(),
   }),
 });
 
