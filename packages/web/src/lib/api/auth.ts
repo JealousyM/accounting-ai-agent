@@ -27,6 +27,8 @@ export interface RegisterData {
   // Subscription option
   subscribeToPro?: boolean;
   billingPeriod?: 'monthly' | 'yearly';
+  // Referral
+  referredByCode?: string;
 }
 
 export interface AuthData {
