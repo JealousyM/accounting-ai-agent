@@ -12,6 +12,7 @@ import {
 } from '../types/subscription.types';
 import { CredentialsService } from './credentials.service';
 import { telegramService } from './telegram.instance';
+import { referralService } from './referral.instance';
 import { logger } from '../utils/logger';
 
 export class SubscriptionService {
@@ -108,7 +109,7 @@ export class SubscriptionService {
     const stripe = getStripeClient();
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
-      select: { email: true, stripeCustomerId: true },
+      select: { email: true, stripeCustomerId: true, referredByCode: true },
     });
 
     if (!user) {
@@ -130,6 +131,11 @@ export class SubscriptionService {
       });
     }
 
+    // Check if user was referred — apply first-month discount
+    const discounts = user.referredByCode
+      ? [{ coupon: 'first_month_referral' }]
+      : undefined;
+
     // Determine base URL
     const baseUrl = process.env.FRONTEND_URL || 'http://localhost:3001';
 
@@ -140,6 +146,7 @@ export class SubscriptionService {
       success_url: request.successUrl || `${baseUrl}${STRIPE_CONFIG.defaultSuccessUrl}`,
       cancel_url: request.cancelUrl || `${baseUrl}${STRIPE_CONFIG.defaultCancelUrl}`,
       metadata: { userId },
+      ...(discounts ? { discounts } : {}),
       subscription_data: {
         metadata: { userId },
       },
@@ -261,6 +268,13 @@ export class SubscriptionService {
       const subscription = await stripe.subscriptions.retrieve(session.subscription);
       await this.syncSubscription(userId, subscription);
       logger.info('[Subscription] Synced subscription after checkout', { userId, subscriptionId: subscription.id });
+
+      // Trigger referral conversion if applicable
+      try {
+        await referralService.convertReferral(userId);
+      } catch (error) {
+        logger.warn('[Subscription] Referral conversion failed', { userId, error });
+      }
     } else {
       logger.warn('[Subscription] No subscription ID in checkout session', { userId, sessionId: session.id });
     }
@@ -314,6 +328,13 @@ export class SubscriptionService {
     });
 
     telegramService.notifySubscriptionCanceled(user.email);
+
+    // Check if this cancellation should revoke a referral reward
+    try {
+      await referralService.checkRevocation(user.id);
+    } catch (error) {
+      logger.warn('[Subscription] Referral revocation check failed', { userId: user.id, error });
+    }
 
     logger.info('[Subscription] Subscription deleted, reverted to free', { userId: user.id });
   }
