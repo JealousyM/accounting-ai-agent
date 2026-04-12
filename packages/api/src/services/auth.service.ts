@@ -7,6 +7,7 @@ import { redis } from '../lib/redis';
 import { emailService } from './email.service';
 import { credentialsService } from './credentials.instance';
 import { organizationService } from './organization.instance';
+import { referralService } from './referral.instance';
 import { logger } from '../utils/logger';
 
 // ============================================
@@ -24,6 +25,7 @@ const registerSchema = z.object({
   firstName: z.string().min(1, 'First name is required'),
   lastName: z.string().min(1, 'Last name is required'),
   companyName: z.string().optional(),
+  referredByCode: z.string().length(8).regex(/^[a-f0-9]+$/).optional(),
 });
 
 const loginSchema = z.object({
@@ -79,6 +81,8 @@ export interface RegisterInput {
   llmModel?: string;
   // Subscription option
   subscribeToPro?: boolean;
+  // Referral
+  referredByCode?: string;
 }
 
 export interface LoginInput {
@@ -142,6 +146,9 @@ export class AuthService {
     // Hash password
     const passwordHash = await bcrypt.hash(validated.password, this.SALT_ROUNDS);
 
+    // Generate unique referral code
+    const referralCode = await referralService.generateReferralCode();
+
     // Create user
     const user = await prisma.user.create({
       data: {
@@ -150,6 +157,8 @@ export class AuthService {
         firstName: validated.firstName,
         lastName: validated.lastName,
         locale: input.locale || 'en',
+        referralCode,
+        referredByCode: validated.referredByCode || undefined,
         wfirmaConfig: validated.companyName
           ? JSON.stringify({ companyName: validated.companyName })
           : undefined,
@@ -164,6 +173,20 @@ export class AuthService {
       } catch (error) {
         // Log error but don't fail registration
         logger.warn('Failed to link user to organization during registration', { userId: user.id, error: (error as Error).message });
+      }
+    }
+
+    // Create referral record if user was referred
+    if (validated.referredByCode) {
+      try {
+        await referralService.createReferral(user.id, validated.referredByCode);
+      } catch (error) {
+        logger.warn('[Auth] Failed to create referral record', {
+          userId: user.id,
+          referredByCode: validated.referredByCode,
+          error: error instanceof Error ? error.message : error,
+        });
+        // Non-blocking: registration still succeeds
       }
     }
 
@@ -298,6 +321,8 @@ export class AuthService {
       const firstName = nameParts[0] || validated.email.split('@')[0];
       const lastName = nameParts.slice(1).join(' ') || '';
 
+      const oauthReferralCode = await referralService.generateReferralCode();
+
       user = await prisma.user.create({
         data: {
           email: validated.email,
@@ -305,6 +330,7 @@ export class AuthService {
           firstName,
           lastName,
           locale: locale || 'en',
+          referralCode: oauthReferralCode,
           wfirmaConfig: validated.picture ? JSON.stringify({ picture: validated.picture }) : undefined,
         },
       });
