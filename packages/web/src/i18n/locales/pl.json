@@ -1289,6 +1289,7 @@
     "joinInfo": "Jeśli organizacja już istnieje, zostanie wysłana prośba o dołączenie do zatwierdzenia przez administratora."
   },
   "referral": {
+    "sidebarLink": "Program poleceń",
     "title": "Program poleceń",
     "description": "Zaproś znajomych i zdobądź darmowe miesiące Pro",
     "yourCode": "Twój kod polecenia",

@@ -1289,6 +1289,7 @@
     "joinInfo": "If the organization already exists, a join request will be sent to its admin for approval."
   },
   "referral": {
+    "sidebarLink": "Referral Program",
     "title": "Referral Program",
     "description": "Invite friends and earn free Pro months",
     "yourCode": "Your referral code",

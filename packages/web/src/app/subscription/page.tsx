@@ -4,7 +4,7 @@ import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { SubscriptionManagement } from '@/components/subscription/SubscriptionManagement';
 import { useLocale } from '@/contexts/LocaleContext';
 import Link from 'next/link';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Gift } from 'lucide-react';
 import enTranslations from '@/i18n/locales/en.json';
 import plTranslations from '@/i18n/locales/pl.json';
 import ruTranslations from '@/i18n/locales/ru.json';
@@ -42,6 +42,20 @@ export default function SubscriptionPage() {
         {/* Content */}
         <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <SubscriptionManagement />
+
+          {/* Referral Banner */}
+          <Link
+            href="/referral"
+            className="block mt-6 p-4 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-xl border border-blue-200 dark:border-blue-800 hover:shadow-md transition-shadow"
+          >
+            <div className="flex items-center gap-3">
+              <Gift className="w-6 h-6 text-blue-500" />
+              <div>
+                <p className="font-medium text-blue-700 dark:text-blue-300">{translations[locale].referral.reward.banner}</p>
+                <p className="text-sm text-blue-500 dark:text-blue-400">{translations[locale].referral.reward.referrerReward}</p>
+              </div>
+            </div>
+          </Link>
         </main>
       </div>
     </ProtectedRoute>
