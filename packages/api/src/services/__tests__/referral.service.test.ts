@@ -1,5 +1,16 @@
 import { ReferralService } from '../referral.service';
 
+// Mock Stripe config
+const mockStripe = {
+  customers: {
+    createBalanceTransaction: jest.fn(),
+  },
+} as any;
+
+jest.mock('../../config/stripe.config', () => ({
+  getStripeClient: () => mockStripe,
+}));
+
 // Mock Prisma
 const mockPrisma = {
   user: {
@@ -16,19 +27,12 @@ const mockPrisma = {
   $transaction: jest.fn((fn: any) => fn(mockPrisma)),
 } as any;
 
-// Mock Stripe
-const mockStripe = {
-  customers: {
-    createBalanceTransaction: jest.fn(),
-  },
-} as any;
-
 describe('ReferralService', () => {
   let service: ReferralService;
 
   beforeEach(() => {
     jest.clearAllMocks();
-    service = new ReferralService(mockPrisma, mockStripe);
+    service = new ReferralService(mockPrisma);
   });
 
   describe('validateCode', () => {
