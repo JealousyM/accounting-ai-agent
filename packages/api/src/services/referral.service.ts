@@ -1,5 +1,5 @@
 import { PrismaClient, ReferralStatus } from '@prisma/client';
-import Stripe from 'stripe';
+import { getStripeClient } from '../config/stripe.config';
 import { logger } from '../utils/logger';
 
 const ANNUAL_REWARD_CAP = 10;
@@ -7,10 +7,7 @@ const MONTHLY_PRO_PRICE_CENTS = 1499;
 const REVOCATION_WINDOW_MS = 7 * 24 * 60 * 60 * 1000;
 
 export class ReferralService {
-  constructor(
-    private prisma: PrismaClient,
-    private stripe: Stripe
-  ) {}
+  constructor(private prisma: PrismaClient) {}
 
   async validateCode(code: string): Promise<{ valid: boolean; referrerFirstName?: string }> {
     const user = await this.prisma.user.findUnique({
@@ -92,7 +89,7 @@ export class ReferralService {
 
     if (canReward) {
       try {
-        await this.stripe.customers.createBalanceTransaction(referrer.stripeCustomerId!, {
+        await getStripeClient().customers.createBalanceTransaction(referrer.stripeCustomerId!, {
           amount: -MONTHLY_PRO_PRICE_CENTS,
           currency: 'pln',
           description: `Referral reward: user subscribed via code ${referral.referralCode}`,
@@ -151,7 +148,7 @@ export class ReferralService {
 
       if (referrer?.stripeCustomerId) {
         try {
-          await this.stripe.customers.createBalanceTransaction(referrer.stripeCustomerId, {
+          await getStripeClient().customers.createBalanceTransaction(referrer.stripeCustomerId, {
             amount: MONTHLY_PRO_PRICE_CENTS,
             currency: 'pln',
             description: `Referral reward reversed: referred user canceled within 7 days`,
