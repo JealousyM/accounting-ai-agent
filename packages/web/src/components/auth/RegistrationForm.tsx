@@ -3,15 +3,16 @@
 import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { Eye, EyeOff, Check, X, Globe, Crown, Zap, AlertTriangle } from 'lucide-react';
+import { Eye, EyeOff, Check, X, Globe, Crown, Zap, AlertTriangle, Gift } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { AppVersion } from '@/components/ui/app-version';
 import { registrationSchema, type RegistrationFormData, checkPasswordStrength } from '@/lib/validations/auth';
 import { registerUser, type ErrorResponse, getPublicLLMModels, type LLMModelInfo } from '@/lib/api/auth';
 import { ApiError } from '@/lib/api/api-client';
+import { validateReferralCode } from '@/lib/api/referral';
 import { useAuth } from '@/contexts/AuthContext';
 import { useGoogleAuth } from '@/hooks/useGoogleAuth';
 import { cn } from '@/lib/utils';
@@ -42,6 +43,9 @@ export function RegistrationForm() {
   const legalLinks = (translations[selectedLocale] as any)?.legal?.footer?.links;
   const [availableModels, setAvailableModels] = useState<LLMModelInfo[]>([]);
   const [isLoadingModels, setIsLoadingModels] = useState(false);
+  const searchParams = useSearchParams();
+  const refCode = searchParams.get('ref');
+  const [referrerName, setReferrerName] = useState<string | null>(null);
 
   // OAuth hooks
   const { login: googleLogin, isLoading: googleLoading, error: googleError } = useGoogleAuth();
@@ -72,6 +76,20 @@ export function RegistrationForm() {
   const agreeToTermsValue = watch('agreeToTerms', false);
   const errorRef = React.useRef<HTMLDivElement>(null);
   const passwordStrength = checkPasswordStrength(password);
+
+  // Validate referral code from URL
+  useEffect(() => {
+    if (refCode && refCode.length === 8) {
+      validateReferralCode(refCode)
+        .then((result) => {
+          if (result.valid) {
+            setReferrerName(result.referrerFirstName || null);
+            setValue('referredByCode', refCode);
+          }
+        })
+        .catch(() => {/* ignore invalid codes */});
+    }
+  }, [refCode, setValue]);
 
   // Update locale in form when user changes language
   const handleLocaleChange = (locale: 'en' | 'pl' | 'ru') => {
@@ -808,6 +826,16 @@ export function RegistrationForm() {
             </a>
           </p>
         </div>
+
+        {/* Referral Badge */}
+        {referrerName && (
+          <div className="flex items-center gap-2 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+            <Gift className="w-4 h-4 text-blue-500" />
+            <span className="text-sm text-blue-700 dark:text-blue-300">
+              {(translations[selectedLocale].referral.invitedBy || 'Invited by {name}').replace('{name}', referrerName)}
+            </span>
+          </div>
+        )}
 
         {/* Submit Button */}
         <Button
