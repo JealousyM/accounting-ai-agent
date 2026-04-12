@@ -17,6 +17,7 @@ async function main() {
       passwordHash,
       firstName: 'Jan',
       lastName: 'Kowalski',
+      referralCode: 'a1b2c3d4',
       wfirmaConfig: {
         apiKey: 'test-api-key',
         companyId: 'test-company-id',
