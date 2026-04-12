@@ -100,6 +100,12 @@ enum OrgMembershipStatus {
   rejected
 }
 
+enum ReferralStatus {
+  pending
+  converted
+  revoked
+}
+
 // ============================================
 // ORGANIZATIONS
 // ============================================
@@ -151,6 +157,10 @@ model User {
   subscriptionEndDate   DateTime?
   cancelAtPeriodEnd     Boolean            @default(false)
 
+  // Referral program
+  referralCode    String   @unique  // 8-char hex, generated in app layer
+  referredByCode  String?           // referral code used during registration
+
   // AI usage limits (for Pro with app keys)
   aiMessagesUsed        Int                @default(0)
   aiMessagesLimit       Int                @default(500)
@@ -191,6 +201,8 @@ model User {
   aiMemories        AIMemory[]
   aiToolUsage       AIToolUsage[]
   telegramLink      TelegramLink?
+  referralsMade     Referral[] @relation("referrals_made")
+  referredBy        Referral?  @relation("referred_by")
 
   @@index([email])
   @@index([googleId])
@@ -199,7 +211,30 @@ model User {
   @@index([stripeCustomerId])
   @@index([subscriptionPlan])
   @@index([organizationId])
+  @@index([referralCode])
   @@map("users")
+}
+
+// ============================================
+// REFERRAL PROGRAM
+// ============================================
+
+model Referral {
+  id             String         @id @default(uuid()) @db.Uuid
+  referrerUserId String         @db.Uuid
+  referredUserId String?        @unique @db.Uuid
+  referralCode   String         // snapshot of code used
+  status         ReferralStatus @default(pending)
+  rewardGranted  Boolean        @default(false)
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  convertedAt    DateTime?
+
+  referrer       User           @relation("referrals_made", fields: [referrerUserId], references: [id])
+  referred       User?          @relation("referred_by", fields: [referredUserId], references: [id])
+
+  @@index([referrerUserId])
+  @@map("referrals")
 }
 
 // ============================================
