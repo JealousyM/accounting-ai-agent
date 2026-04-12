@@ -1287,5 +1287,37 @@
     "joinButton": "Kontynuuj",
     "createInfo": "Jeśli organizacja o tej nazwie nie istnieje, zostanie utworzona nowa, a Ty zostaniesz jej administratorem.",
     "joinInfo": "Jeśli organizacja już istnieje, zostanie wysłana prośba o dołączenie do zatwierdzenia przez administratora."
+  },
+  "referral": {
+    "title": "Program poleceń",
+    "description": "Zaproś znajomych i zdobądź darmowe miesiące Pro",
+    "yourCode": "Twój kod polecenia",
+    "shareLink": "Link do udostępnienia",
+    "copyLink": "Kopiuj link",
+    "copied": "Skopiowano!",
+    "stats": {
+      "totalReferred": "Zaproszonych",
+      "converted": "Subskrybuje Pro",
+      "pending": "Oczekujące",
+      "rewardsEarned": "Darmowe miesiące"
+    },
+    "table": {
+      "name": "Imię",
+      "status": "Status",
+      "date": "Data",
+      "convertedAt": "Subskrypcja"
+    },
+    "invitedBy": "Zaproszony przez {name}",
+    "reward": {
+      "banner": "Zaproś znajomych, zdobądź 1 miesiąc Pro gratis!",
+      "referrerReward": "Ty otrzymujesz: 1 miesiąc Pro gratis",
+      "referredReward": "Znajomy otrzymuje: 20% zniżki na pierwszy miesiąc"
+    },
+    "noReferrals": "Brak poleceń. Udostępnij swój link, aby zacząć!",
+    "status": {
+      "pending": "Oczekujące",
+      "converted": "Subskrybuje",
+      "revoked": "Anulowane"
+    }
   }
 }
