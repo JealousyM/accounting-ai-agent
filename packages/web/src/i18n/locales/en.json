@@ -1287,5 +1287,37 @@
     "joinButton": "Continue",
     "createInfo": "If no organization with this name exists, a new one will be created and you'll become its admin.",
     "joinInfo": "If the organization already exists, a join request will be sent to its admin for approval."
+  },
+  "referral": {
+    "title": "Referral Program",
+    "description": "Invite friends and earn free Pro months",
+    "yourCode": "Your referral code",
+    "shareLink": "Share link",
+    "copyLink": "Copy link",
+    "copied": "Copied!",
+    "stats": {
+      "totalReferred": "Total referred",
+      "converted": "Subscribed to Pro",
+      "pending": "Pending",
+      "rewardsEarned": "Free months earned"
+    },
+    "table": {
+      "name": "Name",
+      "status": "Status",
+      "date": "Date",
+      "convertedAt": "Subscribed"
+    },
+    "invitedBy": "Invited by {name}",
+    "reward": {
+      "banner": "Invite friends, get 1 month free Pro!",
+      "referrerReward": "You get: 1 month free Pro",
+      "referredReward": "They get: 20% off first month"
+    },
+    "noReferrals": "No referrals yet. Share your link to get started!",
+    "status": {
+      "pending": "Pending",
+      "converted": "Subscribed",
+      "revoked": "Revoked"
+    }
   }
 }
