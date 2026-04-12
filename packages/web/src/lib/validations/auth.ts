@@ -50,6 +50,8 @@ export const registrationSchema = z
     wfirmaAccessKey: z.string().max(200).trim().optional(),
     wfirmaSecretKey: z.string().max(200).trim().optional(),
     wfirmaCompanyId: z.string().max(50).trim().optional(),
+    // Referral
+    referredByCode: z.string().length(8).optional(),
     // Subscription option
     subscribeToPro: z.boolean().default(false),
     billingPeriod: z.enum(['monthly', 'yearly']).default('monthly'),
