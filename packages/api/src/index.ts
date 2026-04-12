@@ -20,6 +20,7 @@ import ksefRoutes from './routes/ksef.routes';
 import dashboardRoutes from './routes/dashboard.routes';
 import aiMemoryRoutes from './routes/ai-memory.routes';
 import organizationRoutes from './routes/organization.routes';
+import referralRoutes from './routes/referral.routes';
 import telegramBotRoutes from './routes/telegram-bot.routes';
 import { telegramBotService } from './services/telegram-bot';
 import { globalRateLimiter } from './middleware/rate-limiter.middleware';
@@ -115,6 +116,9 @@ app.use('/api/ai/memory', aiMemoryRoutes);
 
 // Organization routes
 app.use('/api/organization', organizationRoutes);
+
+// Referral routes
+app.use('/api/referral', referralRoutes);
 
 // Telegram bot routes (account linking)
 app.use('/api/telegram', telegramBotRoutes);
