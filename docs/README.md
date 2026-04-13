@@ -14,6 +14,7 @@ Welcome to the technical documentation for the Accounting AI Agent project.
 | [AI Agents](./AI_AGENTS.md) | LangGraph multi-agent system |
 | [wFirma Integration](./WFIRMA_INTEGRATION.md) | Polish accounting system integration |
 | [KSeF Integration](./KSEF_INTEGRATION.md) | KSeF e-invoice system (FA3 XML, AI tools, contractor lookup) |
+| [Referral Program](./REFERRAL_PROGRAM.md) | Referral system with Stripe rewards |
 | [Frontend](./FRONTEND.md) | Next.js 15 web application |
 | [Deployment](./DEPLOYMENT.md) | Production deployment guide |
 
@@ -30,6 +31,7 @@ The Accounting AI Agent is a full-stack monorepo application for AI-powered acco
 - **Audit Log** - Automatic tracking of all write operations with admin viewer
 - **Public Landing Page** - Marketing page with pricing, OG meta tags
 - **Legal Documents** - Terms of service, privacy policy, RODO, and cookie policy
+- **Referral Program** - Invite friends via unique codes, earn Stripe credits and discounts
 - **Google Analytics** - Consent-aware GA4 integration
 - **Multilingual Support** - English, Polish, and Russian
 - **OAuth Authentication** - Google and GitHub login
