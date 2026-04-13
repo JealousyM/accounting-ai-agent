@@ -489,6 +489,30 @@ Comprehensive test checklist for pre-deployment verification.
 
 ---
 
+## 23. Referral Program
+
+| # | Test Scenario | Expected Result | Status |
+|---|---|---|---|
+| 23.1 | User has unique referral code after registration | Referral code present in profile | |
+| 23.2 | Share link format: `{URL}/register?ref={code}` | Correct link displayed | |
+| 23.3 | Registration with `?ref=` shows "Invited by" badge | Badge with referrer's first name initial | |
+| 23.4 | Registration with invalid code — no badge, no error | Form works normally without badge | |
+| 23.5 | Self-referral prevention (can't use own code) | Own referral code ignored | |
+| 23.6 | POST /api/referral/validate rate limited (10/15min) | Error 429 after exceeding limit | |
+| 23.7 | Referral dashboard shows code, link, stats, table | All elements rendered correctly | |
+| 23.8 | Copy link button works | Link copied to clipboard | |
+| 23.9 | When referred user subscribes: referral status -> converted | Status updated in dashboard | |
+| 23.10 | Referrer receives Stripe credit (PLN 14.99) | Credit applied to Stripe account | |
+| 23.11 | Annual reward cap: max 10 credits per year | 11th referral does not grant credit | |
+| 23.12 | Referred user gets 20% off first month (Stripe coupon) | Discount applied at checkout | |
+| 23.13 | Cancellation within 7 days -> referral revoked, credit reversed | Referral status revoked, credit removed | |
+| 23.14 | Cancellation after 7 days -> no revocation | Referral remains converted | |
+| 23.15 | Nav link to /referral visible | Link in navigation menu | |
+| 23.16 | Subscription page shows referral banner | Banner with referral link displayed | |
+| 23.17 | i18n: all referral strings in en, pl, ru | Strings translated in all languages | |
+
+---
+
 ## Summary
 
 | Category | Test Count |
@@ -515,7 +539,8 @@ Comprehensive test checklist for pre-deployment verification.
 | Browser Compatibility | 7 |
 | Database & Cache | 10 |
 | CI/CD & Deployment | 7 |
-| **TOTAL** | **248** |
+| Referral Program | 17 |
+| **TOTAL** | **265** |
 
 ---
 

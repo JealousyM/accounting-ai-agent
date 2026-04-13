@@ -993,6 +993,86 @@ Authorization: Bearer <token>
 
 ---
 
+## Referral
+
+### GET /api/referral
+
+Get current user's referral code, share link, and summary stats.
+
+**Auth:** Required
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "referralCode": "abc12345",
+    "shareLink": "https://app.example.com/register?ref=abc12345",
+    "stats": {
+      "totalReferred": 5,
+      "converted": 2,
+      "pending": 3,
+      "totalRewardsEarned": 1
+    }
+  }
+}
+```
+
+---
+
+### GET /api/referral/stats
+
+Get detailed list of user's referrals.
+
+**Auth:** Required
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "referrals": [
+      {
+        "id": "uuid",
+        "referredUserName": "John D.",
+        "status": "converted",
+        "createdAt": "2026-04-10T...",
+        "convertedAt": "2026-04-11T..."
+      }
+    ]
+  }
+}
+```
+
+---
+
+### POST /api/referral/validate
+
+Validate a referral code (public endpoint).
+
+**Auth:** Not required
+**Rate Limit:** 10 requests per 15 minutes
+
+**Request:**
+```json
+{
+  "code": "abc12345"
+}
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "valid": true,
+    "referrerFirstName": "A."
+  }
+}
+```
+
+---
+
 ## Rate Limiting
 
 All endpoints are rate limited:
@@ -1009,6 +1089,7 @@ All endpoints are rate limited:
 | Admin Role Update | 30 requests | 15 minutes |
 | Admin Audit Log | 60 requests | 15 minutes |
 | AI Memory | 60 requests | 15 minutes |
+| Referral Validate | 10 requests | 15 minutes |
 | General | 100 requests | 15 minutes |
 
 **Rate Limit Headers:**

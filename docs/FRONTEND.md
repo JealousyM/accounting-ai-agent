@@ -30,6 +30,7 @@ packages/web/src/
 │   ├── invoices/               # Invoices page
 │   ├── settings/               # Settings page
 │   ├── pricing/                # Public pricing page (with OG image)
+│   ├── referral/               # Referral dashboard page
 │   ├── terms/                  # Terms of service
 │   ├── privacy-policy/         # Privacy policy
 │   ├── rodo/                   # RODO/GDPR page
@@ -73,6 +74,8 @@ packages/web/src/
 │   │   ├── Header.tsx
 │   │   ├── Sidebar.tsx
 │   │   └── Footer.tsx
+│   ├── referral/               # Referral components
+│   │   └── ReferralDashboard.tsx
 │   ├── legal/                  # Legal page components
 │   │   ├── LegalPageLayout.tsx
 │   │   └── LegalFooter.tsx
@@ -87,6 +90,7 @@ packages/web/src/
 │   ├── useChat.ts              # Chat functionality hook
 │   ├── useDashboard.ts         # Dashboard KPI data hook
 │   ├── useTextToSpeech.ts      # Text-to-speech hook
+│   ├── useReferral.ts           # Referral program hook
 │   ├── useVoiceDictation.ts    # Voice input hook
 │   └── useWFirma.ts            # wFirma data hook
 │
@@ -95,7 +99,8 @@ packages/web/src/
 │   │   ├── client.ts           # Axios instance
 │   │   ├── auth.ts             # Auth API calls
 │   │   ├── chat.ts             # Chat API calls
-│   │   └── dashboard.ts        # Dashboard API calls
+│   │   ├── dashboard.ts        # Dashboard API calls
+│   │   └── referral.ts         # Referral API calls
 │   ├── gtag.ts                 # GA4 pageview/event helpers
 │   ├── validations/            # Zod schemas
 │   │   └── auth.ts
