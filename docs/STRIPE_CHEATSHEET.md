@@ -302,6 +302,28 @@ packages/web/src/
 
 ---
 
+## Referral Program
+
+```bash
+# Create referral coupon
+stripe coupons create --id=first_month_referral --percent-off=20 --duration=once
+
+# List coupons
+stripe coupons list
+
+# Check customer balance (referral credits)
+stripe customers retrieve cus_xxx --expand='["balance_transactions"]'
+
+# Simulate referral checkout with coupon
+stripe checkout sessions create \
+  --success-url="http://localhost:3001/subscription/success" \
+  --mode=subscription \
+  --line-items='[{"price":"price_xxx","quantity":1}]' \
+  --discounts='[{"coupon":"first_month_referral"}]'
+```
+
+---
+
 ## Related Documentation
 
 - [STRIPE_SETUP.md](./STRIPE_SETUP.md) - Full setup instructions

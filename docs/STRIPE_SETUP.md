@@ -290,6 +290,36 @@ When ready to go live:
 
 ---
 
+## Referral Coupon Setup
+
+The referral program requires a Stripe coupon for referred users' first-month discount.
+
+### Create the Coupon
+
+In the Stripe Dashboard:
+1. Go to **Products → Coupons → + New**
+2. Set:
+   - **ID:** `first_month_referral`
+   - **Type:** Percentage
+   - **Discount:** 20%
+   - **Duration:** Once
+   - **Max redemptions:** Leave empty (unlimited)
+3. Click **Create coupon**
+
+Or via Stripe CLI:
+```bash
+stripe coupons create --id=first_month_referral --percent-off=20 --duration=once
+```
+
+### How It Works
+
+- When a user with `referredByCode` creates a checkout session, the coupon is automatically applied via `discounts: [{ coupon: 'first_month_referral' }]`
+- Referrer receives a Stripe Customer Balance credit equal to 1 month Pro (PLN 14.99)
+- Max 10 reward credits per referrer per calendar year
+- If referred user cancels within 7 days, the credit is reversed
+
+---
+
 ## Resources
 
 - [Stripe API Documentation](https://stripe.com/docs/api)

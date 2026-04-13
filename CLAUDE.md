@@ -60,6 +60,7 @@ routes/      → controllers/      → services/      → Prisma/Redis
 - **TTSService** - Text-to-speech via OpenAI TTS API
 - **OrganizationService** - Company grouping with admin/member roles and membership approval
 - **TelegramBotService** - Telegraf-based AI chatbot with account linking via 6-digit codes
+- **ReferralService** - Referral program with Stripe credit rewards and coupon discounts
 
 ### Frontend Structure (packages/web/src/)
 - `app/` - Next.js App Router pages
@@ -70,7 +71,7 @@ routes/      → controllers/      → services/      → Prisma/Redis
 - `lib/api/` - Axios API client
 
 ### Database
-PostgreSQL with Prisma ORM. Key models: User, AIConversation, Organization, TelegramLink, WFirmaCache, WFirmaInvoice, WFirmaCustomer, AIMemory, AIToolUsage.
+PostgreSQL with Prisma ORM. Key models: User, AIConversation, Organization, TelegramLink, WFirmaCache, WFirmaInvoice, WFirmaCustomer, AIMemory, AIToolUsage, Referral.
 
 ## Tech Stack
 
@@ -98,11 +99,12 @@ Web requires `.env.local` with: NEXT_PUBLIC_API_URL
 - Organizations: users grouped by company name, org-level roles (admin/member), membership approval flow
 - Shared conversations: org members share AI chats, real-time polling (5s messages, 10s list)
 - Telegram bot: AI chat via Telegraf, account linking via 6-digit Redis codes
+- Referral program: unique 8-char codes, Stripe credit for referrer (max 10/year), 20% coupon for referred, 7-day revocation window
 
 ## Documentation
 
 Detailed docs in `packages/api/docs/` (API.md, ARCHITECTURE.md, AUTH_API.md)
-Feature docs: `docs/ORGANIZATIONS_AND_SHARING.md`, `docs/WFIRMA_INTEGRATION.md`, `docs/STRIPE_SETUP.md`
+Feature docs: `docs/ORGANIZATIONS_AND_SHARING.md`, `docs/WFIRMA_INTEGRATION.md`, `docs/STRIPE_SETUP.md`, `docs/REFERRAL_PROGRAM.md`
 Service docs: `packages/api/src/services/README.wfirma.md`, `README.cache.md`, `README.tts.md`
 
 ## Claude Code Subagents
