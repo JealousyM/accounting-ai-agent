@@ -43,6 +43,8 @@ erDiagram
     User ||--o{ WFirmaCache : "has many"
     User ||--o{ AIMemory : "has many"
     User ||--o{ AIToolUsage : "has many"
+    User ||--o{ Referral : "referrals_made"
+    User ||--o| Referral : "referred_by"
     WFirmaCustomer ||--o{ WFirmaInvoice : "has many"
     AIConversation ||--o{ AIRecommendation : "has many"
 
@@ -54,9 +56,23 @@ erDiagram
         string lastName
         string googleId UK
         json wfirmaConfig
+        string referralCode
+        string referredByCode
         datetime createdAt
         datetime updatedAt
         datetime deletedAt
+    }
+
+    Referral {
+        uuid id PK
+        uuid referrerUserId FK
+        uuid referredUserId FK
+        string referralCode
+        enum status
+        boolean rewardGranted
+        datetime createdAt
+        datetime updatedAt
+        datetime convertedAt
     }
 
     WFirmaInvoice {
@@ -508,6 +524,27 @@ model AIToolUsage {
 }
 ```
 
+### Referral
+
+Tracks referral relationships between users.
+
+| Column | Type | Description |
+|--------|------|-------------|
+| id | UUID | Primary key |
+| referrerUserId | UUID | FK to User (who invited) |
+| referredUserId | UUID? | FK to User (who was invited), unique |
+| referralCode | String | Snapshot of code used at referral time |
+| status | ReferralStatus | pending, converted, or revoked |
+| rewardGranted | Boolean | Whether Stripe credit was granted |
+| createdAt | DateTime | Record creation |
+| updatedAt | DateTime | Last update |
+| convertedAt | DateTime? | When referred user subscribed to Pro |
+
+**Enum: ReferralStatus**
+- `pending` — referred user registered but hasn't subscribed
+- `converted` — referred user subscribed to Pro
+- `revoked` — referred user canceled within 7 days
+
 ## Cache TTL Configuration
 
 | Data Type | TTL | Reason |
@@ -536,6 +573,8 @@ All tables are optimized with indexes for:
 | User | WFirmaCache | Cascade |
 | User | AIMemory | Cascade |
 | User | AIToolUsage | Cascade |
+| User | Referral (referralsMade) | Cascade |
+| User | Referral (referredBy) | Set Null |
 | WFirmaCustomer | WFirmaInvoice | Set Null |
 | AIConversation | AIRecommendation | Set Null |
 
