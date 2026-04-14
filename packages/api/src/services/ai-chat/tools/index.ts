@@ -13,6 +13,7 @@ import { SubscriptionService } from '../../subscription.service';
 import { HRService } from '../../hr';
 import { KSeFService } from '../../ksef';
 import { KSeFContractorService } from '../../ksef/contractor.service';
+import { taxCalendarService } from '../../tax-calendar.instance';
 
 // Import tool creators
 import {
@@ -79,6 +80,7 @@ import {
   createGetJpkVatTool,
   createGetPitTool,
 } from './declaration.tools';
+import { createGetTaxDeadlinesTool } from './tax-calendar.tools';
 import {
   createGetDocumentsTool,
   createGetDocumentDetailsTool,
@@ -185,6 +187,7 @@ export {
   createGetJpkVatTool,
   createGetPitTool,
 } from './declaration.tools';
+export { createGetTaxDeadlinesTool } from './tax-calendar.tools';
 export {
   createGetDocumentsTool,
   createGetDocumentDetailsTool,
@@ -309,6 +312,9 @@ export function createAllTools(
     // Declaration tools
     createGetJpkVatTool(wfirmaService, userId, locale, subscriptionService),
     createGetPitTool(wfirmaService, userId, locale, subscriptionService),
+
+    // Tax Calendar tool (no wFirma dependency — always available)
+    createGetTaxDeadlinesTool(taxCalendarService, locale),
 
     // Document tools
     createGetDocumentsTool(wfirmaService, userId, locale, subscriptionService),
