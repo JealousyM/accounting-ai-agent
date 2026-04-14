@@ -681,7 +681,7 @@
     "statusToday": "Dziś",
     "statusUpcoming": "Nadchodzący",
     "shiftNote": "Daty przesunięte na najbliższy dzień roboczy, jeśli przypadają na weekend/święto.",
-    "optionalNote": "Terminy oznaczone jako „opcjonalne" (PCC, dywidendy, VAT-UE) obowiązują tylko gdy wystąpiły odpowiednie transakcje.",
+    "optionalNote": "Terminy oznaczone jako 'opcjonalne' (PCC, dywidendy, VAT-UE) obowiązują tylko gdy wystąpiły odpowiednie transakcje.",
     "notFound": "Brak terminów podatkowych dla podanego okresu.",
     "errorFetch": "Nie udało się pobrać terminów podatkowych.",
     "pit4r": "Zaliczka na podatek od wynagrodzeń (PIT-4R)",
