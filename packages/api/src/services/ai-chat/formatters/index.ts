@@ -9,6 +9,7 @@ export {
   formatCompanyAddresses,
   formatCompanyPack,
   formatCompanyDetails,
+  formatPublicRegistryData,
 } from './company.formatter';
 export { formatFinancialData } from './financial.formatter';
 export {
