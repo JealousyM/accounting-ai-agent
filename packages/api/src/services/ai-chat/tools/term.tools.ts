@@ -80,7 +80,7 @@ export function createGetTermsTool(
     {
       name: 'get_terms',
       description:
-        'Get list of terms (appointments/deadlines) from wFirma. Can filter by date range, type (normal/cycle_day_of_week/cycle_day_of_month), group ID, or search by description.',
+        'Get list of user-created terms (appointments/deadlines/reminders) from wFirma. These are custom entries the user added manually. Can filter by date range, type (normal/cycle_day_of_week/cycle_day_of_month), group ID, or search by description. NOTE: When user asks about "сроки" or "deadlines" in general, also call get_tax_deadlines to include statutory tax payment deadlines (VAT, CIT, ZUS, PIT).',
       schema: z.object({
         dateFrom: z.string().nullable().optional().describe('Start date for filtering (YYYY-MM-DD)'),
         dateTo: z.string().nullable().optional().describe('End date for filtering (YYYY-MM-DD)'),

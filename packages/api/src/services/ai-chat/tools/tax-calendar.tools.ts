@@ -52,7 +52,7 @@ export function createGetTaxDeadlinesTool(
     {
       name: 'get_tax_deadlines',
       description:
-        'Get Polish tax payment deadlines (VAT-7, CIT, PIT-4R, ZUS, VAT-UE, PCC, dividends) for a given period. Use when user asks about tax deadlines, payment dates, tax calendar, or upcoming tax obligations.',
+        'Get Polish statutory tax payment deadlines (VAT-7, CIT, PIT-4R, ZUS, VAT-UE, PCC, dividends) for a given period. These are system-generated deadlines based on Polish tax law, NOT user-created terms. Use when user asks about tax deadlines, payment dates, tax calendar, or upcoming tax obligations. NOTE: When user asks about "сроки" or "deadlines" in general, also call get_terms to include user-created custom deadlines/appointments.',
       schema: z.object({
         year: z.number().int().min(2020).max(2030).describe('Year for the deadlines'),
         month: z
