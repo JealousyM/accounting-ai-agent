@@ -416,12 +416,32 @@ export class WFirmaCompanyService {
   async getCompanyDetails(): Promise<WFirmaCompanyDetails> {
     logger.info('Fetching complete company details from wFirma');
 
-    const [company, accounts, addresses, pack] = await Promise.all([
+    const [companyResult, accountsResult, addressesResult, packResult] = await Promise.allSettled([
       this.getCompanyData(),
       this.getCompanyAccounts(),
       this.getCompanyAddresses(),
       this.getCompanyPack(),
     ]);
+
+    // Company data is required, the rest are optional
+    if (companyResult.status === 'rejected') {
+      throw companyResult.reason;
+    }
+
+    const company = companyResult.value;
+    const accounts = accountsResult.status === 'fulfilled' ? accountsResult.value : [];
+    const addresses = addressesResult.status === 'fulfilled' ? addressesResult.value : [];
+    const pack = packResult.status === 'fulfilled' ? packResult.value : null;
+
+    if (accountsResult.status === 'rejected') {
+      logger.warn('Failed to fetch company accounts, continuing without', { error: accountsResult.reason?.message });
+    }
+    if (addressesResult.status === 'rejected') {
+      logger.warn('Failed to fetch company addresses, continuing without', { error: addressesResult.reason?.message });
+    }
+    if (packResult.status === 'rejected') {
+      logger.warn('Failed to fetch company pack, continuing without', { error: packResult.reason?.message });
+    }
 
     const details: WFirmaCompanyDetails = {
       ...company,
