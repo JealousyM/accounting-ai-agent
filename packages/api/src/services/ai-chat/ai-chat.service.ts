@@ -42,6 +42,7 @@ import { ksefService } from '../ksef/ksef.instance';
 import { ksefContractorService } from '../ksef/contractor.instance';
 import { AIMemoryService } from '../ai-memory/ai-memory.service';
 import { AIMemoryExtractionService } from '../ai-memory/memory-extraction.service';
+import { companyEnrichmentService } from '../company-enrichment.instance';
 
 export class AIChatService {
   private readonly prisma: PrismaClient;
@@ -509,7 +510,7 @@ export class AIChatService {
     const systemPrompt = getSystemPrompt(locale, memoryContext);
 
     // Create tools with userId, locale, and subscription tracking
-    const tools = createAllTools(wfirmaService, this.cacheService, this.fileStorageService, userId, locale, subscriptionService, hrService, ksefService, ksefContractorService);
+    const tools = createAllTools(wfirmaService, this.cacheService, companyEnrichmentService, this.fileStorageService, userId, locale, subscriptionService, hrService, ksefService, ksefContractorService);
 
     logger.info('Created tools for agent', {
       toolCount: tools.length,

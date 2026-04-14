@@ -189,6 +189,30 @@ export interface CompanyTranslations {
   errorFetchAccounts: string;
   errorFetchAddresses: string;
   errorFetchPack: string;
+
+  // Public registry
+  publicRegistryTitle: string;
+  vatStatus: string;
+  vatStatusCzynny: string;
+  vatStatusZwolniony: string;
+  vatStatusNiezarejestrowany: string;
+  verifiedAccounts: string;
+  legalForm: string;
+  shareCapital: string;
+  boardMembers: string;
+  registrationDate: string;
+  altname: string;
+  vatPayer: string;
+  taxType: string;
+  bookStartDate: string;
+  buildingNumber: string;
+  flatNumber: string;
+  commune: string;
+  district: string;
+  voivodeship: string;
+  errorFetchPublicRegistry: string;
+  invalidNip: string;
+  nipNotFound: string;
 }
 
 export interface UserTranslations {

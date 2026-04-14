@@ -29,6 +29,7 @@ The system uses a **single LangGraph agent** with 50+ tools (up to 76 when all o
 | `packages/api/src/services/ai-chat/tts-integration.ts` | TTS fire-and-forget after response |
 | `packages/api/src/services/ai-memory/ai-memory.service.ts` | Memory storage, retrieval, decay, prompt injection |
 | `packages/api/src/services/ai-memory/memory-extraction.service.ts` | Fire-and-forget memory extraction after each response |
+| `packages/api/src/services/company-enrichment.service.ts` | MF Biała Lista + KRS API enrichment |
 
 ---
 
@@ -191,13 +192,14 @@ flowchart TD
 
 All tools are created by `createAllTools()` in `packages/api/src/services/ai-chat/tools/index.ts`. Tools are organized by domain.
 
-### Company (3 tools)
+### Company (4 tools)
 
 | Tool | Description | File |
 |------|-------------|------|
-| `get_company_info` | Get company details | `company.tool.ts` |
+| `get_company_info` | Get complete company info from wFirma + public registries (REGON, KRS, VAT status) | `company.tool.ts` |
 | `get_company_accounts` | Get company bank accounts | `company.tool.ts` |
 | `get_company_addresses` | Get company addresses | `company.tool.ts` |
+| `lookup_company_by_nip` | Look up any Polish company by NIP in public registries (MF Biała Lista + KRS) | `company.tool.ts` |
 
 ### Financial (1 tool)
 
@@ -351,7 +353,7 @@ Loaded when `ksefService` is available.
 
 | Domain | Count | Conditional |
 |--------|-------|-------------|
-| Company | 3 | No |
+| Company | 4 | No |
 | Financial | 1 | No |
 | Contractors | 4 | No |
 | Invoices | 10 | No |
@@ -366,7 +368,7 @@ Loaded when `ksefService` is available.
 | Ledger | 4 | No |
 | HR | 15 | Yes (hrService) |
 | KSeF | 9 | Yes (ksefService) |
-| **Total** | **77** | |
+| **Total** | **78** | |
 
 ---
 

@@ -59,7 +59,7 @@ const service = new WFirmaIntegrationService({
 │ • Contractor      │     │ • get_invoices    │     │                   │
 │ • Invoice         │     │ • create_invoice  │     │ • API calls       │
 │ • Financial       │     │ • get_contractors │     │ • Retry logic     │
-│ • Tax             │     │ • etc (53 tools)  │     │ • Error handling  │
+│ • Tax             │     │ • etc (54 tools)  │     │ • Error handling  │
 └───────────────────┘     └───────────────────┘     └───────────────────┘
                                     │                        │
                                     │                        ▼
@@ -80,6 +80,44 @@ const service = new WFirmaIntegrationService({
                                                │ api2.wfirma.pl    │
                                                └───────────────────┘
 ```
+
+## Public Registry Enrichment
+
+In addition to wFirma data, the system enriches company information with data from Polish public registries:
+
+### MF Biała Lista (wl-api.mf.gov.pl)
+- **Auth:** None required
+- **Data:** REGON, KRS, VAT status (czynny/zwolniony/niezarejestrowany), verified bank accounts
+- **Rate limit:** 10 req/s per IP
+
+### KRS API (api-krs.ms.gov.pl)
+- **Auth:** None required
+- **Data:** Board members, share capital, legal form, registration date
+- **Note:** Only covers companies (sp. z o.o., S.A.), not sole proprietors (JDG)
+
+### Architecture
+
+```
+get_company_info (AI tool)
+  ├── WFirmaCompanyService.getCompanyDetails()
+  │     ├── /companies/find         → name, NIP, altname, VAT payer, tax type
+  │     ├── /company_addresses/find → addresses with building/flat numbers
+  │     ├── /company_accounts/find  → bank accounts
+  │     └── /company_packs/find     → subscription (optional, may not be available)
+  └── CompanyEnrichmentService.enrichByNip()
+        ├── MF Biała Lista API  → REGON, KRS, VAT status, verified accounts
+        └── KRS API             → board members, share capital, legal form
+```
+
+### Caching
+- Public registry data cached with 24h TTL
+- Stale cache used as fallback when APIs are unavailable
+- Cache stored per-user in `wfirma_cache` table (type: `public_registry`)
+
+### Error Handling
+- APIs called via `Promise.allSettled()` — one can fail without affecting the other
+- Fallback order: fresh data → stale cache → null
+- `get_company_info` always returns at least wFirma data even if public APIs fail
 
 ## Integration Service
 
@@ -190,7 +228,7 @@ await wfirmaCacheService.invalidateCache('user-123', 'company');
 const stats = await wfirmaCacheService.getCacheStats('user-123');
 ```
 
-## Available Tools (53 Total)
+## Available Tools (54 Total)
 
 ### Company Tools (3)
 

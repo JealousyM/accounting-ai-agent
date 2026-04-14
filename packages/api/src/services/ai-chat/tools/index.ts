@@ -7,6 +7,7 @@ import { StructuredToolInterface } from '@langchain/core/tools';
 import { Locale } from '../../../i18n';
 import { WFirmaIntegrationService } from '../../wfirma';
 import { WFirmaCacheService } from '../../wfirma-cache.service';
+import { CompanyEnrichmentService } from '../../company-enrichment.service';
 import { FileStorageService } from '../../file-storage.service';
 import { SubscriptionService } from '../../subscription.service';
 import { HRService } from '../../hr';
@@ -18,6 +19,7 @@ import {
   createGetCompanyInfoTool,
   createGetCompanyAccountsTool,
   createGetCompanyAddressesTool,
+  createLookupCompanyByNipTool,
 } from './company.tool';
 import { createGetFinancialSummaryTool } from './financial.tool';
 import {
@@ -123,6 +125,7 @@ export {
   createGetCompanyInfoTool,
   createGetCompanyAccountsTool,
   createGetCompanyAddressesTool,
+  createLookupCompanyByNipTool,
 } from './company.tool';
 export { createGetFinancialSummaryTool } from './financial.tool';
 export {
@@ -229,6 +232,7 @@ export {
 export function createAllTools(
   wfirmaService: WFirmaIntegrationService,
   cacheService: WFirmaCacheService,
+  enrichmentService: CompanyEnrichmentService,
   fileStorageService: FileStorageService,
   userId: string,
   locale: Locale,
@@ -239,9 +243,10 @@ export function createAllTools(
 ): StructuredToolInterface[] {
   return [
     // Company tools
-    createGetCompanyInfoTool(wfirmaService, cacheService, userId, locale, subscriptionService),
+    createGetCompanyInfoTool(wfirmaService, cacheService, enrichmentService, userId, locale, subscriptionService),
     createGetCompanyAccountsTool(wfirmaService, cacheService, userId, locale, subscriptionService),
     createGetCompanyAddressesTool(wfirmaService, cacheService, userId, locale, subscriptionService),
+    createLookupCompanyByNipTool(enrichmentService, userId, locale),
 
     // Financial tool
     createGetFinancialSummaryTool(wfirmaService, cacheService, userId, subscriptionService),
