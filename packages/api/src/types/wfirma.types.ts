@@ -35,6 +35,11 @@ export interface WFirmaCompany {
   email?: string;
   phone?: string;
   website?: string;
+  altname?: string;
+  vatPayer?: boolean;
+  taxType?: string;
+  bookStartDate?: string;
+  packRights?: string[];
 }
 
 // ============================================
@@ -64,6 +69,11 @@ export interface WFirmaCompanyAddress {
   zip?: string;
   country?: string;
   isMain: boolean;
+  buildingNumber?: string;
+  flatNumber?: string;
+  commune?: string;
+  district?: string;
+  voivodeship?: string;
 }
 
 // ============================================
@@ -90,6 +100,32 @@ export interface WFirmaCompanyDetails extends WFirmaCompany {
   accounts: WFirmaCompanyAccount[];
   addresses: WFirmaCompanyAddress[];
   pack?: WFirmaCompanyPack;
+}
+
+// ============================================
+// PUBLIC REGISTRY TYPES
+// ============================================
+
+export interface KrsData {
+  legalForm?: string;
+  shareCapital?: string;
+  boardMembers?: { name: string; role: string }[];
+  registrationDate?: string;
+}
+
+export interface PublicRegistryData {
+  nip: string;
+  regon?: string;
+  krs?: string;
+  vatStatus?: 'czynny' | 'zwolniony' | 'niezarejestrowany';
+  vatStatusDate?: string;
+  verifiedBankAccounts?: string[];
+  krsData?: KrsData;
+}
+
+export interface CompanyFullInfo {
+  wfirma: WFirmaCompanyDetails;
+  publicRegistry?: PublicRegistryData;
 }
 
 // ============================================

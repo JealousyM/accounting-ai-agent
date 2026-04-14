@@ -401,6 +401,7 @@ export class WFirmaCacheService {
         document: 0,
         ledger_accountant_year: 0,
         ledger_operation_schema: 0,
+        public_registry: 0,
       };
 
       byTypeResult.forEach((row) => {
