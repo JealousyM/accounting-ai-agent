@@ -203,6 +203,51 @@ export class WFirmaCacheService {
   }
 
   /**
+   * Get cached data even if expired (for fallback scenarios)
+   * Unlike getCachedData, this does NOT invalidate expired entries.
+   */
+  async getCachedDataAllowStale<T = any>(
+    userId: string,
+    dataType: CacheDataType,
+    wfirmaId: string,
+  ): Promise<T | null> {
+    try {
+      const result = await this.prisma.$queryRaw<Array<{
+        data: any;
+        cachedAt: Date;
+        expiresAt: Date;
+        isValid: boolean;
+      }>>`
+        SELECT data, "cachedAt", "expiresAt", "isValid"
+        FROM wfirma_cache
+        WHERE "userId" = ${userId}::uuid
+          AND "dataType" = ${dataType}
+          AND "wfirmaId" = ${wfirmaId}
+          AND "isValid" = true
+        LIMIT 1
+      `;
+
+      if (!result || result.length === 0) {
+        return null;
+      }
+
+      const entry = result[0];
+      const isStale = entry.expiresAt <= new Date();
+
+      logger.debug(isStale ? 'Returning stale cached data as fallback' : 'Returning fresh cached data', {
+        userId, dataType, wfirmaId, isStale,
+        cachedAt: entry.cachedAt,
+        expiresAt: entry.expiresAt,
+      });
+
+      return entry.data as T;
+    } catch (error) {
+      logger.error('Failed to retrieve stale cached data', { userId, dataType, wfirmaId, error });
+      return null;
+    }
+  }
+
+  /**
    * Invalidate cache for specific entry or all entries of a type
    * 
    * @param userId - User ID who owns the data
@@ -401,6 +446,7 @@ export class WFirmaCacheService {
         document: 0,
         ledger_accountant_year: 0,
         ledger_operation_schema: 0,
+        public_registry: 0,
       };
 
       byTypeResult.forEach((row) => {

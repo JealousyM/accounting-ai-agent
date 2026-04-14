@@ -51,7 +51,7 @@ export class WFirmaCompanyService {
         logger.info('wFirma companies raw response', {
           status: data.status,
           companiesKeys: data.companies ? Object.keys(data.companies) : null,
-          rawCompanies: JSON.stringify(data.companies).substring(0, 1000),
+          rawCompanies: JSON.stringify(data.companies ?? null).substring(0, 1000),
         });
 
         if (data.status?.code !== 'OK') {
@@ -100,6 +100,23 @@ export class WFirmaCompanyService {
           email: companyData.email,
           phone: companyData.phone,
           website: companyData.www,
+          altname: companyData.altname || undefined,
+          vatPayer: companyData.vat_payer === '1',
+          taxType: companyData.tax || undefined,
+          bookStartDate: companyData.book_start_date || undefined,
+          packRights: (() => {
+            // pack_rights come as numbered sub-objects: {"0": {"pack_rights": "trade"}, "1": {"pack_rights": "book"}, ...}
+            const rights: string[] = [];
+            if (companyData && typeof companyData === 'object') {
+              for (const key of Object.keys(companyData)) {
+                const val = companyData[key];
+                if (typeof val === 'object' && val !== null && 'pack_rights' in val) {
+                  rights.push(val.pack_rights);
+                }
+              }
+            }
+            return rights.length > 0 ? rights : undefined;
+          })(),
         };
 
         logger.info('Successfully fetched company data from wFirma', {
@@ -148,7 +165,7 @@ export class WFirmaCompanyService {
           status: data.status,
           parametersTotal: data.company_accounts?.parameters?.total,
           accountsKeys: data.company_accounts ? Object.keys(data.company_accounts) : null,
-          rawAccounts: JSON.stringify(data.company_accounts).substring(0, 2000),
+          rawAccounts: JSON.stringify(data.company_accounts ?? null).substring(0, 2000),
         });
 
         if (data.status?.code !== 'OK') {
@@ -264,6 +281,11 @@ export class WFirmaCompanyService {
                 zip: addr.zip || undefined,
                 country: addr.country || 'PL',
                 isMain: addr.is_main === '1' || addr.main === true || addressType === 'main',
+                buildingNumber: addr.building_number || undefined,
+                flatNumber: addr.flat_number || undefined,
+                commune: addr.commune || undefined,
+                district: addr.district || undefined,
+                voivodeship: addr.voivodeship || undefined,
               });
             }
           }
@@ -315,7 +337,7 @@ export class WFirmaCompanyService {
           status: data.status,
           parametersTotal: data.company_packs?.parameters?.total,
           packsKeys: data.company_packs ? Object.keys(data.company_packs) : null,
-          rawPacks: JSON.stringify(data.company_packs).substring(0, 2000),
+          rawPacks: JSON.stringify(data.company_packs ?? null).substring(0, 2000),
           fullResponseKeys: Object.keys(data),
         });
 
@@ -394,12 +416,32 @@ export class WFirmaCompanyService {
   async getCompanyDetails(): Promise<WFirmaCompanyDetails> {
     logger.info('Fetching complete company details from wFirma');
 
-    const [company, accounts, addresses, pack] = await Promise.all([
+    const [companyResult, accountsResult, addressesResult, packResult] = await Promise.allSettled([
       this.getCompanyData(),
       this.getCompanyAccounts(),
       this.getCompanyAddresses(),
       this.getCompanyPack(),
     ]);
+
+    // Company data is required, the rest are optional
+    if (companyResult.status === 'rejected') {
+      throw companyResult.reason;
+    }
+
+    const company = companyResult.value;
+    const accounts = accountsResult.status === 'fulfilled' ? accountsResult.value : [];
+    const addresses = addressesResult.status === 'fulfilled' ? addressesResult.value : [];
+    const pack = packResult.status === 'fulfilled' ? packResult.value : null;
+
+    if (accountsResult.status === 'rejected') {
+      logger.warn('Failed to fetch company accounts, continuing without', { error: accountsResult.reason?.message });
+    }
+    if (addressesResult.status === 'rejected') {
+      logger.warn('Failed to fetch company addresses, continuing without', { error: addressesResult.reason?.message });
+    }
+    if (packResult.status === 'rejected') {
+      logger.warn('Failed to fetch company pack, continuing without', { error: packResult.reason?.message });
+    }
 
     const details: WFirmaCompanyDetails = {
       ...company,

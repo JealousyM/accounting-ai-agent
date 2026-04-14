@@ -10,6 +10,7 @@ import {
   WFirmaCompanyPack,
   WFirmaCompanyDetails,
   CompanyPackType,
+  PublicRegistryData,
 } from '../../../types/wfirma.types';
 import { Locale, getCompanyTranslations } from '../../../i18n';
 
@@ -25,12 +26,24 @@ export function formatCompanyInfo(company: WFirmaCompany, locale: Locale = 'pl')
   result += `| ${t.companyTitle} | |\n`;
   result += '|-------|-------|\n';
   result += `| **${t.name}** | ${company.name} |\n`;
+  if (company.altname && company.altname !== company.name) {
+    result += `| **${t.altname}** | ${company.altname} |\n`;
+  }
   result += `| **${t.nip}** | ${company.nip} |\n`;
   if (company.regon) {
     result += `| **${t.regon}** | ${company.regon} |\n`;
   }
   if (company.krs) {
     result += `| **${t.krs}** | ${company.krs} |\n`;
+  }
+  if (company.vatPayer !== undefined) {
+    result += `| **${t.vatPayer}** | ${company.vatPayer ? t.yes : t.no} |\n`;
+  }
+  if (company.taxType) {
+    result += `| **${t.taxType}** | ${formatTaxType(company.taxType)} |\n`;
+  }
+  if (company.bookStartDate) {
+    result += `| **${t.bookStartDate}** | ${company.bookStartDate} |\n`;
   }
   result += `| **${t.address}** | ${addressStr} |\n`;
   if (company.email) {
@@ -44,6 +57,16 @@ export function formatCompanyInfo(company: WFirmaCompany, locale: Locale = 'pl')
   }
 
   return result;
+}
+
+function formatTaxType(taxType: string): string {
+  const typeMap: Record<string, string> = {
+    'ledger_register': 'KPiR (Księga Przychodów i Rozchodów)',
+    'lump_register': 'Ryczałt',
+    'taxregister': 'KPiR',
+    'lumpregister': 'Ryczałt',
+  };
+  return typeMap[taxType] || taxType;
 }
 
 /**
@@ -92,6 +115,19 @@ export function formatCompanyAddresses(addresses: WFirmaCompanyAddress[], locale
     result += '|-------|-------|\n';
     if (addr.street) {
       result += `| **${t.street}** | ${addr.street} |\n`;
+    }
+    if (addr.buildingNumber) {
+      const flatStr = addr.flatNumber ? `/${addr.flatNumber}` : '';
+      result += `| **${t.buildingNumber}** | ${addr.buildingNumber}${flatStr} |\n`;
+    }
+    if (addr.commune) {
+      result += `| **${t.commune}** | ${addr.commune} |\n`;
+    }
+    if (addr.district) {
+      result += `| **${t.district}** | ${addr.district} |\n`;
+    }
+    if (addr.voivodeship) {
+      result += `| **${t.voivodeship}** | ${addr.voivodeship} |\n`;
     }
     if (addr.city) {
       result += `| **${t.city}** | ${addr.city} |\n`;
@@ -152,9 +188,68 @@ export function formatCompanyPack(pack: WFirmaCompanyPack | null, locale: Locale
 }
 
 /**
+ * Format public registry data (MF Biala Lista + KRS)
+ */
+export function formatPublicRegistryData(data: PublicRegistryData, locale: Locale = 'pl'): string {
+  const t = getCompanyTranslations(locale);
+
+  let result = `## ${t.publicRegistryTitle}\n\n`;
+  result += `| ${t.companyTitle} | |\n`;
+  result += '|-------|-------|\n';
+
+  if (data.regon) {
+    result += `| **${t.regon}** | ${data.regon} |\n`;
+  }
+  if (data.krs) {
+    result += `| **${t.krs}** | ${data.krs} |\n`;
+  }
+  if (data.vatStatus) {
+    const statusLabel = data.vatStatus === 'czynny' ? t.vatStatusCzynny
+      : data.vatStatus === 'zwolniony' ? t.vatStatusZwolniony
+      : t.vatStatusNiezarejestrowany;
+    const icon = data.vatStatus === 'czynny' ? ' ✅' : data.vatStatus === 'zwolniony' ? ' ⚠️' : ' ❌';
+    result += `| **${t.vatStatus}** | ${statusLabel}${icon} |\n`;
+  }
+
+  if (data.verifiedBankAccounts && data.verifiedBankAccounts.length > 0) {
+    result += `\n### ${t.verifiedAccounts}\n\n`;
+    data.verifiedBankAccounts.forEach((acc, i) => {
+      result += `${i + 1}. \`${acc}\`\n`;
+    });
+  }
+
+  if (data.krsData) {
+    result += '\n### KRS\n\n';
+    result += `| ${t.companyTitle} | |\n`;
+    result += '|-------|-------|\n';
+    if (data.krsData.legalForm) {
+      result += `| **${t.legalForm}** | ${data.krsData.legalForm} |\n`;
+    }
+    if (data.krsData.shareCapital) {
+      result += `| **${t.shareCapital}** | ${data.krsData.shareCapital} |\n`;
+    }
+    if (data.krsData.registrationDate) {
+      result += `| **${t.registrationDate}** | ${data.krsData.registrationDate} |\n`;
+    }
+    if (data.krsData.boardMembers && data.krsData.boardMembers.length > 0) {
+      result += `\n#### ${t.boardMembers}\n\n`;
+      data.krsData.boardMembers.forEach((m) => {
+        result += `- **${m.name}** — ${m.role}\n`;
+      });
+    }
+  }
+
+  return result;
+}
+
+/**
  * Format complete company details
  */
-export function formatCompanyDetails(details: WFirmaCompanyDetails, locale: Locale = 'pl'): string {
+export function formatCompanyDetails(
+  details: WFirmaCompanyDetails,
+  locale: Locale = 'pl',
+  publicRegistry?: PublicRegistryData,
+): string {
   let result = formatCompanyInfo(details, locale);
   result += '\n\n';
   result += formatCompanyAccounts(details.accounts, locale);
@@ -162,6 +257,11 @@ export function formatCompanyDetails(details: WFirmaCompanyDetails, locale: Loca
   result += formatCompanyAddresses(details.addresses, locale);
   result += '\n\n';
   result += formatCompanyPack(details.pack || null, locale);
+
+  if (publicRegistry) {
+    result += '\n\n';
+    result += formatPublicRegistryData(publicRegistry, locale);
+  }
 
   return result;
 }

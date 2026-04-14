@@ -7,17 +7,18 @@ import { tool, StructuredToolInterface } from '@langchain/core/tools';
 import { z } from 'zod';
 import { logger } from '../../../utils/logger';
 import {
-  WFirmaCompany,
   WFirmaCompanyAccount,
   WFirmaCompanyAddress,
 } from '../../../types/wfirma.types';
 import { Locale, getCompanyTranslations } from '../../../i18n';
 import { WFirmaIntegrationService } from '../../wfirma';
 import { WFirmaCacheService } from '../../wfirma-cache.service';
+import { CompanyEnrichmentService, validateNip } from '../../company-enrichment.service';
 import {
-  formatCompanyInfo,
   formatCompanyAccounts,
   formatCompanyAddresses,
+  formatCompanyDetails,
+  formatPublicRegistryData,
 } from '../formatters';
 import { SubscriptionService } from '../../subscription.service';
 import { checkWFirmaLimit, incrementWFirmaUsage } from './usage-tracking';
@@ -28,6 +29,7 @@ import { checkWFirmaLimit, incrementWFirmaUsage } from './usage-tracking';
 export function createGetCompanyInfoTool(
   wfirmaService: WFirmaIntegrationService,
   cacheService: WFirmaCacheService,
+  enrichmentService: CompanyEnrichmentService,
   userId: string,
   locale: Locale = 'pl',
   subscriptionService?: SubscriptionService
@@ -41,20 +43,24 @@ export function createGetCompanyInfoTool(
         const limitError = await checkWFirmaLimit(subscriptionService, userId, locale);
         if (limitError) return limitError;
 
-        const cached = await cacheService.getCachedData<WFirmaCompany>(
-          userId,
-          'company',
-          'default'
+        // Check cache for full details
+        const cached = await cacheService.getCachedData<any>(
+          userId, 'company', 'details'
         );
 
+        let companyDetails: any;
         if (cached) {
-          return formatCompanyInfo(cached, locale);
+          companyDetails = cached;
+        } else {
+          companyDetails = await wfirmaService.getCompanyDetails();
+          await cacheService.cacheData(userId, 'company', 'details', companyDetails);
+          await incrementWFirmaUsage(subscriptionService, userId);
         }
 
-        const companyData = await wfirmaService.getCompanyData();
-        await cacheService.cacheData(userId, 'company', 'default', companyData);
-        await incrementWFirmaUsage(subscriptionService, userId);
-        return formatCompanyInfo(companyData, locale);
+        // Enrich with public registry (does not consume wfirma usage)
+        const publicRegistry = await enrichmentService.enrichByNip(companyDetails.nip, userId);
+
+        return formatCompanyDetails(companyDetails, locale, publicRegistry || undefined);
       } catch (error) {
         logger.error('Failed to get company info', { error });
         return `Error: ${t.errorFetch}`;
@@ -62,7 +68,7 @@ export function createGetCompanyInfoTool(
     },
     {
       name: 'get_company_info',
-      description: 'Get company basic information from wFirma (name, NIP, REGON, KRS, address, email, phone). Use when user asks about their company data.',
+      description: 'Get complete company information from wFirma and public registries (name, NIP, REGON, KRS, VAT status, addresses, bank accounts, subscription). Use when user asks about their company data.',
       schema: z.object({}),
     }
   );
@@ -158,6 +164,46 @@ export function createGetCompanyAddressesTool(
       name: 'get_company_addresses',
       description: 'Get company addresses from wFirma (main registration address, correspondence address). Use when user asks about company addresses.',
       schema: z.object({}),
+    }
+  );
+}
+
+/**
+ * Tool for looking up any Polish company by NIP in public registries
+ */
+export function createLookupCompanyByNipTool(
+  enrichmentService: CompanyEnrichmentService,
+  userId: string,
+  locale: Locale = 'pl',
+): StructuredToolInterface {
+  const t = getCompanyTranslations(locale);
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (tool as any)(
+    async (input: { nip: string }) => {
+      try {
+        if (!validateNip(input.nip)) {
+          return t.invalidNip;
+        }
+
+        const data = await enrichmentService.enrichByNip(input.nip, userId);
+
+        if (!data) {
+          return t.nipNotFound;
+        }
+
+        return formatPublicRegistryData(data, locale);
+      } catch (error) {
+        logger.error('Failed to lookup company by NIP', { nip: input.nip, error });
+        return `Error: ${t.errorFetchPublicRegistry}`;
+      }
+    },
+    {
+      name: 'lookup_company_by_nip',
+      description: 'Look up any Polish company by NIP in public registries (REGON, KRS, VAT status, verified bank accounts, board members). Use when user asks to check or verify a company by NIP.',
+      schema: z.object({
+        nip: z.string().regex(/^\d{10}$/).describe('Polish NIP number (10 digits)'),
+      }),
     }
   );
 }
