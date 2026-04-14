@@ -13,6 +13,7 @@ The wFirma Integration Service provides a robust interface for interacting with 
 - **Automatic Retry Logic**: Configurable retry mechanism with exponential backoff
 - **Comprehensive Error Handling**: Specific error types for different failure scenarios
 - **Connection Health Checks**: Verify wFirma API connectivity
+- **Public Registry Enrichment**: REGON, KRS, VAT status from MF Biała Lista and KRS API
 
 ## Configuration
 
@@ -227,6 +228,38 @@ The service uses Winston logger for comprehensive logging:
 - **Info:** Successful operations
 - **Warn:** Retry attempts
 - **Error:** Failed operations
+
+## Company Enrichment Service
+
+The `CompanyEnrichmentService` (`company-enrichment.service.ts`) supplements wFirma company data with information from Polish public registries. It does not depend on wFirma — it works with any Polish NIP.
+
+### Public APIs Used
+
+| API | Base URL | Auth | Returns |
+|-----|----------|------|---------|
+| MF Biała Lista | `wl-api.mf.gov.pl` | None | REGON, KRS, VAT status, verified bank accounts |
+| KRS API | `api-krs.ms.gov.pl` | None | Board members, share capital, legal form |
+
+### Usage
+
+```typescript
+import { companyEnrichmentService } from './company-enrichment.instance';
+
+// Look up any company by NIP
+const data = await companyEnrichmentService.enrichByNip('5833510147', userId);
+// Returns: { nip, regon, krs, vatStatus, verifiedBankAccounts, krsData }
+
+// Validate NIP (with modulo 11 checksum)
+import { validateNip } from './company-enrichment.service';
+validateNip('5833510147'); // true
+```
+
+### Caching Strategy
+
+- Cache type: `public_registry` (24h TTL)
+- Stored per-user via `WFirmaCacheService`
+- Stale cache fallback: `getCachedDataAllowStale()` returns expired entries when APIs fail
+- Both MF and KRS called via `Promise.allSettled()` — partial results returned on partial failure
 
 ## Testing
 
