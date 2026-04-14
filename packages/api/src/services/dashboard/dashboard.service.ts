@@ -194,15 +194,14 @@ export class DashboardService {
           };
         });
 
-      // Add tax deadlines (dashboard uses 'pl' locale; TODO: pass user locale when available)
-      const taxDeadlines = taxCalendarService.getUpcomingDeadlines(30, 'pl');
+      // Add tax deadlines — only future ones (no overdue, since we don't know if they were paid)
+      const taxDeadlines = taxCalendarService.getUpcomingDeadlines(30, 'pl', 0);
 
       const taxDashboardDeadlines: DashboardDeadline[] = taxDeadlines.map((td) => {
         const daysUntil = Math.ceil((td.date.getTime() - todayMs) / dayMs);
 
         let urgency: DashboardDeadline['urgency'];
-        if (daysUntil < 0) urgency = 'overdue';
-        else if (daysUntil <= 3) urgency = 'urgent';
+        if (daysUntil <= 3) urgency = 'urgent';
         else if (daysUntil <= 7) urgency = 'soon';
         else urgency = 'normal';
 

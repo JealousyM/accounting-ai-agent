@@ -43,15 +43,20 @@ export function formatTaxDeadlinesList(
 ): string {
   const t = getTaxCalendarTranslations(locale);
 
-  if (deadlines.length === 0) {
+  // Filter out past deadlines — tax deadlines are statutory,
+  // the system doesn't know if they were paid, so showing "overdue" is misleading
+  const todayStr = formatDate(new Date());
+  const activeDeadlines = deadlines.filter(d => formatDate(d.date) >= todayStr);
+
+  if (activeDeadlines.length === 0) {
     return t.notFound;
   }
 
-  let result = `## ${t.deadlinesTitle} (${deadlines.length})\n\n`;
+  let result = `## ${t.deadlinesTitle} (${activeDeadlines.length})\n\n`;
   result += `| # | ${t.date} | ${t.name} | ${t.description} | ${t.category} | ${t.status} |\n`;
   result += '|---|------|------|-------------|----------|--------|\n';
 
-  deadlines.forEach((d, i) => {
+  activeDeadlines.forEach((d, i) => {
     const status = getStatus(d.date, locale);
     const desc = d.description.length > 40
       ? d.description.substring(0, 40) + '...'
