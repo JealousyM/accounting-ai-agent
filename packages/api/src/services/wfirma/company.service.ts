@@ -100,6 +100,23 @@ export class WFirmaCompanyService {
           email: companyData.email,
           phone: companyData.phone,
           website: companyData.www,
+          altname: companyData.altname || undefined,
+          vatPayer: companyData.vat_payer === '1',
+          taxType: companyData.tax || undefined,
+          bookStartDate: companyData.book_start_date || undefined,
+          packRights: (() => {
+            // pack_rights come as numbered sub-objects: {"0": {"pack_rights": "trade"}, "1": {"pack_rights": "book"}, ...}
+            const rights: string[] = [];
+            if (companyData && typeof companyData === 'object') {
+              for (const key of Object.keys(companyData)) {
+                const val = companyData[key];
+                if (typeof val === 'object' && val !== null && 'pack_rights' in val) {
+                  rights.push(val.pack_rights);
+                }
+              }
+            }
+            return rights.length > 0 ? rights : undefined;
+          })(),
         };
 
         logger.info('Successfully fetched company data from wFirma', {
@@ -264,6 +281,11 @@ export class WFirmaCompanyService {
                 zip: addr.zip || undefined,
                 country: addr.country || 'PL',
                 isMain: addr.is_main === '1' || addr.main === true || addressType === 'main',
+                buildingNumber: addr.building_number || undefined,
+                flatNumber: addr.flat_number || undefined,
+                commune: addr.commune || undefined,
+                district: addr.district || undefined,
+                voivodeship: addr.voivodeship || undefined,
               });
             }
           }
