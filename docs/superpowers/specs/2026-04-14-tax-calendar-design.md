@@ -42,6 +42,7 @@ Weekend/holiday rule: if deadline falls on Saturday/Sunday/Polish public holiday
 ```
 packages/api/src/types/tax-calendar.types.ts
 packages/api/src/services/tax-calendar.service.ts
+packages/api/src/services/tax-calendar.instance.ts
 packages/api/src/services/ai-chat/tools/tax-calendar.tools.ts
 packages/api/src/services/ai-chat/formatters/tax-calendar.formatter.ts
 ```
@@ -97,11 +98,20 @@ Internal structure:
 - Static array of deadline rules: `{ day, name, category, frequency, obligatory, monthRestriction? }`
 - `isPolishHoliday(date)` — checks against fixed + moveable holidays (Easter-based)
 - `shiftToBusinessDay(date)` — if weekend/holiday, move to next Monday/business day
-- Polish public holidays list (fixed dates + Easter Monday, Corpus Christi)
+- Easter Sunday calculation via Computus algorithm (Anonymous Gregorian)
+- Full list of 13 Polish public holidays:
+  - Fixed: Jan 1, Jan 6, May 1, May 3, Aug 15, Nov 1, Nov 11, Dec 25, Dec 26
+  - Moveable (Easter-based): Easter Sunday, Easter Monday, Whit Sunday (Pentecost, +49 days), Corpus Christi (+60 days)
 
 ### AI Tool (`tax-calendar.tools.ts`)
 
 Tool name: `get_tax_deadlines`
+
+**Important:** This tool is purely computational — no wFirma API calls. Therefore:
+- Does NOT need `wfirmaService`, `cacheService`, `userId`, or `subscriptionService` dependencies
+- Does NOT call `checkWFirmaLimit` / `incrementWFirmaUsage`
+- Tool creator only needs `locale` parameter
+- Must be registered unconditionally in `createAllTools` (not behind a credential check) — available to all users
 
 Description: "Get Polish tax payment deadlines (VAT-7, CIT, PIT-4R, ZUS, VAT-UE, PCC, dividends) for a given period. Use when user asks about tax deadlines, payment dates, tax calendar, or upcoming tax obligations."
 
@@ -139,7 +149,7 @@ In `dashboard.service.ts` `getDeadlinesSection()`:
 1. Fetch user terms (existing)
 2. Fetch tax deadlines via `TaxCalendarService.getUpcomingDeadlines(30)`
 3. Merge both lists, sort by date
-4. Add `source: 'user' | 'tax'` to `DashboardDeadline` type
+4. Add optional `source?: 'user' | 'tax'` to `DashboardDeadline` type (optional for backward compatibility)
 
 ## Data Flow
 
