@@ -7,6 +7,7 @@ import { logger } from '../../utils/logger';
 import { WFirmaServiceFactory } from '../wfirma-integration.factory';
 import { HRService } from '../hr/hr.service';
 import { KSeFService } from '../ksef/ksef.service';
+import { taxCalendarService } from '../tax-calendar.instance';
 import {
   DashboardSummaryResponse,
   DashboardFinancialSummary,
@@ -171,7 +172,7 @@ export class DashboardService {
       const todayMs = today.getTime();
       const dayMs = 24 * 60 * 60 * 1000;
 
-      return terms
+      const userDeadlines: DashboardDeadline[] = terms
         .map((term) => {
           const termDate = term.date instanceof Date ? term.date : new Date(term.date);
           const daysUntil = Math.ceil((termDate.getTime() - todayMs) / dayMs);
@@ -189,8 +190,33 @@ export class DashboardService {
             groupName: term.groupId ? groupMap.get(term.groupId) : undefined,
             daysUntil,
             urgency,
+            source: 'user' as const,
           };
-        })
+        });
+
+      // Add tax deadlines (dashboard uses 'pl' locale; TODO: pass user locale when available)
+      const taxDeadlines = taxCalendarService.getUpcomingDeadlines(30, 'pl');
+
+      const taxDashboardDeadlines: DashboardDeadline[] = taxDeadlines.map((td) => {
+        const daysUntil = Math.ceil((td.date.getTime() - todayMs) / dayMs);
+
+        let urgency: DashboardDeadline['urgency'];
+        if (daysUntil < 0) urgency = 'overdue';
+        else if (daysUntil <= 3) urgency = 'urgent';
+        else if (daysUntil <= 7) urgency = 'soon';
+        else urgency = 'normal';
+
+        return {
+          id: `tax-${td.id}`,
+          date: td.date.toISOString(),
+          description: `${td.name}: ${td.description}`,
+          daysUntil,
+          urgency,
+          source: 'tax' as const,
+        };
+      });
+
+      return [...userDeadlines, ...taxDashboardDeadlines]
         .sort((a, b) => a.daysUntil - b.daysUntil);
     } catch (error) {
       logger.error('Dashboard: failed to fetch deadlines', { error, userId });
