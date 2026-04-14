@@ -88,7 +88,7 @@ interface CompanyFullInfo {
 }
 ```
 
-`regon` and `krs` remain on `WFirmaCompany` as optional fields for backward compatibility (wFirma may return them for some accounts, and KSeF adapter references them). `PublicRegistryData` provides authoritative values — when merging, public registry data takes precedence over wFirma values.
+`regon` and `krs` are removed from `WFirmaCompany` — wFirma doesn't return them; they live in `PublicRegistryData`.
 
 ## Public APIs
 
@@ -117,7 +117,7 @@ interface CompanyFullInfo {
 
 ### lookup_company_by_nip (new)
 
-- Parameter: `nip: string` (Zod: 10 digits + modulo 11 checksum validation)
+- Parameter: `nip: string` (Zod: 10 digits)
 - Calls `CompanyEnrichmentService.enrichByNip(nip)` only
 - Works with any Polish NIP, not just own company
 - Cache: `public_registry:{nip}`, 24h TTL
@@ -146,7 +146,6 @@ Localization: new keys in `i18n/index.ts` for pl/en/ru.
 - Each public API call has 5s timeout
 - On error: `logger.warn()`, return `null` for that source
 - Fallback order: fresh data → stale cache → `null`
-- Stale cache: add `getCachedDataAllowStale(userId, type, id)` method to `WFirmaCacheService` that returns expired entries instead of invalidating them
 - `get_company_info` always returns at least wFirma data
 - MF and KRS called via `Promise.allSettled()` — one can fail without affecting the other
 - KRS not found is normal for sole proprietors (JDG) — `krsData` = `undefined`
@@ -155,19 +154,12 @@ Localization: new keys in `i18n/index.ts` for pl/en/ru.
 ## Files to Create/Modify
 
 ### New files
-- `packages/api/src/services/company-enrichment.service.ts` — MF + KRS API client + caching; constructor: `constructor(private readonly cacheService: WFirmaCacheService)`
-- `packages/api/src/services/company-enrichment.instance.ts` — singleton wired with `WFirmaCacheService` instance
+- `packages/api/src/services/company-enrichment.service.ts` — MF + KRS API client + caching
+- `packages/api/src/services/company-enrichment.instance.ts` — singleton
 
 ### Modified files
-- `packages/api/src/types/wfirma.types.ts` — new types (`PublicRegistryData`, `CompanyFullInfo`), extended interfaces
-- `packages/api/src/types/cache.types.ts` — add `'public_registry'` to `CacheDataType` union and `DEFAULT_TTL_CONFIG`
-- `packages/api/src/services/wfirma-cache.service.ts` — add `getCachedDataAllowStale()` method for stale fallback
-- `packages/api/src/services/wfirma/company.service.ts` — extract new fields (altname, vatPayer, tax, bookStartDate, packRights, buildingNumber, flatNumber, etc.)
-- `packages/api/src/services/ai-chat/tools/company.tool.ts` — modify `get_company_info`, add `lookup_company_by_nip`
-- `packages/api/src/services/ai-chat/tools/index.ts` — add `CompanyEnrichmentService` parameter to `createAllTools`
-- `packages/api/src/services/ai-chat/formatters/company.formatter.ts` — new fields + `formatPublicRegistryData()`
-- `packages/api/src/i18n/index.ts` — new translation keys (pl/en/ru) including error keys
-
-### Caching strategy for public registry data
-- Public registry data is NIP-scoped, not user-scoped — use `userId = 'system'` as sentinel value when caching via `WFirmaCacheService`
-- `get_company_accounts` and `get_company_addresses` tools are kept for backward compatibility (AI agent can still call them for focused queries)
+- `packages/api/src/types/wfirma.types.ts` — new types, extended interfaces
+- `packages/api/src/services/wfirma/company.service.ts` — extract new fields
+- `packages/api/src/services/ai-chat/tools/company.tool.ts` — modify get_company_info, add lookup_company_by_nip
+- `packages/api/src/services/ai-chat/formatters/company.formatter.ts` — new fields + public registry formatter
+- `packages/api/src/i18n/index.ts` — new translation keys (pl/en/ru)
