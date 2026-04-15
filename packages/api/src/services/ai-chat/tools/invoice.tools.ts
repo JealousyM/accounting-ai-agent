@@ -39,25 +39,15 @@ export function createGetInvoicesTool(
 ): StructuredToolInterface {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return (tool as any)(
-    async ({ year, month, status }: { year?: number; month?: number; status?: string }) => {
+    async ({ dateFrom, dateTo, status }: { dateFrom?: string; dateTo?: string; status?: string }) => {
       try {
         // Check wFirma usage limit
         const limitError = await checkWFirmaLimit(subscriptionService, userId, locale);
         if (limitError) return limitError;
 
-        let dateFrom: Date | undefined;
-        let dateTo: Date | undefined;
-
-        if (year) {
-          dateFrom = new Date(year, month ? month - 1 : 0, 1);
-          dateTo = month
-            ? new Date(year, month, 0)
-            : new Date(year, 11, 31);
-        }
-
         const invoices = await wfirmaService.findInvoices({
-          dateFrom,
-          dateTo,
+          dateFrom: dateFrom ? new Date(dateFrom) : undefined,
+          dateTo: dateTo ? new Date(dateTo) : undefined,
           status: status && status !== 'all' ? status as any : undefined,
           limit: 100,
         });
@@ -77,10 +67,10 @@ export function createGetInvoicesTool(
     },
     {
       name: 'get_invoices',
-      description: 'Get list of invoices from wFirma. Can filter by year, month, and payment status (paid, unpaid, overdue, draft, issued, sent).',
+      description: 'Get list of OUTGOING invoices (faktury sprzedaży — issued by the user to their clients) from wFirma. For INCOMING bills/purchases (wydatki), use get_expenses instead. CRITICAL: whenever the user mentions any period (month, year, quarter, "last month", "April 2026", etc.) you MUST pass dateFrom and dateTo. Never call this tool without date filters if a period was mentioned — returning unfiltered results is a bug.',
       schema: z.object({
-        year: z.number().nullable().optional().describe('Filter by year (e.g., 2024, 2025, 2026)'),
-        month: z.number().min(1).max(12).nullable().optional().describe('Filter by month (1-12)'),
+        dateFrom: z.string().nullable().optional().describe('Start date YYYY-MM-DD inclusive. REQUIRED when user specifies any period. For "April 2026" pass "2026-04-01".'),
+        dateTo: z.string().nullable().optional().describe('End date YYYY-MM-DD inclusive. REQUIRED when user specifies any period. For "April 2026" pass "2026-04-30".'),
         status: z.enum(['all', 'paid', 'unpaid', 'overdue', 'draft', 'issued', 'sent']).nullable().optional().describe('Filter by payment status'),
       }),
     }
