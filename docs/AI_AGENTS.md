@@ -293,6 +293,14 @@ All tools are created by `createAllTools()` in `packages/api/src/services/ai-cha
 | `get_jpk_vat` | Get JPK_VAT declaration data | `declaration.tools.ts` |
 | `get_pit` | Get PIT declaration data | `declaration.tools.ts` |
 
+### Tax Calendar (1 tool)
+
+No wFirma dependency — always available to all users.
+
+| Tool | Description | File |
+|------|-------------|------|
+| `get_tax_deadlines` | Get Polish statutory tax payment deadlines (VAT-7, CIT, PIT-4R, ZUS, VAT-UE, PCC, dividends) for a given period. Shifts to next business day on weekends/holidays. | `tax-calendar.tools.ts` |
+
 ### Documents (4 tools)
 
 | Tool | Description | File |
@@ -364,11 +372,12 @@ Loaded when `ksefService` is available.
 | Terms | 5 | No |
 | Term Groups | 5 | No |
 | Declarations | 2 | No |
+| Tax Calendar | 1 | No |
 | Documents | 4 | No |
 | Ledger | 4 | No |
 | HR | 15 | Yes (hrService) |
 | KSeF | 9 | Yes (ksefService) |
-| **Total** | **78** | |
+| **Total** | **79** | |
 
 ---
 

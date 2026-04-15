@@ -102,3 +102,6 @@ export {
   formatIncomingInvoicesList,
   formatIncomingInvoiceMatch,
 } from './ksef.formatter';
+export {
+  formatTaxDeadlinesList,
+} from './tax-calendar.formatter';

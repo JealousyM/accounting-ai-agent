@@ -61,6 +61,7 @@ routes/      → controllers/      → services/      → Prisma/Redis
 - **OrganizationService** - Company grouping with admin/member roles and membership approval
 - **TelegramBotService** - Telegraf-based AI chatbot with account linking via 6-digit codes
 - **ReferralService** - Referral program with Stripe credit rewards and coupon discounts
+- **TaxCalendarService** - Polish statutory tax deadlines (VAT, CIT, PIT, ZUS, PCC, dividends) with weekend/holiday shifting
 
 ### Frontend Structure (packages/web/src/)
 - `app/` - Next.js App Router pages

@@ -811,6 +811,40 @@ export interface KSeFTranslations {
   ksefNipHint: string;
 }
 
+export interface TaxCalendarTranslations {
+  title: string;
+  deadlinesTitle: string;
+  date: string;
+  name: string;
+  description: string;
+  category: string;
+  status: string;
+  obligatory: string;
+  optional: string;
+  statusOverdue: string;
+  statusToday: string;
+  statusUpcoming: string;
+  shiftNote: string;
+  optionalNote: string;
+  notFound: string;
+  errorFetch: string;
+  pit4r: string;
+  pcc: string;
+  dividend: string;
+  zus: string;
+  cit: string;
+  vat7: string;
+  vatue: string;
+  pit11: string;
+  cit8: string;
+  categoryVat: string;
+  categoryCit: string;
+  categoryPit: string;
+  categoryZus: string;
+  categoryPcc: string;
+  categoryDividend: string;
+}
+
 export interface CommonTranslations {
   wfirmaLimitReached: string;
   aiLimitReached: string;
@@ -832,6 +866,7 @@ export interface Translations {
   ledger: LedgerTranslations;
   hr: HRTranslations;
   ksef: KSeFTranslations;
+  taxCalendar: TaxCalendarTranslations;
 }
 
 const translations: Record<Locale, Translations> = {
@@ -898,4 +933,8 @@ export function getKSeFTranslations(locale: Locale = 'pl'): KSeFTranslations {
 
 export function getCommonTranslations(locale: Locale = 'pl'): CommonTranslations {
   return getTranslations(locale).common;
+}
+
+export function getTaxCalendarTranslations(locale: Locale = 'pl'): TaxCalendarTranslations {
+  return getTranslations(locale).taxCalendar;
 }

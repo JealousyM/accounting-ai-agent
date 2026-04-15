@@ -36,6 +36,7 @@ export interface DashboardDeadline {
   groupName?: string;
   daysUntil: number;
   urgency: 'overdue' | 'urgent' | 'soon' | 'normal';
+  source?: 'user' | 'tax';
 }
 
 export interface DashboardHRSummary {
