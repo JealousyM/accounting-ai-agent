@@ -115,7 +115,7 @@ export class WFirmaInvoiceService {
         logger.debug('wFirma findInvoices payload', { payload });
 
         const response = await this.client.apiClient.request({
-          method: 'POST',
+          method: 'GET',
           url: '/invoices/find',
           params: this.client.buildQueryParams(),
           data: payload,
