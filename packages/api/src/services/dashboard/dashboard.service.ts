@@ -258,6 +258,28 @@ export class DashboardService {
   private async getKSeFSection(userId: string): Promise<DashboardKSeFSummary | null> {
     try {
       const stats = await this.ksefService.getStatistics(userId);
+
+      // The local DB only tracks KSeF activity that went through our system.
+      // Users commonly import invoices into wFirma directly (wFirma uses the
+      // UBL 2.1 parser for KSeF-sourced expenses), so those never land in
+      // our table. Augment totalReceived with the wFirma-side count so the
+      // dashboard isn't stuck at zero.
+      let wfirmaReceived = 0;
+      try {
+        if (await this.wfirmaServiceFactory.hasUserCredentials(userId)) {
+          const wfirmaService = await this.wfirmaServiceFactory.getServiceForUser(userId);
+          const year = new Date().getFullYear();
+          const expenses = await wfirmaService.findExpenses({
+            dateFrom: new Date(year, 0, 1),
+            dateTo: new Date(year, 11, 31, 23, 59, 59),
+            limit: 1000,
+          });
+          wfirmaReceived = expenses.filter((e) => e.parser === 'ubl21').length;
+        }
+      } catch (err) {
+        logger.warn('Dashboard: failed to augment KSeF received count from wFirma', { err, userId });
+      }
+
       const totalDecided = stats.acceptedCount + stats.rejectedCount;
       const acceptanceRate = totalDecided > 0
         ? Math.round((stats.acceptedCount / totalDecided) * 100)
@@ -265,7 +287,7 @@ export class DashboardService {
 
       return {
         totalSent: stats.totalSent,
-        totalReceived: stats.totalReceived,
+        totalReceived: stats.totalReceived + wfirmaReceived,
         acceptedCount: stats.acceptedCount,
         rejectedCount: stats.rejectedCount,
         pendingCount: stats.pendingCount,

@@ -573,6 +573,11 @@ export interface WFirmaExpense {
   totalNet: number;
   totalVat: number;
 
+  // Import source — wFirma uses `parser: 'ubl21'` for expenses that entered
+  // the system via a structured e-invoice (KSeF/UBL 2.1). Other values
+  // include 'scanye', 'gemini' (OCR) or empty (manual entry).
+  parser?: string;
+
   // Parts/items
   parts: WFirmaExpensePart[];
 
