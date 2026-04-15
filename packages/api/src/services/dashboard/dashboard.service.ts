@@ -52,46 +52,47 @@ export class DashboardService {
       if (!hasCredentials) return null;
 
       const wfirmaService = await this.wfirmaServiceFactory.getServiceForUser(userId);
-      const currentYear = new Date().getFullYear();
+      const now = new Date();
+      const year = now.getFullYear();
+      const yearStart = new Date(year, 0, 1);
+      const yearEnd = new Date(year, 11, 31, 23, 59, 59);
+      const monthStart = new Date(year, now.getMonth(), 1);
 
-      // Get yearly totals
-      const financialData = await wfirmaService.getFinancialData(currentYear);
+      // wFirma returns `netto` and `tax` already converted to PLN even on
+      // foreign-currency invoices, so totalNet + totalVat is the gross PLN
+      // amount. Expenses are stored directly in PLN (`brutto`).
+      const [invoices, expenses] = await Promise.all([
+        wfirmaService.findInvoices({ dateFrom: yearStart, dateTo: yearEnd, limit: 1000 }),
+        wfirmaService.findExpenses({ dateFrom: yearStart, dateTo: yearEnd, limit: 1000 }),
+      ]);
 
-      // Get invoices for monthly breakdown
-      const dateFrom = new Date(currentYear, 0, 1);
-      const dateTo = new Date(currentYear, 11, 31);
-      const invoices = await wfirmaService.findInvoices({ dateFrom, dateTo, limit: 1000 });
-
-      // Build monthly breakdown
       const monthlyMap = new Map<string, { revenue: number; expenses: number }>();
-
-      // Initialize all months of the current year
       for (let m = 0; m < 12; m++) {
-        const key = `${currentYear}-${String(m + 1).padStart(2, '0')}`;
+        const key = `${year}-${String(m + 1).padStart(2, '0')}`;
         monthlyMap.set(key, { revenue: 0, expenses: 0 });
       }
 
-      for (const invoice of invoices) {
-        const issueDate = invoice.issueDate instanceof Date
-          ? invoice.issueDate
-          : new Date(invoice.issueDate);
-        const monthKey = `${issueDate.getFullYear()}-${String(issueDate.getMonth() + 1).padStart(2, '0')}`;
-        const entry = monthlyMap.get(monthKey);
-        if (!entry) continue;
+      const monthKey = (d: Date) =>
+        `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
 
-        const total = typeof invoice.total === 'number' ? invoice.total : parseFloat(String(invoice.total) || '0');
-        if (invoice.status !== 'cancelled') {
-          // Revenue from normal/vat invoices, expenses from purchase invoices
-          // This mirrors the logic in financial.service.ts
-          if ((invoice as any).type === 'normal' || (invoice as any).type === 'vat') {
-            entry.revenue += total;
-          } else if ((invoice as any).type === 'purchase') {
-            entry.expenses += total;
-          } else {
-            // Default: positive totals are revenue
-            if (total > 0) entry.revenue += total;
-          }
-        }
+      let currentMonthRevenue = 0;
+      for (const inv of invoices) {
+        if (inv.status === 'cancelled' || inv.status === 'draft') continue;
+        if ((inv as any).type === 'proforma') continue;
+        const plnGross = (inv.totalNet ?? 0) + (inv.totalVat ?? 0);
+        const date = inv.issueDate instanceof Date ? inv.issueDate : new Date(inv.issueDate);
+        const entry = monthlyMap.get(monthKey(date));
+        if (entry) entry.revenue += plnGross;
+        if (date >= monthStart) currentMonthRevenue += plnGross;
+      }
+
+      let currentMonthExpenses = 0;
+      for (const exp of expenses) {
+        const plnGross = exp.total ?? 0;
+        const date = exp.date instanceof Date ? exp.date : new Date(exp.date);
+        const entry = monthlyMap.get(monthKey(date));
+        if (entry) entry.expenses += plnGross;
+        if (date >= monthStart) currentMonthExpenses += plnGross;
       }
 
       const monthlyBreakdown: MonthlyFinancialData[] = Array.from(monthlyMap.entries())
@@ -99,13 +100,13 @@ export class DashboardService {
         .map(([month, data]) => ({ month, revenue: data.revenue, expenses: data.expenses }));
 
       return {
-        year: currentYear,
-        revenue: financialData.revenue,
-        expenses: financialData.expenses,
-        profit: financialData.profit,
-        vatPaid: financialData.vatPaid || 0,
-        pitPaid: financialData.pitPaid || 0,
-        zusPaid: financialData.zusPaid || 0,
+        year,
+        revenue: currentMonthRevenue,
+        expenses: currentMonthExpenses,
+        profit: currentMonthRevenue - currentMonthExpenses,
+        vatPaid: 0,
+        pitPaid: 0,
+        zusPaid: 0,
         currency: 'PLN',
         monthlyBreakdown,
       };
