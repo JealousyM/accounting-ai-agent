@@ -82,7 +82,7 @@ export function createGetExpensesTool(
     {
       name: 'get_expenses',
       description:
-        'Get list of expenses from wFirma. Can filter by contractor name, date range, payment status, and expense type. Use this to find business expenses, bills, and purchases.',
+        'Get list of INCOMING expenses/bills (wydatki — purchases and bills received from vendors) from wFirma. For OUTGOING invoices issued to clients, use get_invoices instead. CRITICAL: whenever the user mentions any period (month, year, quarter, "last month", "April 2026", etc.) you MUST pass dateFrom and dateTo. Never call this tool without date filters if a period was mentioned — returning unfiltered results is a bug.',
       schema: z.object({
         contractorName: z
           .string()
@@ -91,8 +91,8 @@ export function createGetExpensesTool(
         dateFrom: z
           .string()
           .nullable().optional()
-          .describe('Start date (YYYY-MM-DD)'),
-        dateTo: z.string().nullable().optional().describe('End date (YYYY-MM-DD)'),
+          .describe('Start date YYYY-MM-DD inclusive. REQUIRED when user specifies any period. For "April 2026" pass "2026-04-01".'),
+        dateTo: z.string().nullable().optional().describe('End date YYYY-MM-DD inclusive. REQUIRED when user specifies any period. For "April 2026" pass "2026-04-30".'),
         paid: z
           .boolean()
           .nullable().optional()
