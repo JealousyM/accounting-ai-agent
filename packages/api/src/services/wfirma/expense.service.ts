@@ -343,6 +343,9 @@ export class WFirmaExpenseService {
       totalNet,
       totalVat,
 
+      // Import source
+      parser: e.parser || undefined,
+
       // Parts
       parts,
 
