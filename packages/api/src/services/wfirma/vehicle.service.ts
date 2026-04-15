@@ -62,11 +62,10 @@ export class WFirmaVehicleService {
           },
         };
 
-        if (conditions.length > 0) {
-          vehiclesParams.parameters.conditions = {
-            condition: conditions,
-          };
-        }
+        const builtConditions = this.client.buildConditions(conditions);
+          if (builtConditions) {
+            vehiclesParams.parameters.conditions = builtConditions;
+          }
 
         const payload = {
           api: {

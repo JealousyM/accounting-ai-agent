@@ -176,12 +176,10 @@ export class WFirmaNoteService {
           api: {
             notes: {
               parameters: {
-                conditions: {
-                  condition: [
-                    { field: 'object_name', operator: 'eq', value: objectName },
-                    { field: 'object_id', operator: 'eq', value: objectId },
-                  ],
-                },
+                conditions: this.client.buildConditions([
+                  { field: 'object_name', operator: 'eq', value: objectName },
+                  { field: 'object_id', operator: 'eq', value: objectId },
+                ]),
                 limit: 100,
                 page: 1,
               },

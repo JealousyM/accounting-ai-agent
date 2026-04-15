@@ -45,11 +45,10 @@ export class WFirmaTermGroupService {
           },
         };
 
-        if (conditions.length > 0) {
-          termGroupsParams.parameters.conditions = {
-            condition: conditions,
-          };
-        }
+        const builtConditions = this.client.buildConditions(conditions);
+          if (builtConditions) {
+            termGroupsParams.parameters.conditions = builtConditions;
+          }
 
         const payload = {
           api: {

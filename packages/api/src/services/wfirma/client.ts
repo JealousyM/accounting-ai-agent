@@ -127,6 +127,22 @@ export class WFirmaClient {
   }
 
   /**
+   * wFirma's JSON API ignores `conditions.condition` when sent as an array
+   * (silently returns all records). It expects the XML-style repeated
+   * element shape, encoded in JSON as numbered keys, each wrapping a
+   * `condition` object. This helper converts `[cond1, cond2, ...]` into
+   * `{ "0": { condition: cond1 }, "1": { condition: cond2 }, ... }`.
+   */
+  buildConditions(conditions: Array<Record<string, unknown>>): Record<string, unknown> | undefined {
+    if (conditions.length === 0) return undefined;
+    const out: Record<string, unknown> = {};
+    conditions.forEach((c, i) => {
+      out[String(i)] = { condition: c };
+    });
+    return out;
+  }
+
+  /**
    * Build query parameters for wFirma API
    */
   buildQueryParams(): Record<string, string> {

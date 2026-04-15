@@ -85,11 +85,10 @@ export class WFirmaTermService {
           },
         };
 
-        if (conditions.length > 0) {
-          termsParams.parameters.conditions = {
-            condition: conditions,
-          };
-        }
+        const builtConditions = this.client.buildConditions(conditions);
+          if (builtConditions) {
+            termsParams.parameters.conditions = builtConditions;
+          }
 
         const payload = {
           api: {

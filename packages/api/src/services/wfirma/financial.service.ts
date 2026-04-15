@@ -26,20 +26,10 @@ export class WFirmaFinancialService {
           api: {
             invoices: {
               parameters: {
-                conditions: {
-                  condition: [
-                    {
-                      field: 'date',
-                      operator: 'ge',
-                      value: dateFrom,
-                    },
-                    {
-                      field: 'date',
-                      operator: 'le',
-                      value: dateTo,
-                    },
-                  ],
-                },
+                conditions: this.client.buildConditions([
+                  { field: 'date', operator: 'ge', value: dateFrom },
+                  { field: 'date', operator: 'le', value: dateTo },
+                ]),
                 limit: 1000,
                 page: 1,
               },

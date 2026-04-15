@@ -110,11 +110,10 @@ export class WFirmaPaymentService {
           },
         };
 
-        if (conditions.length > 0) {
-          paymentsParams.parameters.conditions = {
-            condition: conditions,
-          };
-        }
+        const builtConditions = this.client.buildConditions(conditions);
+          if (builtConditions) {
+            paymentsParams.parameters.conditions = builtConditions;
+          }
 
         const payload = {
           api: {
