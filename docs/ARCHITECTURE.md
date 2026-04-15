@@ -293,6 +293,7 @@ Language detection is automatic based on:
 | AuditLogService | `services/audit-log.service.ts` | Writes to `audit_logs` table; sanitizes sensitive fields; exposes paginated `getAll()` for admin queries |
 | AIMemoryService | `services/ai-memory/ai-memory.service.ts` | CRUD for per-user AI context memories (preferences, business facts, frequent entities); builds a prompt fragment injected into the system prompt so the agent retains long-term context |
 | AIMemoryExtractionService | `services/ai-memory/memory-extraction.service.ts` | Runs after each chat turn (fire-and-forget); extracts user preferences, business facts, and frequently referenced entities from messages and tool calls via pattern matching; upserts into `AIMemory` table |
+| TaxCalendarService | `services/tax-calendar.service.ts` | Generates Polish statutory tax payment deadlines (VAT-7, CIT, PIT-4R, ZUS, PCC, dividends, VAT-UE) with weekend/holiday shifting using Computus algorithm; pure computation, no DB or API calls; integrated into dashboard alongside user terms |
 
 ## KSeF Integration Layer
 
