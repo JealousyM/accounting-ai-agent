@@ -121,7 +121,7 @@ export class WFirmaExpenseService {
         });
 
         const response = await this.client.apiClient.request({
-          method: 'GET',
+          method: 'POST',
           url: '/expenses/find',
           params: this.client.buildQueryParams(),
           data: payload,
