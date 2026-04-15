@@ -7,7 +7,6 @@ import type {
   DashboardFinancialSummary,
   DashboardInvoiceSummary,
   DashboardDeadline,
-  DashboardHRSummary,
   DashboardKSeFSummary,
 } from '@/types/dashboard.types';
 
@@ -16,7 +15,6 @@ interface UseDashboardReturn {
   financial: DashboardFinancialSummary | null;
   invoices: DashboardInvoiceSummary | null;
   deadlines: DashboardDeadline[] | null;
-  hr: DashboardHRSummary | null;
   ksef: DashboardKSeFSummary | null;
   isLoading: boolean;
   isError: boolean;
@@ -44,7 +42,6 @@ export function useDashboard(): UseDashboardReturn {
     financial: summary?.financial ?? null,
     invoices: summary?.invoices ?? null,
     deadlines: summary?.deadlines ?? null,
-    hr: summary?.hr ?? null,
     ksef: summary?.ksef ?? null,
     isLoading,
     isError,

@@ -8,7 +8,6 @@ import {
   RevenueExpenseChart,
   UnpaidInvoicesCard,
   TaxDeadlines,
-  HRSummaryCard,
   KSeFStatusCard,
 } from '@/components/dashboard';
 import { RefreshCw, ArrowLeft } from 'lucide-react';
@@ -39,7 +38,6 @@ function DashboardContent() {
     financial,
     invoices,
     deadlines,
-    hr,
     ksef,
     isLoading,
     refetch,
@@ -84,7 +82,6 @@ function DashboardContent() {
           <SummaryCards
             financial={financial}
             invoices={invoices}
-            hr={hr}
             ksef={ksef}
             isLoading={isLoading}
             translations={t.summary}
@@ -106,17 +103,12 @@ function DashboardContent() {
             />
           </div>
 
-          {/* Row 3: Deadlines + HR + KSeF */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-2">
+          {/* Row 3: Deadlines + KSeF */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-2">
             <TaxDeadlines
               deadlines={deadlines}
               isLoading={isLoading}
               translations={t.deadlines}
-            />
-            <HRSummaryCard
-              data={hr}
-              isLoading={isLoading}
-              translations={t.hr}
             />
             <KSeFStatusCard
               data={ksef}
