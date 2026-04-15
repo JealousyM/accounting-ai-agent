@@ -100,10 +100,9 @@ export class WFirmaInvoiceService {
           invoicesParams.parameters.order = { desc: 'Invoice.id' };
         }
 
-        if (conditions.length > 0) {
-          invoicesParams.parameters.conditions = {
-            condition: conditions,
-          };
+        const builtConditions = this.client.buildConditions(conditions);
+        if (builtConditions) {
+          invoicesParams.parameters.conditions = builtConditions;
         }
 
         const payload = {

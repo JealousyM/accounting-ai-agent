@@ -53,10 +53,9 @@ export class WFirmaContractorService {
           },
         };
 
-        if (conditions.length > 0) {
-          contractorsParams.parameters.conditions = {
-            condition: conditions,
-          };
+        const builtConditions = this.client.buildConditions(conditions);
+        if (builtConditions) {
+          contractorsParams.parameters.conditions = builtConditions;
         }
 
         const payload = {

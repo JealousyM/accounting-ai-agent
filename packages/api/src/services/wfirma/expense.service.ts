@@ -104,10 +104,9 @@ export class WFirmaExpenseService {
           },
         };
 
-        if (conditions.length > 0) {
-          expensesParams.parameters.conditions = {
-            condition: conditions,
-          };
+        const builtConditions = this.client.buildConditions(conditions);
+        if (builtConditions) {
+          expensesParams.parameters.conditions = builtConditions;
         }
 
         const payload = {
