@@ -39,13 +39,6 @@ export interface DashboardDeadline {
   source?: 'user' | 'tax';
 }
 
-export interface DashboardHRSummary {
-  employeeCount: number;
-  activeContractsByType: Record<string, number>;
-  latestPeriod: string | null;
-  totalMonthlyPayroll: number;
-}
-
 export interface DashboardKSeFSummary {
   totalSent: number;
   totalReceived: number;
@@ -59,7 +52,6 @@ export interface DashboardSummaryResponse {
   financial: DashboardFinancialSummary | null;
   invoices: DashboardInvoiceSummary | null;
   deadlines: DashboardDeadline[] | null;
-  hr: DashboardHRSummary | null;
   ksef: DashboardKSeFSummary | null;
   generatedAt: string;
 }

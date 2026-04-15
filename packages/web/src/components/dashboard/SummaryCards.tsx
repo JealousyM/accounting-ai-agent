@@ -5,13 +5,11 @@ import {
   TrendingDown,
   DollarSign,
   FileWarning,
-  Users,
   Send,
 } from 'lucide-react';
 import type {
   DashboardFinancialSummary,
   DashboardInvoiceSummary,
-  DashboardHRSummary,
   DashboardKSeFSummary,
 } from '@/types/dashboard.types';
 
@@ -20,14 +18,12 @@ interface SummaryCardsTranslations {
   expenses: string;
   profit: string;
   unpaidInvoices: string;
-  employees: string;
   ksefSent: string;
 }
 
 interface SummaryCardsProps {
   financial: DashboardFinancialSummary | null;
   invoices: DashboardInvoiceSummary | null;
-  hr: DashboardHRSummary | null;
   ksef: DashboardKSeFSummary | null;
   isLoading?: boolean;
   translations: SummaryCardsTranslations;
@@ -47,15 +43,14 @@ const formatPLN = (value: number): string =>
 export function SummaryCards({
   financial,
   invoices,
-  hr,
   ksef,
   isLoading,
   translations,
 }: SummaryCardsProps) {
   if (isLoading) {
     return (
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2">
-        {[...Array(6)].map((_, i) => (
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2">
+        {[...Array(5)].map((_, i) => (
           <div key={i} className="animate-pulse bg-gray-200 dark:bg-gray-700 h-24 rounded-lg" />
         ))}
       </div>
@@ -92,13 +87,6 @@ export function SummaryCards({
       iconBg: 'bg-orange-50 dark:bg-orange-900/30',
     },
     {
-      label: translations.employees,
-      value: hr != null ? String(hr.employeeCount) : '--',
-      icon: Users,
-      iconColor: 'text-purple-600 dark:text-purple-400',
-      iconBg: 'bg-purple-50 dark:bg-purple-900/30',
-    },
-    {
       label: translations.ksefSent,
       value: ksef != null ? String(ksef.totalSent) : '--',
       icon: Send,
@@ -108,7 +96,7 @@ export function SummaryCards({
   ];
 
   return (
-    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2">
+    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2">
       {stats.map((stat) => {
         const Icon = stat.icon;
         return (

@@ -5,7 +5,6 @@
 
 import { logger } from '../../utils/logger';
 import { WFirmaServiceFactory } from '../wfirma-integration.factory';
-import { HRService } from '../hr/hr.service';
 import { KSeFService } from '../ksef/ksef.service';
 import { taxCalendarService } from '../tax-calendar.instance';
 import {
@@ -13,7 +12,6 @@ import {
   DashboardFinancialSummary,
   DashboardInvoiceSummary,
   DashboardDeadline,
-  DashboardHRSummary,
   DashboardKSeFSummary,
   MonthlyFinancialData,
 } from '../../types/dashboard.types';
@@ -21,7 +19,6 @@ import {
 export class DashboardService {
   constructor(
     private readonly wfirmaServiceFactory: WFirmaServiceFactory,
-    private readonly hrService: HRService,
     private readonly ksefService: KSeFService,
   ) {}
 
@@ -32,7 +29,6 @@ export class DashboardService {
       this.getFinancialSection(userId),
       this.getInvoiceSection(userId),
       this.getDeadlinesSection(userId),
-      this.getHRSection(userId),
       this.getKSeFSection(userId),
     ]);
 
@@ -40,8 +36,7 @@ export class DashboardService {
       financial: results[0].status === 'fulfilled' ? results[0].value : null,
       invoices: results[1].status === 'fulfilled' ? results[1].value : null,
       deadlines: results[2].status === 'fulfilled' ? results[2].value : null,
-      hr: results[3].status === 'fulfilled' ? results[3].value : null,
-      ksef: results[4].status === 'fulfilled' ? results[4].value : null,
+      ksef: results[3].status === 'fulfilled' ? results[3].value : null,
       generatedAt: new Date().toISOString(),
     };
   }
@@ -236,21 +231,6 @@ export class DashboardService {
         .sort((a, b) => a.daysUntil - b.daysUntil);
     } catch (error) {
       logger.error('Dashboard: failed to fetch deadlines', { error, userId });
-      return null;
-    }
-  }
-
-  private async getHRSection(userId: string): Promise<DashboardHRSummary | null> {
-    try {
-      const summary = await this.hrService.getHRSummary(userId);
-      return {
-        employeeCount: summary.employeeCount,
-        activeContractsByType: summary.activeContractsByType,
-        latestPeriod: summary.latestPeriod,
-        totalMonthlyPayroll: summary.totalMonthlyPayroll,
-      };
-    } catch (error) {
-      logger.error('Dashboard: failed to fetch HR data', { error, userId });
       return null;
     }
   }
