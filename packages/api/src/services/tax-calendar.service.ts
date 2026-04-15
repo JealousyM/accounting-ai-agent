@@ -109,13 +109,10 @@ function formatDateKey(date: Date): string {
  */
 function shiftToBusinessDay(date: Date, holidays: Set<string>): Date {
   const result = new Date(date);
-  while (true) {
-    const dow = result.getDay();
-    if (dow === 0 || dow === 6 || holidays.has(formatDateKey(result))) {
-      result.setDate(result.getDate() + 1);
-    } else {
-      break;
-    }
+  let dow = result.getDay();
+  while (dow === 0 || dow === 6 || holidays.has(formatDateKey(result))) {
+    result.setDate(result.getDate() + 1);
+    dow = result.getDay();
   }
   return result;
 }
