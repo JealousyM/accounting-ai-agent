@@ -123,22 +123,38 @@ export class DashboardService {
 
       const wfirmaService = await this.wfirmaServiceFactory.getServiceForUser(userId);
 
-      const [unpaidInvoices, overdueInvoices] = await Promise.all([
-        wfirmaService.findInvoices({ status: 'unpaid', limit: 500 }),
-        wfirmaService.findInvoices({ status: 'overdue', limit: 500 }),
-      ]);
+      // One query, filter locally. Status is derived in mapInvoiceData from
+      // paymentdate + alreadypaid, so the wFirma endpoint has no native
+      // "unpaid" filter. Overdue is a strict subset of unpaid — previously
+      // the two were fetched separately (with a spurious status='unpaid'
+      // filter that matched nothing) and summed, double-counting overdue.
+      const invoices = await wfirmaService.findInvoices({ limit: 500 });
 
-      const sumTotal = (invoices: any[]) =>
-        invoices.reduce((sum, inv) => {
-          const total = typeof inv.total === 'number' ? inv.total : parseFloat(String(inv.total) || '0');
-          return sum + total;
-        }, 0);
+      const isUnpaid = (s?: string) => s === 'issued' || s === 'sent' || s === 'overdue';
+      const plnGross = (inv: { totalNet?: number; totalVat?: number }) =>
+        (inv.totalNet ?? 0) + (inv.totalVat ?? 0);
+
+      let unpaidCount = 0;
+      let unpaidTotal = 0;
+      let overdueCount = 0;
+      let overdueTotal = 0;
+
+      for (const inv of invoices) {
+        if (!isUnpaid(inv.status)) continue;
+        const amount = plnGross(inv);
+        unpaidCount += 1;
+        unpaidTotal += amount;
+        if (inv.status === 'overdue') {
+          overdueCount += 1;
+          overdueTotal += amount;
+        }
+      }
 
       return {
-        unpaidCount: unpaidInvoices.length,
-        unpaidTotal: sumTotal(unpaidInvoices),
-        overdueCount: overdueInvoices.length,
-        overdueTotal: sumTotal(overdueInvoices),
+        unpaidCount,
+        unpaidTotal,
+        overdueCount,
+        overdueTotal,
         currency: 'PLN',
       };
     } catch (error) {
