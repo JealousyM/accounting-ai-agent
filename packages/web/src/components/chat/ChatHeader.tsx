@@ -181,10 +181,10 @@ export function ChatHeader({
             <select
               value={locale}
               onChange={(e) => onLocaleChange(e.target.value as Locale)}
-              className="text-xs font-medium bg-transparent border-none cursor-pointer focus:ring-0 focus:outline-none text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 py-1"
+              className="text-xs font-medium bg-transparent border-none cursor-pointer focus:ring-0 focus:outline-none text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 py-1 [color-scheme:light] dark:[color-scheme:dark]"
             >
               {Object.entries(localeLabels).map(([val, label]) => (
-                <option key={val} value={val}>{label}</option>
+                <option key={val} value={val} className="bg-white text-gray-900 dark:bg-gray-800 dark:text-gray-100">{label}</option>
               ))}
             </select>
           </div>
@@ -264,10 +264,10 @@ export function ChatHeader({
                   <select
                     value={locale}
                     onChange={(e) => { onLocaleChange(e.target.value as Locale); setIsMobileMenuOpen(false); }}
-                    className="text-sm bg-transparent border-none cursor-pointer focus:ring-0 focus:outline-none text-gray-700 dark:text-gray-300 py-0"
+                    className="text-sm bg-transparent border-none cursor-pointer focus:ring-0 focus:outline-none text-gray-700 dark:text-gray-300 py-0 [color-scheme:light] dark:[color-scheme:dark]"
                   >
                     {Object.entries(localeLabels).map(([val, label]) => (
-                      <option key={val} value={val}>{label}</option>
+                      <option key={val} value={val} className="bg-white text-gray-900 dark:bg-gray-800 dark:text-gray-100">{label}</option>
                     ))}
                   </select>
                 </div>
