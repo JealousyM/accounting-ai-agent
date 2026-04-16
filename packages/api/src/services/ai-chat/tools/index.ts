@@ -80,6 +80,9 @@ import {
   createGetJpkVatTool,
   createGetPitTool,
 } from './declaration.tools';
+import {
+  createGetTaxRegistersTool,
+} from './taxregister.tools';
 import { createGetTaxDeadlinesTool } from './tax-calendar.tools';
 import {
   createGetDocumentsTool,
@@ -187,6 +190,9 @@ export {
   createGetJpkVatTool,
   createGetPitTool,
 } from './declaration.tools';
+export {
+  createGetTaxRegistersTool,
+} from './taxregister.tools';
 export { createGetTaxDeadlinesTool } from './tax-calendar.tools';
 export {
   createGetDocumentsTool,
@@ -312,6 +318,9 @@ export function createAllTools(
     // Declaration tools
     createGetJpkVatTool(wfirmaService, userId, locale, subscriptionService),
     createGetPitTool(wfirmaService, userId, locale, subscriptionService),
+
+    // Tax Register (KPiR) tools
+    createGetTaxRegistersTool(wfirmaService, userId, locale, subscriptionService),
 
     // Tax Calendar tool (no wFirma dependency — always available)
     createGetTaxDeadlinesTool(taxCalendarService, locale),

@@ -845,6 +845,24 @@ export interface TaxCalendarTranslations {
   categoryDividend: string;
 }
 
+export interface TaxRegisterTranslations {
+  title: string;
+  entries: string;
+  sums: string;
+  totalSums: string;
+  date: string;
+  name: string;
+  lp: string;
+  income: string;
+  expense: string;
+  contractor: string;
+  noEntries: string;
+  errorFetch: string;
+  summary: string;
+  profit: string;
+  loss: string;
+}
+
 export interface CommonTranslations {
   wfirmaLimitReached: string;
   aiLimitReached: string;
@@ -867,6 +885,7 @@ export interface Translations {
   hr: HRTranslations;
   ksef: KSeFTranslations;
   taxCalendar: TaxCalendarTranslations;
+  taxRegister: TaxRegisterTranslations;
 }
 
 const translations: Record<Locale, Translations> = {
@@ -937,4 +956,8 @@ export function getCommonTranslations(locale: Locale = 'pl'): CommonTranslations
 
 export function getTaxCalendarTranslations(locale: Locale = 'pl'): TaxCalendarTranslations {
   return getTranslations(locale).taxCalendar;
+}
+
+export function getTaxRegisterTranslations(locale: Locale = 'pl'): TaxRegisterTranslations {
+  return getTranslations(locale).taxRegister;
 }

@@ -699,5 +699,22 @@
     "categoryZus": "ZUS",
     "categoryPcc": "PCC",
     "categoryDividend": "Dividends"
+  },
+  "taxRegister": {
+    "title": "Tax Register (KPiR)",
+    "entries": "Entries",
+    "sums": "Cumulative sums (previous months)",
+    "totalSums": "Cumulative sums (including current)",
+    "date": "Date",
+    "name": "Name / Description",
+    "lp": "No.",
+    "income": "Income",
+    "expense": "Expense",
+    "contractor": "Contractor",
+    "noEntries": "No KPiR entries found for the given period.",
+    "errorFetch": "Failed to fetch KPiR entries.",
+    "summary": "Summary",
+    "profit": "Profit",
+    "loss": "Loss"
   }
 }

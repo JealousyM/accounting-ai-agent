@@ -59,6 +59,8 @@ import {
   LedgerAccountantYearFilters,
   WFirmaLedgerOperationSchema,
   LedgerOperationSchemaFilters,
+  TaxRegisterParams,
+  TaxRegisterResult,
 } from '../../types/wfirma.types';
 
 // Import domain services
@@ -78,6 +80,7 @@ import { WFirmaTermGroupService } from './term-group.service';
 import { WFirmaDeclarationService } from './declaration.service';
 import { WFirmaDocumentService } from './document.service';
 import { WFirmaLedgerService } from './ledger.service';
+import { WFirmaTaxRegisterService } from './taxregister.service';
 
 // Re-export errors
 export {
@@ -106,6 +109,7 @@ export { WFirmaTermGroupService } from './term-group.service';
 export { WFirmaDeclarationService } from './declaration.service';
 export { WFirmaDocumentService } from './document.service';
 export { WFirmaLedgerService } from './ledger.service';
+export { WFirmaTaxRegisterService } from './taxregister.service';
 
 /**
  * Main WFirma Integration Service
@@ -128,6 +132,7 @@ export class WFirmaIntegrationService {
   private readonly declarationService: WFirmaDeclarationService;
   private readonly documentService: WFirmaDocumentService;
   private readonly ledgerService: WFirmaLedgerService;
+  private readonly taxRegisterService: WFirmaTaxRegisterService;
 
   constructor(config?: Partial<WFirmaConfig>) {
     // Initialize client
@@ -153,6 +158,7 @@ export class WFirmaIntegrationService {
     this.declarationService = new WFirmaDeclarationService(this.client);
     this.documentService = new WFirmaDocumentService(this.client);
     this.ledgerService = new WFirmaLedgerService(this.client);
+    this.taxRegisterService = new WFirmaTaxRegisterService(this.client);
 
     logger.info('WFirmaIntegrationService initialized');
   }
@@ -491,5 +497,13 @@ export class WFirmaIntegrationService {
     id: string
   ): Promise<WFirmaLedgerOperationSchema | null> {
     return this.ledgerService.getLedgerOperationSchema(id);
+  }
+
+  // ============================================
+  // TAX REGISTER METHODS (KPiR)
+  // ============================================
+
+  async getTaxRegisters(params: TaxRegisterParams): Promise<TaxRegisterResult> {
+    return this.taxRegisterService.getTaxRegisters(params);
   }
 }

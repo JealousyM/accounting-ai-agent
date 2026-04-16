@@ -699,5 +699,22 @@
     "categoryZus": "ZUS",
     "categoryPcc": "PCC",
     "categoryDividend": "Dywidendy"
+  },
+  "taxRegister": {
+    "title": "Księga Przychodów i Rozchodów (KPiR)",
+    "entries": "Wpisy",
+    "sums": "Sumy narastająco (poprzednie miesiące)",
+    "totalSums": "Sumy narastająco (łącznie z bieżącym)",
+    "date": "Data",
+    "name": "Nazwa / Opis",
+    "lp": "Lp",
+    "income": "Przychód",
+    "expense": "Koszt",
+    "contractor": "Kontrahent",
+    "noEntries": "Brak wpisów KPiR dla podanego okresu.",
+    "errorFetch": "Nie udało się pobrać wpisów KPiR.",
+    "summary": "Podsumowanie",
+    "profit": "Zysk",
+    "loss": "Strata"
   }
 }
