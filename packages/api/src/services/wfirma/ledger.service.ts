@@ -103,19 +103,51 @@ export class WFirmaLedgerService {
   }
 
   /**
-   * Get a single fiscal year by ID from wFirma
+   * Get a single fiscal year by ID or symbol from wFirma.
+   * First tries /get by ID, then falls back to finding by symbol in the full list.
    */
   async getLedgerAccountantYear(
+    idOrSymbol: string
+  ): Promise<WFirmaLedgerAccountantYear | null> {
+    logger.info('Fetching ledger accountant year from wFirma', { idOrSymbol });
+
+    if (!idOrSymbol) {
+      throw new WFirmaValidationError('Ledger accountant year ID or symbol is required');
+    }
+
+    // Try direct /get by ID first
+    const directResult = await this.getLedgerAccountantYearById(idOrSymbol);
+    if (directResult) {
+      return directResult;
+    }
+
+    // Fall back to searching by symbol in the full list
+    logger.info('Direct get failed, searching by symbol', { idOrSymbol });
+    const allYears = await this.findLedgerAccountantYears();
+    const year = allYears.find((y) => y.symbol === idOrSymbol);
+
+    if (!year) {
+      logger.warn('Ledger accountant year not found', { idOrSymbol });
+      return null;
+    }
+
+    logger.info('Successfully found ledger accountant year by symbol', {
+      idOrSymbol,
+      yearId: year.id,
+      symbol: year.symbol,
+    });
+
+    return year;
+  }
+
+  /**
+   * Get a single fiscal year by ID from wFirma API
+   */
+  private async getLedgerAccountantYearById(
     id: string
   ): Promise<WFirmaLedgerAccountantYear | null> {
-    logger.info('Fetching ledger accountant year by ID from wFirma', { yearId: id });
-
     return this.client.withRetry(async () => {
       try {
-        if (!id) {
-          throw new WFirmaValidationError('Ledger accountant year ID is required');
-        }
-
         const response = await this.client.apiClient.request({
           method: 'GET',
           url: `/ledger_accountant_years/get/${id}`,
@@ -125,17 +157,7 @@ export class WFirmaLedgerService {
         const data = response.data;
 
         if (data.status?.code !== 'OK') {
-          if (
-            data.status?.code === 'NOT FOUND' ||
-            data.status?.code === 'ACTION NOT FOUND'
-          ) {
-            return null;
-          }
-          throw new WFirmaError(
-            'WFIRMA_API_ERROR',
-            'Failed to fetch ledger accountant year',
-            data.status
-          );
+          return null;
         }
 
         let yearData = data.ledger_accountant_years?.ledger_accountant_year;
@@ -155,17 +177,10 @@ export class WFirmaLedgerService {
           return null;
         }
 
-        logger.info('Successfully fetched ledger accountant year from wFirma', {
-          yearId: id,
-        });
-
         return this.mapLedgerAccountantYear(yearData);
       } catch (error) {
-        logger.error('Failed to fetch ledger accountant year from wFirma', {
-          error,
-          yearId: id,
-        });
-        throw error;
+        logger.debug('Direct get for ledger accountant year failed', { id, error });
+        return null;
       }
     });
   }
@@ -289,12 +304,12 @@ export class WFirmaLedgerService {
   ): Promise<WFirmaLedgerOperationSchema | null> {
     logger.info('Fetching ledger operation schema by ID from wFirma', { schemaId: id });
 
+    if (!id) {
+      throw new WFirmaValidationError('Ledger operation schema ID is required');
+    }
+
     return this.client.withRetry(async () => {
       try {
-        if (!id) {
-          throw new WFirmaValidationError('Ledger operation schema ID is required');
-        }
-
         const response = await this.client.apiClient.request({
           method: 'GET',
           url: `/ledger_operation_schemas/get/${id}`,
@@ -317,15 +332,13 @@ export class WFirmaLedgerService {
           );
         }
 
-        let schemaData = data.ledger_operation_schemas?.ledger_operation_schema;
-        if (!schemaData) {
-          const schemasObj = data.ledger_operation_schemas;
-          if (schemasObj) {
-            for (const key in schemasObj) {
-              if (!isNaN(Number(key)) && schemasObj[key]?.ledger_operation_schema) {
-                schemaData = schemasObj[key].ledger_operation_schema;
-                break;
-              }
+        let schemaData: any = null;
+        const schemasObj = data.ledger_operation_schemas;
+        if (schemasObj) {
+          for (const key in schemasObj) {
+            if (!isNaN(Number(key)) && schemasObj[key]?.ledger_operation_schema) {
+              schemaData = schemasObj[key].ledger_operation_schema;
+              break;
             }
           }
         }
@@ -355,7 +368,7 @@ export class WFirmaLedgerService {
 
   private mapLedgerAccountantYear(y: any): WFirmaLedgerAccountantYear {
     return {
-      id: y.id || '',
+      id: String(y.id || ''),
       symbol: y.symbol || '',
       start: y.start ? new Date(y.start) : new Date(),
       stop: y.stop ? new Date(y.stop) : new Date(),
@@ -364,21 +377,24 @@ export class WFirmaLedgerService {
 
   private mapLedgerOperationSchema(s: any): WFirmaLedgerOperationSchema {
     const schema: WFirmaLedgerOperationSchema = {
-      id: s.id || '',
+      id: String(s.id || ''),
       name: s.name || '',
       category: s.category || '',
       visibility: s.visibility || '',
     };
 
-    // Handle relation - can be just ID string or full object
+    // Handle relation - can be just ID string/number or full object
     if (s.ledger_accountant_year) {
-      if (typeof s.ledger_accountant_year === 'string') {
-        schema.ledgerAccountantYearId = s.ledger_accountant_year;
+      if (typeof s.ledger_accountant_year === 'string' || typeof s.ledger_accountant_year === 'number') {
+        schema.ledgerAccountantYearId = String(s.ledger_accountant_year);
       } else if (typeof s.ledger_accountant_year === 'object') {
-        schema.ledgerAccountantYearId = s.ledger_accountant_year.id;
-        schema.ledgerAccountantYear = this.mapLedgerAccountantYear(
-          s.ledger_accountant_year
-        );
+        schema.ledgerAccountantYearId = String(s.ledger_accountant_year.id);
+        // Only map full year object if it has symbol (not just {id})
+        if (s.ledger_accountant_year.symbol) {
+          schema.ledgerAccountantYear = this.mapLedgerAccountantYear(
+            s.ledger_accountant_year
+          );
+        }
       }
     }
 

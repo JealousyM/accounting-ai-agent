@@ -478,9 +478,9 @@ export class WFirmaIntegrationService {
   }
 
   async getLedgerAccountantYear(
-    id: string
+    idOrSymbol: string
   ): Promise<WFirmaLedgerAccountantYear | null> {
-    return this.ledgerService.getLedgerAccountantYear(id);
+    return this.ledgerService.getLedgerAccountantYear(idOrSymbol);
   }
 
   // ============================================

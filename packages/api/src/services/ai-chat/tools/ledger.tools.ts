@@ -114,9 +114,9 @@ export function createGetFiscalYearDetailsTool(
     {
       name: 'get_fiscal_year_details',
       description:
-        'Get detailed information about a specific fiscal year by ID. Shows symbol, start date, and end date.',
+        'Get detailed information about a specific fiscal year by ID or symbol (e.g. "2025"). Shows symbol, start date, and end date.',
       schema: z.object({
-        fiscalYearId: z.string().describe('Fiscal year ID from wFirma'),
+        fiscalYearId: z.string().describe('Fiscal year ID or symbol (e.g. "2025") from wFirma'),
       }),
     }
   );
