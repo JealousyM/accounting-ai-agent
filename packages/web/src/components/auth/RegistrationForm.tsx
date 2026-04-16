@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { Eye, EyeOff, Check, X, Globe, Crown, Zap, AlertTriangle, Gift } from 'lucide-react';
+import { Eye, EyeOff, Check, X, Globe, Crown, Zap, Gift } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { AppVersion } from '@/components/ui/app-version';
@@ -265,19 +265,6 @@ export function RegistrationForm() {
             <Globe className="h-4 w-4" />
             Русский
           </button>
-        </div>
-      </div>
-
-      {/* Beta Warning */}
-      <div className="mb-6 p-4 bg-amber-50 dark:bg-amber-900/30 border border-amber-300 dark:border-amber-700 rounded-lg">
-        <div className="flex items-start gap-3 text-amber-800 dark:text-amber-300">
-          <AlertTriangle className="h-5 w-5 mt-0.5 flex-shrink-0" />
-          <div className="text-sm">
-            <p className="font-semibold">Wersja testowa</p>
-            <p className="mt-1">
-              Aplikacja znajduje się w fazie testowej. Niektóre funkcje mogą działać niestabilnie. Korzystasz na własną odpowiedzialność.
-            </p>
-          </div>
         </div>
       </div>
 
