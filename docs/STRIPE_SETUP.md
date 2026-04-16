@@ -42,7 +42,7 @@ This guide explains how to set up Stripe integration and obtain all necessary en
 
 ### Step 2.2: Create Monthly Price
 1. In the pricing section:
-   - **Price:** PLN19.99
+   - **Price:** PLN14.99
    - **Billing period:** Monthly
    - **Currency:** PLN
 2. Click **Save product**
@@ -63,7 +63,7 @@ This guide explains how to set up Stripe integration and obtain all necessary en
 1. Click on your **Pro Plan** product
 2. Click **+ Add another price**
 3. Fill in:
-   - **Price:** PLN199.00
+   - **Price:** PLN149.00
    - **Billing period:** Yearly
    - **Currency:** PLN
 4. Click **Save**
@@ -315,6 +315,20 @@ stripe coupons create --id=first_month_referral --percent-off=20 --duration=once
 
 - When a user with `referredByCode` creates a checkout session, the coupon is automatically applied via `discounts: [{ coupon: 'first_month_referral' }]`
 - Referrer receives a Stripe Customer Balance credit equal to 1 month Pro (PLN 14.99)
+
+---
+
+## Automated Setup (Live Mode)
+
+For quick live-mode setup, use the included script:
+
+```bash
+cd packages/api
+STRIPE_SECRET_KEY=sk_live_... WEBHOOK_URL=https://your-domain/api/webhooks/stripe \
+  npx ts-node --transpile-only src/scripts/setup-stripe-live.ts
+```
+
+The script is **idempotent** — it finds or creates the Pro product, monthly/yearly PLN prices, webhook endpoint, and `first_month_referral` coupon, then prints the env lines for `.env.production`.
 - Max 10 reward credits per referrer per calendar year
 - If referred user cancels within 7 days, the credit is reversed
 
