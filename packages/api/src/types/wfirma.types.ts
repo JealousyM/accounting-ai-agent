@@ -831,3 +831,53 @@ export interface LedgerOperationSchemaFilters {
   limit?: number;
   page?: number;
 }
+
+// ============================================
+// TAX REGISTER TYPES (KPiR)
+// ============================================
+
+export interface TaxRegisterEntry {
+  lp: number;
+  date: string;
+  name: string;
+  description: string;
+  incomeSale: number;
+  incomeOdd: number;
+  income: number;
+  expensePurchase: number;
+  expensePurchaseCost: number;
+  expenseSalaries: number;
+  expenseOdd: number;
+  expense: number;
+  inventory: number;
+  expenseResearchDescription: string;
+  expenseResearch: number;
+  annotation: string;
+  expenseCorrection: boolean;
+  contractorName: string;
+  contractorAddress: string;
+}
+
+export interface TaxRegisterSum {
+  month: number;
+  incomeSale: number;
+  incomeOdd: number;
+  income: number;
+  expensePurchase: number;
+  expensePurchaseCost: number;
+  expenseSalaries: number;
+  expenseOdd: number;
+  expense: number;
+  expenseResearch: number;
+}
+
+export interface TaxRegisterResult {
+  entries: TaxRegisterEntry[];
+  sums: TaxRegisterSum[];
+  totalSums: TaxRegisterSum[];
+}
+
+export interface TaxRegisterParams {
+  year: number;
+  month?: number;
+}

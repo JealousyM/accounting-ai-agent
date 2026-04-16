@@ -59,7 +59,7 @@ const service = new WFirmaIntegrationService({
 │ • Contractor      │     │ • get_invoices    │     │                   │
 │ • Invoice         │     │ • create_invoice  │     │ • API calls       │
 │ • Financial       │     │ • get_contractors │     │ • Retry logic     │
-│ • Tax             │     │ • etc (54 tools)  │     │ • Error handling  │
+│ • Tax             │     │ • etc (55 tools)  │     │ • Error handling  │
 └───────────────────┘     └───────────────────┘     └───────────────────┘
                                     │                        │
                                     │                        ▼
@@ -228,7 +228,7 @@ await wfirmaCacheService.invalidateCache('user-123', 'company');
 const stats = await wfirmaCacheService.getCacheStats('user-123');
 ```
 
-## Available Tools (54 Total)
+## Available Tools (55 Total)
 
 ### Company Tools (3)
 
@@ -323,6 +323,12 @@ const stats = await wfirmaCacheService.getCacheStats('user-123');
 |------|-------------|
 | `get_jpk_vat_declaration` | JPK VAT declaration (XML) |
 | `get_pit_declaration` | PIT declaration (XML) |
+
+### Tax Register / KPiR Tools (1)
+
+| Tool | Description | Parameters |
+|------|-------------|------------|
+| `get_tax_registers` | Get KPiR entries, monthly sums, and cumulative totals | `year` (required), `month` (optional) |
 
 ### Document Tools (4)
 

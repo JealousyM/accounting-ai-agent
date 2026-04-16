@@ -64,6 +64,7 @@ export {
   formatTermGroupDeleted,
 } from './term.formatter';
 export { formatDeclarationResult } from './declaration.formatter';
+export { formatTaxRegisterResult } from './taxregister.formatter';
 export {
   formatDocumentsList,
   formatDocumentDetails,

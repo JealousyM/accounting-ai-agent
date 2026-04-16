@@ -14,6 +14,7 @@ The wFirma Integration Service provides a robust interface for interacting with 
 - **Comprehensive Error Handling**: Specific error types for different failure scenarios
 - **Connection Health Checks**: Verify wFirma API connectivity
 - **Public Registry Enrichment**: REGON, KRS, VAT status from MF Biała Lista and KRS API
+- **Tax Register (KPiR)**: KPiR entries with monthly sums and cumulative totals
 
 ## Configuration
 
@@ -143,6 +144,16 @@ Retrieves financial summary for a specific year.
 Synchronizes all data from wFirma (company, contractors, financial data).
 
 **Returns:** Sync result with success status, items synced count, and any errors
+
+### `getTaxRegisters(params: { year: number; month?: number }): Promise<TaxRegisterData>`
+
+Gets KPiR (Tax Register) entries for a given year and optional month.
+
+**Parameters:**
+- `params.year` - Year for KPiR data (e.g., 2026)
+- `params.month` - Optional month (1-12) to filter entries
+
+**Returns:** KPiR entries with monthly sums and cumulative totals
 
 ### `checkConnection(): Promise<boolean>`
 

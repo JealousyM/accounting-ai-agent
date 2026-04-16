@@ -26,7 +26,7 @@ The Accounting AI Agent is a full-stack monorepo application for AI-powered acco
 
 - **AI-Powered Chat** - Natural language interface for accounting tasks
 - **Multi-Agent System** - Specialized agents for contractors, invoices, finances, and taxes
-- **wFirma Integration** - Full integration with Polish accounting system (53 tools)
+- **wFirma Integration** - Full integration with Polish accounting system (54 tools)
 - **KPI Dashboard** - Aggregated financial, invoice, HR, and KSeF metrics in one view
 - **Audit Log** - Automatic tracking of all write operations with admin viewer
 - **Public Landing Page** - Marketing page with pricing, OG meta tags
@@ -106,7 +106,7 @@ docs/
 - [API Endpoints](../packages/api/docs/API.md)
 - [Auth API](../packages/api/docs/AUTH_API.md)
 - [Middleware](../packages/api/docs/MIDDLEWARE.md)
-- [AI Tools (53)](../packages/api/docs/AI_TOOLS.md)
+- [AI Tools (54)](../packages/api/docs/AI_TOOLS.md)
 
 ### Configuration
 

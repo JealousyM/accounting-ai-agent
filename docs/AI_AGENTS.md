@@ -4,7 +4,7 @@ This document describes the LangGraph-based single-agent architecture powering t
 
 ## Overview
 
-The system uses a **single LangGraph agent** with 50+ tools (up to 76 when all optional services are available). There is no multi-agent routing -- a single `StateGraph` with `agent` and `tools` nodes handles all user requests. The LLM decides which tools to call based on the user's message and the conversation history.
+The system uses a **single LangGraph agent** with 55+ tools (up to 80 when all optional services are available). There is no multi-agent routing -- a single `StateGraph` with `agent` and `tools` nodes handles all user requests. The LLM decides which tools to call based on the user's message and the conversation history.
 
 **Key characteristics:**
 
@@ -22,7 +22,7 @@ The system uses a **single LangGraph agent** with 50+ tools (up to 76 when all o
 | File | Purpose |
 |------|---------|
 | `packages/api/src/services/ai-chat/ai-chat.service.ts` | Main service: conversation CRUD, `sendMessage`, `runAgent` |
-| `packages/api/src/services/ai-chat/tools/index.ts` | `createAllTools()` factory -- registers all 76 tools |
+| `packages/api/src/services/ai-chat/tools/index.ts` | `createAllTools()` factory -- registers all 80 tools |
 | `packages/api/src/services/ai-chat/constants.ts` | `getSystemPrompt()` builder |
 | `packages/api/src/services/ai-chat/prompt-fragments.ts` | Shared prompt fragments (language, tools, formatting, tax data) |
 | `packages/api/src/services/ai-chat/utils.ts` | `detectLocale()`, title generation |
@@ -99,7 +99,7 @@ flowchart TD
         G --> H[detectLocale from message text]
         H --> I[Load AI Context Memory<br/>buildMemoryPromptFragment]
         I --> J[Build system prompt<br/>base + language + tools + formatting<br/>+ professional + data accuracy<br/>+ error handling + tax data + memory]
-        J --> K[createAllTools<br/>52 base + 15 HR + 9 KSeF]
+        J --> K[createAllTools<br/>53 base + 15 HR + 9 KSeF]
         K --> L[Bind tools to LLM]
         L --> M[Build LangChain messages<br/>SystemMessage + history + HumanMessage]
         M --> N[graph.invoke<br/>recursionLimit: 25]
@@ -293,6 +293,12 @@ All tools are created by `createAllTools()` in `packages/api/src/services/ai-cha
 | `get_jpk_vat` | Get JPK_VAT declaration data | `declaration.tools.ts` |
 | `get_pit` | Get PIT declaration data | `declaration.tools.ts` |
 
+### Tax Register / KPiR (1 tool)
+
+| Tool | Description | File |
+|------|-------------|------|
+| `get_tax_registers` | Get KPiR entries, monthly sums and cumulative totals for a year/month. Params: year (required), month (optional) | `tax-register.tools.ts` |
+
 ### Tax Calendar (1 tool)
 
 No wFirma dependency — always available to all users.
@@ -372,12 +378,13 @@ Loaded when `ksefService` is available.
 | Terms | 5 | No |
 | Term Groups | 5 | No |
 | Declarations | 2 | No |
+| Tax Register / KPiR | 1 | No |
 | Tax Calendar | 1 | No |
 | Documents | 4 | No |
 | Ledger | 4 | No |
 | HR | 15 | Yes (hrService) |
 | KSeF | 9 | Yes (ksefService) |
-| **Total** | **79** | |
+| **Total** | **80** | |
 
 ---
 
@@ -535,7 +542,7 @@ buildMemoryPromptFragment(userId, 'en') -> memory context (or undefined)
 getSystemPrompt('en', memoryContext) -> full system prompt
         |
         v
-createAllTools(...) -> 76 tools bound to LLM
+createAllTools(...) -> 80 tools bound to LLM
         |
         v
 graph.invoke({ messages: [SystemMessage, HumanMessage] })

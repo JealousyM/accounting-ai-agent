@@ -52,7 +52,7 @@ Comprehensive test checklist for pre-deployment verification.
 
 ---
 
-## 3. AI Tools — wFirma (44 tools)
+## 3. AI Tools — wFirma (45 tools)
 
 ### 3.1 Company
 
@@ -131,37 +131,44 @@ Comprehensive test checklist for pre-deployment verification.
 | 3.8.1 | „Pokaż deklaracje JPK VAT" | VAT declaration list | |
 | 3.8.2 | „Pokaż deklaracje PIT" | PIT declaration list | |
 
-### 3.9 Documents
+### 3.9 Tax Register (KPiR)
 
 | # | Test Scenario | Expected Result | Status |
 |---|---|---|---|
-| 3.9.1 | „Pokaż listę dokumentów" | Document list | |
-| 3.9.2 | „Pokaż szczegóły dokumentu [id]" | Document data | |
-| 3.9.3 | „Pobierz dokument [id]" | File downloaded | |
-| 3.9.4 | „Usuń dokument [id]" | Document deleted | |
+| 3.9.1 | „Pokaż wpisy KPiR za marzec 2026" | KPiR entries for March 2026 displayed with sums | |
+| 3.9.2 | „Покажи книгу доходов и расходов за 2026 год" | Yearly KPiR summary with cumulative sums | |
 
-### 3.10 Accounting
+### 3.10 Documents
 
 | # | Test Scenario | Expected Result | Status |
 |---|---|---|---|
-| 3.10.1 | „Pokaż lata podatkowe" | Fiscal year list | |
-| 3.10.2 | „Pokaż szczegóły roku podatkowego [id]" | Fiscal year data | |
-| 3.10.3 | „Pokaż schematy księgowe" | Schema list | |
-| 3.10.4 | „Pokaż szczegóły schematu [id]" | Accounting schema data | |
+| 3.10.1 | „Pokaż listę dokumentów" | Document list | |
+| 3.10.2 | „Pokaż szczegóły dokumentu [id]" | Document data | |
+| 3.10.3 | „Pobierz dokument [id]" | File downloaded | |
+| 3.10.4 | „Usuń dokument [id]" | Document deleted | |
 
-### 3.11 Financial Summary
-
-| # | Test Scenario | Expected Result | Status |
-|---|---|---|---|
-| 3.11.1 | „Pokaż podsumowanie finansowe" | Company financial overview | |
-
-### 3.12 wFirma Users
+### 3.11 Accounting
 
 | # | Test Scenario | Expected Result | Status |
 |---|---|---|---|
-| 3.12.1 | „Pokaż użytkowników wFirma" | User list | |
-| 3.12.2 | „Pokaż firmy użytkownika" | Company list | |
-| 3.12.3 | „Pokaż szczegóły firmy [id]" | Company data | |
+| 3.11.1 | „Pokaż lata podatkowe" | Fiscal year list | |
+| 3.11.2 | „Pokaż szczegóły roku podatkowego [id]" | Fiscal year data | |
+| 3.11.3 | „Pokaż schematy księgowe" | Schema list | |
+| 3.11.4 | „Pokaż szczegóły schematu [id]" | Accounting schema data | |
+
+### 3.12 Financial Summary
+
+| # | Test Scenario | Expected Result | Status |
+|---|---|---|---|
+| 3.12.1 | „Pokaż podsumowanie finansowe" | Company financial overview | |
+
+### 3.13 wFirma Users
+
+| # | Test Scenario | Expected Result | Status |
+|---|---|---|---|
+| 3.13.1 | „Pokaż użytkowników wFirma" | User list | |
+| 3.13.2 | „Pokaż firmy użytkownika" | Company list | |
+| 3.13.3 | „Pokaż szczegóły firmy [id]" | Company data | |
 
 ---
 
@@ -519,7 +526,7 @@ Comprehensive test checklist for pre-deployment verification.
 |---|---|
 | Authentication & Registration | 20 |
 | AI Chat | 15 |
-| AI Tools — wFirma | 44 |
+| AI Tools — wFirma | 46 |
 | AI Tools — KSeF | 28 |
 | Subscriptions & Payments | 12 |
 | Credential Management | 10 |
@@ -540,8 +547,8 @@ Comprehensive test checklist for pre-deployment verification.
 | Database & Cache | 10 |
 | CI/CD & Deployment | 7 |
 | Referral Program | 17 |
-| **TOTAL** | **265** |
+| **TOTAL** | **267** |
 
 ---
 
-*Last updated: 2026-02-19*
+*Last updated: 2026-04-16*

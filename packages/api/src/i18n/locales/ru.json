@@ -699,5 +699,22 @@
     "categoryZus": "ZUS",
     "categoryPcc": "PCC",
     "categoryDividend": "Дивиденды"
+  },
+  "taxRegister": {
+    "title": "Книга доходов и расходов (KPiR)",
+    "entries": "Записи",
+    "sums": "Нарастающий итог (предыдущие месяцы)",
+    "totalSums": "Нарастающий итог (включая текущий)",
+    "date": "Дата",
+    "name": "Название / Описание",
+    "lp": "№",
+    "income": "Доход",
+    "expense": "Расход",
+    "contractor": "Контрагент",
+    "noEntries": "Записи KPiR за указанный период не найдены.",
+    "errorFetch": "Не удалось получить записи KPiR.",
+    "summary": "Итого",
+    "profit": "Прибыль",
+    "loss": "Убыток"
   }
 }
