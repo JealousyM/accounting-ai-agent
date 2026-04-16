@@ -23,12 +23,12 @@ export function createGetTaxRegistersTool(
   subscriptionService?: SubscriptionService
 ): StructuredToolInterface {
   return (tool as any)(
-    async ({ year, month }: { year: number; month?: number }) => {
+    async ({ year, month }: { year: number; month?: number | null }) => {
       try {
         const limitError = await checkWFirmaLimit(subscriptionService, userId, locale);
         if (limitError) return limitError;
 
-        const result = await wfirmaService.getTaxRegisters({ year, month });
+        const result = await wfirmaService.getTaxRegisters({ year, month: month ?? undefined });
 
         await incrementWFirmaUsage(subscriptionService, userId);
 
@@ -66,6 +66,7 @@ export function createGetTaxRegistersTool(
           .int()
           .min(1)
           .max(12)
+          .nullable()
           .optional()
           .describe(
             'Optional month number (1-12) to filter entries (e.g., 1 for January, 12 for December)'
