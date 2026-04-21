@@ -24,9 +24,8 @@ export function LandingFooter() {
               <img
                 src="/logo.svg"
                 alt="eKsięgowy AI"
-                width={64}
-                height={64}
-                className="rounded-full"
+                width={128}
+                height={128}
               />
               <h3 className="text-lg font-bold text-gray-900 dark:text-white">
                 eKsiegowy AI
