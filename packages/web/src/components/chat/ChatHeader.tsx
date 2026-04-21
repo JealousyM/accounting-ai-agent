@@ -124,9 +124,8 @@ export function ChatHeader({
               <img
                 src="/logo.svg"
                 alt="eKsięgowy AI"
-                width={56}
-                height={56}
-                className="rounded-full"
+                width={96}
+                height={96}
               />
             </Link>
             <div>
