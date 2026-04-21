@@ -57,9 +57,19 @@ export function LegalFooter() {
             {footerT.links.rodo}
           </Link>
         </nav>
-        <p className="text-center text-xs text-gray-500 dark:text-gray-500">
-          &copy; {new Date().getFullYear()} eKsięgowy AI — MICODE sp. z o.o. {footerT.allRightsReserved}
-        </p>
+        <div className="flex items-center justify-center gap-2">
+          {/* eslint-disable-next-line @next/next/no-img-element -- static SVG logo, no optimization benefit */}
+          <img
+            src="/mi_code_logo.svg"
+            alt="MICODE sp. z o.o."
+            width={40}
+            height={40}
+            className="rounded-full"
+          />
+          <p className="text-center text-xs text-gray-500 dark:text-gray-500">
+            &copy; {new Date().getFullYear()} eKsięgowy AI — MICODE sp. z o.o. {footerT.allRightsReserved}
+          </p>
+        </div>
       </div>
     </footer>
   );
