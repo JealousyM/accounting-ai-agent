@@ -19,9 +19,19 @@ export function LandingFooter() {
         <div className="grid md:grid-cols-3 gap-8">
           {/* Brand */}
           <div>
-            <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-3">
-              eKsiegowy AI
-            </h3>
+            <div className="flex items-center gap-2 mb-3">
+              {/* eslint-disable-next-line @next/next/no-img-element -- static SVG logo, no optimization benefit */}
+              <img
+                src="/logo.svg"
+                alt="eKsięgowy AI"
+                width={64}
+                height={64}
+                className="rounded-full"
+              />
+              <h3 className="text-lg font-bold text-gray-900 dark:text-white">
+                eKsiegowy AI
+              </h3>
+            </div>
             <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
               {t.description}
             </p>
@@ -95,7 +105,15 @@ export function LandingFooter() {
         </div>
 
         {/* Copyright */}
-        <div className="mt-10 pt-6 border-t border-gray-200 dark:border-gray-700">
+        <div className="mt-10 pt-6 border-t border-gray-200 dark:border-gray-700 flex flex-col sm:flex-row items-center justify-center gap-3">
+          {/* eslint-disable-next-line @next/next/no-img-element -- static SVG logo, no optimization benefit */}
+          <img
+            src="/mi_code_logo.svg"
+            alt="MICODE sp. z o.o."
+            width={52}
+            height={52}
+            className="rounded-full"
+          />
           <p className="text-sm text-gray-500 dark:text-gray-500 text-center">
             &copy; 2026 eKsiegowy AI &mdash; MICODE sp. z o.o. {t.allRightsReserved}
           </p>

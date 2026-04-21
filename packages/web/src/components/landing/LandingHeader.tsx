@@ -25,13 +25,23 @@ export function LandingHeader() {
 
   return (
     <header className="sticky top-0 z-50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm border-b border-gray-200 dark:border-gray-700">
-      <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+      <div className="max-w-6xl mx-auto px-4 h-20 flex items-center justify-between">
         {/* Logo */}
         <Link
           href="/"
-          className="text-xl font-bold text-gray-900 dark:text-white shrink-0"
+          className="flex items-center gap-2 shrink-0"
         >
-          eKsiegowy AI
+          {/* eslint-disable-next-line @next/next/no-img-element -- static SVG logo, no optimization benefit */}
+          <img
+            src="/logo.svg"
+            alt="eKsięgowy AI"
+            width={64}
+            height={64}
+            className="rounded-full"
+          />
+          <span className="text-xl font-bold text-gray-900 dark:text-white">
+            eKsiegowy AI
+          </span>
         </Link>
 
         {/* Desktop nav - center */}
