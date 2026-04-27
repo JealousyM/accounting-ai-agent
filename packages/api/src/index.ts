@@ -1,6 +1,10 @@
 // IMPORTANT: Load environment variables FIRST before any other imports
 import './config/env';
 
+// IMPORTANT: Initialize Sentry BEFORE any other imports that may throw at boot
+import { initSentry, Sentry } from './lib/sentry';
+initSentry();
+
 import express, { Application, Request, Response } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
@@ -133,6 +137,10 @@ app.use('/api/telegram', telegramBotRoutes);
 
 // 404 handler
 app.use(notFoundHandler);
+
+// Sentry error handler must be registered BEFORE the application's error handler
+// so it captures errors first, then the existing handler responds to the user.
+Sentry.setupExpressErrorHandler(app);
 
 // Global error handler
 app.use(errorHandler);
