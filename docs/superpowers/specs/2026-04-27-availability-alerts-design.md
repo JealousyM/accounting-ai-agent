@@ -134,6 +134,7 @@ class HealthService {
 - Every public `/health` request would otherwise probe wFirma/OpenAI/Anthropic — at 30s polling × N users this would burn rate limits and create noise
 - Cached entry served immediately; if expired, return the stale entry and trigger a background refresh
 - The `HealthMonitorService` poll itself drives the refresh, so cache is naturally warm
+- **All callers share the same cache** — frontend polling, `HealthMonitorService` ticks, and external probes (UptimeRobot, etc.) all read from `getIntegrationsCached()`. None can force-revalidate. This means external uptime monitors see at most 5-minute-stale integration data — acceptable trade-off vs. amplifying outbound API load
 
 ### `/health` endpoint — replaces `packages/api/src/index.ts:66`
 
@@ -192,7 +193,7 @@ process.on('SIGTERM', () => healthMonitorService.stop());
 process.on('SIGINT',  () => healthMonitorService.stop());
 ```
 
-State is in-memory only. After API restart, state begins as `ok`; the next tick re-establishes truth. Incident history is the responsibility of Sentry, not this service.
+`start()` fires an **immediate first tick** (no 30s blind window after boot), then schedules subsequent ticks at 30s intervals. State is in-memory only. After API restart, state begins as `ok`; the immediate tick re-establishes truth. Incident history is the responsibility of Sentry, not this service.
 
 ### Telegram alert format
 
@@ -326,12 +327,13 @@ export function SystemStatusBanner() {
 }
 ```
 
-`buildMessage` distinguishes degraded sub-cases:
+`buildMessage` distinguishes degraded sub-cases (precedence top-down — first match wins):
 
-- `snapshot.integrations.openai.ok === false` OR `anthropic.ok === false` → `system.banner.degraded.ai`
-- `snapshot.integrations.wfirma.ok === false` → `system.banner.degraded.wfirma`
-- For `down` → `system.banner.down`
-- For `unreachable` → `system.banner.unreachable`
+1. `unreachable` (browser offline) → `system.banner.unreachable`
+2. `down` (DB or Redis) → `system.banner.down`
+3. `degraded` and (`openai.ok === false` OR `anthropic.ok === false`) → `system.banner.degraded.ai`
+   *(AI takes precedence over wFirma because chat is the primary user-facing feature)*
+4. `degraded` and `wfirma.ok === false` → `system.banner.degraded.wfirma`
 
 Sticky-top placement (does not block UI). Accessible via `role="status"` + `aria-live="polite"`.
 
@@ -362,7 +364,7 @@ Customizations:
 
 - `tracesSampleRate: 0.1`
 - `replaysSessionSampleRate: 0`, `replaysOnErrorSampleRate: 1.0` (Session Replay only on errors)
-- `beforeSend` drops `/health` failures (already covered by health monitor + the banner; would otherwise create duplicate frontend issues during every backend outage)
+- `beforeSend` drops `/health` failures using exact pathname match: `new URL(event.request.url).pathname === '/health'` (substring match could swallow unrelated errors with `/health` in path)
 
 ## i18n
 
@@ -427,7 +429,7 @@ All Sentry / alerting envs are **optional**. If absent:
 ### E2E (Playwright)
 
 - One happy-path test: login → no banner visible
-- Mock route blocks `/health` → banner appears within 60s
+- Mock route blocks `/health` → banner appears within poll interval. Tests override the poll interval via `NEXT_PUBLIC_HEALTH_POLL_MS` env (e.g., 1000ms in tests) to avoid flake on the 30s production interval
 
 ## Files
 
@@ -471,8 +473,8 @@ packages/web/src/i18n/messages/{en,pl,ru}.json      (+ system.* keys)
 
 ### New npm dependencies
 
-- `@sentry/node` (api)
-- `@sentry/nextjs` (web)
+- `@sentry/node` (api) — **v8+ required** for `Sentry.setupExpressErrorHandler` API used in this design
+- `@sentry/nextjs` (web) — latest stable, installed via `npx @sentry/wizard@latest -i nextjs`
 
 ## Risks / open considerations
 
