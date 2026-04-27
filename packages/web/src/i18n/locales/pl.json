@@ -698,51 +698,37 @@
                 }
               },
               {
-                "title": "Otwórz ustawienia API",
-                "body": "Kliknij ikonę ustawień i przejdź do Ustawienia → Aplikacje → API. Dokładna nazwa może różnić się w zależności od planu wFirma.",
+                "title": "Dodaj nowy klucz API w wFirma",
+                "body": "Z pulpitu znajdź sekcję 'Bezpieczeństwo' w prawej kolumnie i kliknij 'Aplikacje'. W otwartym oknie przełącz się na zakładkę 'Klucze API' i kliknij '+Dodaj', aby utworzyć nowy klucz API. Nadaj mu rozpoznawalną nazwę (na przykład 'eKsiegowyAI').",
                 "screenshot": {
                   "src": "/guide/wfirma/get-api-credentials/wfirma-1.png",
-                  "alt": "Menu ustawień wFirma z opcją API",
-                  "caption": "Przejdź do ustawień API w wFirma.",
-                  "placeholderHint": "Zrzut ekranu bocznego menu ustawień wFirma z widoczną pozycją 'Aplikacje' lub 'API'."
+                  "alt": "Okno Aplikacje wFirma z zakładką Klucze API i przyciskiem Dodaj",
+                  "caption": "Aplikacje → Klucze API → +Dodaj. Pulpit wFirma pokazuje link Aplikacje w prawej kolumnie; okno wyświetla listę istniejących kluczy z przyciskiem '+Dodaj' do tworzenia nowego.",
+                  "placeholderHint": "Zrzut ekranu pulpitu wFirma z podświetlonym linkiem Aplikacje oraz zakładką Klucze API otwartego okna Bezpieczeństwo z przyciskiem +Dodaj."
                 }
               },
               {
-                "title": "Włącz dostęp do API",
-                "body": "Włącz przełącznik dostępu do API dla Twojej firmy. wFirma może poprosić o zaakceptowanie regulaminu API."
+                "title": "Skopiuj Access Key i Secret Key",
+                "body": "Po utworzeniu nowy wpis pojawia się w tabeli z kolumnami Access key i Secret key. Skopiuj obie wartości — wkleisz je do eKsięgowy AI w ostatnim kroku."
               },
               {
-                "title": "Skopiuj Klucz dostępu i Klucz tajny",
-                "body": "Po włączeniu dostępu do API wFirma wyświetla oba klucze. Skopiuj każdy z nich — wkleisz je do eKsięgowy AI w ostatnim kroku."
-              },
-              {
-                "title": "Znajdź identyfikator firmy (Company ID)",
-                "body": "Company ID to numeryczny identyfikator Twojej firmy w wFirma. Zazwyczaj widać go w adresie URL podczas pracy w wFirma (np. wfirma.pl/firma/{companyId}/...) lub w Ustawienia → Firma → Dane firmy.",
+                "title": "Znajdź swój Company ID",
+                "body": "Wróć do pulpitu wFirma. Twój Company ID jest wyświetlany obok 'Moja firma' w nagłówku — to identyfikator numeryczny.",
                 "screenshot": {
-                  "src": "/guide/wfirma/get-api-credentials/wfirma-4.png",
-                  "alt": "Lokalizacja Company ID w wFirma",
-                  "caption": "Gdzie znaleźć identyfikator firmy w wFirma.",
-                  "placeholderHint": "Zrzut ekranu paska adresu wFirma z podświetlonym identyfikatorem firmy lub ekranu danych firmy z numerycznym ID."
+                  "src": "/guide/wfirma/get-api-credentials/wfirma-2.png",
+                  "alt": "Nagłówek Moja firma w wFirma z Company ID",
+                  "caption": "Company ID jest wyświetlany obok 'Moja firma' w nagłówku pulpitu.",
+                  "placeholderHint": "Zrzut ekranu pulpitu wFirma z podświetlonym nagłówkiem 'Moja firma (ID: ...)'."
                 }
               },
               {
-                "title": "Otwórz Dane uwierzytelniające API w eKsięgowy AI",
-                "body": "W naszej aplikacji kliknij swój awatar w prawym górnym rogu i wybierz 'API Credentials' (Dane uwierzytelniające API), aby otworzyć modal z danymi uwierzytelniającymi.",
+                "title": "Wklej dane do eKsięgowy AI",
+                "body": "W naszej aplikacji kliknij awatar profilu w prawym górnym rogu i wybierz 'API Credentials'. W sekcji wFirma Integration wklej Access Key, Secret Key i Company ID, a następnie kliknij 'Save'. eKsięgowy AI zweryfikuje dane uwierzytelniające w wFirma.",
                 "screenshot": {
-                  "src": "/guide/wfirma/get-api-credentials/wfirma-5.png",
-                  "alt": "Pozycja menu API Credentials w eKsięgowy AI",
-                  "caption": "Menu profilu → API Credentials.",
-                  "placeholderHint": "Zrzut ekranu rozwijanego menu profilu eKsięgowy AI z wyróżnioną pozycją 'API Credentials'."
-                }
-              },
-              {
-                "title": "Wklej dane uwierzytelniające i zapisz",
-                "body": "W sekcji wFirma w modalu wklej Klucz dostępu, Klucz tajny i identyfikator firmy, a następnie kliknij Zapisz. eKsięgowy AI zweryfikuje dane uwierzytelniające w wFirma — po sukcesie zobaczysz potwierdzenie.",
-                "screenshot": {
-                  "src": "/guide/wfirma/get-api-credentials/wfirma-6.png",
-                  "alt": "Wypełnione dane wFirma w eKsięgowy AI",
-                  "caption": "Wklej wszystkie trzy wartości i kliknij Zapisz.",
-                  "placeholderHint": "Zrzut ekranu modala z danymi uwierzytelniającymi API z wypełnioną sekcją wFirma (Access Key, Secret Key, Company ID)."
+                  "src": "/guide/wfirma/get-api-credentials/wfirma-3.png",
+                  "alt": "Okno API Credentials w eKsięgowy AI z sekcją wFirma Integration",
+                  "caption": "Nasze okno API Credentials na /profile — wklej Access Key, Secret Key i Company ID, następnie kliknij Save.",
+                  "placeholderHint": "Zrzut ekranu naszego okna API Credentials z sekcją wFirma Integration zawierającą pola Access Key, Secret Key i Company ID."
                 }
               }
             ],
