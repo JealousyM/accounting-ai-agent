@@ -562,6 +562,121 @@
       }
     }
   },
+  "guide": {
+    "title": "Przewodnik",
+    "description": "Przewodniki krok po kroku, jak skonfigurować i korzystać z eKsięgowy AI.",
+    "breadcrumbHome": "Przewodnik",
+    "topics": {
+      "ksef": {
+        "title": "KSeF",
+        "description": "Praca z Krajowym Systemem e-Faktur.",
+        "articles": {
+          "getTokens": {
+            "title": "Jak uzyskać tokeny KSeF",
+            "summary": "Wygeneruj token uwierzytelniający w portalu KSeF i podłącz go do eKsięgowy AI.",
+            "intro": "Aby wysyłać i odbierać faktury przez KSeF, eKsięgowy AI potrzebuje tokenu uwierzytelniającego wydanego przez portal KSeF. Ten przewodnik przeprowadzi Cię przez proces jego wygenerowania i wklejenia do aplikacji. Będziesz potrzebować Kwalifikowanego Podpisu Elektronicznego (KEP) lub Profilu Zaufanego.",
+            "steps": [
+              {
+                "title": "Otwórz portal KSeF",
+                "body": "Otwórz portal KSeF w nowej karcie. Najpierw użyj środowiska testowego, aby zweryfikować konfigurację; następnie przejdź na produkcję, gdy nabierzesz pewności.",
+                "links": [
+                  { "label": "KSeF — produkcja (ap.ksef.mf.gov.pl/web)", "href": "https://ap.ksef.mf.gov.pl/web/" },
+                  { "label": "KSeF — środowisko demo (ap-demo.ksef.mf.gov.pl/web)", "href": "https://ap-demo.ksef.mf.gov.pl/web/" },
+                  { "label": "KSeF — środowisko testowe (ap-test.ksef.mf.gov.pl/web)", "href": "https://ap-test.ksef.mf.gov.pl/web/" }
+                ],
+                "screenshot": {
+                  "src": "/guide/ksef/get-tokens/ksef-0.png",
+                  "alt": "Strona logowania Aplikacji Podatnika KSeF",
+                  "caption": "Strona logowania Aplikacji Podatnika KSeF. Wybierz Login.gov.pl (mObywatel, bankowość, Profil Zaufany) lub Certyfikat kwalifikowany.",
+                  "placeholderHint": "Zrzut ekranu strony logowania Aplikacji Podatnika KSeF z dwoma dużymi przyciskami: 'Login.gov.pl' i 'Certyfikat kwalifikowany'."
+                }
+              },
+              {
+                "title": "Zaloguj się i wybierz podmiot",
+                "body": "Po kliknięciu wybranej metody logowania ukończ proces uwierzytelniania (mObywatel, bankowość albo Profil Zaufany przez Login.gov.pl, lub certyfikat kwalifikowany). Po powrocie do KSeF wpisz NIP podmiotu, w imieniu którego będziesz działać.",
+                "screenshot": {
+                  "src": "/guide/ksef/get-tokens/ksef-1.png",
+                  "alt": "Wybór identyfikatora podmiotu (NIP)",
+                  "caption": "Wpisz NIP firmy, w imieniu której będziesz wystawiać i odbierać faktury.",
+                  "placeholderHint": "Zrzut ekranu z wyborem identyfikatora podmiotu, polem NIP i przyciskiem 'Przejdź dalej'."
+                }
+              },
+              {
+                "title": "Otwórz sekcję Tokeny",
+                "body": "Po zalogowaniu przejdź do Uprawnienia → Tokeny w bocznym menu.",
+                "screenshot": {
+                  "src": "/guide/ksef/get-tokens/ksef-2.png",
+                  "alt": "Pulpit KSeF z bocznym menu zawierającym Tokeny",
+                  "caption": "Pulpit KSeF. Boczne menu zawiera Faktury, Historia sesji, Uprawnienia, Tokeny i Certyfikaty.",
+                  "placeholderHint": "Zrzut ekranu zalogowanego pulpitu KSeF z widocznym po lewej stronie bocznym menu."
+                }
+              },
+              {
+                "title": "Wypełnij formularz tokenu",
+                "body": "W bocznym menu otwórz Tokeny → Generuj token. Nadaj tokenowi rozpoznawalną nazwę (na przykład 'eKsiegowyAI'). Pod nazwą zaznacz uprawnienia, których potrzebuje eKsięgowy AI: 'wystawianie faktur' i 'przeglądanie faktur'. Nie nadawaj uprawnień administracyjnych.",
+                "screenshot": {
+                  "src": "/guide/ksef/get-tokens/ksef-3.png",
+                  "alt": "Formularz generowania tokenu z polem nazwy i checkboxami uprawnień",
+                  "caption": "Formularz tokenu: pole nazwy u góry, checkboxy uprawnień poniżej.",
+                  "placeholderHint": "Zrzut ekranu formularza tokenu z polem 'Nazwa tokena' i listą checkboxów uprawnień (wystawianie faktur, przeglądanie faktur, ...)."
+                }
+              },
+              {
+                "title": "Wygeneruj i poczekaj",
+                "body": "Kliknij 'Generuj token' u dołu formularza. KSeF zakolejkuje żądanie — ekran statusu pokaże 'W realizacji'. Klikaj 'Odśwież' co jakiś czas, aby zaktualizować status. Generowanie może potrwać kilka minut.",
+                "screenshot": {
+                  "src": "/guide/ksef/get-tokens/ksef-4.png",
+                  "alt": "Ekran trwającego generowania tokenu",
+                  "caption": "Ekran statusu 'Generowanie tokena' — kliknij 'Odśwież' aby zaktualizować.",
+                  "placeholderHint": "Zrzut ekranu strony statusu generowania tokenu pokazującej stan 'W realizacji' z przyciskiem 'Odśwież'."
+                }
+              },
+              {
+                "title": "Skopiuj token",
+                "body": "Po zakończeniu generowania ekran pokazuje 'Zakończono pomyślnie'. Token pojawia się w polu kopiowania z przyciskiem 'Kopiuj'. KSeF ostrzega: 'Token wyświetlany jest tylko raz' — natychmiast skopiuj go do menedżera haseł.",
+                "screenshot": {
+                  "src": "/guide/ksef/get-tokens/ksef-5.png",
+                  "alt": "Wygenerowany token z przyciskiem Kopiuj",
+                  "caption": "Generowanie tokenu zakończone. Kliknij 'Kopiuj' i zapisz token w bezpiecznym miejscu.",
+                  "placeholderHint": "Zrzut ekranu strony sukcesu z tokenem w polu kopiowania, przyciskiem 'Kopiuj' i ostrzeżeniem, że token jest wyświetlany tylko raz."
+                }
+              },
+              {
+                "title": "Wklej token do eKsięgowy AI",
+                "body": "Otwórz ustawienia KSeF w naszej aplikacji. Wybierz 'Direct KSeF API' jako tryb integracji oraz odpowiednie środowisko (Production, Demo lub Test — to samo, w którym wygenerowałeś token). Wklej token do pola 'KSeF Authorization Token', wpisz NIP i kliknij 'Save Settings'.",
+                "screenshot": {
+                  "src": "/guide/ksef/get-tokens/ksef-6.png",
+                  "alt": "Strona ustawień KSeF w eKsięgowy AI",
+                  "caption": "Strona /ksef/settings — wpisz token i NIP, następnie kliknij Save Settings.",
+                  "placeholderHint": "Zrzut ekranu naszej strony /ksef/settings z wybranym Direct KSeF API, listą środowisk oraz polami Token i NIP."
+                }
+              }
+            ],
+            "callouts": {
+              "tokenOnce": {
+                "variant": "warning",
+                "title": "Token jest wyświetlany tylko raz",
+                "body": "Jeśli go zgubisz, musisz wygenerować nowy. Przechowuj go w menedżerze haseł lub w sejfie sekretów Twojego zespołu."
+              },
+              "testFirst": {
+                "variant": "tip",
+                "title": "Najpierw użyj środowiska testowego",
+                "body": "Wygeneruj token w środowisku testowym KSeF, sprawdź, czy działa w eKsięgowy AI, a następnie powtórz proces dla produkcji."
+              }
+            },
+            "links": {
+              "title": "Przydatne linki",
+              "officialPortal": { "label": "Aplikacja Podatnika KSeF — produkcja", "href": "https://ap.ksef.mf.gov.pl/web/" },
+              "demoPortal": { "label": "Aplikacja Podatnika KSeF — demo", "href": "https://ap-demo.ksef.mf.gov.pl/web/" },
+              "testPortal": { "label": "Aplikacja Podatnika KSeF — test", "href": "https://ap-test.ksef.mf.gov.pl/web/" },
+              "officialDocs": { "label": "Oficjalna dokumentacja KSeF (Ministerstwo Finansów)", "href": "https://www.podatki.gov.pl/ksef/" },
+              "appSettings": { "label": "Otwórz ustawienia KSeF w eKsięgowy AI", "href": "/ksef/settings" }
+            }
+          }
+        }
+      }
+    }
+  },
   "help": {
     "title": "Pomoc",
     "searchPlaceholder": "Szukaj w pomocy...",

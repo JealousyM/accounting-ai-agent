@@ -562,6 +562,121 @@
       }
     }
   },
+  "guide": {
+    "title": "Guide",
+    "description": "Step-by-step guides to set up and use eKsięgowy AI.",
+    "breadcrumbHome": "Guide",
+    "topics": {
+      "ksef": {
+        "title": "KSeF",
+        "description": "Working with Poland's National e-Invoicing System.",
+        "articles": {
+          "getTokens": {
+            "title": "How to get KSeF tokens",
+            "summary": "Generate an authentication token in the KSeF portal and connect it to eKsięgowy AI.",
+            "intro": "To send and receive invoices through KSeF, eKsięgowy AI needs an authentication token issued by the KSeF portal. This guide walks you through generating one and pasting it into the app. You will need a Qualified Electronic Signature (KEP) or a Trusted Profile (Profil Zaufany).",
+            "steps": [
+              {
+                "title": "Open the KSeF portal",
+                "body": "Open the KSeF portal in a new tab. Use the test environment first to verify your setup; switch to production once you are confident.",
+                "links": [
+                  { "label": "KSeF — production (ap.ksef.mf.gov.pl/web)", "href": "https://ap.ksef.mf.gov.pl/web/" },
+                  { "label": "KSeF — demo environment (ap-demo.ksef.mf.gov.pl/web)", "href": "https://ap-demo.ksef.mf.gov.pl/web/" },
+                  { "label": "KSeF — test environment (ap-test.ksef.mf.gov.pl/web)", "href": "https://ap-test.ksef.mf.gov.pl/web/" }
+                ],
+                "screenshot": {
+                  "src": "/guide/ksef/get-tokens/ksef-0.png",
+                  "alt": "KSeF Taxpayer Application sign-in page",
+                  "caption": "Sign-in page of the KSeF Taxpayer Application. Choose Login.gov.pl (mObywatel, banking, Profil Zaufany) or Certyfikat kwalifikowany.",
+                  "placeholderHint": "Screenshot of the KSeF Taxpayer Application sign-in page with two large buttons: 'Login.gov.pl' and 'Certyfikat kwalifikowany'."
+                }
+              },
+              {
+                "title": "Sign in and select your entity",
+                "body": "After clicking your chosen sign-in method, complete the authentication flow (mObywatel, banking, or Profil Zaufany via Login.gov.pl, or your qualified certificate). When you return to KSeF, enter the NIP of the entity on whose behalf you'll act.",
+                "screenshot": {
+                  "src": "/guide/ksef/get-tokens/ksef-1.png",
+                  "alt": "Entity identifier (NIP) selection screen",
+                  "caption": "Enter the NIP of the company on whose behalf you'll issue and receive invoices.",
+                  "placeholderHint": "Screenshot of the entity-identifier screen with a NIP input field and a 'Przejdź dalej' button."
+                }
+              },
+              {
+                "title": "Open the Tokens section",
+                "body": "After signing in, go to Uprawnienia → Tokeny in the side menu.",
+                "screenshot": {
+                  "src": "/guide/ksef/get-tokens/ksef-2.png",
+                  "alt": "KSeF dashboard with side menu showing Tokeny",
+                  "caption": "KSeF dashboard. The side menu lists Faktury, Historia sesji, Uprawnienia, Tokeny, and Certyfikaty.",
+                  "placeholderHint": "Screenshot of the logged-in KSeF dashboard with the side menu visible on the left."
+                }
+              },
+              {
+                "title": "Fill out the token form",
+                "body": "Open Tokeny → Generuj token in the side menu. Give the token a recognizable name (for example, 'eKsiegowyAI'). Below the name, tick the permissions eKsięgowy AI needs: 'wystawianie faktur' (issue invoices) and 'przeglądanie faktur' (view invoices). Do not grant administrative rights.",
+                "screenshot": {
+                  "src": "/guide/ksef/get-tokens/ksef-3.png",
+                  "alt": "Token generation form with name input and permission checkboxes",
+                  "caption": "Token form: name input on top, permission checkboxes below.",
+                  "placeholderHint": "Screenshot of the token form showing a 'Nazwa tokena' input and a list of permission checkboxes (wystawianie faktur, przeglądanie faktur, ...)."
+                }
+              },
+              {
+                "title": "Generate and wait",
+                "body": "Click 'Generuj token' at the bottom of the form. KSeF queues the request — the status screen shows 'W realizacji' (in progress). Click 'Odśwież' periodically to refresh status. Generation can take a few minutes.",
+                "screenshot": {
+                  "src": "/guide/ksef/get-tokens/ksef-4.png",
+                  "alt": "Token generation in progress screen",
+                  "caption": "'Generowanie tokena' status screen — click 'Odśwież' to update.",
+                  "placeholderHint": "Screenshot of the token-generation status page showing 'W realizacji' state with an 'Odśwież' button."
+                }
+              },
+              {
+                "title": "Copy the token",
+                "body": "When generation finishes, the screen shows 'Zakończono pomyślnie' (completed successfully). The token appears in a copy field with a 'Kopiuj' button. KSeF warns 'Token wyświetlany jest tylko raz' — copy it immediately to a password manager.",
+                "screenshot": {
+                  "src": "/guide/ksef/get-tokens/ksef-5.png",
+                  "alt": "Generated token displayed with Copy button",
+                  "caption": "Token generation complete. Click 'Kopiuj', then store the token in a secure place.",
+                  "placeholderHint": "Screenshot of the success screen with the token string in a copy field, a 'Kopiuj' button, and a warning that the token is shown only once."
+                }
+              },
+              {
+                "title": "Paste the token into eKsięgowy AI",
+                "body": "Open KSeF settings in our app. Choose 'Direct KSeF API' as the integration mode and the matching environment (Production, Demo, or Test — the same one you used in KSeF). Paste the token into 'KSeF Authorization Token', enter your NIP, then click 'Save Settings'.",
+                "screenshot": {
+                  "src": "/guide/ksef/get-tokens/ksef-6.png",
+                  "alt": "KSeF settings page in eKsięgowy AI",
+                  "caption": "/ksef/settings page — fill in the token and NIP, then click Save Settings.",
+                  "placeholderHint": "Screenshot of our /ksef/settings page with Direct KSeF API selected, environment dropdown, and Token + NIP input fields."
+                }
+              }
+            ],
+            "callouts": {
+              "tokenOnce": {
+                "variant": "warning",
+                "title": "The token is shown only once",
+                "body": "If you lose it, you must generate a new one. Store it in a password manager or your team's secret vault."
+              },
+              "testFirst": {
+                "variant": "tip",
+                "title": "Use the test environment first",
+                "body": "Generate a token in the KSeF test environment, verify it works in eKsięgowy AI, then repeat the process for production."
+              }
+            },
+            "links": {
+              "title": "Useful links",
+              "officialPortal": { "label": "KSeF Taxpayer Application — production", "href": "https://ap.ksef.mf.gov.pl/web/" },
+              "demoPortal": { "label": "KSeF Taxpayer Application — demo", "href": "https://ap-demo.ksef.mf.gov.pl/web/" },
+              "testPortal": { "label": "KSeF Taxpayer Application — test", "href": "https://ap-test.ksef.mf.gov.pl/web/" },
+              "officialDocs": { "label": "Official KSeF documentation (Ministry of Finance)", "href": "https://www.podatki.gov.pl/ksef/" },
+              "appSettings": { "label": "Open KSeF settings in eKsięgowy AI", "href": "/ksef/settings" }
+            }
+          }
+        }
+      }
+    }
+  },
   "help": {
     "title": "Help",
     "searchPlaceholder": "Search help topics...",
