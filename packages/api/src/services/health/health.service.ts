@@ -29,4 +29,40 @@ export class HealthService {
     const [db, redisCheck] = await Promise.all([this.checkDb(), this.checkRedis()]);
     return { db, redis: redisCheck };
   }
+
+  private async probeWithTimeout(url: string, headers: Record<string, string>, timeoutMs = 5000): Promise<CheckResult> {
+    const t0 = Date.now();
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), timeoutMs);
+    try {
+      // Cost-free probe — must remain a non-billable endpoint.
+      // Do NOT call /v1/chat/completions, /v1/messages, or any inference endpoint.
+      const res = await fetch(url, { method: 'GET', headers, signal: controller.signal });
+      if (!res.ok) {
+        return { ok: false, latencyMs: Date.now() - t0, error: `HTTP ${res.status}` };
+      }
+      return { ok: true, latencyMs: Date.now() - t0 };
+    } catch (err) {
+      return { ok: false, latencyMs: Date.now() - t0, error: (err as Error).message };
+    } finally {
+      clearTimeout(timer);
+    }
+  }
+
+  private async checkOpenAI(): Promise<CheckResult> {
+    const key = process.env.OPENAI_API_KEY;
+    if (!key) return { ok: true, latencyMs: 0, error: 'not configured' };
+    return this.probeWithTimeout('https://api.openai.com/v1/models', {
+      Authorization: `Bearer ${key}`,
+    });
+  }
+
+  private async checkAnthropic(): Promise<CheckResult> {
+    const key = process.env.ANTHROPIC_API_KEY;
+    if (!key) return { ok: true, latencyMs: 0, error: 'not configured' };
+    return this.probeWithTimeout('https://api.anthropic.com/v1/models', {
+      'x-api-key': key,
+      'anthropic-version': '2023-06-01',
+    });
+  }
 }
