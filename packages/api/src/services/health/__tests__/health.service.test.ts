@@ -158,4 +158,90 @@ describe('HealthService', () => {
       expect(result.ok).toBe(false);
     });
   });
+
+  describe('getSnapshot', () => {
+    const fetchMock = jest.fn();
+    beforeAll(() => { (global as any).fetch = fetchMock; });
+    beforeEach(() => {
+      fetchMock.mockReset();
+      process.env.OPENAI_API_KEY = 'sk-test';
+      process.env.ANTHROPIC_API_KEY = 'sk-ant-test';
+      process.env.WFIRMA_HEALTH_API_KEY = 'k';
+      process.env.WFIRMA_HEALTH_COMPANY_ID = 'c';
+      fetchMock.mockResolvedValue({ ok: true } as Response);
+      mockedPrisma.$queryRaw.mockResolvedValue([]);
+      mockedRedis.ping.mockResolvedValue('PONG');
+    });
+
+    it('returns status=ok when everything works', async () => {
+      const snap = await service.getSnapshot();
+      expect(snap.status).toBe('ok');
+      expect(snap.checks.db.ok).toBe(true);
+      expect(snap.checks.redis.ok).toBe(true);
+      expect(snap.integrations.wfirma.ok).toBe(true);
+    });
+
+    it('returns status=down when DB fails', async () => {
+      mockedPrisma.$queryRaw.mockRejectedValueOnce(new Error('boom'));
+      const snap = await service.getSnapshot();
+      expect(snap.status).toBe('down');
+    });
+
+    it('returns status=down when Redis fails', async () => {
+      mockedRedis.ping.mockRejectedValueOnce(new Error('boom'));
+      const snap = await service.getSnapshot();
+      expect(snap.status).toBe('down');
+    });
+
+    it('returns status=degraded when only an integration fails', async () => {
+      fetchMock.mockResolvedValueOnce({ ok: false, status: 500 } as Response); // wfirma fails
+      const snap = await service.getSnapshot();
+      expect(snap.status).toBe('degraded');
+      expect(snap.integrations.wfirma.ok).toBe(false);
+    });
+
+    it('caches integrations for 5 minutes (does not re-probe)', async () => {
+      await service.getSnapshot();
+      fetchMock.mockClear();
+      await service.getSnapshot();
+      expect(fetchMock).not.toHaveBeenCalled(); // served from cache
+    });
+
+    it('serves stale integration data when cache expired and refreshes in background', async () => {
+      jest.useFakeTimers({ doNotFake: ['setImmediate'] });
+      await service.getSnapshot();
+      fetchMock.mockClear();
+      jest.advanceTimersByTime(6 * 60 * 1000); // 6 min
+      fetchMock.mockResolvedValue({ ok: true } as Response);
+      await service.getSnapshot();
+      // Stale-while-revalidate: returns immediately with old data, background refresh started
+      // Verify a refresh request fired (not blocking)
+      await new Promise(r => setImmediate(r));
+      expect(fetchMock).toHaveBeenCalled();
+      jest.useRealTimers();
+    });
+
+    it('skips integrations entirely when skipIntegrations=true', async () => {
+      fetchMock.mockClear();
+      const fresh = new HealthService();
+      await fresh.getSnapshot({ skipIntegrations: true });
+      expect(fetchMock).not.toHaveBeenCalled();
+    });
+
+    it('uptimeSeconds is non-negative', async () => {
+      const snap = await service.getSnapshot();
+      expect(snap.uptimeSeconds).toBeGreaterThanOrEqual(0);
+    });
+
+    it('production mode strips error messages from CheckResult', async () => {
+      const oldEnv = process.env.NODE_ENV;
+      process.env.NODE_ENV = 'production';
+      const fresh = new HealthService(); // avoid cache contamination from prior tests in this describe
+      mockedPrisma.$queryRaw.mockRejectedValueOnce(new Error('secret stack trace'));
+      const snap = await fresh.getSnapshot({ skipIntegrations: true });
+      expect(snap.checks.db.error).toBeUndefined();
+      expect(snap.checks.db.ok).toBe(false);
+      process.env.NODE_ENV = oldEnv;
+    });
+  });
 });
