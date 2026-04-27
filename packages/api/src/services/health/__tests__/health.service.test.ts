@@ -49,4 +49,82 @@ describe('HealthService', () => {
       expect(result.error).toContain('ECONNREFUSED');
     });
   });
+
+  describe('integration probes — cost-free guarantee', () => {
+    const fetchMock = jest.fn();
+    beforeAll(() => {
+      (global as any).fetch = fetchMock;
+    });
+    beforeEach(() => fetchMock.mockReset());
+
+    it('checkOpenAI calls GET /v1/models exactly (must remain non-billable)', async () => {
+      process.env.OPENAI_API_KEY = 'sk-test';
+      fetchMock.mockResolvedValueOnce({ ok: true } as Response);
+
+      await service['checkOpenAI']();
+
+      expect(fetchMock).toHaveBeenCalledTimes(1);
+      const [url, options] = fetchMock.mock.calls[0];
+      expect(String(url)).toMatch(/\/v1\/models$/);   // regression guard
+      expect(options.method ?? 'GET').toBe('GET');    // regression guard
+    });
+
+    it('checkAnthropic calls GET /v1/models exactly (must remain non-billable)', async () => {
+      process.env.ANTHROPIC_API_KEY = 'sk-ant-test';
+      fetchMock.mockResolvedValueOnce({ ok: true } as Response);
+
+      await service['checkAnthropic']();
+
+      const [url, options] = fetchMock.mock.calls[0];
+      expect(String(url)).toMatch(/\/v1\/models$/);
+      expect(options.method ?? 'GET').toBe('GET');
+    });
+
+    it('checkOpenAI returns ok=true with "not configured" when env missing, makes NO request', async () => {
+      delete process.env.OPENAI_API_KEY;
+      const result = await service['checkOpenAI']();
+      expect(result.ok).toBe(true);
+      expect(result.error).toBe('not configured');
+      expect(fetchMock).not.toHaveBeenCalled();
+    });
+
+    it('checkAnthropic returns ok=true with "not configured" when env missing, makes NO request', async () => {
+      delete process.env.ANTHROPIC_API_KEY;
+      const result = await service['checkAnthropic']();
+      expect(result.ok).toBe(true);
+      expect(result.error).toBe('not configured');
+      expect(fetchMock).not.toHaveBeenCalled();
+    });
+
+    it('checkOpenAI returns ok=false when fetch rejects', async () => {
+      process.env.OPENAI_API_KEY = 'sk-test';
+      fetchMock.mockRejectedValueOnce(new Error('timeout'));
+      const result = await service['checkOpenAI']();
+      expect(result.ok).toBe(false);
+      expect(result.error).toContain('timeout');
+    });
+
+    it('checkOpenAI returns ok=false when API returns non-2xx', async () => {
+      process.env.OPENAI_API_KEY = 'sk-test';
+      fetchMock.mockResolvedValueOnce({ ok: false, status: 500 } as Response);
+      const result = await service['checkOpenAI']();
+      expect(result.ok).toBe(false);
+      expect(result.error).toContain('500');
+    });
+
+    it('aborts after 5s timeout', async () => {
+      process.env.OPENAI_API_KEY = 'sk-test'; // explicit reset — earlier tests may have deleted it
+      fetchMock.mockImplementationOnce((_url, opts: any) =>
+        new Promise((_resolve, reject) => {
+          opts.signal.addEventListener('abort', () => reject(new Error('aborted')));
+        })
+      );
+      jest.useFakeTimers();
+      const promise = service['checkOpenAI']();
+      jest.advanceTimersByTime(5001);
+      const result = await promise;
+      jest.useRealTimers();
+      expect(result.ok).toBe(false);
+    });
+  });
 });
