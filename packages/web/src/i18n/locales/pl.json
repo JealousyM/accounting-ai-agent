@@ -674,6 +674,106 @@
             }
           }
         }
+      },
+      "wfirma": {
+        "title": "wFirma",
+        "description": "Łączenie eKsięgowy AI z Twoim kontem wFirma.",
+        "articles": {
+          "getApiCredentials": {
+            "title": "Jak uzyskać dane uwierzytelniające API wFirma",
+            "summary": "Wygeneruj dane uwierzytelniające API w wFirma i wklej je do eKsięgowy AI.",
+            "intro": "Nasza integracja z wFirma potrzebuje trzech wartości: Klucza dostępu (Access Key), Klucza tajnego (Secret Key) oraz identyfikatora firmy (Company ID). Ten przewodnik przeprowadzi Cię przez ich wygenerowanie w wFirma i podłączenie do eKsięgowy AI.",
+            "steps": [
+              {
+                "title": "Zaloguj się do wFirma",
+                "body": "Otwórz wFirma w nowej karcie i zaloguj się na swoje konto.",
+                "links": [
+                  { "label": "Logowanie do wFirma", "href": "https://wfirma.pl/login" }
+                ],
+                "screenshot": {
+                  "src": "/guide/wfirma/get-api-credentials/wfirma-0.png",
+                  "alt": "wFirma sign-in page",
+                  "caption": "Strona logowania wFirma.",
+                  "placeholderHint": "Zrzut ekranu strony wfirma.pl/login z formularzem e-mail/hasło."
+                }
+              },
+              {
+                "title": "Otwórz ustawienia API",
+                "body": "Kliknij ikonę ustawień i przejdź do Ustawienia → Aplikacje → API. Dokładna nazwa może różnić się w zależności od planu wFirma.",
+                "screenshot": {
+                  "src": "/guide/wfirma/get-api-credentials/wfirma-1.png",
+                  "alt": "wFirma settings menu with API option",
+                  "caption": "Przejdź do ustawień API w wFirma.",
+                  "placeholderHint": "Zrzut ekranu bocznego menu ustawień wFirma z widoczną pozycją 'Aplikacje' lub 'API'."
+                }
+              },
+              {
+                "title": "Włącz dostęp do API",
+                "body": "Włącz przełącznik dostępu do API dla Twojej firmy. wFirma może poprosić o zaakceptowanie regulaminu API.",
+                "screenshot": {
+                  "src": "/guide/wfirma/get-api-credentials/wfirma-2.png",
+                  "alt": "wFirma API access toggle",
+                  "caption": "Włącz dostęp do API dla swojej firmy.",
+                  "placeholderHint": "Zrzut ekranu przełącznika włączania API na stronie ustawień API w wFirma."
+                }
+              },
+              {
+                "title": "Skopiuj Klucz dostępu i Klucz tajny",
+                "body": "Po włączeniu dostępu do API wFirma wyświetla oba klucze. Skopiuj każdy z nich — wkleisz je do eKsięgowy AI w ostatnim kroku.",
+                "screenshot": {
+                  "src": "/guide/wfirma/get-api-credentials/wfirma-3.png",
+                  "alt": "wFirma API keys displayed",
+                  "caption": "Klucz dostępu (Access Key) i Klucz tajny (Secret Key) w panelu API wFirma.",
+                  "placeholderHint": "Zrzut ekranu strony API wFirma pokazujący Klucz dostępu i Klucz tajny z przyciskami kopiowania."
+                }
+              },
+              {
+                "title": "Znajdź identyfikator firmy (Company ID)",
+                "body": "Company ID to numeryczny identyfikator Twojej firmy w wFirma. Zazwyczaj widać go w adresie URL podczas pracy w wFirma (np. wfirma.pl/firma/{companyId}/...) lub w Ustawienia → Firma → Dane firmy.",
+                "screenshot": {
+                  "src": "/guide/wfirma/get-api-credentials/wfirma-4.png",
+                  "alt": "wFirma Company ID location",
+                  "caption": "Gdzie znaleźć identyfikator firmy w wFirma.",
+                  "placeholderHint": "Zrzut ekranu paska adresu wFirma z podświetlonym identyfikatorem firmy lub ekranu danych firmy z numerycznym ID."
+                }
+              },
+              {
+                "title": "Otwórz Dane uwierzytelniające API w eKsięgowy AI",
+                "body": "W naszej aplikacji kliknij swój awatar w prawym górnym rogu i wybierz 'API Credentials' (Dane uwierzytelniające API), aby otworzyć modal z danymi uwierzytelniającymi.",
+                "screenshot": {
+                  "src": "/guide/wfirma/get-api-credentials/wfirma-5.png",
+                  "alt": "API Credentials menu item in eKsięgowy AI",
+                  "caption": "Menu profilu → API Credentials.",
+                  "placeholderHint": "Zrzut ekranu rozwijanego menu profilu eKsięgowy AI z wyróżnioną pozycją 'API Credentials'."
+                }
+              },
+              {
+                "title": "Wklej dane uwierzytelniające i zapisz",
+                "body": "W sekcji wFirma w modalu wklej Klucz dostępu, Klucz tajny i identyfikator firmy, a następnie kliknij Zapisz. eKsięgowy AI zweryfikuje dane uwierzytelniające w wFirma — po sukcesie zobaczysz potwierdzenie.",
+                "screenshot": {
+                  "src": "/guide/wfirma/get-api-credentials/wfirma-6.png",
+                  "alt": "Filled-in wFirma credentials in eKsięgowy AI",
+                  "caption": "Wklej wszystkie trzy wartości i kliknij Zapisz.",
+                  "placeholderHint": "Zrzut ekranu modala z danymi uwierzytelniającymi API z wypełnioną sekcją wFirma (Access Key, Secret Key, Company ID)."
+                }
+              }
+            ],
+            "callouts": {
+              "secretSafety": {
+                "variant": "warning",
+                "title": "Chroń swój Klucz tajny",
+                "body": "Klucz tajny (Secret Key) daje pełny dostęp API do Twojego konta wFirma. Traktuj go jak hasło — nigdy go nie udostępniaj, nie publikuj na czacie ani nie wgrywaj do repozytorium."
+              }
+            },
+            "links": {
+              "title": "Przydatne linki",
+              "wfirma": { "label": "wFirma", "href": "https://wfirma.pl" },
+              "wfirmaSignIn": { "label": "Logowanie do wFirma", "href": "https://wfirma.pl/login" },
+              "wfirmaApiDocs": { "label": "Dokumentacja API wFirma", "href": "https://doc.wfirma.pl" },
+              "appCredentials": { "label": "Otwórz Dane uwierzytelniające API w eKsięgowy AI", "href": "/profile" }
+            }
+          }
+        }
       }
     }
   },
