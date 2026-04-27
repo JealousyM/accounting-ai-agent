@@ -562,6 +562,121 @@
       }
     }
   },
+  "guide": {
+    "title": "Руководство",
+    "description": "Пошаговые руководства по настройке и использованию eKsięgowy AI.",
+    "breadcrumbHome": "Руководство",
+    "topics": {
+      "ksef": {
+        "title": "KSeF",
+        "description": "Работа с польской Национальной системой электронных счетов-фактур.",
+        "articles": {
+          "getTokens": {
+            "title": "Как получить токены KSeF",
+            "summary": "Сгенерируйте токен аутентификации в портале KSeF и подключите его к eKsięgowy AI.",
+            "intro": "Чтобы отправлять и получать счета-фактуры через KSeF, eKsięgowy AI требуется токен аутентификации, выданный порталом KSeF. Это руководство проведёт вас через процесс его генерации и вставки в приложение. Вам понадобится Квалифицированная электронная подпись (KEP) или Доверенный профиль (Profil Zaufany).",
+            "steps": [
+              {
+                "title": "Откройте портал KSeF",
+                "body": "Откройте портал KSeF в новой вкладке. Сначала используйте тестовую среду, чтобы проверить настройку; перейдите на продакшн, когда будете уверены.",
+                "links": [
+                  { "label": "KSeF — продакшн (ap.ksef.mf.gov.pl/web)", "href": "https://ap.ksef.mf.gov.pl/web/" },
+                  { "label": "KSeF — демо-среда (ap-demo.ksef.mf.gov.pl/web)", "href": "https://ap-demo.ksef.mf.gov.pl/web/" },
+                  { "label": "KSeF — тестовая среда (ap-test.ksef.mf.gov.pl/web)", "href": "https://ap-test.ksef.mf.gov.pl/web/" }
+                ],
+                "screenshot": {
+                  "src": "/guide/ksef/get-tokens/ksef-0.png",
+                  "alt": "Страница входа Приложения налогоплательщика KSeF",
+                  "caption": "Страница входа Приложения налогоплательщика KSeF. Выберите Login.gov.pl (mObywatel, банкинг, Profil Zaufany) или Certyfikat kwalifikowany.",
+                  "placeholderHint": "Скриншот страницы входа Приложения налогоплательщика KSeF с двумя крупными кнопками: «Login.gov.pl» и «Certyfikat kwalifikowany»."
+                }
+              },
+              {
+                "title": "Войдите и выберите субъект",
+                "body": "После нажатия на выбранный способ входа завершите аутентификацию (mObywatel, банкинг или Profil Zaufany через Login.gov.pl, либо ваш квалифицированный сертификат). Вернувшись в KSeF, введите NIP субъекта, от имени которого будете действовать.",
+                "screenshot": {
+                  "src": "/guide/ksef/get-tokens/ksef-1.png",
+                  "alt": "Выбор идентификатора субъекта (NIP)",
+                  "caption": "Введите NIP компании, от имени которой будете выставлять и получать счета-фактуры.",
+                  "placeholderHint": "Скриншот выбора идентификатора субъекта с полем NIP и кнопкой «Przejdź dalej»."
+                }
+              },
+              {
+                "title": "Откройте раздел «Токены»",
+                "body": "После входа перейдите в боковом меню по пути Uprawnienia → Tokeny.",
+                "screenshot": {
+                  "src": "/guide/ksef/get-tokens/ksef-2.png",
+                  "alt": "Главная KSeF с боковым меню, содержащим Tokeny",
+                  "caption": "Главная KSeF. Боковое меню содержит Faktury, Historia sesji, Uprawnienia, Tokeny и Certyfikaty.",
+                  "placeholderHint": "Скриншот главной страницы KSeF после входа с боковым меню слева."
+                }
+              },
+              {
+                "title": "Заполните форму токена",
+                "body": "В боковом меню откройте Tokeny → Generuj token. Дайте токену узнаваемое имя (например, «eKsiegowyAI»). Ниже имени отметьте права, нужные eKsięgowy AI: «wystawianie faktur» (выставление счетов) и «przeglądanie faktur» (просмотр счетов). Не давайте административных прав.",
+                "screenshot": {
+                  "src": "/guide/ksef/get-tokens/ksef-3.png",
+                  "alt": "Форма генерации токена с полем имени и чекбоксами прав",
+                  "caption": "Форма токена: поле имени вверху, чекбоксы прав ниже.",
+                  "placeholderHint": "Скриншот формы токена с полем «Nazwa tokena» и списком чекбоксов прав (wystawianie faktur, przeglądanie faktur, ...)."
+                }
+              },
+              {
+                "title": "Сгенерируйте и подождите",
+                "body": "Нажмите «Generuj token» внизу формы. KSeF поставит запрос в очередь — экран статуса покажет «W realizacji» (в процессе). Нажимайте «Odśwież» периодически, чтобы обновить статус. Генерация может занять несколько минут.",
+                "screenshot": {
+                  "src": "/guide/ksef/get-tokens/ksef-4.png",
+                  "alt": "Экран идущей генерации токена",
+                  "caption": "Экран статуса «Generowanie tokena» — нажмите «Odśwież», чтобы обновить.",
+                  "placeholderHint": "Скриншот страницы статуса генерации токена с состоянием «W realizacji» и кнопкой «Odśwież»."
+                }
+              },
+              {
+                "title": "Скопируйте токен",
+                "body": "После завершения генерации экран показывает «Zakończono pomyślnie» (успешно завершено). Токен появляется в поле копирования с кнопкой «Kopiuj». KSeF предупреждает: «Token wyświetlany jest tylko raz» — сразу же скопируйте его в менеджер паролей.",
+                "screenshot": {
+                  "src": "/guide/ksef/get-tokens/ksef-5.png",
+                  "alt": "Сгенерированный токен с кнопкой Kopiuj",
+                  "caption": "Генерация токена завершена. Нажмите «Kopiuj» и сохраните токен в надёжном месте.",
+                  "placeholderHint": "Скриншот страницы успеха с токеном в поле копирования, кнопкой «Kopiuj» и предупреждением, что токен показывается только один раз."
+                }
+              },
+              {
+                "title": "Вставьте токен в eKsięgowy AI",
+                "body": "Откройте настройки KSeF в нашем приложении. Выберите «Direct KSeF API» как режим интеграции и соответствующую среду (Production, Demo или Test — ту же, в которой вы сгенерировали токен). Вставьте токен в поле «KSeF Authorization Token», введите NIP и нажмите «Save Settings».",
+                "screenshot": {
+                  "src": "/guide/ksef/get-tokens/ksef-6.png",
+                  "alt": "Страница настроек KSeF в eKsięgowy AI",
+                  "caption": "Страница /ksef/settings — введите токен и NIP, затем нажмите Save Settings.",
+                  "placeholderHint": "Скриншот нашей страницы /ksef/settings с выбранным Direct KSeF API, выпадающим списком сред и полями Token и NIP."
+                }
+              }
+            ],
+            "callouts": {
+              "tokenOnce": {
+                "variant": "warning",
+                "title": "Токен показывается только один раз",
+                "body": "Если вы его потеряете, необходимо сгенерировать новый. Храните его в менеджере паролей или в общем хранилище секретов вашей команды."
+              },
+              "testFirst": {
+                "variant": "tip",
+                "title": "Сначала используйте тестовую среду",
+                "body": "Сгенерируйте токен в тестовой среде KSeF, убедитесь, что он работает в eKsięgowy AI, затем повторите процесс для продакшна."
+              }
+            },
+            "links": {
+              "title": "Полезные ссылки",
+              "officialPortal": { "label": "Приложение налогоплательщика KSeF — продакшн", "href": "https://ap.ksef.mf.gov.pl/web/" },
+              "demoPortal": { "label": "Приложение налогоплательщика KSeF — демо", "href": "https://ap-demo.ksef.mf.gov.pl/web/" },
+              "testPortal": { "label": "Приложение налогоплательщика KSeF — тест", "href": "https://ap-test.ksef.mf.gov.pl/web/" },
+              "officialDocs": { "label": "Официальная документация KSeF (Министерство финансов)", "href": "https://www.podatki.gov.pl/ksef/" },
+              "appSettings": { "label": "Открыть настройки KSeF в eKsięgowy AI", "href": "/ksef/settings" }
+            }
+          }
+        }
+      }
+    }
+  },
   "help": {
     "title": "Справка",
     "searchPlaceholder": "Поиск по справке...",

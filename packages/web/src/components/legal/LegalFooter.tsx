@@ -27,11 +27,19 @@ export function LegalFooter() {
   const { locale } = useLocale();
   const legalT = (translations[locale] as Record<string, unknown>).legal as { footer?: typeof fallback };
   const footerT: typeof fallback = legalT.footer ?? fallback;
+  const guideT = (translations[locale] as Record<string, unknown>).guide as { title?: string } | undefined;
+  const guideLabel = guideT?.title ?? 'Guide';
 
   return (
     <footer className="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 mt-auto">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6">
         <nav className="flex flex-wrap gap-x-6 gap-y-2 mb-4 justify-center">
+          <Link
+            href="/guide"
+            className="text-sm text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+          >
+            {guideLabel}
+          </Link>
           <Link
             href="/terms"
             className="text-sm text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"

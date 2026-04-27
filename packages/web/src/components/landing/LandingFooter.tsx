@@ -11,6 +11,7 @@ const translations = { en: enTranslations, pl: plTranslations, ru: ruTranslation
 export function LandingFooter() {
   const { locale } = useLocale();
   const t = translations[locale].landing.footer;
+  const guideT = translations[locale].guide;
 
   return (
     <footer className="bg-gray-50 dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
@@ -56,6 +57,14 @@ export function LandingFooter() {
                   className="text-sm text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
                 >
                   {t.links.pricing}
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/guide"
+                  className="text-sm text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                >
+                  {guideT.title}
                 </Link>
               </li>
             </ul>
