@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { useAuth, UserRole } from '@/contexts/AuthContext';
 import { LoadingScreen } from '@/components/ui/loading-screen';
+import { SystemStatusBanner } from '@/components/system/SystemStatusBanner';
 
 // ============================================
 // PROTECTED ROUTE COMPONENT
@@ -88,8 +89,13 @@ export function ProtectedRoute({
     return null;
   }
 
-  // Render children
-  return <>{children}</>;
+  // Render children with health banner above
+  return (
+    <>
+      <SystemStatusBanner />
+      {children}
+    </>
+  );
 }
 
 // ============================================
