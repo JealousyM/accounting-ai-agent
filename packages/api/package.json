@@ -30,6 +30,7 @@
     "@langchain/langgraph": "^0.2.0",
     "@langchain/openai": "^0.3.0",
     "@prisma/client": "^5.7.1",
+    "@sentry/node": "^8.55.1",
     "@types/multer": "^2.0.0",
     "@types/pdfkit": "^0.17.5",
     "axios": "^1.13.2",
