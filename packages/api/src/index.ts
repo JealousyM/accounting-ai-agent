@@ -62,9 +62,17 @@ app.use('/api', globalRateLimiter);
 // Audit log middleware (fire-and-forget, logs POST/PUT/PATCH/DELETE)
 app.use('/api', auditLogMiddleware);
 
-// Health check
-app.get('/health', (_req: Request, res: Response) => {
-  res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
+// Health check (full snapshot — used by frontend banner and uptime monitors)
+app.get('/health', async (_req: Request, res: Response) => {
+  const { healthService } = await import('./services/health');
+  const snapshot = await healthService.getSnapshot();
+  const code = snapshot.status === 'down' ? 503 : 200;
+  res.status(code).json(snapshot);
+});
+
+// Liveness probe (no dependency checks — for k8s/docker)
+app.get('/health/live', (_req: Request, res: Response) => {
+  res.status(200).json({ status: 'ok' });
 });
 
 // API routes
