@@ -674,6 +674,80 @@
             }
           }
         }
+      },
+      "wfirma": {
+        "title": "wFirma",
+        "description": "Łączenie eKsięgowy AI z Twoim kontem wFirma.",
+        "articles": {
+          "getApiCredentials": {
+            "title": "Jak uzyskać dane uwierzytelniające API wFirma",
+            "summary": "Wygeneruj dane uwierzytelniające API w wFirma i wklej je do eKsięgowy AI.",
+            "intro": "Nasza integracja z wFirma potrzebuje trzech wartości: Klucza dostępu (Access Key), Klucza tajnego (Secret Key) oraz identyfikatora firmy (Company ID). Ten przewodnik przeprowadzi Cię przez ich wygenerowanie w wFirma i podłączenie do eKsięgowy AI.",
+            "steps": [
+              {
+                "title": "Zaloguj się do wFirma",
+                "body": "Otwórz wFirma w nowej karcie i zaloguj się na swoje konto.",
+                "links": [
+                  { "label": "Logowanie do wFirma", "href": "https://wfirma.pl/login" }
+                ],
+                "screenshot": {
+                  "src": "/guide/wfirma/get-api-credentials/wfirma-0.png",
+                  "alt": "Strona logowania wFirma",
+                  "caption": "Strona logowania wFirma.",
+                  "placeholderHint": "Zrzut ekranu strony wfirma.pl/login z formularzem e-mail/hasło."
+                }
+              },
+              {
+                "title": "Dodaj nowy klucz API w wFirma",
+                "body": "Z pulpitu znajdź sekcję 'Bezpieczeństwo' w prawej kolumnie i kliknij 'Aplikacje'. W otwartym oknie przełącz się na zakładkę 'Klucze API' i kliknij '+Dodaj', aby utworzyć nowy klucz API. Nadaj mu rozpoznawalną nazwę (na przykład 'eKsiegowyAI').",
+                "screenshot": {
+                  "src": "/guide/wfirma/get-api-credentials/wfirma-1.png",
+                  "alt": "Okno Aplikacje wFirma z zakładką Klucze API i przyciskiem Dodaj",
+                  "caption": "Aplikacje → Klucze API → +Dodaj. Pulpit wFirma pokazuje link Aplikacje w prawej kolumnie; okno wyświetla listę istniejących kluczy z przyciskiem '+Dodaj' do tworzenia nowego.",
+                  "placeholderHint": "Zrzut ekranu pulpitu wFirma z podświetlonym linkiem Aplikacje oraz zakładką Klucze API otwartego okna Bezpieczeństwo z przyciskiem +Dodaj."
+                }
+              },
+              {
+                "title": "Skopiuj Access Key i Secret Key",
+                "body": "Po utworzeniu nowy wpis pojawia się w tabeli z kolumnami Access key i Secret key. Skopiuj obie wartości — wkleisz je do eKsięgowy AI w ostatnim kroku."
+              },
+              {
+                "title": "Znajdź swój Company ID",
+                "body": "Wróć do pulpitu wFirma. Twój Company ID jest wyświetlany obok 'Moja firma' w nagłówku — to identyfikator numeryczny.",
+                "screenshot": {
+                  "src": "/guide/wfirma/get-api-credentials/wfirma-2.png",
+                  "alt": "Nagłówek Moja firma w wFirma z Company ID",
+                  "caption": "Company ID jest wyświetlany obok 'Moja firma' w nagłówku pulpitu.",
+                  "placeholderHint": "Zrzut ekranu pulpitu wFirma z podświetlonym nagłówkiem 'Moja firma (ID: ...)'."
+                }
+              },
+              {
+                "title": "Wklej dane do eKsięgowy AI",
+                "body": "W naszej aplikacji kliknij awatar profilu w prawym górnym rogu i wybierz 'API Credentials'. W sekcji wFirma Integration wklej Access Key, Secret Key i Company ID, a następnie kliknij 'Save'. eKsięgowy AI zweryfikuje dane uwierzytelniające w wFirma.",
+                "screenshot": {
+                  "src": "/guide/wfirma/get-api-credentials/wfirma-3.png",
+                  "alt": "Okno API Credentials w eKsięgowy AI z sekcją wFirma Integration",
+                  "caption": "Nasze okno API Credentials na /profile — wklej Access Key, Secret Key i Company ID, następnie kliknij Save.",
+                  "placeholderHint": "Zrzut ekranu naszego okna API Credentials z sekcją wFirma Integration zawierającą pola Access Key, Secret Key i Company ID."
+                }
+              }
+            ],
+            "callouts": {
+              "secretSafety": {
+                "variant": "warning",
+                "title": "Chroń swój Klucz tajny",
+                "body": "Klucz tajny (Secret Key) daje pełny dostęp API do Twojego konta wFirma. Traktuj go jak hasło — nigdy go nie udostępniaj, nie publikuj na czacie ani nie wgrywaj do repozytorium."
+              }
+            },
+            "links": {
+              "title": "Przydatne linki",
+              "wfirma": { "label": "wFirma", "href": "https://wfirma.pl" },
+              "wfirmaSignIn": { "label": "Logowanie do wFirma", "href": "https://wfirma.pl/login" },
+              "wfirmaApiDocs": { "label": "Dokumentacja API wFirma", "href": "https://doc.wfirma.pl" },
+              "appCredentials": { "label": "Otwórz Dane uwierzytelniające API w eKsięgowy AI", "href": "/profile" }
+            }
+          }
+        }
       }
     }
   },
