@@ -33,6 +33,7 @@ import { errorHandler, notFoundHandler } from './middleware/error-handler.middle
 import { logger } from './utils/logger';
 import { seedHelpTopicsIfEmpty } from './services/help-seed.service';
 import { ksefStatusPoller } from './services/ksef';
+import { healthMonitorService } from './services/health';
 
 const app: Application = express();
 const PORT = process.env.PORT || 3011;
@@ -156,6 +157,9 @@ const server = app.listen(PORT, async () => {
   // Start KSeF status poller for background invoice status updates
   ksefStatusPoller.start();
 
+  // Start health monitor (periodic dependency snapshot + alerting)
+  healthMonitorService.start();
+
   // Start Telegram chatbot
   if (telegramBotService.isInitialized()) {
     const webhookUrl = process.env.TELEGRAM_WEBHOOK_URL;
@@ -181,6 +185,7 @@ const server = app.listen(PORT, async () => {
 const shutdown = () => {
   logger.info('Shutting down gracefully...');
   ksefStatusPoller.stop();
+  healthMonitorService.stop();
   telegramBotService.stop();
   server.close(() => {
     logger.info('Server closed');
