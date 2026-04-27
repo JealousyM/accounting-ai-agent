@@ -53,7 +53,7 @@ export default function GetApiCredentialsPage() {
                 placeholderHint={step.screenshot.placeholderHint}
               />
             )}
-            {i === 3 && (
+            {i === 2 && (
               <GuideCallout
                 variant={article.callouts.secretSafety.variant as 'info' | 'warning' | 'tip'}
                 title={article.callouts.secretSafety.title}

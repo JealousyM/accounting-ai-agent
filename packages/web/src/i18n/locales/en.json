@@ -698,51 +698,37 @@
                 }
               },
               {
-                "title": "Open API settings",
-                "body": "Click the settings icon and navigate to Ustawienia → Aplikacje → API. The exact label may vary by wFirma plan.",
+                "title": "Add a new API key in wFirma",
+                "body": "From the dashboard, find the Bezpieczeństwo section in the right column and click 'Aplikacje'. In the modal that opens, switch to the 'Klucze API' tab and click '+Dodaj' to create a new API key. Give it a recognizable name (for example, 'eKsiegowyAI').",
                 "screenshot": {
                   "src": "/guide/wfirma/get-api-credentials/wfirma-1.png",
-                  "alt": "wFirma settings menu with API option",
-                  "caption": "Navigate to API settings in wFirma.",
-                  "placeholderHint": "Screenshot of the wFirma settings sidebar with 'Aplikacje' or 'API' menu visible."
+                  "alt": "wFirma Aplikacje modal with Klucze API tab and Dodaj button",
+                  "caption": "Aplikacje → Klucze API → +Dodaj. The wFirma dashboard shows the Aplikacje link in the right column; the modal lists existing keys and the '+Dodaj' button creates a new one.",
+                  "placeholderHint": "Screenshot of the wFirma dashboard with the Aplikacje link highlighted and the Klucze API tab of the Bezpieczeństwo modal showing the +Dodaj button."
                 }
               },
               {
-                "title": "Enable API access",
-                "body": "Toggle on API access for your company. wFirma may ask you to accept the API terms (regulamin)."
-              },
-              {
-                "title": "Copy your Access Key and Secret Key",
-                "body": "wFirma displays both keys after enabling API access. Copy each — you will paste them into eKsięgowy AI in the last step."
+                "title": "Copy Access Key and Secret Key",
+                "body": "After creation, the new entry appears in the table with Access key and Secret key columns. Copy both values — you will paste them into eKsięgowy AI in the last step."
               },
               {
                 "title": "Find your Company ID",
-                "body": "The Company ID is the numeric identifier of your wFirma company. You can usually see it in the URL while working in wFirma (e.g. wfirma.pl/firma/{companyId}/...) or in Ustawienia → Firma → Dane firmy.",
+                "body": "Return to the wFirma dashboard. Your Company ID is shown next to 'Moja firma' at the top of the page — it is a numeric identifier.",
                 "screenshot": {
-                  "src": "/guide/wfirma/get-api-credentials/wfirma-4.png",
-                  "alt": "wFirma Company ID location",
-                  "caption": "Where to find your wFirma Company ID.",
-                  "placeholderHint": "Screenshot of the wFirma URL bar with the company ID highlighted, or the company info screen showing the numeric ID."
+                  "src": "/guide/wfirma/get-api-credentials/wfirma-2.png",
+                  "alt": "wFirma Moja firma header showing Company ID",
+                  "caption": "The Company ID is shown next to 'Moja firma' in the dashboard header.",
+                  "placeholderHint": "Screenshot of the wFirma dashboard with the 'Moja firma (ID: ...)' header highlighted."
                 }
               },
               {
-                "title": "Open API Credentials in eKsięgowy AI",
-                "body": "In our app, click your profile avatar in the top-right and choose 'API Credentials' to open the credentials modal.",
+                "title": "Paste credentials into eKsięgowy AI",
+                "body": "In our app, click your profile avatar in the top-right and choose 'API Credentials'. In the wFirma Integration section, paste your Access Key, Secret Key, and Company ID, then click 'Save'. eKsięgowy AI will validate the credentials against wFirma.",
                 "screenshot": {
-                  "src": "/guide/wfirma/get-api-credentials/wfirma-5.png",
-                  "alt": "API Credentials menu item in eKsięgowy AI",
-                  "caption": "Profile menu → API Credentials.",
-                  "placeholderHint": "Screenshot of the eKsięgowy AI profile dropdown with 'API Credentials' highlighted."
-                }
-              },
-              {
-                "title": "Paste credentials and save",
-                "body": "In the wFirma section of the modal, paste your Access Key, Secret Key, and Company ID, then click Save. eKsięgowy AI will validate the credentials against wFirma — you'll see a confirmation when successful.",
-                "screenshot": {
-                  "src": "/guide/wfirma/get-api-credentials/wfirma-6.png",
-                  "alt": "Filled-in wFirma credentials in eKsięgowy AI",
-                  "caption": "Paste all three values and click Save.",
-                  "placeholderHint": "Screenshot of the API Credentials modal with the wFirma section filled in (Access Key, Secret Key, Company ID)."
+                  "src": "/guide/wfirma/get-api-credentials/wfirma-3.png",
+                  "alt": "API Credentials modal in eKsięgowy AI with wFirma Integration section",
+                  "caption": "Our /profile API Credentials modal — paste Access Key, Secret Key, and Company ID, then click Save.",
+                  "placeholderHint": "Screenshot of our API Credentials modal with the wFirma Integration section showing Access Key, Secret Key, and Company ID inputs."
                 }
               }
             ],
