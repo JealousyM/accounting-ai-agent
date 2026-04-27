@@ -65,4 +65,16 @@ export class HealthService {
       'anthropic-version': '2023-06-01',
     });
   }
+
+  private async checkWfirma(): Promise<CheckResult> {
+    const apiKey = process.env.WFIRMA_HEALTH_API_KEY;
+    const companyId = process.env.WFIRMA_HEALTH_COMPANY_ID;
+    if (!apiKey || !companyId) {
+      return { ok: true, latencyMs: 0, error: 'not configured' };
+    }
+    // Lightweight probe: list companies (read-only, covered by subscription, no per-call cost).
+    return this.probeWithTimeout(`https://api2.wfirma.pl/companies/find?inputFormat=json&company_id=${companyId}`, {
+      Authorization: `Bearer ${apiKey}`,
+    });
+  }
 }

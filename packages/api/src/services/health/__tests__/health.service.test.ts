@@ -127,4 +127,35 @@ describe('HealthService', () => {
       expect(result.ok).toBe(false);
     });
   });
+
+  describe('checkWfirma', () => {
+    const fetchMock = jest.fn();
+    beforeAll(() => { (global as any).fetch = fetchMock; });
+    beforeEach(() => fetchMock.mockReset());
+
+    it('returns ok=true with "not configured" when WFIRMA_HEALTH_* missing', async () => {
+      delete process.env.WFIRMA_HEALTH_API_KEY;
+      delete process.env.WFIRMA_HEALTH_COMPANY_ID;
+      const result = await service['checkWfirma']();
+      expect(result.ok).toBe(true);
+      expect(result.error).toBe('not configured');
+      expect(fetchMock).not.toHaveBeenCalled();
+    });
+
+    it('returns ok=true on 2xx response', async () => {
+      process.env.WFIRMA_HEALTH_API_KEY = 'k';
+      process.env.WFIRMA_HEALTH_COMPANY_ID = 'c';
+      fetchMock.mockResolvedValueOnce({ ok: true } as Response);
+      const result = await service['checkWfirma']();
+      expect(result.ok).toBe(true);
+    });
+
+    it('returns ok=false on network error', async () => {
+      process.env.WFIRMA_HEALTH_API_KEY = 'k';
+      process.env.WFIRMA_HEALTH_COMPANY_ID = 'c';
+      fetchMock.mockRejectedValueOnce(new Error('ENOTFOUND'));
+      const result = await service['checkWfirma']();
+      expect(result.ok).toBe(false);
+    });
+  });
 });
