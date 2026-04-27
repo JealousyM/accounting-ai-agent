@@ -45,12 +45,14 @@ export default function GetApiCredentialsPage() {
                 ))}
               </ul>
             )}
-            <GuideScreenshot
-              src={step.screenshot.src}
-              alt={step.screenshot.alt}
-              caption={step.screenshot.caption}
-              placeholderHint={step.screenshot.placeholderHint}
-            />
+            {step.screenshot && (
+              <GuideScreenshot
+                src={step.screenshot.src}
+                alt={step.screenshot.alt}
+                caption={step.screenshot.caption}
+                placeholderHint={step.screenshot.placeholderHint}
+              />
+            )}
             {i === 3 && (
               <GuideCallout
                 variant={article.callouts.secretSafety.variant as 'info' | 'warning' | 'tip'}

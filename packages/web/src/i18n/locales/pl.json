@@ -709,23 +709,11 @@
               },
               {
                 "title": "Włącz dostęp do API",
-                "body": "Włącz przełącznik dostępu do API dla Twojej firmy. wFirma może poprosić o zaakceptowanie regulaminu API.",
-                "screenshot": {
-                  "src": "/guide/wfirma/get-api-credentials/wfirma-2.png",
-                  "alt": "Przełącznik dostępu API w wFirma",
-                  "caption": "Włącz dostęp do API dla swojej firmy.",
-                  "placeholderHint": "Zrzut ekranu przełącznika włączania API na stronie ustawień API w wFirma."
-                }
+                "body": "Włącz przełącznik dostępu do API dla Twojej firmy. wFirma może poprosić o zaakceptowanie regulaminu API."
               },
               {
                 "title": "Skopiuj Klucz dostępu i Klucz tajny",
-                "body": "Po włączeniu dostępu do API wFirma wyświetla oba klucze. Skopiuj każdy z nich — wkleisz je do eKsięgowy AI w ostatnim kroku.",
-                "screenshot": {
-                  "src": "/guide/wfirma/get-api-credentials/wfirma-3.png",
-                  "alt": "Wyświetlone klucze API wFirma",
-                  "caption": "Klucz dostępu (Access Key) i Klucz tajny (Secret Key) w panelu API wFirma.",
-                  "placeholderHint": "Zrzut ekranu strony API wFirma pokazujący Klucz dostępu i Klucz tajny z przyciskami kopiowania."
-                }
+                "body": "Po włączeniu dostępu do API wFirma wyświetla oba klucze. Skopiuj każdy z nich — wkleisz je do eKsięgowy AI w ostatnim kroku."
               },
               {
                 "title": "Znajdź identyfikator firmy (Company ID)",
