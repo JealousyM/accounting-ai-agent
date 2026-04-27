@@ -449,7 +449,7 @@ describe('integration probes — cost-free guarantee', () => {
   });
 
   it('aborts after 5s timeout', async () => {
-    process.env.OPENAI_API_KEY = 'sk-test';
+    process.env.OPENAI_API_KEY = 'sk-test'; // explicit reset — earlier tests may have deleted it
     fetchMock.mockImplementationOnce((_url, opts: any) =>
       new Promise((_resolve, reject) => {
         opts.signal.addEventListener('abort', () => reject(new Error('aborted')));
@@ -696,8 +696,9 @@ describe('getSnapshot', () => {
   it('production mode strips error messages from CheckResult', async () => {
     const oldEnv = process.env.NODE_ENV;
     process.env.NODE_ENV = 'production';
+    const fresh = new HealthService(); // avoid cache contamination from prior tests in this describe
     mockedPrisma.$queryRaw.mockRejectedValueOnce(new Error('secret stack trace'));
-    const snap = await service.getSnapshot();
+    const snap = await fresh.getSnapshot({ skipIntegrations: true });
     expect(snap.checks.db.error).toBeUndefined();
     expect(snap.checks.db.ok).toBe(false);
     process.env.NODE_ENV = oldEnv;
@@ -914,7 +915,8 @@ export function initSentry(): void {
     integrations: [
       Sentry.httpIntegration(),
       Sentry.expressIntegration(),
-      Sentry.prismaIntegration(),
+      // Sentry.prismaIntegration() — uncomment if available in installed @sentry/node version.
+      // Some v8 minor releases relocate it; if TS errors with "not exported", drop this line.
     ],
     beforeSend(event) {
       if (event.request?.headers) {
@@ -2009,7 +2011,7 @@ In `packages/web/playwright.config.ts` (or the closest equivalent), add `NEXT_PU
 cd packages/web && npx playwright test tests/e2e/system/availability-banner.spec.ts
 ```
 
-Expected: 2 passing. (May require auth-helper updates if the project uses storageState; in that case, follow existing E2E patterns in `tests/e2e/auth/`.)
+Expected: 2 passing. (May require auth-helper updates if the project uses storageState; follow the login pattern from existing specs such as `packages/web/tests/e2e/admin/dashboard.spec.ts` or `packages/web/tests/e2e/auth/`.)
 
 - [ ] **Step 4: Commit**
 
