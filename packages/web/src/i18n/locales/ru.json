@@ -692,7 +692,7 @@
                 ],
                 "screenshot": {
                   "src": "/guide/wfirma/get-api-credentials/wfirma-0.png",
-                  "alt": "wFirma sign-in page",
+                  "alt": "Страница входа в wFirma",
                   "caption": "Страница входа wFirma.",
                   "placeholderHint": "Скриншот страницы wfirma.pl/login с формой e-mail/пароль."
                 }
@@ -702,7 +702,7 @@
                 "body": "Нажмите на иконку настроек и перейдите по пути «Ustawienia» → «Aplikacje» → «API». Точное название может отличаться в зависимости от тарифа wFirma.",
                 "screenshot": {
                   "src": "/guide/wfirma/get-api-credentials/wfirma-1.png",
-                  "alt": "wFirma settings menu with API option",
+                  "alt": "Меню настроек wFirma с опцией API",
                   "caption": "Перейдите к настройкам API в wFirma.",
                   "placeholderHint": "Скриншот бокового меню настроек wFirma с видимым пунктом «Aplikacje» или «API»."
                 }
@@ -712,7 +712,7 @@
                 "body": "Включите переключатель доступа к API для вашей компании. wFirma может попросить принять регламент API («regulamin»).",
                 "screenshot": {
                   "src": "/guide/wfirma/get-api-credentials/wfirma-2.png",
-                  "alt": "wFirma API access toggle",
+                  "alt": "Переключатель доступа к API в wFirma",
                   "caption": "Включите доступ к API для своей компании.",
                   "placeholderHint": "Скриншот переключателя включения API на странице настроек API в wFirma."
                 }
@@ -722,7 +722,7 @@
                 "body": "После включения доступа к API wFirma показывает оба ключа. Скопируйте каждый — на последнем шаге вы вставите их в eKsięgowy AI.",
                 "screenshot": {
                   "src": "/guide/wfirma/get-api-credentials/wfirma-3.png",
-                  "alt": "wFirma API keys displayed",
+                  "alt": "Отображённые ключи API wFirma",
                   "caption": "Access Key и Secret Key в панели API wFirma.",
                   "placeholderHint": "Скриншот страницы API wFirma с Access Key и Secret Key и кнопками копирования."
                 }
@@ -732,7 +732,7 @@
                 "body": "Company ID — это числовой идентификатор вашей компании в wFirma. Обычно его видно в URL во время работы в wFirma (например, wfirma.pl/firma/{companyId}/...) или в разделе «Ustawienia» → «Firma» → «Dane firmy».",
                 "screenshot": {
                   "src": "/guide/wfirma/get-api-credentials/wfirma-4.png",
-                  "alt": "wFirma Company ID location",
+                  "alt": "Расположение Company ID в wFirma",
                   "caption": "Где найти Company ID в wFirma.",
                   "placeholderHint": "Скриншот адресной строки wFirma с подсвеченным Company ID или экрана данных компании с числовым ID."
                 }
@@ -742,7 +742,7 @@
                 "body": "В нашем приложении нажмите на аватар профиля в правом верхнем углу и выберите «API Credentials», чтобы открыть модальное окно с учётными данными.",
                 "screenshot": {
                   "src": "/guide/wfirma/get-api-credentials/wfirma-5.png",
-                  "alt": "API Credentials menu item in eKsięgowy AI",
+                  "alt": "Пункт меню API Credentials в eKsięgowy AI",
                   "caption": "Меню профиля → API Credentials.",
                   "placeholderHint": "Скриншот выпадающего меню профиля eKsięgowy AI с выделенным пунктом «API Credentials»."
                 }
@@ -752,7 +752,7 @@
                 "body": "В секции wFirma модального окна вставьте Access Key, Secret Key и Company ID, затем нажмите «Сохранить». eKsięgowy AI проверит учётные данные в wFirma — при успехе вы увидите подтверждение.",
                 "screenshot": {
                   "src": "/guide/wfirma/get-api-credentials/wfirma-6.png",
-                  "alt": "Filled-in wFirma credentials in eKsięgowy AI",
+                  "alt": "Заполненные данные wFirma в eKsięgowy AI",
                   "caption": "Вставьте все три значения и нажмите «Сохранить».",
                   "placeholderHint": "Скриншот модального окна API Credentials с заполненной секцией wFirma (Access Key, Secret Key, Company ID)."
                 }
