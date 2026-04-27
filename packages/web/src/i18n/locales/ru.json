@@ -709,23 +709,11 @@
               },
               {
                 "title": "Включите доступ к API",
-                "body": "Включите переключатель доступа к API для вашей компании. wFirma может попросить принять регламент API («regulamin»).",
-                "screenshot": {
-                  "src": "/guide/wfirma/get-api-credentials/wfirma-2.png",
-                  "alt": "Переключатель доступа к API в wFirma",
-                  "caption": "Включите доступ к API для своей компании.",
-                  "placeholderHint": "Скриншот переключателя включения API на странице настроек API в wFirma."
-                }
+                "body": "Включите переключатель доступа к API для вашей компании. wFirma может попросить принять регламент API («regulamin»)."
               },
               {
                 "title": "Скопируйте Access Key и Secret Key",
-                "body": "После включения доступа к API wFirma показывает оба ключа. Скопируйте каждый — на последнем шаге вы вставите их в eKsięgowy AI.",
-                "screenshot": {
-                  "src": "/guide/wfirma/get-api-credentials/wfirma-3.png",
-                  "alt": "Отображённые ключи API wFirma",
-                  "caption": "Access Key и Secret Key в панели API wFirma.",
-                  "placeholderHint": "Скриншот страницы API wFirma с Access Key и Secret Key и кнопками копирования."
-                }
+                "body": "После включения доступа к API wFirma показывает оба ключа. Скопируйте каждый — на последнем шаге вы вставите их в eKsięgowy AI."
               },
               {
                 "title": "Найдите Company ID",

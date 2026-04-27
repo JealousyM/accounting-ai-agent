@@ -709,23 +709,11 @@
               },
               {
                 "title": "Enable API access",
-                "body": "Toggle on API access for your company. wFirma may ask you to accept the API terms (regulamin).",
-                "screenshot": {
-                  "src": "/guide/wfirma/get-api-credentials/wfirma-2.png",
-                  "alt": "wFirma API access toggle",
-                  "caption": "Enable API access for your company.",
-                  "placeholderHint": "Screenshot of the API enable toggle on the wFirma API settings page."
-                }
+                "body": "Toggle on API access for your company. wFirma may ask you to accept the API terms (regulamin)."
               },
               {
                 "title": "Copy your Access Key and Secret Key",
-                "body": "wFirma displays both keys after enabling API access. Copy each — you will paste them into eKsięgowy AI in the last step.",
-                "screenshot": {
-                  "src": "/guide/wfirma/get-api-credentials/wfirma-3.png",
-                  "alt": "wFirma API keys displayed",
-                  "caption": "Access Key and Secret Key in the wFirma API panel.",
-                  "placeholderHint": "Screenshot of the wFirma API page showing the Access Key and Secret Key with copy buttons."
-                }
+                "body": "wFirma displays both keys after enabling API access. Copy each — you will paste them into eKsięgowy AI in the last step."
               },
               {
                 "title": "Find your Company ID",
