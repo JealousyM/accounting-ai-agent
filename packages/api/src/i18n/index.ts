@@ -869,8 +869,42 @@ export interface CommonTranslations {
   subscriptionRequired: string;
 }
 
+export interface OcrTranslations {
+  // Bot status
+  recognizing: string;
+  recognizeFailed: string;
+  // Card
+  title: string;
+  field: string;
+  value: string;
+  documentType: string;
+  documentTypeValues: {
+    paragon: string;
+    faktura: string;
+    rachunek: string;
+    unknown: string;
+  };
+  sellerName: string;
+  sellerNip: string;
+  sellerAddress: string;
+  documentNumber: string;
+  issueDate: string;
+  totalNet: string;
+  totalVat: string;
+  totalGross: string;
+  confidence: string;
+  itemsTitle: string;
+  itemName: string;
+  itemQuantity: string;
+  itemVatRate: string;
+  itemTotal: string;
+  notes: string;
+  confirmHint: string;
+}
+
 export interface Translations {
   common: CommonTranslations;
+  ocr: OcrTranslations;
   contractor: ContractorTranslations;
   invoice: InvoiceTranslations;
   company: CompanyTranslations;
@@ -952,6 +986,10 @@ export function getKSeFTranslations(locale: Locale = 'pl'): KSeFTranslations {
 
 export function getCommonTranslations(locale: Locale = 'pl'): CommonTranslations {
   return getTranslations(locale).common;
+}
+
+export function getOcrTranslations(locale: Locale = 'pl'): OcrTranslations {
+  return getTranslations(locale).ocr;
 }
 
 export function getTaxCalendarTranslations(locale: Locale = 'pl'): TaxCalendarTranslations {
