@@ -115,7 +115,7 @@ export interface KrsData {
 
 export interface PublicRegistryData {
   nip: string;
-  /** Full legal name from Biała Lista (subject.name) */
+  /** Full legal name. Prefers GUS over Biała Lista (GUS covers more entities). */
   name?: string;
   regon?: string;
   krs?: string;
@@ -126,6 +126,12 @@ export interface PublicRegistryData {
   workingAddress?: string;
   /** Residence address (residenceAddress) — single-string form from MF */
   residenceAddress?: string;
+  /** Structured street/city/zip from GUS BIR1.1 (preferred when present) */
+  street?: string;
+  city?: string;
+  zip?: string;
+  /** GUS entity type: 'P' legal person | 'F' sole prop | 'LP'/'LF' branches */
+  entityType?: 'P' | 'F' | 'LP' | 'LF';
   krsData?: KrsData;
 }
 
