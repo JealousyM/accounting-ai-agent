@@ -66,9 +66,8 @@ REDIS_URL=redis://localhost:6379
 JWT_SECRET=your-jwt-secret-min-32-characters
 REFRESH_TOKEN_SECRET=your-refresh-secret-min-32-characters
 
-# AI Providers (at least one required)
+# AI Provider (required)
 OPENAI_API_KEY=sk-...
-ANTHROPIC_API_KEY=sk-ant-...
 
 # wFirma Integration (optional)
 WFIRMA_ACCESS_KEY=your-access-key

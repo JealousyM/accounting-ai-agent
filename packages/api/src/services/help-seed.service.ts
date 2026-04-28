@@ -1573,6 +1573,414 @@ Telegram-бот позволяет использовать AI-ассистен�
     order: 3,
     isFeatured: false,
   },
+  {
+    slug: 'ai-chat-receipt-ocr-telegram',
+    category: 'aiChat',
+    titlePl: 'Skanowanie paragonów w bocie Telegram',
+    titleEn: 'Receipt scanning in the Telegram bot',
+    titleRu: 'Сканирование чеков в Telegram-боте',
+    contentPl: `Wyślij zdjęcie paragonu lub faktury do bota Telegram, a otrzymasz w odpowiedzi rozpoznane dane gotowe do wprowadzenia do księgowości.
+
+## Jak używać
+
+1. Połącz konto Telegram z aplikacją (zobacz "Bot Telegram")
+2. Zrób zdjęcie paragonu / faktury telefonem
+3. Wyślij zdjęcie do bota — bez tekstu
+4. Po kilku sekundach bot odpowie tabelką z rozpoznanymi danymi
+
+## Co bot rozpozna
+
+- **Sprzedawca:** nazwa firmy
+- **NIP sprzedawcy:** 10 cyfr (bez kresek)
+- **Adres** sprzedawcy (jeśli widoczny)
+- **Numer dokumentu**
+- **Data wystawienia** (format YYYY-MM-DD)
+- **Kwoty:** netto, VAT, brutto + waluta (domyślnie PLN)
+- **Pozycje:** nazwa, ilość, stawka VAT, kwota — jeśli czytelne na zdjęciu
+- **Typ dokumentu:** paragon / faktura VAT / rachunek
+- **Pewność rozpoznania** w procentach
+
+## Wskazówki dla najlepszej jakości zdjęcia
+
+- Dobre oświetlenie, bez cieni i odblasków
+- Cały dokument w kadrze, nie ucinaj brzegów
+- Bez rozmycia — telefon nieruchomo, papier płasko
+- Polskie znaki (ą, ć, ę, ł, ń, ó, ś, ź, ż) są obsługiwane
+
+## Co dalej
+
+Sprawdź kwoty na karcie. Jeśli wszystko się zgadza, przepisz dane do wFirmy ręcznie albo poproś AI w czacie o utworzenie wydatku.
+
+## Język odpowiedzi
+
+Bot dopasowuje język karty do ustawień Twojego klienta Telegram (PL / EN / RU). Sama logika rozpoznania jest niezależna od języka.
+
+## Technologia
+
+Rozpoznanie wykorzystuje **GPT-4o Vision** (OpenAI). Koszt jednego zdjęcia jest minimalny i mieści się w Twoim limicie subskrypcji.`,
+    contentEn: `Send a photo of a receipt (paragon) or VAT invoice (faktura) to the Telegram bot and you'll get back the extracted data ready to enter into your accounting.
+
+## How to use
+
+1. Link your Telegram account to the app (see "Telegram Bot")
+2. Take a photo of the receipt / invoice with your phone
+3. Send the photo to the bot — no text needed
+4. Within a few seconds the bot replies with a card containing the recognized data
+
+## What the bot extracts
+
+- **Seller:** company name
+- **Seller NIP:** 10 digits, no dashes
+- **Seller address** (when visible)
+- **Document number**
+- **Issue date** (YYYY-MM-DD format)
+- **Amounts:** net, VAT, gross + currency (defaults to PLN)
+- **Line items:** name, quantity, VAT rate, amount — when readable on the photo
+- **Document type:** paragon / faktura VAT / rachunek
+- **Recognition confidence** as a percentage
+
+## Tips for the best photo quality
+
+- Good lighting, no shadows or glare
+- Whole document in frame, don't cut the edges
+- No blur — hold phone steady, keep paper flat
+- Polish letters (ą, ć, ę, ł, ń, ó, ś, ź, ż) are supported
+
+## What's next
+
+Verify the amounts on the card. If everything looks right, copy the data into wFirma manually, or ask the AI in chat to log the expense.
+
+## Reply language
+
+The bot picks the card language from your Telegram client's settings (PL / EN / RU). The recognition logic itself is language-independent.
+
+## Technology
+
+Recognition uses **GPT-4o Vision** (OpenAI). The cost per photo is minimal and fits within your subscription quota.`,
+    contentRu: `Отправь фотографию чека (paragon) или счёта-фактуры (faktura) в Telegram-бот — получишь распознанные данные, готовые к занесению в бухгалтерию.
+
+## Как пользоваться
+
+1. Привяжи аккаунт Telegram к приложению (см. "Telegram-бот")
+2. Сфотографируй чек / счёт телефоном
+3. Отправь фото боту — без текста
+4. Через несколько секунд бот ответит карточкой с распознанными данными
+
+## Что бот распознаёт
+
+- **Продавец:** название компании
+- **NIP продавца:** 10 цифр (без дефисов)
+- **Адрес** продавца (если виден)
+- **Номер документа**
+- **Дата выставления** (формат YYYY-MM-DD)
+- **Суммы:** нетто, НДС, брутто + валюта (по умолчанию PLN)
+- **Позиции:** название, количество, ставка НДС, сумма — если читаемы
+- **Тип документа:** paragon / faktura VAT / rachunek
+- **Уверенность распознавания** в процентах
+
+## Советы для лучшего качества фото
+
+- Хорошее освещение, без теней и бликов
+- Весь документ в кадре, не обрезай края
+- Без размытия — держи телефон неподвижно, бумагу ровно
+- Польские буквы (ą, ć, ę, ł, ń, ó, ś, ź, ż) поддерживаются
+
+## Что дальше
+
+Проверь суммы на карточке. Если всё верно — перенеси данные в wFirma вручную или попроси AI в чате занести расход.
+
+## Язык ответа
+
+Бот подбирает язык карточки по настройкам твоего Telegram-клиента (PL / EN / RU). Сама логика распознавания от языка не зависит.
+
+## Технология
+
+Распознавание использует **GPT-4o Vision** (OpenAI). Стоимость одного фото минимальна и укладывается в лимит твоей подписки.`,
+    searchKeywordsPl: ['ocr', 'paragon', 'skan', 'zdjęcie', 'faktura', 'telegram', 'rozpoznawanie', 'wydatek', 'foto'],
+    searchKeywordsEn: ['ocr', 'paragon', 'receipt', 'photo', 'scan', 'invoice', 'telegram', 'recognition', 'expense'],
+    searchKeywordsRu: ['ocr', 'чек', 'скан', 'фото', 'снимок', 'счёт', 'телеграм', 'распознавание', 'расход'],
+    order: 4,
+    isFeatured: true,
+  },
+  {
+    slug: 'wfirma-biala-lista-vat',
+    category: 'wfirma',
+    titlePl: 'Biała Lista MF — weryfikacja rachunków VAT',
+    titleEn: 'White List MF — VAT bank account verification',
+    titleRu: 'Biała Lista МФ — проверка банковских счетов VAT',
+    contentPl: `Asystent AI sprawdza rachunki bankowe kontrahentów na oficjalnej **Białej Liście podatników VAT** Ministerstwa Finansów. Jest to obowiązek prawny przy płatnościach od 15 000 PLN.
+
+## Dlaczego to ważne
+
+Polskie prawo (art. 117ba Ordynacji podatkowej + art. 19 Prawa przedsiębiorców) wymaga weryfikacji każdej pojedynczej płatności **≥ 15 000 PLN** na Białej Liście. Zapłata na nieujęty rachunek powoduje:
+
+- ❌ Wyłączenie kosztu z **KUP** (kosztów uzyskania przychodu)
+- ❌ Solidarną odpowiedzialność w **VAT** za podatek niezapłacony przez sprzedawcę
+
+## Jak korzystać
+
+### Sprawdzenie ręczne
+
+> "Sprawdź rachunek PL12 1140 ... dla NIP 5260205428"
+
+Asystent zwróci kartę z wynikiem:
+- ✅ **ZGODNE** — rachunek jest na Białej Liście dla tego NIP
+- ⚠️ **NIEZGODNE** — rachunek **NIE** jest na Białej Liście — nie wykonuj przelewu
+
+W każdym przypadku karta zawiera **identyfikator zapytania MF** — to oficjalny dowód weryfikacji, który należy zachować.
+
+### Automatyczna kontrola przy płatnościach
+
+Gdy poprosisz asystenta o zarejestrowanie płatności **≥ 15 000 PLN**, AI **automatycznie** sprawdzi rachunek odbiorcy przed zapisaniem operacji. Nie musisz prosić — to zachowanie wbudowane w prompt systemowy.
+
+## Format danych
+
+- **NIP** — 10 cyfr, możesz wpisać z kreskami lub bez
+- **Numer rachunku** — 26 cyfr w formacie NRB, z prefiksem PL i spacjami lub bez (asystent normalizuje sam)
+- **Data sprawdzenia** — domyślnie dziś; możesz podać planowaną datę płatności
+
+## Cache i wydajność
+
+Wyniki są cache'owane na 24 godziny dla pary (NIP, rachunek, data). Powtórne sprawdzenie tego samego rachunku tego samego dnia jest darmowe.
+
+## Awaria API MF
+
+Jeśli API MF jest niedostępne, asystent zwróci zapisaną wcześniej odpowiedź (jeśli istnieje) lub jasno poinformuje o niemożności weryfikacji. Nie pomijaj tego ostrzeżenia przy dużych płatnościach.
+
+## Ograniczenia
+
+- Sprawdzenie dotyczy tylko **polskich** podmiotów VAT (NIP)
+- Dla zagranicznych kontrahentów Biała Lista nie obowiązuje, ale uważaj na inne wymogi prawne (np. VIES dla UE)`,
+    contentEn: `The AI assistant verifies contractor bank accounts against the official **White List of VAT taxpayers** (Biała Lista) maintained by the Polish Ministry of Finance. This is a legal requirement for payments of 15,000 PLN or more.
+
+## Why it matters
+
+Polish law (Art. 117ba of the Tax Ordinance + Art. 19 of the Entrepreneurs Law) requires verification of every single payment **≥ 15,000 PLN** on the White List. Paying to an unverified account causes:
+
+- ❌ Disqualification of the cost as **KUP** (deductible expense)
+- ❌ Joint **VAT** liability for tax unpaid by the seller
+
+## How to use
+
+### Manual check
+
+> "Verify account PL12 1140 ... for NIP 5260205428"
+
+The assistant returns a card with the result:
+- ✅ **MATCH** — the account is on the White List for this NIP
+- ⚠️ **NO MATCH** — the account is **NOT** on the White List — do not transfer
+
+In either case, the card includes the **MF Request ID** — official proof of verification, keep it for your records.
+
+### Automatic check on payments
+
+When you ask the assistant to record a payment **≥ 15,000 PLN**, the AI **automatically** verifies the recipient's account before saving the operation. You don't have to ask — this behavior is baked into the system prompt.
+
+## Input format
+
+- **NIP** — 10 digits, with or without dashes
+- **Account number** — 26 digits in NRB format, with or without PL prefix and spaces (the assistant normalizes them)
+- **Check date** — defaults to today; you can pass the planned payment date
+
+## Cache and performance
+
+Results are cached for 24 hours per (NIP, account, date) triple. Repeating the same check on the same day is free.
+
+## MF API outage
+
+If the MF API is unavailable, the assistant returns a previously cached answer (if any) or clearly says verification couldn't be completed. Don't ignore that warning for large payments.
+
+## Limitations
+
+- The check applies only to **Polish** VAT entities (NIP)
+- For foreign contractors the White List does not apply — watch out for other legal requirements (e.g. VIES for EU)`,
+    contentRu: `AI-ассистент проверяет банковские счета контрагентов в официальном **Белом Списке плательщиков VAT** (Biała Lista) Министерства финансов Польши. Это юридическое требование для платежей от 15 000 PLN.
+
+## Почему это важно
+
+Польское законодательство (ст. 117ba Налогового кодекса + ст. 19 Закона о предпринимателях) требует проверки каждого разового платежа **≥ 15 000 PLN** в Белом Списке. Оплата на неподтверждённый счёт влечёт:
+
+- ❌ Исключение расхода из **KUP** (вычитаемых расходов)
+- ❌ Солидарную ответственность по **НДС** за налог, не уплаченный продавцом
+
+## Как пользоваться
+
+### Ручная проверка
+
+> "Проверь счёт PL12 1140 ... для NIP 5260205428"
+
+Ассистент вернёт карточку с результатом:
+- ✅ **СОВПАДЕНИЕ** — счёт есть в Белом Списке для этого NIP
+- ⚠️ **НЕТ СОВПАДЕНИЯ** — счёт **НЕТ** в Белом Списке — не переводи
+
+В любом случае карточка содержит **ID запроса МФ** — официальное доказательство проверки, его нужно сохранить.
+
+### Автоматическая проверка при платежах
+
+Когда ты просишь ассистента зарегистрировать платёж **≥ 15 000 PLN**, AI **автоматически** проверит счёт получателя перед сохранением операции. Просить не нужно — это поведение встроено в системный промпт.
+
+## Формат данных
+
+- **NIP** — 10 цифр, с дефисами или без
+- **Номер счёта** — 26 цифр в формате NRB, с префиксом PL и пробелами или без (ассистент нормализует сам)
+- **Дата проверки** — по умолчанию сегодня; можно указать планируемую дату оплаты
+
+## Кэш и производительность
+
+Результаты кэшируются на 24 часа для тройки (NIP, счёт, дата). Повторная проверка того же счёта в тот же день — бесплатно.
+
+## Отказ API МФ
+
+Если API МФ недоступен, ассистент вернёт ранее закэшированный ответ (если он есть) или чётко сообщит о невозможности проверки. Не игнорируй это предупреждение при крупных платежах.
+
+## Ограничения
+
+- Проверка касается только **польских** субъектов VAT (NIP)
+- Для иностранных контрагентов Biała Lista не применяется — смотри другие требования (например, VIES для ЕС)`,
+    searchKeywordsPl: ['biała lista', 'wykaz', 'vat', 'rachunek', 'weryfikacja', 'kup', '15000', 'art 117ba', 'compliance', 'kontrahent'],
+    searchKeywordsEn: ['white list', 'biala lista', 'vat', 'account', 'verify', 'kup', '15000', 'compliance', 'contractor', 'mf'],
+    searchKeywordsRu: ['белый список', 'biala lista', 'ндс', 'счёт', 'проверка', 'kup', '15000', 'compliance', 'контрагент', 'мф'],
+    order: 5,
+    isFeatured: true,
+  },
+  {
+    slug: 'contractors-nip-autofill',
+    category: 'contractors',
+    titlePl: 'Automatyczne uzupełnianie kontrahenta po NIP',
+    titleEn: 'Automatic contractor autofill from NIP',
+    titleRu: 'Автозаполнение контрагента по NIP',
+    contentPl: `Wystarczy podać NIP — asystent sam pobierze nazwę, REGON i adres kontrahenta z polskich rejestrów publicznych. Nie musisz wpisywać wszystkiego ręcznie.
+
+## Jak to działa
+
+Powiedz asystentowi:
+
+> "Utwórz kontrahenta o NIP 5260205428"
+
+I gotowe. Asystent:
+
+1. Sprawdzi NIP (suma kontrolna modulo 11)
+2. Pobierze dane z **Białej Listy MF** + **API KRS** (dla spółek)
+3. Uzupełni puste pola: **nazwa**, **REGON**, **ulica**, **miasto**, **kod pocztowy**
+4. Utworzy kontrahenta w wFirmie
+5. Pokaże kartę potwierdzenia z listą **automatycznie wypełnionych pól**
+
+## Pola, które możesz nadpisać
+
+Jeśli podasz nazwę razem z NIP, Twoja nazwa wygrywa — rejestrowa zostanie pominięta. To samo dla adresu i pozostałych pól.
+
+> "Utwórz kontrahenta 'Acme dla mnie' o NIP 5260205428"
+
+→ kontrahent z nazwą "Acme dla mnie", ale adres i REGON pobrane z rejestru.
+
+## Źródła danych
+
+| Źródło | Co zwraca |
+|---|---|
+| Biała Lista MF | nazwa, REGON, status VAT, weryfikowane rachunki, adres |
+| KRS API | forma prawna, kapitał zakładowy, zarząd (tylko spółki) |
+
+Dla **jednoosobowych działalności** (JDG, samozatrudnieni) KRS nie zwraca danych — używamy Białej Listy.
+
+## Limity
+
+- Działa tylko dla **polskich** NIP-ów (10 cyfr)
+- NIP z błędną sumą kontrolną zostanie odrzucony
+- Jeśli NIP nie istnieje w rejestrach — kontrahent nie zostanie utworzony, asystent poprosi o nazwę
+
+## Cache
+
+Dane z rejestrów są cache'owane na 24 godziny. Tworzenie wielu kontrahentów ze znanym Ci wcześniej NIP nie wymaga ponownego pobierania danych.`,
+    contentEn: `Just provide a NIP — the assistant will pull the contractor's name, REGON, and address from Polish public registries. No need to type everything by hand.
+
+## How it works
+
+Tell the assistant:
+
+> "Create a contractor with NIP 5260205428"
+
+That's it. The assistant:
+
+1. Validates the NIP (modulo 11 checksum)
+2. Pulls data from the **MF White List** + **KRS API** (for companies)
+3. Fills in the missing fields: **name**, **REGON**, **street**, **city**, **zip**
+4. Creates the contractor in wFirma
+5. Shows a confirmation card listing the **auto-filled fields**
+
+## Fields you can override
+
+If you pass a name alongside the NIP, your name wins — the registry name is ignored. Same for address and other fields.
+
+> "Create contractor 'Acme for me' with NIP 5260205428"
+
+→ contractor named "Acme for me", but address and REGON pulled from the registry.
+
+## Data sources
+
+| Source | What it returns |
+|---|---|
+| MF White List | name, REGON, VAT status, verified accounts, address |
+| KRS API | legal form, share capital, board members (companies only) |
+
+For **sole proprietors** (JDG, self-employed) KRS doesn't return data — we use the White List.
+
+## Limits
+
+- Works only for **Polish** NIPs (10 digits)
+- NIPs with a wrong checksum are rejected
+- If the NIP doesn't exist in the registries — the contractor is not created and the assistant asks for a name
+
+## Cache
+
+Registry data is cached for 24 hours. Creating multiple contractors with NIPs you've used before doesn't re-fetch the data.`,
+    contentRu: `Достаточно указать NIP — ассистент сам подтянет название, REGON и адрес контрагента из польских публичных реестров. Вручную всё вбивать не нужно.
+
+## Как это работает
+
+Скажи ассистенту:
+
+> "Создай контрагента с NIP 5260205428"
+
+И готово. Ассистент:
+
+1. Проверит NIP (контрольная сумма по модулю 11)
+2. Подтянет данные из **Białej Listy МФ** + **API KRS** (для компаний)
+3. Заполнит пустые поля: **название**, **REGON**, **улица**, **город**, **индекс**
+4. Создаст контрагента в wFirma
+5. Покажет карточку подтверждения со списком **автоматически заполненных полей**
+
+## Поля, которые можно переопределить
+
+Если ты передашь название вместе с NIP, твоё название победит — реестровое будет проигнорировано. То же для адреса и остальных полей.
+
+> "Создай контрагента 'Acme для меня' с NIP 5260205428"
+
+→ контрагент с названием "Acme для меня", но адрес и REGON подтянуты из реестра.
+
+## Источники данных
+
+| Источник | Что возвращает |
+|---|---|
+| Biała Lista МФ | название, REGON, статус VAT, проверенные счета, адрес |
+| KRS API | правовая форма, уставной капитал, правление (только компании) |
+
+Для **индивидуальных предпринимателей** (JDG, самозанятых) KRS не отдаёт данные — используем Białą Listę.
+
+## Ограничения
+
+- Работает только для **польских** NIP (10 цифр)
+- NIP с неверной контрольной суммой отклоняется
+- Если NIP отсутствует в реестрах — контрагент не создаётся, ассистент попросит название
+
+## Кэш
+
+Данные реестров кэшируются на 24 часа. Создание нескольких контрагентов с уже использованными NIP не требует повторных запросов.`,
+    searchKeywordsPl: ['nip', 'kontrahent', 'autouzupełnianie', 'biała lista', 'rejestr', 'krs', 'regon', 'utwórz kontrahenta'],
+    searchKeywordsEn: ['nip', 'contractor', 'autofill', 'white list', 'registry', 'krs', 'regon', 'create contractor'],
+    searchKeywordsRu: ['nip', 'контрагент', 'автозаполнение', 'белый список', 'реестр', 'krs', 'regon', 'создать контрагента'],
+    order: 4,
+    isFeatured: true,
+  },
 ];
 
 export async function seedHelpTopicsIfEmpty(): Promise<void> {
