@@ -23,7 +23,6 @@ describe('TelegramNotificationService — health alerts', () => {
     integrations: {
       wfirma: { ok: false, latencyMs: 5000, error: 'timeout' },
       openai: { ok: true, latencyMs: 230 },
-      anthropic: { ok: true, latencyMs: 180 },
     },
   };
 

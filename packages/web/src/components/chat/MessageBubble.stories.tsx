@@ -245,7 +245,7 @@ export const ConversationFlow: Story = {
           content: 'I found 8 invoices from January 2024 with a total value of **32,500 PLN**. Would you like me to provide more details?',
           timestamp: new Date(Date.now() - 30000).toISOString(),
           toolCalls: [{ id: 'tc1', name: 'get_invoices', arguments: '{"month": "2024-01"}' }],
-          metadata: { model: 'claude-3-opus' },
+          metadata: { model: 'gpt-4o' },
         }}
         translations={defaultTranslations}
         toolsTranslations={defaultToolsTranslations}
