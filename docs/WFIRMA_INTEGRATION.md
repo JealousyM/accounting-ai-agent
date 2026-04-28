@@ -7,13 +7,39 @@ This document describes the integration with the wFirma Polish accounting system
 wFirma is a Polish online accounting system. The Accounting AI Agent integrates with wFirma to provide:
 
 - Company data management
-- Contractor/customer management
+- Contractor/customer management (with NIP autofill from public registry)
 - Invoice creation and management
-- Payment tracking
+- Payment tracking (with Biała Lista MF guard for ≥ 15 000 PLN payments)
 - Expense management
 - Vehicle fleet management
 - Tax declarations (JPK VAT, PIT)
 - Document management
+
+## Polish Public Registry Integration (CompanyEnrichmentService)
+
+Beyond pure wFirma calls, the platform pulls free data from official Polish public registries to reduce manual entry and guard against compliance failures:
+
+### MF Biała Lista (Wykaz podatników VAT)
+
+Two distinct uses:
+
+1. **Subject lookup** — `enrichByNip(nip, userId)` returns name, REGON, KRS, VAT status (`czynny` / `zwolniony` / `niezarejestrowany`), verified bank accounts, and the seller's working / residence addresses. Used by:
+   - `lookup_company_by_nip` AI tool — direct lookup
+   - `create_contractor` AI tool — autofill of name / REGON / street / city / zip when only a NIP is provided. The confirmation card lists which fields were auto-filled.
+
+2. **Bank-account verification** — `verifyBankAccount(nip, accountNumber, userId, date?)` calls the dedicated MF endpoint `/api/check/nip/{nip}/bank-account/{account}?date={YYYY-MM-DD}` and returns a structured result including the **MF Request ID** (legal proof of the check).
+   - Exposed as the `verify_bank_account_white_list` AI tool.
+   - The system prompt instructs the agent to invoke this tool automatically before confirming any payment ≥ 15 000 PLN. Paying to an unverified account disqualifies the cost as KUP and triggers joint VAT liability under Art. 117ba Ordynacji podatkowej + Art. 19 Prawa przedsiębiorców.
+   - Cached for 24h by `(nip, accountNumber, date)` triple in the `public_registry` cache type.
+   - On MF outage, falls back to the most recent stale cached result rather than blocking the user.
+
+### KRS (court register)
+
+Returns legal form, share capital, board members for limited companies (sp. z o.o., S.A.). Sole proprietors are not in KRS — for those, Biała Lista is the only source.
+
+### Receipt OCR (Telegram photo handler)
+
+Photographs of paragony / faktury sent to the Telegram bot are processed by `ReceiptOCRService` (Claude Vision) and replied with a structured markdown card. This is *not* a wFirma call — it's a separate service that lives in `packages/api/src/services/ocr/`. Direct creation of a wFirma expense from the recognized receipt is a planned follow-up; today the user copies the data into wFirma manually or asks the AI to log it by text.
 
 ## Configuration
 

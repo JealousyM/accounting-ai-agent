@@ -4,7 +4,13 @@ This document describes the LangGraph-based single-agent architecture powering t
 
 ## Overview
 
-The system uses a **single LangGraph agent** with 55+ tools (up to 80 when all optional services are available). There is no multi-agent routing -- a single `StateGraph` with `agent` and `tools` nodes handles all user requests. The LLM decides which tools to call based on the user's message and the conversation history.
+The system uses a **single LangGraph agent** with 55+ tools (up to 79 when all optional services are available). There is no multi-agent routing -- a single `StateGraph` with `agent` and `tools` nodes handles all user requests. The LLM decides which tools to call based on the user's message and the conversation history.
+
+**Recent additions (April 2026):**
+
+- `verify_bank_account_white_list` — verifies a contractor's bank account against the Polish Ministry of Finance White List (Biała Lista). Mandatory before any payment ≥ 15 000 PLN per Art. 117ba Ordynacji podatkowej. The system prompt instructs the agent to invoke this tool automatically when a user records such a payment.
+- `create_contractor` autofill — when only a NIP is provided, missing name / REGON / address fields are populated from the public registry (Biała Lista MF + KRS) before the contractor is created in wFirma. The confirmation card lists which fields were auto-filled.
+- **Telegram receipt OCR** — `bot.on('photo')` runs the image through `ReceiptOCRService` (Claude Vision) and replies with a structured markdown card. This is *not* an AI tool — the OCR runs in the photo handler before any AI invocation. Locale is resolved from the user's Telegram `language_code`.
 
 **Key characteristics:**
 
@@ -22,7 +28,9 @@ The system uses a **single LangGraph agent** with 55+ tools (up to 80 when all o
 | File | Purpose |
 |------|---------|
 | `packages/api/src/services/ai-chat/ai-chat.service.ts` | Main service: conversation CRUD, `sendMessage`, `runAgent` |
-| `packages/api/src/services/ai-chat/tools/index.ts` | `createAllTools()` factory -- registers all 80 tools |
+| `packages/api/src/services/ai-chat/tools/index.ts` | `createAllTools()` factory -- registers up to 79 tools |
+| `packages/api/src/services/ai-chat/tools/biala-lista.tools.ts` | Biała Lista MF White List bank-account verification tool |
+| `packages/api/src/services/ocr/receipt-ocr.service.ts` | Receipt OCR (Claude Vision) — invoked from the Telegram photo handler |
 | `packages/api/src/services/ai-chat/constants.ts` | `getSystemPrompt()` builder |
 | `packages/api/src/services/ai-chat/prompt-fragments.ts` | Shared prompt fragments (language, tools, formatting, tax data) |
 | `packages/api/src/services/ai-chat/utils.ts` | `detectLocale()`, title generation |
@@ -99,7 +107,7 @@ flowchart TD
         G --> H[detectLocale from message text]
         H --> I[Load AI Context Memory<br/>buildMemoryPromptFragment]
         I --> J[Build system prompt<br/>base + language + tools + formatting<br/>+ professional + data accuracy<br/>+ error handling + tax data + memory]
-        J --> K[createAllTools<br/>53 base + 15 HR + 9 KSeF]
+        J --> K[createAllTools<br/>55 base + 15 HR + 9 KSeF]
         K --> L[Bind tools to LLM]
         L --> M[Build LangChain messages<br/>SystemMessage + history + HumanMessage]
         M --> N[graph.invoke<br/>recursionLimit: 25]
@@ -542,7 +550,7 @@ buildMemoryPromptFragment(userId, 'en') -> memory context (or undefined)
 getSystemPrompt('en', memoryContext) -> full system prompt
         |
         v
-createAllTools(...) -> 80 tools bound to LLM
+createAllTools(...) -> up to 79 tools bound to LLM (55 base + 15 HR + 9 KSeF)
         |
         v
 graph.invoke({ messages: [SystemMessage, HumanMessage] })
