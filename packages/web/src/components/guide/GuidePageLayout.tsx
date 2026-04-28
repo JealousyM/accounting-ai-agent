@@ -12,9 +12,14 @@ interface Props {
   children: React.ReactNode;
 }
 
+const LOCALE_OPTIONS: { value: Locale; label: string }[] = [
+  { value: 'en', label: 'EN' },
+  { value: 'pl', label: 'PL' },
+  { value: 'ru', label: 'RU' },
+];
+
 export function GuidePageLayout({ title, summary, breadcrumbs, children }: Props) {
   const { locale, setLocale } = useLocale();
-  const locales: Locale[] = ['en', 'pl', 'ru'];
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col">
@@ -30,21 +35,16 @@ export function GuidePageLayout({ title, summary, breadcrumbs, children }: Props
             </Link>
             <span className="font-semibold text-gray-900 dark:text-white text-sm">eKsięgowy AI</span>
           </div>
-          <div className="flex items-center gap-1">
-            {locales.map((l) => (
-              <button
-                key={l}
-                onClick={() => setLocale(l)}
-                className={`px-2 py-1 text-xs rounded uppercase font-medium transition-colors ${
-                  locale === l
-                    ? 'bg-blue-600 text-white'
-                    : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700'
-                }`}
-              >
-                {l}
-              </button>
+          <select
+            value={locale}
+            onChange={(e) => setLocale(e.target.value as Locale)}
+            className="px-2 py-1 text-xs font-medium rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent cursor-pointer"
+            aria-label="Language"
+          >
+            {LOCALE_OPTIONS.map((l) => (
+              <option key={l.value} value={l.value}>{l.label}</option>
             ))}
-          </div>
+          </select>
         </div>
       </header>
 

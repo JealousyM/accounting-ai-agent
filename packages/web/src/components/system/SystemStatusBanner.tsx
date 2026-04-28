@@ -1,27 +1,42 @@
 'use client';
 
-import { useTranslations } from 'next-intl';
+import { useLocale } from '@/contexts/LocaleContext';
 import { useSystemHealth } from '@/hooks/useSystemHealth';
 import type { HealthSnapshot } from '@/lib/api/health';
+import en from '@/i18n/locales/en.json';
+import pl from '@/i18n/locales/pl.json';
+import ru from '@/i18n/locales/ru.json';
+
+const translations = { en, pl, ru };
+
+type BannerKey = 'unreachable' | 'down' | 'degraded.ai' | 'degraded.wfirma';
 
 function buildKey(
   status: 'unreachable' | 'down' | 'degraded',
   snapshot: HealthSnapshot | undefined,
-): string | null {
-  if (status === 'unreachable') return 'banner.unreachable';
-  if (status === 'down') return 'banner.down';
+): BannerKey | null {
+  if (status === 'unreachable') return 'unreachable';
+  if (status === 'down') return 'down';
   if (status === 'degraded') {
     const i = snapshot?.integrations;
-    if (i && (!i.openai.ok || !i.anthropic.ok)) return 'banner.degraded.ai';
-    if (i && !i.wfirma.ok) return 'banner.degraded.wfirma';
-    return 'banner.down'; // fallback if degraded but reason unknown
+    if (i && (!i.openai.ok || !i.anthropic.ok)) return 'degraded.ai';
+    if (i && !i.wfirma.ok) return 'degraded.wfirma';
+    return 'down';
   }
   return null;
 }
 
+function getMessage(locale: 'en' | 'pl' | 'ru', key: BannerKey): string {
+  const banner = translations[locale].system.banner;
+  if (key === 'unreachable') return banner.unreachable;
+  if (key === 'down') return banner.down;
+  if (key === 'degraded.ai') return banner.degraded.ai;
+  return banner.degraded.wfirma;
+}
+
 export function SystemStatusBanner() {
   const { status, snapshot } = useSystemHealth();
-  const t = useTranslations('system');
+  const { locale } = useLocale();
 
   if (status === 'ok') return null;
 
@@ -38,7 +53,7 @@ export function SystemStatusBanner() {
 
   return (
     <div role="status" aria-live="polite" className={className}>
-      {t(key)}
+      {getMessage(locale, key)}
     </div>
   );
 }
