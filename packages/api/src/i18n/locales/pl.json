@@ -72,7 +72,9 @@
     "similarContractors": "Podobni kontrahenci",
     "specifyNameUpdate": "Podaj dokładną nazwę do aktualizacji.",
     "specifyNameDelete": "Podaj dokładną nazwę do usunięcia.",
-    "autoFilledFromRegistry": "Uzupełnione automatycznie z rejestrów publicznych (Biała Lista MF)"
+    "autoFilledFromRegistry": "Uzupełnione automatycznie z rejestrów publicznych (Biała Lista MF)",
+    "nipInvalid": "Nieprawidłowy NIP — niepoprawna suma kontrolna. Sprawdź 10 cyfr.",
+    "nipValidButNotInRegistry": "NIP jest prawidłowy, ale podmiot nie figuruje na oficjalnej Białej Liście MF — najprawdopodobniej nie jest czynnym podatnikiem VAT (jednoosobowa działalność poniżej progu, działalność zwolniona z VAT lub świeżo zarejestrowana firma). Nie mogę pobrać nazwy automatycznie. Podaj nazwę kontrahenta — utworzę go z podanym NIP-em."
   },
   "invoice": {
     "invoices": "Faktury",
