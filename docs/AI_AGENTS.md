@@ -10,7 +10,8 @@ The system uses a **single LangGraph agent** with 55+ tools (up to 79 when all o
 
 - `verify_bank_account_white_list` — verifies a contractor's bank account against the Polish Ministry of Finance White List (Biała Lista). Mandatory before any payment ≥ 15 000 PLN per Art. 117ba Ordynacji podatkowej. The system prompt instructs the agent to invoke this tool automatically when a user records such a payment.
 - `create_contractor` autofill — when only a NIP is provided, missing name / REGON / address fields are populated from the public registry (Biała Lista MF + KRS) before the contractor is created in wFirma. The confirmation card lists which fields were auto-filled.
-- **Telegram receipt OCR** — `bot.on('photo')` runs the image through `ReceiptOCRService` (Claude Vision) and replies with a structured markdown card. This is *not* an AI tool — the OCR runs in the photo handler before any AI invocation. Locale is resolved from the user's Telegram `language_code`.
+- **Telegram receipt OCR** — `bot.on('photo')` runs the image through `ReceiptOCRService` (OpenAI GPT-4o vision) and replies with a structured markdown card. This is *not* an AI tool — the OCR runs in the photo handler before any AI invocation. Locale is resolved from the user's Telegram `language_code`.
+- **Anthropic removed** — the platform is now OpenAI-only (plus Google Gemini for the user-facing chat). Anthropic was wired in only as legacy multi-agent code and confusing UI copy that the registration form did not actually accept; keeping it cost an extra paid API key. The legacy `packages/api/src/agents/` directory was deleted and `@langchain/anthropic` removed from dependencies.
 
 **Key characteristics:**
 
@@ -30,7 +31,7 @@ The system uses a **single LangGraph agent** with 55+ tools (up to 79 when all o
 | `packages/api/src/services/ai-chat/ai-chat.service.ts` | Main service: conversation CRUD, `sendMessage`, `runAgent` |
 | `packages/api/src/services/ai-chat/tools/index.ts` | `createAllTools()` factory -- registers up to 79 tools |
 | `packages/api/src/services/ai-chat/tools/biala-lista.tools.ts` | Biała Lista MF White List bank-account verification tool |
-| `packages/api/src/services/ocr/receipt-ocr.service.ts` | Receipt OCR (Claude Vision) — invoked from the Telegram photo handler |
+| `packages/api/src/services/ocr/receipt-ocr.service.ts` | Receipt OCR (OpenAI GPT-4o vision) — invoked from the Telegram photo handler |
 | `packages/api/src/services/ai-chat/constants.ts` | `getSystemPrompt()` builder |
 | `packages/api/src/services/ai-chat/prompt-fragments.ts` | Shared prompt fragments (language, tools, formatting, tax data) |
 | `packages/api/src/services/ai-chat/utils.ts` | `detectLocale()`, title generation |
