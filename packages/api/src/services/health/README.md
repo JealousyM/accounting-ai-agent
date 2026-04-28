@@ -1,14 +1,14 @@
 # Health service
 
-`HealthService` exposes a single `getSnapshot()` method that probes the database, Redis, and three external integrations. Results for integrations are cached 5 minutes (stale-while-revalidate).
+`HealthService` exposes a single `getSnapshot()` method that probes the database, Redis, and two external integrations (OpenAI + wFirma). Results for integrations are cached 5 minutes (stale-while-revalidate).
 
 `HealthMonitorService` ticks every 30s, applies a 2-failure debounce, and fires Sentry + Telegram alerts on state transitions.
 
 ## Cost-free probes
 
-The OpenAI and Anthropic probes call only `GET /v1/models`. Do **not** add probes that hit chat / messages / completion endpoints — those are billed.
+The OpenAI probe calls only `GET /v1/models`. Do **not** add probes that hit chat / messages / completion endpoints — those are billed.
 
-The unit test suite asserts the URL ends with `/models` and the method is `GET` for both probes. Removing those assertions silently re-enables billable probes.
+The unit test suite asserts the URL ends with `/models` and the method is `GET`. Removing that assertion silently re-enables billable probes.
 
 ## Adding a new integration probe
 

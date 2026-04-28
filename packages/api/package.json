@@ -24,7 +24,6 @@
     "seed": "npx tsx prisma/seed.ts"
   },
   "dependencies": {
-    "@langchain/anthropic": "^0.3.0",
     "@langchain/core": "^0.3.0",
     "@langchain/google-genai": "^0.2.18",
     "@langchain/langgraph": "^0.2.0",
