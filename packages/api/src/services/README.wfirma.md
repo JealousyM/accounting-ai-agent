@@ -7,13 +7,14 @@ The wFirma Integration Service provides a robust interface for interacting with 
 ## Features
 
 - **Company Data Management**: Fetch company information from wFirma
-- **Contractor Management**: List and create contractors
+- **Contractor Management**: List and create contractors (with NIP autofill — see `CompanyEnrichmentService.enrichByNip` populating name / REGON / address from the public registry when only a NIP is given to `create_contractor`)
 - **Financial Data**: Retrieve financial summaries by year
 - **Data Synchronization**: Sync data from wFirma to local cache
 - **Automatic Retry Logic**: Configurable retry mechanism with exponential backoff
 - **Comprehensive Error Handling**: Specific error types for different failure scenarios
 - **Connection Health Checks**: Verify wFirma API connectivity
-- **Public Registry Enrichment**: REGON, KRS, VAT status from MF Biała Lista and KRS API
+- **Public Registry Enrichment**: name, REGON, KRS, VAT status, working/residence addresses from MF Biała Lista; legal form / share capital / board members from KRS API
+- **Biała Lista bank-account verification**: `CompanyEnrichmentService.verifyBankAccount(nip, accountNumber, userId, date?)` calls the MF check endpoint and returns the MF Request ID as legal proof. Used by the `verify_bank_account_white_list` AI tool which the agent invokes automatically for payments ≥ 15 000 PLN.
 - **Tax Register (KPiR)**: KPiR entries with monthly sums and cumulative totals
 
 ## Configuration

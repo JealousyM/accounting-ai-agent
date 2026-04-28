@@ -15,14 +15,16 @@ graph TD
     end
 
     subgraph AI["AI Layer"]
-        LANGGRAPH["LangGraph Single Agent<br/>50+ Domain Tools"]
+        LANGGRAPH["LangGraph Single Agent<br/>55+ Domain Tools"]
         MEMORY["AI Context Memory<br/>AIMemoryService<br/>AIMemoryExtractionService"]
+        OCR["Receipt OCR<br/>Claude Vision<br/>Telegram photo handler"]
         LANGGRAPH <--> MEMORY
     end
 
     subgraph INTEGRATION["Integration Layer"]
         WFIRMA["wFirma API Client<br/>Company &bull; Invoices<br/>Payments &bull; Expenses"]
         KSEF["KSeF Integration<br/>e-Invoice System<br/>FA(3) XML Generation"]
+        REGISTRY["Polish Public Registry<br/>MF Biała Lista &bull; KRS<br/>NIP autofill &bull; account verify"]
         CACHE["Cache Service<br/>TTL-based"]
     end
 
@@ -35,9 +37,12 @@ graph TD
     EXPRESS --> LANGGRAPH
     EXPRESS --> WFIRMA
     EXPRESS --> KSEF
+    EXPRESS --> OCR
     LANGGRAPH --> WFIRMA
     LANGGRAPH --> KSEF
+    LANGGRAPH --> REGISTRY
     WFIRMA --> CACHE
+    REGISTRY --> CACHE
     CACHE --> PG
     EXPRESS --> PG
     EXPRESS --> REDIS

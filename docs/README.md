@@ -26,7 +26,10 @@ The Accounting AI Agent is a full-stack monorepo application for AI-powered acco
 
 - **AI-Powered Chat** - Natural language interface for accounting tasks
 - **Multi-Agent System** - Specialized agents for contractors, invoices, finances, and taxes
-- **wFirma Integration** - Full integration with Polish accounting system (54 tools)
+- **wFirma Integration** - Full integration with Polish accounting system (55 tools)
+- **Receipt OCR in Telegram** - Photograph a paragon or faktura → structured card with seller, NIP, dates, totals, items (Claude Vision)
+- **Biała Lista MF Verification** - One-call check that a contractor's bank account is on the official MF White List, with the legal-proof Request ID — required for any payment ≥ 15 000 PLN
+- **NIP Autofill for Contractors** - Provide a NIP, the rest (name / REGON / street / city / zip) is filled in from the public registry
 - **KPI Dashboard** - Aggregated financial, invoice, HR, and KSeF metrics in one view
 - **Audit Log** - Automatic tracking of all write operations with admin viewer
 - **Public Landing Page** - Marketing page with pricing, OG meta tags
