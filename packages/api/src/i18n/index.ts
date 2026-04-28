@@ -44,6 +44,9 @@ export interface ContractorTranslations {
   specifyNameDelete: string;
   // Auto-fill from public registry
   autoFilledFromRegistry: string;
+  // NIP-related errors when creating
+  nipInvalid: string;
+  nipValidButNotInRegistry: string;
 }
 
 export interface InvoiceTranslations {

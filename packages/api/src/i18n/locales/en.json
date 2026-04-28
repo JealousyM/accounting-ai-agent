@@ -72,7 +72,9 @@
     "similarContractors": "Similar contractors",
     "specifyNameUpdate": "Please specify exact name for update.",
     "specifyNameDelete": "Please specify exact name for deletion.",
-    "autoFilledFromRegistry": "Auto-filled from the Polish public registry (Biała Lista MF)"
+    "autoFilledFromRegistry": "Auto-filled from the Polish public registry (Biała Lista MF)",
+    "nipInvalid": "Invalid NIP — checksum failed. Please verify the 10 digits.",
+    "nipValidButNotInRegistry": "NIP is valid but the entity is not on the official MF Biała Lista — most likely a non-VAT-registered entity (sole proprietor under the VAT threshold, VAT-exempt activity, or recently formed). I cannot autofill the name. Please provide the company name and I will create the contractor with the NIP you supplied."
   },
   "invoice": {
     "invoices": "Invoices",

@@ -106,17 +106,26 @@ export function createCreateContractorTool(
 
         const t = getContractorTranslations(locale);
 
+        // Reject malformed NIPs early with a clear, specific message.
+        // (A user typing 5842872419 expects "checksum failed", not "name required".)
+        if (nip && !validateNip(nip)) {
+          return `## ❌ ${t.errorCreateTitle}
+
+**${t.errorReason}:** ${t.nipInvalid} (NIP: \`${nip}\`)`;
+        }
+
         // Auto-fill from public registry when NIP is provided and core fields are missing.
         // Saves the user from re-typing what's already on Biała Lista MF.
         const autoFilledFields: string[] = [];
+        let registryHadEntry = false;
         if (
           enrichmentService &&
           nip &&
-          validateNip(nip) &&
           (!name || !regon || !street || !city || !zip)
         ) {
           const enriched = await enrichmentService.enrichByNip(nip, userId);
           if (enriched) {
+            registryHadEntry = true;
             if (!name && enriched.name) {
               name = enriched.name;
               autoFilledFields.push('name');
@@ -144,10 +153,21 @@ export function createCreateContractorTool(
           }
         }
 
+        // Distinguish three "no name" cases so the AI gives the user the right next step:
+        // 1. Valid NIP given but registry has no entry (likely non-VAT entity) → tell them why and ask for a name.
+        // 2. NIP given and registry had an entry but somehow no name came back (rare) → fall through to generic.
+        // 3. No NIP and no name → original generic error.
         if (!name || !name.trim()) {
+          if (nip && !registryHadEntry) {
+            return `## ❌ ${t.errorCreateTitle}
+
+**${t.errorReason}:** ${t.nipValidButNotInRegistry}
+
+**NIP:** \`${nip}\``;
+          }
           return `## ❌ ${t.errorCreateTitle}
 
-**${t.errorReason}:** ${t.requiredFields}: name (and optionally NIP). When NIP is provided, name is auto-filled from the public registry — but here either no NIP was given or the NIP was not found.
+**${t.errorReason}:** ${t.requiredFields}: name (and optionally NIP). When a NIP is provided, name and address are auto-filled from the public registry.
 
 ${t.tryAgain}`;
         }
