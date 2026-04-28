@@ -1,14 +1,17 @@
 import { render, screen } from '@testing-library/react';
 import { SystemStatusBanner } from '../SystemStatusBanner';
+import en from '@/i18n/locales/en.json';
 
 const mockSystemHealth = jest.fn();
 jest.mock('@/hooks/useSystemHealth', () => ({
   useSystemHealth: () => mockSystemHealth(),
 }));
 
-jest.mock('next-intl', () => ({
-  useTranslations: () => (key: string) => key, // returns key, easy to assert
+jest.mock('@/contexts/LocaleContext', () => ({
+  useLocale: () => ({ locale: 'en', setLocale: jest.fn() }),
 }));
+
+const banner = en.system.banner;
 
 describe('SystemStatusBanner', () => {
   it('renders nothing when status is ok', () => {
@@ -20,13 +23,13 @@ describe('SystemStatusBanner', () => {
   it('renders unreachable copy when offline', () => {
     mockSystemHealth.mockReturnValue({ status: 'unreachable' });
     render(<SystemStatusBanner />);
-    expect(screen.getByText(/banner.unreachable/)).toBeInTheDocument();
+    expect(screen.getByText(banner.unreachable)).toBeInTheDocument();
   });
 
   it('renders down copy when status=down', () => {
     mockSystemHealth.mockReturnValue({ status: 'down' });
     render(<SystemStatusBanner />);
-    expect(screen.getByText(/banner.down/)).toBeInTheDocument();
+    expect(screen.getByText(banner.down)).toBeInTheDocument();
   });
 
   it('prioritizes AI degradation over wFirma when both fail', () => {
@@ -37,8 +40,8 @@ describe('SystemStatusBanner', () => {
       },
     });
     render(<SystemStatusBanner />);
-    expect(screen.getByText(/banner.degraded.ai/)).toBeInTheDocument();
-    expect(screen.queryByText(/banner.degraded.wfirma/)).not.toBeInTheDocument();
+    expect(screen.getByText(banner.degraded.ai)).toBeInTheDocument();
+    expect(screen.queryByText(banner.degraded.wfirma)).not.toBeInTheDocument();
   });
 
   it('shows wFirma copy when only wFirma is down', () => {
@@ -49,7 +52,7 @@ describe('SystemStatusBanner', () => {
       },
     });
     render(<SystemStatusBanner />);
-    expect(screen.getByText(/banner.degraded.wfirma/)).toBeInTheDocument();
+    expect(screen.getByText(banner.degraded.wfirma)).toBeInTheDocument();
   });
 
   it('uses role=status and aria-live=polite', () => {
