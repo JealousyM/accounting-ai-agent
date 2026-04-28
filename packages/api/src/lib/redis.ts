@@ -33,6 +33,7 @@ export const redis = {
     redisClient.setex(key, seconds, value),
   del: (key: string) => redisClient.del(key),
   incr: (key: string) => redisClient.incr(key),
+  ping: () => redisClient.ping(),
   quit: () => redisClient.quit(),
   isReady: redisClient.status === 'ready',
 };

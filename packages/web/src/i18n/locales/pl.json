@@ -1509,5 +1509,15 @@
       "converted": "Subskrybuje",
       "revoked": "Anulowane"
     }
+  },
+  "system": {
+    "banner": {
+      "unreachable": "Brak połączenia z internetem. Spróbujemy ponownie automatycznie.",
+      "down": "Serwis jest tymczasowo niedostępny. Już o tym wiemy i pracujemy nad rozwiązaniem.",
+      "degraded": {
+        "ai": "Czat AI jest tymczasowo niedostępny. Pozostałe funkcje działają.",
+        "wfirma": "Integracja z wFirmą jest tymczasowo niedostępna. Pozostałe funkcje działają."
+      }
+    }
   }
 }

@@ -1509,5 +1509,15 @@
       "converted": "Subscribed",
       "revoked": "Revoked"
     }
+  },
+  "system": {
+    "banner": {
+      "unreachable": "No internet connection. We'll reconnect automatically.",
+      "down": "Service is temporarily unavailable. We're aware and working on it.",
+      "degraded": {
+        "ai": "AI chat is temporarily unavailable. Other features still work.",
+        "wfirma": "wFirma integration is temporarily unavailable. Other features still work."
+      }
+    }
   }
 }
