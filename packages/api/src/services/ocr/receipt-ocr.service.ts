@@ -2,19 +2,23 @@
  * ReceiptOCRService
  *
  * Extracts structured receipt / faktura data from an image using a
- * vision-capable LLM (Claude Sonnet 3.5+). Designed for the Telegram bot
+ * vision-capable LLM (OpenAI GPT-4o). Designed for the Telegram bot
  * photo flow: user sends a photo → bot calls this → bot replies with the
  * formatted markdown so the user can copy it into wFirma (or the future
  * `create_expense_from_receipt` AI tool).
+ *
+ * Why OpenAI: the rest of the platform uses OpenAI/Google for the user-
+ * facing AI chat. Adding Anthropic just for OCR would mean an extra paid
+ * API key with no other benefit, and a higher per-receipt cost.
  */
 
-import { ChatAnthropic } from '@langchain/anthropic';
+import { ChatOpenAI } from '@langchain/openai';
 import { HumanMessage, SystemMessage } from '@langchain/core/messages';
 import { logger } from '../../utils/logger';
 import { Locale } from '../../i18n';
 import { ParsedReceiptSchema, ParsedReceipt } from './types';
 
-const VISION_MODEL = 'claude-3-5-sonnet-20241022';
+const VISION_MODEL = 'gpt-4o';
 const MAX_TOKENS = 1024;
 const TEMPERATURE = 0; // deterministic — we want the same answer twice for the same receipt
 
@@ -49,7 +53,7 @@ Rules:
 export class ReceiptOCRService {
   /**
    * Constructor accepts an optional pre-built model so tests can inject a mock.
-   * In production we lazily instantiate ChatAnthropic on first use.
+   * In production we lazily instantiate ChatOpenAI on first use.
    */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   constructor(private readonly model?: { invoke: (messages: any[]) => Promise<any> }) {}
@@ -57,7 +61,7 @@ export class ReceiptOCRService {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private getModel(): { invoke: (messages: any[]) => Promise<any> } {
     if (this.model) return this.model;
-    return new ChatAnthropic({
+    return new ChatOpenAI({
       modelName: VISION_MODEL,
       maxTokens: MAX_TOKENS,
       temperature: TEMPERATURE,
