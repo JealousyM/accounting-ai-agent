@@ -27,7 +27,6 @@ const okSnap: HealthSnapshot = {
   integrations: {
     wfirma: { ok: true, latencyMs: 1 },
     openai: { ok: true, latencyMs: 1 },
-    anthropic: { ok: true, latencyMs: 1 },
   },
 };
 const downSnap: HealthSnapshot = { ...okSnap, status: 'down', checks: { db: { ok: false, latencyMs: 1 }, redis: { ok: true, latencyMs: 1 } } };

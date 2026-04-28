@@ -939,7 +939,7 @@ Aby połączyć konto wFirma:
 Możesz użyć własnego klucza API dla AI:
 
 1. W oknie **API Keys** wybierz sekcję LLM
-2. Wybierz dostawcę: **OpenAI** lub **Anthropic**
+2. Wybierz dostawcę: **OpenAI**
 3. Wprowadź swój klucz API
 4. Kliknij **Zapisz**`,
     contentEn: `Manage your account and integrations.
@@ -974,7 +974,7 @@ To connect your wFirma account:
 You can use your own AI API key:
 
 1. In the **API Keys** window, select LLM section
-2. Choose provider: **OpenAI** or **Anthropic**
+2. Choose provider: **OpenAI**
 3. Enter your API key
 4. Click **Save**`,
     contentRu: `Управляйте аккаунтом и интеграциями.
@@ -1009,7 +1009,7 @@ You can use your own AI API key:
 Вы можете использовать собственный API ключ для AI:
 
 1. В окне **API Keys** выберите секцию LLM
-2. Выберите провайдера: **OpenAI** или **Anthropic**
+2. Выберите провайдера: **OpenAI**
 3. Введите ваш API ключ
 4. Нажмите **Сохранить**`,
     searchKeywordsPl: ['ustawienia', 'profil', 'konto', 'integracja', 'wfirma', 'hasło', 'bezpieczeństwo'],

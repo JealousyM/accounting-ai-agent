@@ -209,7 +209,7 @@ export const incrementWFirmaUsage = async (userId: string): Promise<void> => {
 function getErrorMessage(errorCode: string): string {
   switch (errorCode) {
     case SUBSCRIPTION_ERROR_CODES.LLM_KEY_REQUIRED:
-      return 'Free plan requires your own API key. Please add your OpenAI or Anthropic API key in settings.';
+      return 'Free plan requires your own API key. Please add your OpenAI API key in settings.';
     case SUBSCRIPTION_ERROR_CODES.AI_LIMIT_REACHED:
       return 'You have reached your monthly AI message limit. Upgrade to Pro or add your own API key for unlimited messages.';
     case SUBSCRIPTION_ERROR_CODES.WFIRMA_LIMIT_REACHED:
