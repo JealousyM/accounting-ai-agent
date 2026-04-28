@@ -13,6 +13,5 @@ export interface HealthSnapshot {
   integrations: {
     wfirma: CheckResult;
     openai: CheckResult;
-    anthropic: CheckResult;
   };
 }

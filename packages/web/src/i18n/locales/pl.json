@@ -49,7 +49,6 @@
       "llmProviderHelp": "Wybierz dostawcę AI. Musisz podać własny klucz API.",
       "llmApiKey": "Klucz API",
       "llmApiKeyHelpOpenai": "Pobierz klucz API z platform.openai.com",
-      "llmApiKeyHelpAnthropic": "Pobierz klucz API z console.anthropic.com",
       "choosePlan": "Wybierz plan",
       "connecting": "Łączenie...",
       "proCheckoutInfo": "Po rejestracji zostaniesz przekierowany do płatności, aby dokończyć subskrypcję Pro.",
@@ -155,7 +154,6 @@
       "llmApiKey": "Klucz API",
       "llmApiKeyPlaceholder": "Wprowadź klucz API",
       "llmApiKeyHelpOpenai": "Pobierz klucz API z platform.openai.com",
-      "llmApiKeyHelpAnthropic": "Pobierz klucz API z console.anthropic.com",
       "wfirmaSection": "Integracja wFirma (opcjonalnie)",
       "useWfirma": "Czy korzystasz z wFirma?",
       "wfirmaHelp": "Dane uwierzytelniające znajdziesz w ustawieniach konta wFirma w sekcji API.",
@@ -375,7 +373,7 @@
         },
         "apiKeys": {
           "title": "4. Klucze API i Usługi Zewnętrzne",
-          "content": "Możesz podać własne klucze API dla dostawców AI (OpenAI, Anthropic). Jesteś odpowiedzialny za zabezpieczenie tych kluczy i za wszelkie opłaty poniesione w związku z ich użyciem. Przechowujemy klucze API w formie zaszyfrowanej, ale nie możemy zagwarantować całkowitego bezpieczeństwa."
+          "content": "Możesz podać własne klucze API dla dostawców AI (OpenAI). Jesteś odpowiedzialny za zabezpieczenie tych kluczy i za wszelkie opłaty poniesione w związku z ich użyciem. Przechowujemy klucze API w formie zaszyfrowanej, ale nie możemy zagwarantować całkowitego bezpieczeństwa."
         },
         "wfirma": {
           "title": "5. Integracja z wFirma",
@@ -437,7 +435,7 @@
         },
         "thirdParties": {
           "title": "5. Usługi Zewnętrzne",
-          "content": "Integrujemy się z usługami zewnętrznymi, w tym: dostawcami AI (OpenAI, Anthropic), systemem księgowym wFirma, dostawcami OAuth (Google, GitHub). Każdy z nich ma własną politykę prywatności."
+          "content": "Integrujemy się z usługami zewnętrznymi, w tym: dostawcami AI (OpenAI), systemem księgowym wFirma, dostawcami OAuth (Google, GitHub). Każdy z nich ma własną politykę prywatności."
         },
         "cookies": {
           "title": "6. Pliki Cookie i Śledzenie",
@@ -485,7 +483,7 @@
         },
         "eeaTransfers": {
           "title": "Przekazywanie Danych poza Europejski Obszar Gospodarczy (EOG)",
-          "content": "Część naszych dostawców technologicznych ma siedziby poza EOG, w tym w Stanach Zjednoczonych (m.in. OpenAI, Anthropic, Google). Transfery tych danych opieramy na standardowych klauzulach umownych (SCC) przyjętych przez Komisję Europejską na podstawie art. 46 ust. 2 RODO, zapewniających odpowiedni poziom ochrony danych."
+          "content": "Część naszych dostawców technologicznych ma siedziby poza EOG, w tym w Stanach Zjednoczonych (m.in. OpenAI, Google). Transfery tych danych opieramy na standardowych klauzulach umownych (SCC) przyjętych przez Komisję Europejską na podstawie art. 46 ust. 2 RODO, zapewniających odpowiedni poziom ochrony danych."
         }
       }
     },
@@ -541,7 +539,7 @@
         },
         "recipients": {
           "title": "4. Odbiorcy Danych Osobowych",
-          "content": "Twoje dane mogą być przekazywane następującym kategoriom odbiorców: (a) podmiotom świadczącym usługi IT — hosting, infrastruktura chmurowa, utrzymanie systemów; (b) dostawcom usług AI (OpenAI, Anthropic) — wyłącznie w zakresie niezbędnym do realizacji funkcji AI Asystenta; (c) systemowi wFirma — w zakresie integracji danych księgowych na podstawie Twojego upoważnienia; (d) podmiotom przetwarzającym dane w naszym imieniu (procesorzy) — na podstawie umów o przetwarzanie danych osobowych; (e) organom publicznym — w przypadkach przewidzianych przepisami prawa (sądy, organy ścigania, organy podatkowe)."
+          "content": "Twoje dane mogą być przekazywane następującym kategoriom odbiorców: (a) podmiotom świadczącym usługi IT — hosting, infrastruktura chmurowa, utrzymanie systemów; (b) dostawcom usług AI (OpenAI) — wyłącznie w zakresie niezbędnym do realizacji funkcji AI Asystenta; (c) systemowi wFirma — w zakresie integracji danych księgowych na podstawie Twojego upoważnienia; (d) podmiotom przetwarzającym dane w naszym imieniu (procesorzy) — na podstawie umów o przetwarzanie danych osobowych; (e) organom publicznym — w przypadkach przewidzianych przepisami prawa (sądy, organy ścigania, organy podatkowe)."
         },
         "retention": {
           "title": "5. Okres Retencji Danych",
@@ -1009,7 +1007,7 @@
       }
     },
     "features": {
-      "byok": "Użyj własnego klucza OpenAI/Anthropic",
+      "byok": "Użyj własnego klucza OpenAI",
       "unlimitedWithKey": "Nieograniczone wiadomości AI (z własnym kluczem)",
       "wfirmaLimited": "30 żądań wFirma/miesiąc",
       "basicSupport": "Wsparcie społeczności",
@@ -1022,7 +1020,7 @@
     "registerForFree": "Zarejestruj się za darmo",
     "faq": {
       "title": "Pytania?",
-      "description": "Plan darmowy wymaga własnego klucza API z OpenAI lub Anthropic. Plan Pro zawiera kredyty API, więc możesz zacząć natychmiast."
+      "description": "Plan darmowy wymaga własnego klucza API z OpenAI. Plan Pro zawiera kredyty API, więc możesz zacząć natychmiast."
     },
     "management": {
       "loadError": "Nie udało się załadować szczegółów subskrypcji",
@@ -1056,7 +1054,7 @@
     },
     "upgrade": {
       "apiKeyRequired": "Wymagany klucz API",
-      "apiKeyRequiredDesc": "Plan darmowy wymaga własnego klucza API OpenAI lub Anthropic. Dodaj swój klucz, aby rozpocząć czat, lub ulepsz do Pro, aby otrzymać kredyty.",
+      "apiKeyRequiredDesc": "Plan darmowy wymaga własnego klucza API OpenAI. Dodaj swój klucz, aby rozpocząć czat, lub ulepsz do Pro, aby otrzymać kredyty.",
       "addApiKey": "Dodaj klucz API",
       "limitReached": "Osiągnięto limit wiadomości",
       "limitReachedDesc": "Wykorzystałeś wszystkie wiadomości AI w tym miesiącu. Dodaj własny klucz API dla nieograniczonych wiadomości lub poczekaj na reset limitu.",
@@ -1377,7 +1375,7 @@
       "title": "Jak to działa",
       "step1": {
         "title": "Załóż konto",
-        "description": "Zarejestruj się za darmo z własnym kluczem API OpenAI lub Anthropic, albo wybierz Pro z kredytami."
+        "description": "Zarejestruj się za darmo z własnym kluczem API OpenAI, albo wybierz Pro z kredytami."
       },
       "step2": {
         "title": "Połącz wFirma",

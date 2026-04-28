@@ -69,28 +69,9 @@ describe('HealthService', () => {
       expect(options.method ?? 'GET').toBe('GET');    // regression guard
     });
 
-    it('checkAnthropic calls GET /v1/models exactly (must remain non-billable)', async () => {
-      process.env.ANTHROPIC_API_KEY = 'sk-ant-test';
-      fetchMock.mockResolvedValueOnce({ ok: true } as Response);
-
-      await service['checkAnthropic']();
-
-      const [url, options] = fetchMock.mock.calls[0];
-      expect(String(url)).toMatch(/\/v1\/models$/);
-      expect(options.method ?? 'GET').toBe('GET');
-    });
-
     it('checkOpenAI returns ok=true with "not configured" when env missing, makes NO request', async () => {
       delete process.env.OPENAI_API_KEY;
       const result = await service['checkOpenAI']();
-      expect(result.ok).toBe(true);
-      expect(result.error).toBe('not configured');
-      expect(fetchMock).not.toHaveBeenCalled();
-    });
-
-    it('checkAnthropic returns ok=true with "not configured" when env missing, makes NO request', async () => {
-      delete process.env.ANTHROPIC_API_KEY;
-      const result = await service['checkAnthropic']();
       expect(result.ok).toBe(true);
       expect(result.error).toBe('not configured');
       expect(fetchMock).not.toHaveBeenCalled();
@@ -165,7 +146,6 @@ describe('HealthService', () => {
     beforeEach(() => {
       fetchMock.mockReset();
       process.env.OPENAI_API_KEY = 'sk-test';
-      process.env.ANTHROPIC_API_KEY = 'sk-ant-test';
       process.env.WFIRMA_HEALTH_API_KEY = 'k';
       process.env.WFIRMA_HEALTH_COMPANY_ID = 'c';
       fetchMock.mockResolvedValue({ ok: true } as Response);

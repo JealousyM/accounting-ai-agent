@@ -45,7 +45,6 @@ export class HealthMonitorService {
         integrations: {
           wfirma: { ok: false, latencyMs: 0 },
           openai: { ok: false, latencyMs: 0 },
-          anthropic: { ok: false, latencyMs: 0 },
         },
       };
     }

@@ -49,7 +49,6 @@
       "llmProviderHelp": "Select your AI provider. You will need to provide your own API key.",
       "llmApiKey": "API Key",
       "llmApiKeyHelpOpenai": "Get your API key from platform.openai.com",
-      "llmApiKeyHelpAnthropic": "Get your API key from console.anthropic.com",
       "choosePlan": "Choose Your Plan",
       "connecting": "Connecting...",
       "proCheckoutInfo": "You will be redirected to checkout after registration to complete your Pro subscription.",
@@ -155,7 +154,6 @@
       "llmApiKey": "API Key",
       "llmApiKeyPlaceholder": "Enter your API key",
       "llmApiKeyHelpOpenai": "Get your API key from platform.openai.com",
-      "llmApiKeyHelpAnthropic": "Get your API key from console.anthropic.com",
       "wfirmaSection": "wFirma Integration (Optional)",
       "useWfirma": "Do you use wFirma?",
       "wfirmaHelp": "You can find these credentials in your wFirma account settings under API section.",
@@ -375,7 +373,7 @@
         },
         "apiKeys": {
           "title": "4. API Keys and Third-Party Services",
-          "content": "You may provide your own API keys for AI providers (OpenAI, Anthropic). You are responsible for securing these keys and for any charges incurred through their use. We encrypt stored API keys but cannot guarantee absolute security."
+          "content": "You may provide your own API keys for AI providers (OpenAI). You are responsible for securing these keys and for any charges incurred through their use. We encrypt stored API keys but cannot guarantee absolute security."
         },
         "wfirma": {
           "title": "5. wFirma Integration",
@@ -437,7 +435,7 @@
         },
         "thirdParties": {
           "title": "5. Third-Party Services",
-          "content": "We integrate with third-party services including: AI providers (OpenAI, Anthropic), wFirma accounting system, OAuth providers (Google, GitHub). Each has their own privacy policies."
+          "content": "We integrate with third-party services including: AI providers (OpenAI), wFirma accounting system, OAuth providers (Google, GitHub). Each has their own privacy policies."
         },
         "cookies": {
           "title": "6. Cookies and Tracking",
@@ -485,7 +483,7 @@
         },
         "eeaTransfers": {
           "title": "Data Transfers Outside the EEA",
-          "content": "Some of our technology providers are located outside the European Economic Area (EEA), including in the United States (e.g., OpenAI, Anthropic, Google). We base these transfers on Standard Contractual Clauses (SCCs) adopted by the European Commission pursuant to Art. 46(2) GDPR, ensuring an adequate level of data protection."
+          "content": "Some of our technology providers are located outside the European Economic Area (EEA), including in the United States (e.g., OpenAI, Google). We base these transfers on Standard Contractual Clauses (SCCs) adopted by the European Commission pursuant to Art. 46(2) GDPR, ensuring an adequate level of data protection."
         }
       }
     },
@@ -541,7 +539,7 @@
         },
         "recipients": {
           "title": "4. Data Recipients",
-          "content": "Your data may be disclosed to the following categories of recipients: (a) IT service providers — hosting, cloud infrastructure, system maintenance; (b) AI service providers (OpenAI, Anthropic) — solely to the extent necessary to provide AI Assistant functionality; (c) wFirma system — for accounting data integration based on your authorization; (d) data processors acting on our behalf — under data processing agreements; (e) public authorities — in cases provided by law (courts, law enforcement, tax authorities)."
+          "content": "Your data may be disclosed to the following categories of recipients: (a) IT service providers — hosting, cloud infrastructure, system maintenance; (b) AI service providers (OpenAI) — solely to the extent necessary to provide AI Assistant functionality; (c) wFirma system — for accounting data integration based on your authorization; (d) data processors acting on our behalf — under data processing agreements; (e) public authorities — in cases provided by law (courts, law enforcement, tax authorities)."
         },
         "retention": {
           "title": "5. Retention Periods",
@@ -1009,7 +1007,7 @@
       }
     },
     "features": {
-      "byok": "Bring your own OpenAI/Anthropic key",
+      "byok": "Bring your own OpenAI key",
       "unlimitedWithKey": "Unlimited AI messages (with your key)",
       "wfirmaLimited": "30 wFirma requests/month",
       "basicSupport": "Community support",
@@ -1022,7 +1020,7 @@
     "registerForFree": "Sign up free",
     "faq": {
       "title": "Questions?",
-      "description": "Free plan requires your own API key from OpenAI or Anthropic. Pro plan includes API credits so you can start immediately."
+      "description": "Free plan requires your own API key from OpenAI. Pro plan includes API credits so you can start immediately."
     },
     "management": {
       "loadError": "Failed to load subscription details",
@@ -1056,7 +1054,7 @@
     },
     "upgrade": {
       "apiKeyRequired": "API Key Required",
-      "apiKeyRequiredDesc": "Free plan requires your own OpenAI or Anthropic API key. Add your key to start chatting, or upgrade to Pro for included credits.",
+      "apiKeyRequiredDesc": "Free plan requires your own OpenAI API key. Add your key to start chatting, or upgrade to Pro for included credits.",
       "addApiKey": "Add API Key",
       "limitReached": "Message Limit Reached",
       "limitReachedDesc": "You've used all your included AI messages this month. Add your own API key for unlimited messages, or wait for your limit to reset.",
@@ -1377,7 +1375,7 @@
       "title": "How It Works",
       "step1": {
         "title": "Create an Account",
-        "description": "Sign up free with your own OpenAI or Anthropic API key, or choose Pro for included credits."
+        "description": "Sign up free with your own OpenAI API key, or choose Pro for included credits."
       },
       "step2": {
         "title": "Connect wFirma",
