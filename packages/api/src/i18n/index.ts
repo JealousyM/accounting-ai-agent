@@ -42,6 +42,8 @@ export interface ContractorTranslations {
   similarContractors: string;
   specifyNameUpdate: string;
   specifyNameDelete: string;
+  // Auto-fill from public registry
+  autoFilledFromRegistry: string;
 }
 
 export interface InvoiceTranslations {

@@ -41,7 +41,8 @@
     "exactNotFound": "Nie znaleziono kontrahenta o dokładnej nazwie",
     "similarContractors": "Podobni kontrahenci",
     "specifyNameUpdate": "Podaj dokładną nazwę do aktualizacji.",
-    "specifyNameDelete": "Podaj dokładną nazwę do usunięcia."
+    "specifyNameDelete": "Podaj dokładną nazwę do usunięcia.",
+    "autoFilledFromRegistry": "Uzupełnione automatycznie z rejestrów publicznych (Biała Lista MF)"
   },
   "invoice": {
     "invoices": "Faktury",

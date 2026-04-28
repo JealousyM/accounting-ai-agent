@@ -41,7 +41,8 @@
     "exactNotFound": "Contractor with exact name not found",
     "similarContractors": "Similar contractors",
     "specifyNameUpdate": "Please specify exact name for update.",
-    "specifyNameDelete": "Please specify exact name for deletion."
+    "specifyNameDelete": "Please specify exact name for deletion.",
+    "autoFilledFromRegistry": "Auto-filled from the Polish public registry (Biała Lista MF)"
   },
   "invoice": {
     "invoices": "Invoices",
