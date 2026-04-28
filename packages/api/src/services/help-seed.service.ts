@@ -1242,7 +1242,7 @@ Data is automatically refreshed every 10 minutes. You can also refresh manually 
   },
   {
     slug: 'settings-organization',
-    category: 'settings',
+    category: 'organization',
     titlePl: 'Organizacja',
     titleEn: 'Organization',
     titleRu: 'Организация',
@@ -1461,7 +1461,7 @@ Only **active members** of the organization can see shared conversations. Users 
   },
   {
     slug: 'settings-telegram',
-    category: 'settings',
+    category: 'telegram',
     titlePl: 'Bot Telegram',
     titleEn: 'Telegram Bot',
     titleRu: 'Telegram-бот',
@@ -1575,7 +1575,7 @@ Telegram-бот позволяет использовать AI-ассистен�
   },
   {
     slug: 'ai-chat-receipt-ocr-telegram',
-    category: 'aiChat',
+    category: 'telegram',
     titlePl: 'Skanowanie paragonów w bocie Telegram',
     titleEn: 'Receipt scanning in the Telegram bot',
     titleRu: 'Сканирование чеков в Telegram-боте',
