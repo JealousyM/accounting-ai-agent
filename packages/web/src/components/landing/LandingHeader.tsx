@@ -25,7 +25,7 @@ export function LandingHeader() {
 
   return (
     <header className="sticky top-0 z-50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm border-b border-gray-200 dark:border-gray-700">
-      <div className="max-w-6xl mx-auto px-4 h-32 flex items-center justify-between">
+      <div className="max-w-6xl mx-auto px-4 h-20 flex items-center justify-between">
         {/* Logo */}
         <Link
           href="/"
@@ -35,8 +35,8 @@ export function LandingHeader() {
           <img
             src="/logo.svg"
             alt="eKsięgowy AI"
-            width={112}
-            height={112}
+            width={64}
+            height={64}
           />
           <span className="text-xl font-bold text-gray-900 dark:text-white">
             eKsiegowy AI
