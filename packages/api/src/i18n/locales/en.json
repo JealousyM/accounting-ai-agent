@@ -698,6 +698,25 @@
     "ksefTokenHint": "Authorization token from KSeF portal",
     "ksefNipHint": "Company NIP for KSeF session"
   },
+  "bialaLista": {
+    "verificationTitle": "Bank Account Verification — Biała Lista (MF)",
+    "statusMatch": "MATCH — account is registered for this NIP on the White List",
+    "statusNoMatch": "NO MATCH — account is NOT registered for this NIP on the White List",
+    "field": "Field",
+    "value": "Value",
+    "nip": "NIP",
+    "accountNumber": "Bank Account",
+    "checkDate": "Check Date",
+    "requestId": "MF Request ID",
+    "matchHint": "Safe to pay — the account is on the official MF White List for this NIP. Save the MF Request ID as legal proof of the check.",
+    "noMatchHint": "Do NOT pay to this account. Paying to an unverified account ≥ 15,000 PLN disqualifies the cost as KUP and triggers joint VAT liability under Art. 117ba Tax Ordinance.",
+    "legalNote15k": "Legal note: Verification is mandatory for any single payment of 15,000 PLN or more (Art. 19 Entrepreneurs Law).",
+    "invalidNip": "Invalid NIP — must be exactly 10 digits with a valid checksum.",
+    "invalidAccount": "Invalid bank account number — must be 26 digits (NRB format, with or without country prefix and spaces).",
+    "errorVerify": "Error verifying bank account on Biała Lista",
+    "errorReason": "Reason",
+    "disclaimer": "Source: https://wl-api.mf.gov.pl — Polish Ministry of Finance, Wykaz podatników VAT."
+  },
   "taxCalendar": {
     "title": "Tax Calendar",
     "deadlinesTitle": "Tax Deadlines",

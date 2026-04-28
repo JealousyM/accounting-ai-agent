@@ -124,6 +124,7 @@ import {
   createMatchIncomingInvoiceTool,
   createDirectSendToKSeFTool,
 } from './ksef.tools';
+import { createVerifyBankAccountTool } from './biala-lista.tools';
 
 // Re-export individual tool creators
 export {
@@ -234,6 +235,7 @@ export {
   createMatchIncomingInvoiceTool,
   createDirectSendToKSeFTool,
 } from './ksef.tools';
+export { createVerifyBankAccountTool } from './biala-lista.tools';
 
 /**
  * Create all AI chat tools for wFirma integration
@@ -324,6 +326,9 @@ export function createAllTools(
 
     // Tax Calendar tool (no wFirma dependency — always available)
     createGetTaxDeadlinesTool(taxCalendarService, locale),
+
+    // Biała Lista MF tool (no wFirma dependency — always available)
+    createVerifyBankAccountTool(enrichmentService, userId, locale),
 
     // Document tools
     createGetDocumentsTool(wfirmaService, userId, locale, subscriptionService),

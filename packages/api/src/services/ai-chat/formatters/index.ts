@@ -106,3 +106,6 @@ export {
 export {
   formatTaxDeadlinesList,
 } from './tax-calendar.formatter';
+export {
+  formatBankAccountVerification,
+} from './biala-lista.formatter';

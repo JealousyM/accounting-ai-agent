@@ -129,6 +129,17 @@ export interface PublicRegistryData {
   krsData?: KrsData;
 }
 
+export interface BankAccountVerification {
+  nip: string;
+  accountNumber: string;
+  /** Date the verification was performed against (YYYY-MM-DD) */
+  date: string;
+  /** Whether the account is assigned to the entity on the Biała Lista MF registry */
+  accountAssigned: boolean;
+  /** MF requestId returned by the API; used as legal proof of the check */
+  requestId?: string;
+}
+
 export interface CompanyFullInfo {
   wfirma: WFirmaCompanyDetails;
   publicRegistry?: PublicRegistryData;
