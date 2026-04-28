@@ -82,8 +82,6 @@ export function RunsTable({ runs, isLoading, translations = DEFAULT_TRANSLATIONS
     switch (provider.toLowerCase()) {
       case 'openai':
         return 'bg-green-100 text-green-700';
-      case 'anthropic':
-        return 'bg-orange-100 text-orange-700';
       default:
         return 'bg-gray-100 text-gray-700';
     }

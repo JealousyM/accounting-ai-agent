@@ -115,11 +115,17 @@ export interface KrsData {
 
 export interface PublicRegistryData {
   nip: string;
+  /** Full legal name from Biała Lista (subject.name) */
+  name?: string;
   regon?: string;
   krs?: string;
   vatStatus?: 'czynny' | 'zwolniony' | 'niezarejestrowany';
   vatStatusDate?: string;
   verifiedBankAccounts?: string[];
+  /** Address of business activity (workingAddress) — single-string form from MF */
+  workingAddress?: string;
+  /** Residence address (residenceAddress) — single-string form from MF */
+  residenceAddress?: string;
   krsData?: KrsData;
 }
 

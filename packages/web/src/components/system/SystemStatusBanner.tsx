@@ -19,7 +19,7 @@ function buildKey(
   if (status === 'down') return 'down';
   if (status === 'degraded') {
     const i = snapshot?.integrations;
-    if (i && (!i.openai.ok || !i.anthropic.ok)) return 'degraded.ai';
+    if (i && !i.openai.ok) return 'degraded.ai';
     if (i && !i.wfirma.ok) return 'degraded.wfirma';
     return 'down';
   }

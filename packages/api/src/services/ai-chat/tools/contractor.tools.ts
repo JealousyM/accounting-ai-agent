@@ -10,6 +10,11 @@ import { getContractorTranslations, Locale } from '../../../i18n';
 import { WFirmaIntegrationService } from '../../wfirma';
 import { WFirmaCacheService } from '../../wfirma-cache.service';
 import {
+  CompanyEnrichmentService,
+  parsePolishAddress,
+  validateNip,
+} from '../../company-enrichment.service';
+import {
   formatContractorsList,
   formatContractorCreated,
   formatContractorUpdated,
@@ -65,7 +70,8 @@ export function createCreateContractorTool(
   cacheService: WFirmaCacheService,
   userId: string,
   locale: Locale,
-  subscriptionService?: SubscriptionService
+  subscriptionService?: SubscriptionService,
+  enrichmentService?: CompanyEnrichmentService,
 ): StructuredToolInterface {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return (tool as any)(
@@ -82,7 +88,7 @@ export function createCreateContractorTool(
       bankAccount,
       notes,
     }: {
-      name: string;
+      name?: string;
       nip?: string;
       regon?: string;
       email?: string;
@@ -97,6 +103,54 @@ export function createCreateContractorTool(
       try {
         const limitError = await checkWFirmaLimit(subscriptionService, userId, locale);
         if (limitError) return limitError;
+
+        const t = getContractorTranslations(locale);
+
+        // Auto-fill from public registry when NIP is provided and core fields are missing.
+        // Saves the user from re-typing what's already on Biała Lista MF.
+        const autoFilledFields: string[] = [];
+        if (
+          enrichmentService &&
+          nip &&
+          validateNip(nip) &&
+          (!name || !regon || !street || !city || !zip)
+        ) {
+          const enriched = await enrichmentService.enrichByNip(nip, userId);
+          if (enriched) {
+            if (!name && enriched.name) {
+              name = enriched.name;
+              autoFilledFields.push('name');
+            }
+            if (!regon && enriched.regon) {
+              regon = enriched.regon;
+              autoFilledFields.push('regon');
+            }
+            const sourceAddress = enriched.workingAddress || enriched.residenceAddress;
+            if (sourceAddress) {
+              const parsed = parsePolishAddress(sourceAddress);
+              if (!street && parsed.street) {
+                street = parsed.street;
+                autoFilledFields.push('street');
+              }
+              if (!city && parsed.city) {
+                city = parsed.city;
+                autoFilledFields.push('city');
+              }
+              if (!zip && parsed.zip) {
+                zip = parsed.zip;
+                autoFilledFields.push('zip');
+              }
+            }
+          }
+        }
+
+        if (!name || !name.trim()) {
+          return `## ❌ ${t.errorCreateTitle}
+
+**${t.errorReason}:** ${t.requiredFields}: name (and optionally NIP). When NIP is provided, name is auto-filled from the public registry — but here either no NIP was given or the NIP was not found.
+
+${t.tryAgain}`;
+        }
 
         const address = (street || city || zip || country)
           ? {
@@ -124,7 +178,7 @@ export function createCreateContractorTool(
 
         await cacheService.invalidateCache(userId, 'contractor');
 
-        return formatContractorCreated(contractor, locale);
+        return formatContractorCreated(contractor, locale, autoFilledFields);
       } catch (error) {
         logger.error('Failed to create contractor', { error });
         const t = getContractorTranslations(locale);
@@ -148,10 +202,21 @@ ${t.tryAgain}`;
     },
     {
       name: 'create_contractor',
-      description: 'Create a new contractor/customer in wFirma. Required: name. Recommended: city (city name). Optional: nip, regon, email, phone, street, zip, country (2-letter code like PL, LT), bankAccount, notes.',
+      description:
+        'Create a new contractor/customer in wFirma. Provide either `name` OR `nip` (when only NIP is given, name/REGON/address are auto-filled from the Polish public registry — Biała Lista MF). Optional: email, phone, street, city, zip, country (2-letter code like PL, LT), bankAccount, notes. The reply lists which fields were auto-filled.',
       schema: z.object({
-        name: z.string().describe('Full name or company name of the contractor (required)'),
-        nip: z.string().nullable().optional().describe('NIP (Polish tax ID) - 10 digits'),
+        name: z
+          .string()
+          .nullable()
+          .optional()
+          .describe(
+            'Full name or company name of the contractor. Optional only if NIP is provided — in that case it is auto-filled from the Polish public registry.',
+          ),
+        nip: z
+          .string()
+          .nullable()
+          .optional()
+          .describe('NIP (Polish tax ID) — 10 digits. When provided, missing fields (name, REGON, address) are auto-filled from Biała Lista MF.'),
         regon: z.string().nullable().optional().describe('REGON number'),
         email: z.string().nullable().optional().describe('Email address'),
         phone: z.string().nullable().optional().describe('Phone number'),

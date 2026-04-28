@@ -1,4 +1,9 @@
-import { CompanyEnrichmentService, validateNip, normalizeBankAccount } from '../company-enrichment.service';
+import {
+  CompanyEnrichmentService,
+  validateNip,
+  parsePolishAddress,
+  normalizeBankAccount,
+} from '../company-enrichment.service';
 import axios from 'axios';
 
 // Mock axios
@@ -75,10 +80,12 @@ describe('CompanyEnrichmentService', () => {
             data: {
               result: {
                 subject: {
+                  name: 'MICODE SP. Z O.O.',
                   regon: '523456789',
                   krs: '0001234567',
                   statusVat: 'Czynny',
                   accountNumbers: ['PL12345678901234567890123456'],
+                  workingAddress: 'UL. PIĘKNA 47B/8, 00-672 WARSZAWA',
                 },
               },
             },
@@ -107,13 +114,41 @@ describe('CompanyEnrichmentService', () => {
       const result = await service.enrichByNip('5833510147', 'user-123');
 
       expect(result).toBeDefined();
+      expect(result!.name).toBe('MICODE SP. Z O.O.');
       expect(result!.regon).toBe('523456789');
       expect(result!.krs).toBe('0001234567');
       expect(result!.vatStatus).toBe('czynny');
       expect(result!.verifiedBankAccounts).toEqual(['PL12345678901234567890123456']);
+      expect(result!.workingAddress).toBe('UL. PIĘKNA 47B/8, 00-672 WARSZAWA');
       expect(result!.krsData?.legalForm).toBe('SPÓŁKA Z OGRANICZONĄ ODPOWIEDZIALNOŚCIĄ');
       expect(result!.krsData?.shareCapital).toBe('5000.00 PLN');
       expect(mockCacheService.cacheData).toHaveBeenCalled();
+    });
+
+    it('extracts residenceAddress for sole proprietors (no working address)', async () => {
+      mockCacheService.getCachedData.mockResolvedValue(null);
+      mockCacheService.cacheData.mockResolvedValue(undefined);
+      mockedAxios.get.mockImplementation((url: string) => {
+        if (url.includes('wl-api.mf.gov.pl')) {
+          return Promise.resolve({
+            data: {
+              result: {
+                subject: {
+                  name: 'JAN KOWALSKI - INDYWIDUALNA DZIAŁALNOŚĆ',
+                  statusVat: 'Czynny',
+                  residenceAddress: 'UL. KWIATOWA 5, 30-010 KRAKÓW',
+                },
+              },
+            },
+          });
+        }
+        return Promise.reject(new Error('KRS unavailable'));
+      });
+
+      const result = await service.enrichByNip('5833510147', 'user-123');
+      expect(result!.name).toBe('JAN KOWALSKI - INDYWIDUALNA DZIAŁALNOŚĆ');
+      expect(result!.residenceAddress).toBe('UL. KWIATOWA 5, 30-010 KRAKÓW');
+      expect(result!.workingAddress).toBeUndefined();
     });
 
     it('should return partial data when KRS fails', async () => {
@@ -284,5 +319,47 @@ describe('normalizeBankAccount', () => {
 
   it('rejects empty input', () => {
     expect(normalizeBankAccount('')).toBeNull();
+  });
+});
+
+describe('parsePolishAddress', () => {
+  it('parses "STREET NN, ZIP CITY" format', () => {
+    expect(parsePolishAddress('UL. PIĘKNA 47B/8, 00-672 WARSZAWA')).toEqual({
+      street: 'UL. PIĘKNA 47B/8',
+      city: 'WARSZAWA',
+      zip: '00-672',
+    });
+  });
+
+  it('parses without leading "UL." prefix', () => {
+    expect(parsePolishAddress('PIĘKNA 47B/8, 00-672 WARSZAWA')).toEqual({
+      street: 'PIĘKNA 47B/8',
+      city: 'WARSZAWA',
+      zip: '00-672',
+    });
+  });
+
+  it('parses without comma separator', () => {
+    expect(parsePolishAddress('PIĘKNA 47B/8 00-672 WARSZAWA')).toEqual({
+      street: 'PIĘKNA 47B/8',
+      city: 'WARSZAWA',
+      zip: '00-672',
+    });
+  });
+
+  it('parses reversed order ("ZIP CITY, STREET")', () => {
+    expect(parsePolishAddress('00-672 WARSZAWA, UL. PIĘKNA 47B/8')).toEqual({
+      street: 'UL. PIĘKNA 47B/8',
+      city: 'WARSZAWA',
+      zip: '00-672',
+    });
+  });
+
+  it('returns street-only for input without postcode', () => {
+    expect(parsePolishAddress('SOMEWHERE')).toEqual({ street: 'SOMEWHERE' });
+  });
+
+  it('returns empty object for empty input', () => {
+    expect(parsePolishAddress('')).toEqual({});
   });
 });

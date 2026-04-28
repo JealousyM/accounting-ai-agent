@@ -28,7 +28,7 @@ export function initSentry(): void {
     },
   });
 
-  logger.info('[Sentry] Initialized for environment:', process.env.NODE_ENV);
+  logger.info(`[Sentry] Initialized for environment: ${process.env.NODE_ENV}`);
 }
 
 export { Sentry };

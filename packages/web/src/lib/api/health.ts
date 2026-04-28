@@ -8,7 +8,6 @@ export interface HealthSnapshot {
   integrations: {
     wfirma: HealthCheck;
     openai: HealthCheck;
-    anthropic: HealthCheck;
   };
 }
 

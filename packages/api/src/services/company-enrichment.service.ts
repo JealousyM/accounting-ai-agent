@@ -13,6 +13,39 @@ const KRS_API_BASE = 'https://api-krs.ms.gov.pl';
 const API_TIMEOUT = 5000;
 
 /**
+ * Parse a Polish single-string address (as returned by MF Biała Lista) into
+ * street/city/zip components.
+ *
+ * Handles common forms:
+ *   "UL. PIĘKNA 47B/8, 00-672 WARSZAWA"
+ *   "PIĘKNA 47B/8 00-672 WARSZAWA"
+ *   "00-672 WARSZAWA, UL. PIĘKNA 47B/8"
+ *
+ * Best-effort. Anything we cannot identify as a postcode-anchored token goes
+ * into `street`. Returns an empty object if input is empty.
+ */
+export function parsePolishAddress(input: string): { street?: string; city?: string; zip?: string } {
+  if (!input) return {};
+  const zipPattern = /(\d{2}-\d{3})\s+([^,]+)/;
+  const match = input.match(zipPattern);
+  if (!match) {
+    return { street: input.trim() };
+  }
+  const zip = match[1];
+  const city = match[2].trim();
+  const street = input
+    .replace(match[0], '')
+    .replace(/[,\s]+$/, '')
+    .replace(/^[,\s]+/, '')
+    .trim();
+  return {
+    street: street || undefined,
+    city: city || undefined,
+    zip: zip || undefined,
+  };
+}
+
+/**
  * Normalize a Polish bank account to NRB (26 digits, no spaces, no country prefix).
  * Accepts: "PL12 3456 7890 1234 5678 9012 3456", "12345678901234567890123456",
  * "12 3456 7890 1234 5678 9012 3456", etc. Returns null if it can't be reduced
@@ -88,11 +121,14 @@ export class CompanyEnrichmentService {
       // 3. Merge results
       const result: PublicRegistryData = {
         nip,
+        name: mfData?.name || undefined,
         regon: mfData?.regon || undefined,
         krs: mfData?.krs || undefined,
         vatStatus: mfData?.vatStatus || undefined,
         vatStatusDate: mfData?.vatStatusDate || undefined,
         verifiedBankAccounts: mfData?.verifiedBankAccounts || undefined,
+        workingAddress: mfData?.workingAddress || undefined,
+        residenceAddress: mfData?.residenceAddress || undefined,
         krsData: krsData || undefined,
       };
 
@@ -115,11 +151,14 @@ export class CompanyEnrichmentService {
    * GET https://wl-api.mf.gov.pl/api/search/nip/{nip}?date={YYYY-MM-DD}
    */
   private async fetchFromBialaLista(nip: string): Promise<{
+    name?: string;
     regon?: string;
     krs?: string;
     vatStatus?: PublicRegistryData['vatStatus'];
     vatStatusDate?: string;
     verifiedBankAccounts?: string[];
+    workingAddress?: string;
+    residenceAddress?: string;
   } | null> {
     const today = new Date().toISOString().split('T')[0];
     const url = `${MF_API_BASE}/api/search/nip/${nip}?date=${today}`;
@@ -135,12 +174,19 @@ export class CompanyEnrichmentService {
     }
 
     return {
+      name: typeof subject.name === 'string' && subject.name.trim() ? subject.name.trim() : undefined,
       regon: subject.regon || undefined,
       krs: subject.krs || undefined,
       vatStatus: this.mapVatStatus(subject.statusVat),
       vatStatusDate: subject.registrationDenialDate || subject.registrationLegalDate || undefined,
       verifiedBankAccounts: Array.isArray(subject.accountNumbers)
         ? subject.accountNumbers.filter((a: string) => a)
+        : undefined,
+      workingAddress: typeof subject.workingAddress === 'string' && subject.workingAddress.trim()
+        ? subject.workingAddress.trim()
+        : undefined,
+      residenceAddress: typeof subject.residenceAddress === 'string' && subject.residenceAddress.trim()
+        ? subject.residenceAddress.trim()
         : undefined,
     };
   }

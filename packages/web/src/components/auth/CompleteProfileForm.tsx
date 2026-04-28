@@ -66,7 +66,6 @@ export function CompleteProfileForm() {
     llmProviderHelp: t.llmProviderHelp || 'Select your AI provider. You will need to provide your own API key.',
     llmApiKey: t.llmApiKey || 'API Key',
     llmApiKeyHelpOpenai: t.llmApiKeyHelpOpenai || 'Get your API key from platform.openai.com',
-    llmApiKeyHelpAnthropic: t.llmApiKeyHelpAnthropic || 'Get your API key from console.anthropic.com',
     useWfirma: t.useWfirma || 'Do you use wFirma?',
     wfirmaHelp: t.wfirmaHelp || 'You can find these credentials in your wFirma account settings under API section.',
     wfirmaAccessKey: t.wfirmaAccessKey || 'Access Key',

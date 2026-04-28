@@ -56,15 +56,6 @@ export class HealthService {
     });
   }
 
-  private async checkAnthropic(): Promise<CheckResult> {
-    const key = process.env.ANTHROPIC_API_KEY;
-    if (!key) return { ok: true, latencyMs: 0, error: 'not configured' };
-    return this.probeWithTimeout('https://api.anthropic.com/v1/models', {
-      'x-api-key': key,
-      'anthropic-version': '2023-06-01',
-    });
-  }
-
   private async checkWfirma(): Promise<CheckResult> {
     const apiKey = process.env.WFIRMA_HEALTH_API_KEY;
     const companyId = process.env.WFIRMA_HEALTH_COMPANY_ID;
@@ -81,17 +72,15 @@ export class HealthService {
     return {
       wfirma: { ok: true, latencyMs: 0, error: 'not configured' },
       openai: { ok: true, latencyMs: 0, error: 'not configured' },
-      anthropic: { ok: true, latencyMs: 0, error: 'not configured' },
     };
   }
 
   private async refreshIntegrations(): Promise<HealthSnapshot['integrations']> {
-    const [wfirma, openai, anthropic] = await Promise.all([
+    const [wfirma, openai] = await Promise.all([
       this.checkWfirma(),
       this.checkOpenAI(),
-      this.checkAnthropic(),
     ]);
-    return { wfirma, openai, anthropic };
+    return { wfirma, openai };
   }
 
   private async getIntegrationsCached(): Promise<HealthSnapshot['integrations']> {
@@ -148,7 +137,6 @@ export class HealthService {
       integrations: {
         wfirma: scrub(snap.integrations.wfirma),
         openai: scrub(snap.integrations.openai),
-        anthropic: scrub(snap.integrations.anthropic),
       },
     };
   }

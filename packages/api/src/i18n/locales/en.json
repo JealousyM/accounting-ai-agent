@@ -4,6 +4,36 @@
     "aiLimitReached": "You have reached your monthly AI message limit. Please upgrade your plan or use your own API key.",
     "subscriptionRequired": "This feature requires an active subscription."
   },
+  "ocr": {
+    "recognizing": "Recognizing receipt…",
+    "recognizeFailed": "Could not read this image. Please try a clearer photo (good lighting, no blur, full receipt visible).",
+    "title": "Recognized receipt",
+    "field": "Field",
+    "value": "Value",
+    "documentType": "Document type",
+    "documentTypeValues": {
+      "paragon": "Cash receipt (paragon)",
+      "faktura": "VAT invoice (faktura)",
+      "rachunek": "Bill (rachunek)",
+      "unknown": "Unknown"
+    },
+    "sellerName": "Seller",
+    "sellerNip": "Seller NIP",
+    "sellerAddress": "Seller address",
+    "documentNumber": "Document #",
+    "issueDate": "Issue date",
+    "totalNet": "Net total",
+    "totalVat": "VAT total",
+    "totalGross": "Gross total",
+    "confidence": "Recognition confidence",
+    "itemsTitle": "Items",
+    "itemName": "Name",
+    "itemQuantity": "Qty",
+    "itemVatRate": "VAT",
+    "itemTotal": "Total",
+    "notes": "Notes",
+    "confirmHint": "Verify the totals — if everything looks right, copy the data into wFirma or ask the AI to log this expense."
+  },
   "contractor": {
     "notFound": "No contractors found.",
     "contractorsTitle": "Contractors",
@@ -41,7 +71,8 @@
     "exactNotFound": "Contractor with exact name not found",
     "similarContractors": "Similar contractors",
     "specifyNameUpdate": "Please specify exact name for update.",
-    "specifyNameDelete": "Please specify exact name for deletion."
+    "specifyNameDelete": "Please specify exact name for deletion.",
+    "autoFilledFromRegistry": "Auto-filled from the Polish public registry (Biała Lista MF)"
   },
   "invoice": {
     "invoices": "Invoices",

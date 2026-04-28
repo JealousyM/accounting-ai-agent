@@ -496,6 +496,52 @@ Comprehensive test checklist for pre-deployment verification.
 
 ---
 
+## 23a. Receipt OCR — Telegram bot
+
+| # | Test Scenario | Expected Result | Status |
+|---|---|---|---|
+| 23a.1 | Send a clear Polish paragon photo | Markdown card with seller, NIP, date, totals, items returned within ~5s | |
+| 23a.2 | Send a faktura VAT photo | Card with documentType=faktura and 10-digit NIP | |
+| 23a.3 | Send a non-receipt photo (random image) | "Could not read this image" reply, no crash | |
+| 23a.4 | Send a photo without /link first | "Please link your account first" message | |
+| 23a.5 | Send 11 photos in 60 seconds | 11th hits rate limit ("sending too fast") | |
+| 23a.6 | Telegram language_code=ru → recognizing message in Russian | "Распознаю чек…" placeholder shown | |
+| 23a.7 | Telegram language_code=en → card headers in English | "Recognized receipt", "Seller", "Gross total" etc. | |
+| 23a.8 | Photo with Polish letters (ą/ć/ę/ł) in seller name | Letters preserved, no mojibake | |
+| 23a.9 | Crumpled / low-light receipt | Recognition still works (model confidence may be lower) | |
+
+---
+
+## 23b. Biała Lista MF — Bank account verification
+
+| # | Test Scenario | Expected Result | Status |
+|---|---|---|---|
+| 23b.1 | Ask AI: "verify account PL... for NIP X" with valid match | ✅ MATCH card with MF Request ID | |
+| 23b.2 | Ask AI: "verify account ..." with mismatch | ⚠️ NO MATCH card with legal warning hint | |
+| 23b.3 | Invalid NIP (wrong checksum) | "Invalid NIP" error from tool | |
+| 23b.4 | Account number with spaces or PL prefix | Normalized correctly, verification works | |
+| 23b.5 | User: "register payment of 20 000 PLN to NIP X account Y" | Agent calls verify_bank_account_white_list before confirming | |
+| 23b.6 | Repeat the same check within 24h | Cache hit, no MF API call | |
+| 23b.7 | MF API down (simulated 5xx) | Soft fail with stale cache fallback or clear error | |
+| 23b.8 | i18n: card and hints in pl / en / ru | All strings translated | |
+| 23b.9 | MF Request ID present in successful response | Request ID rendered in the markdown card | |
+
+---
+
+## 23c. Contractor NIP autofill
+
+| # | Test Scenario | Expected Result | Status |
+|---|---|---|---|
+| 23c.1 | "Create contractor NIP 5833510147" — no other fields | Contractor created; card lists auto-filled fields (name, regon, street, city, zip) | |
+| 23c.2 | "Create contractor 'Acme' NIP 5833510147" — name overrides registry | Contractor with name=Acme; address still auto-filled | |
+| 23c.3 | "Create contractor NIP 1234567890" — invalid checksum | Validation error, contractor not created | |
+| 23c.4 | "Create contractor NIP not-in-registry" | Falls through to required-field error (no name) | |
+| 23c.5 | i18n: autoFilledFromRegistry note in pl / en / ru | Localized "auto-filled from public registry" line | |
+| 23c.6 | Sole proprietor NIP (no KRS) | Autofill works from Biała Lista alone | |
+| 23c.7 | Repeat NIP within 24h | Public-registry cache hit, no re-fetch | |
+
+---
+
 ## 23. Referral Program
 
 | # | Test Scenario | Expected Result | Status |
@@ -547,8 +593,11 @@ Comprehensive test checklist for pre-deployment verification.
 | Database & Cache | 10 |
 | CI/CD & Deployment | 7 |
 | Referral Program | 17 |
-| **TOTAL** | **267** |
+| Receipt OCR — Telegram | 9 |
+| Biała Lista MF | 9 |
+| Contractor NIP Autofill | 7 |
+| **TOTAL** | **292** |
 
 ---
 
-*Last updated: 2026-04-16*
+*Last updated: 2026-04-28*

@@ -15,6 +15,10 @@ import { redis } from '../../lib/redis';
 import { logger } from '../../utils/logger';
 import { AIChatService } from '../ai-chat/ai-chat.service';
 import { convertToTelegramMarkdown, splitMessage } from './markdown-converter';
+import { receiptOCRService } from '../ocr/receipt-ocr.instance';
+import { formatParsedReceipt } from '../ocr/formatter';
+import { getOcrTranslations, Locale } from '../../i18n';
+import { detectLocale } from '../ai-chat/utils';
 
 const RATE_LIMIT_WINDOW_SECONDS = 60;
 const RATE_LIMIT_MAX_MESSAGES = 10;
@@ -308,6 +312,104 @@ export class TelegramBotService {
         await ctx.reply('An error occurred while processing your message. Please try again.');
       }
     });
+
+    this.bot.on('photo', async (ctx) => {
+      try {
+        await this.handlePhoto(ctx);
+      } catch (error) {
+        logger.error('[TelegramBot] Unhandled error in photo handler', {
+          error: (error as Error).message,
+        });
+        await ctx.reply('Could not process the photo. Please try again.');
+      }
+    });
+  }
+
+  /**
+   * OCR a receipt photo: download highest-resolution variant, run it through
+   * the receipt-ocr service, post a formatted markdown card back. Locale is
+   * detected from the user's Telegram language setting (`language_code`).
+   */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private async handlePhoto(ctx: any): Promise<void> {
+    const telegramUserId = String(ctx.from?.id);
+    const langCode: string = ctx.from?.language_code || 'pl';
+    // Map Telegram language_code → our Locale (pl/en/ru). Default to pl.
+    const locale: Locale = langCode.startsWith('ru')
+      ? 'ru'
+      : langCode.startsWith('en')
+        ? 'en'
+        : 'pl';
+    const t = getOcrTranslations(locale);
+
+    // Account-link gate (same as text handler)
+    const link = await prisma.telegramLink.findUnique({ where: { telegramUserId } });
+    if (!link) {
+      await ctx.reply('Please link your account first with /link');
+      return;
+    }
+
+    // Rate limit
+    const rateLimitKey = `telegram:rate:${telegramUserId}`;
+    const currentCount = await redis.incr(rateLimitKey);
+    if (currentCount === 1) {
+      await redis.setEx(rateLimitKey, RATE_LIMIT_WINDOW_SECONDS, String(currentCount));
+    }
+    if (currentCount > RATE_LIMIT_MAX_MESSAGES) {
+      await ctx.reply('You are sending messages too fast. Please wait a moment and try again.');
+      return;
+    }
+
+    await ctx.sendChatAction('typing');
+    const ackMsg = await ctx.reply(`🔍 ${t.recognizing}`);
+
+    // Pick the largest photo size (Telegram sends multiple resolutions)
+    const photos = ctx.message.photo as Array<{ file_id: string; width: number; height: number }>;
+    const largest = photos.reduce((a, b) => (a.width * a.height >= b.width * b.height ? a : b));
+    const fileLink = await ctx.telegram.getFileLink(largest.file_id);
+
+    // Download bytes
+    const response = await fetch(fileLink.toString());
+    if (!response.ok) {
+      throw new Error(`Failed to download photo: ${response.status}`);
+    }
+    const buffer = Buffer.from(await response.arrayBuffer());
+
+    let markdown: string;
+    try {
+      const parsed = await receiptOCRService.extractFromImage(buffer, 'image/jpeg', locale);
+      // detectLocale on parsed seller name lets us refine: a receipt clearly in PL
+      // but user has language_code=en → still use 'pl' formatting? No — keep user
+      // locale for table headers, the data itself is locale-neutral.
+      void detectLocale; // referenced to keep import — used by AI chat path
+      markdown = formatParsedReceipt(parsed, locale);
+    } catch (error) {
+      logger.warn('[TelegramBot] OCR failed', {
+        telegramUserId,
+        error: (error as Error).message,
+      });
+      await ctx.reply(`⚠️ ${t.recognizeFailed}`);
+      return;
+    } finally {
+      // remove the "recognizing..." placeholder so chat stays clean
+      try {
+        await ctx.telegram.deleteMessage(ackMsg.chat.id, ackMsg.message_id);
+      } catch {
+        /* best effort */
+      }
+    }
+
+    const telegramText = convertToTelegramMarkdown(markdown);
+    const chunks = splitMessage(telegramText);
+    for (const chunk of chunks) {
+      try {
+        await ctx.reply(chunk, { parse_mode: 'MarkdownV2' });
+      } catch {
+        // eslint-disable-next-line no-useless-escape
+        const plainText = chunk.replace(/\\([_*\[\]()~`>#\+\-=|{}.!\\])/g, '$1');
+        await ctx.reply(plainText);
+      }
+    }
   }
 
   private async handleMessage(ctx: Context & { message: { text: string } }): Promise<void> {

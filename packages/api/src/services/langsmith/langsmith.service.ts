@@ -995,7 +995,6 @@ export class LangSmithService {
   private detectProvider(model: string | undefined): string {
     if (!model) return 'unknown';
 
-    if (model.includes('claude')) return 'anthropic';
     if (model.includes('gpt')) return 'openai';
     if (model.includes('gemini')) return 'google';
 

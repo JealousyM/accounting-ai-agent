@@ -36,7 +36,7 @@ describe('SystemStatusBanner', () => {
     mockSystemHealth.mockReturnValue({
       status: 'degraded',
       snapshot: {
-        integrations: { openai: { ok: false }, anthropic: { ok: true }, wfirma: { ok: false } },
+        integrations: { openai: { ok: false }, wfirma: { ok: false } },
       },
     });
     render(<SystemStatusBanner />);
@@ -48,7 +48,7 @@ describe('SystemStatusBanner', () => {
     mockSystemHealth.mockReturnValue({
       status: 'degraded',
       snapshot: {
-        integrations: { openai: { ok: true }, anthropic: { ok: true }, wfirma: { ok: false } },
+        integrations: { openai: { ok: true }, wfirma: { ok: false } },
       },
     });
     render(<SystemStatusBanner />);

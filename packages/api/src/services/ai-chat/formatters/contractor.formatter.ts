@@ -50,12 +50,19 @@ export function formatContractorDetails(contractor: WFirmaContractor, locale: Lo
 | **${t.notes}** | ${contractor.notes ? sanitizeForPrompt(contractor.notes) : '-'} |`;
 }
 
-export function formatContractorCreated(contractor: WFirmaContractor, locale: Locale = 'pl'): string {
+export function formatContractorCreated(
+  contractor: WFirmaContractor,
+  locale: Locale = 'pl',
+  autoFilledFields: string[] = [],
+): string {
   const t = getContractorTranslations(locale);
+  const autofillNote = autoFilledFields.length > 0
+    ? `\n> ✨ ${t.autoFilledFromRegistry}: ${autoFilledFields.join(', ')}\n`
+    : '';
   return `## ✅ ${t.created}
 
 ${formatContractorDetails(contractor, locale)}
-
+${autofillNote}
 > ${t.createdHint}`;
 }
 
