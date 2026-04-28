@@ -210,7 +210,6 @@ FRONTEND_URL=http://localhost:3001
 
 # Optional - will use app credentials
 OPENAI_API_KEY=sk-proj-xxx
-ANTHROPIC_API_KEY=sk-ant-xxx
 
 # wFirma (optional for testing)
 WFIRMA_ACCESS_KEY=your_test_key
