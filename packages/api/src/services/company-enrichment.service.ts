@@ -5,12 +5,26 @@
 
 import axios from 'axios';
 import { logger } from '../utils/logger';
-import { PublicRegistryData, KrsData } from '../types/wfirma.types';
+import { PublicRegistryData, KrsData, BankAccountVerification } from '../types/wfirma.types';
 import { WFirmaCacheService } from './wfirma-cache.service';
 
 const MF_API_BASE = 'https://wl-api.mf.gov.pl';
 const KRS_API_BASE = 'https://api-krs.ms.gov.pl';
 const API_TIMEOUT = 5000;
+
+/**
+ * Normalize a Polish bank account to NRB (26 digits, no spaces, no country prefix).
+ * Accepts: "PL12 3456 7890 1234 5678 9012 3456", "12345678901234567890123456",
+ * "12 3456 7890 1234 5678 9012 3456", etc. Returns null if it can't be reduced
+ * to exactly 26 digits.
+ */
+export function normalizeBankAccount(input: string): string | null {
+  if (!input) return null;
+  const stripped = input.replace(/\s+/g, '').toUpperCase();
+  const digits = stripped.startsWith('PL') ? stripped.slice(2) : stripped;
+  if (!/^\d{26}$/.test(digits)) return null;
+  return digits;
+}
 
 /**
  * Validate Polish NIP with modulo 11 checksum
@@ -187,6 +201,77 @@ export class CompanyEnrichmentService {
       boardMembers: boardMembers.length > 0 ? boardMembers : undefined,
       registrationDate: data?.odpis?.dane?.dataWpisuDoRejestruPrzedsiebiorstw || undefined,
     };
+  }
+
+  /**
+   * Verify a single bank account against the MF Biała Lista for a given NIP.
+   *
+   * Uses the dedicated check endpoint:
+   *   GET /api/check/nip/{nip}/bank-account/{account}?date={YYYY-MM-DD}
+   *
+   * Polish law (Art. 117ba Tax Ordinance + Art. 19 Entrepreneurs Law) requires
+   * this check before any single payment ≥ 15,000 PLN — paying to an
+   * unverified account disqualifies the cost as KUP and triggers joint VAT
+   * liability for the buyer.
+   *
+   * Cached for 24h by (nip, accountNumber, date) so retries on the same day
+   * are free. The MF Request ID returned by the API is preserved as legal
+   * proof of the check.
+   */
+  async verifyBankAccount(
+    nip: string,
+    accountNumber: string,
+    userId: string,
+    date?: string
+  ): Promise<BankAccountVerification | null> {
+    const checkDate = date || new Date().toISOString().split('T')[0];
+    const cacheKey = `nip_${nip}_acct_${accountNumber}_${checkDate}`;
+
+    const cached = await this.cacheService.getCachedData<BankAccountVerification>(
+      userId, 'public_registry', cacheKey
+    );
+    if (cached) {
+      logger.debug('Biała Lista bank-account check cache hit', { nip, accountNumber, checkDate });
+      return cached;
+    }
+
+    const url = `${MF_API_BASE}/api/check/nip/${nip}/bank-account/${accountNumber}?date=${checkDate}`;
+    logger.info('Verifying bank account on Biała Lista', { nip, accountNumber, checkDate });
+
+    try {
+      const response = await axios.get(url, { timeout: API_TIMEOUT });
+      const result = response.data?.result;
+
+      if (!result || typeof result.accountAssigned !== 'string') {
+        logger.warn('Unexpected MF response shape on bank-account check', { nip, accountNumber });
+        return null;
+      }
+
+      const verification: BankAccountVerification = {
+        nip,
+        accountNumber,
+        date: checkDate,
+        accountAssigned: result.accountAssigned === 'TAK',
+        requestId: result.requestId || undefined,
+      };
+
+      await this.cacheService.cacheData(userId, 'public_registry', cacheKey, verification)
+        .catch(err => logger.warn('Failed to cache bank-account verification', {
+          nip, accountNumber, error: err.message,
+        }));
+
+      return verification;
+    } catch (error) {
+      logger.warn('MF Biała Lista bank-account check failed', {
+        nip,
+        accountNumber,
+        checkDate,
+        error: error instanceof Error ? error.message : String(error),
+      });
+      return this.cacheService.getCachedDataAllowStale<BankAccountVerification>(
+        userId, 'public_registry', cacheKey
+      );
+    }
   }
 
   private mapVatStatus(status: string | undefined): PublicRegistryData['vatStatus'] | undefined {

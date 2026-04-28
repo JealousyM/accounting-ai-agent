@@ -667,6 +667,25 @@
     "ksefTokenHint": "Token autoryzacyjny z portalu KSeF",
     "ksefNipHint": "NIP firmy dla sesji KSeF"
   },
+  "bialaLista": {
+    "verificationTitle": "Weryfikacja rachunku bankowego — Biała Lista (MF)",
+    "statusMatch": "ZGODNE — rachunek figuruje na Białej Liście dla podanego NIP",
+    "statusNoMatch": "NIEZGODNE — rachunek NIE figuruje na Białej Liście dla podanego NIP",
+    "field": "Pole",
+    "value": "Wartość",
+    "nip": "NIP",
+    "accountNumber": "Rachunek bankowy",
+    "checkDate": "Data weryfikacji",
+    "requestId": "Identyfikator zapytania MF",
+    "matchHint": "Płatność jest bezpieczna — rachunek znajduje się na oficjalnym Wykazie podatników VAT (Biała Lista). Zachowaj identyfikator zapytania jako dowód weryfikacji.",
+    "noMatchHint": "NIE wykonuj przelewu na ten rachunek. Zapłata na nieujęty rachunek przy kwocie ≥ 15 000 PLN wyłącza koszt z KUP i powoduje solidarną odpowiedzialność w VAT (art. 117ba Ordynacji podatkowej).",
+    "legalNote15k": "Uwaga prawna: Weryfikacja jest obowiązkowa dla każdej pojedynczej płatności od 15 000 PLN (art. 19 Prawa przedsiębiorców).",
+    "invalidNip": "Nieprawidłowy NIP — wymagane 10 cyfr z poprawną sumą kontrolną.",
+    "invalidAccount": "Nieprawidłowy numer rachunku — wymagane 26 cyfr w formacie NRB (z prefiksem PL i spacjami lub bez).",
+    "errorVerify": "Błąd weryfikacji rachunku na Białej Liście",
+    "errorReason": "Powód",
+    "disclaimer": "Źródło: https://wl-api.mf.gov.pl — Ministerstwo Finansów, Wykaz podatników VAT."
+  },
   "taxCalendar": {
     "title": "Kalendarz podatkowy",
     "deadlinesTitle": "Terminy podatkowe",
