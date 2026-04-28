@@ -4,6 +4,36 @@
     "aiLimitReached": "Osiągnięto miesięczny limit wiadomości AI. Ulepsz plan lub użyj własnego klucza API.",
     "subscriptionRequired": "Ta funkcja wymaga aktywnej subskrypcji."
   },
+  "ocr": {
+    "recognizing": "Rozpoznaję paragon…",
+    "recognizeFailed": "Nie udało się odczytać tego zdjęcia. Spróbuj wyraźniejszego ujęcia (dobre oświetlenie, bez rozmycia, cały paragon w kadrze).",
+    "title": "Rozpoznany dokument",
+    "field": "Pole",
+    "value": "Wartość",
+    "documentType": "Typ dokumentu",
+    "documentTypeValues": {
+      "paragon": "Paragon",
+      "faktura": "Faktura VAT",
+      "rachunek": "Rachunek",
+      "unknown": "Nieznany"
+    },
+    "sellerName": "Sprzedawca",
+    "sellerNip": "NIP sprzedawcy",
+    "sellerAddress": "Adres sprzedawcy",
+    "documentNumber": "Nr dokumentu",
+    "issueDate": "Data wystawienia",
+    "totalNet": "Netto razem",
+    "totalVat": "VAT razem",
+    "totalGross": "Brutto razem",
+    "confidence": "Pewność rozpoznania",
+    "itemsTitle": "Pozycje",
+    "itemName": "Nazwa",
+    "itemQuantity": "Ilość",
+    "itemVatRate": "VAT",
+    "itemTotal": "Razem",
+    "notes": "Uwagi",
+    "confirmHint": "Sprawdź kwoty — jeśli wszystko się zgadza, wprowadź dane do wFirma lub poproś AI o zaksięgowanie wydatku."
+  },
   "contractor": {
     "notFound": "Nie znaleziono kontrahentów.",
     "contractorsTitle": "Kontrahenci",

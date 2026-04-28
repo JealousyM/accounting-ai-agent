@@ -4,6 +4,36 @@
     "aiLimitReached": "Достигнут месячный лимит AI сообщений. Обновите тариф или используйте собственный API ключ.",
     "subscriptionRequired": "Эта функция требует активной подписки."
   },
+  "ocr": {
+    "recognizing": "Распознаю чек…",
+    "recognizeFailed": "Не удалось прочитать это изображение. Попробуй более чёткое фото (хорошее освещение, без размытия, весь чек в кадре).",
+    "title": "Распознанный документ",
+    "field": "Поле",
+    "value": "Значение",
+    "documentType": "Тип документа",
+    "documentTypeValues": {
+      "paragon": "Кассовый чек (paragon)",
+      "faktura": "Счёт-фактура (faktura)",
+      "rachunek": "Счёт (rachunek)",
+      "unknown": "Неизвестный"
+    },
+    "sellerName": "Продавец",
+    "sellerNip": "NIP продавца",
+    "sellerAddress": "Адрес продавца",
+    "documentNumber": "№ документа",
+    "issueDate": "Дата",
+    "totalNet": "Нетто всего",
+    "totalVat": "НДС всего",
+    "totalGross": "Брутто всего",
+    "confidence": "Уверенность распознавания",
+    "itemsTitle": "Позиции",
+    "itemName": "Название",
+    "itemQuantity": "Кол-во",
+    "itemVatRate": "НДС",
+    "itemTotal": "Сумма",
+    "notes": "Заметки",
+    "confirmHint": "Проверь суммы — если всё верно, перенеси данные в wFirma или попроси AI занести этот расход."
+  },
   "contractor": {
     "notFound": "Контрагенты не найдены.",
     "contractorsTitle": "Контрагенты",
