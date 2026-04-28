@@ -262,7 +262,7 @@ export function createAllTools(
 
     // Contractor tools
     createGetContractorsTool(wfirmaService, locale, userId, subscriptionService),
-    createCreateContractorTool(wfirmaService, cacheService, userId, locale, subscriptionService),
+    createCreateContractorTool(wfirmaService, cacheService, userId, locale, subscriptionService, enrichmentService),
     createUpdateContractorTool(wfirmaService, cacheService, userId, locale, subscriptionService),
     createDeleteContractorTool(wfirmaService, cacheService, userId, locale, subscriptionService),
 

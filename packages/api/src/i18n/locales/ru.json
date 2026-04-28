@@ -71,7 +71,8 @@
     "exactNotFound": "Контрагент с точным названием не найден",
     "similarContractors": "Похожие контрагенты",
     "specifyNameUpdate": "Уточните название для обновления.",
-    "specifyNameDelete": "Уточните название для удаления."
+    "specifyNameDelete": "Уточните название для удаления.",
+    "autoFilledFromRegistry": "Автозаполнено из польского публичного реестра (Biała Lista МФ)"
   },
   "invoice": {
     "invoices": "Счета-фактуры",
