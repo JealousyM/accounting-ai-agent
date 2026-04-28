@@ -421,7 +421,7 @@ Accountants love referrals. Now they pay you back too.
 🤖 Распознаёт paragon, fakturę VAT и rachunek
 🇵🇱 Понимает польские реквизиты — NIP сразу 10 цифрами, ставки VAT 23/8/5/0/ZW/NP, формат даты
 🌍 Карточка приходит на твоём языке (PL/EN/RU — по настройкам Telegram)
-✨ На базе Claude Vision — точность >90% на нормальном фото
+✨ На базе GPT-4o Vision (OpenAI) — точность >90% на нормальном фото
 
 Под капотом — мощная мультимодальная модель, которая видит структуру документа, а не просто читает текст. Кривое освещение? Помятый чек? Она справится.
 
@@ -442,7 +442,7 @@ Bez ręcznego wpisywania. Bez zgubionych paragonów w kieszeni. Bez „przypomn�
 🤖 Rozpoznaje paragony, faktury VAT i rachunki
 🇵🇱 Rozumie polskie dane — NIP od razu w 10 cyfrach, stawki VAT 23/8/5/0/ZW/NP, format daty
 🌍 Karta przychodzi w Twoim języku (PL/EN/RU — według ustawień Telegrama)
-✨ Oparte na Claude Vision — dokładność >90% przy normalnym zdjęciu
+✨ Oparte na GPT-4o Vision (OpenAI) — dokładność >90% przy normalnym zdjęciu
 
 Pod maską — potężny model multimodalny, który widzi strukturę dokumentu, nie tylko czyta tekst. Krzywe światło? Pomięty paragon? Poradzi sobie.
 
@@ -463,7 +463,7 @@ No manual entry. No receipts lost in jacket pockets. No "I'll remember tonight."
 🤖 Recognizes paragony, faktury VAT and rachunki
 🇵🇱 Understands Polish accounting fields — NIP as 10 digits, VAT rates 23/8/5/0/ZW/NP, date format
 🌍 Card arrives in your language (PL/EN/RU — based on your Telegram settings)
-✨ Powered by Claude Vision — >90% accuracy on a normal photo
+✨ Powered by GPT-4o Vision (OpenAI) — >90% accuracy on a normal photo
 
 Under the hood: a powerful multimodal model that sees the document structure, not just text. Awkward lighting? Crumpled receipt? It handles it.
 

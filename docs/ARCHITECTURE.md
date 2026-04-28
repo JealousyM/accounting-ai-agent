@@ -17,7 +17,7 @@ graph TD
     subgraph AI["AI Layer"]
         LANGGRAPH["LangGraph Single Agent<br/>55+ Domain Tools"]
         MEMORY["AI Context Memory<br/>AIMemoryService<br/>AIMemoryExtractionService"]
-        OCR["Receipt OCR<br/>Claude Vision<br/>Telegram photo handler"]
+        OCR["Receipt OCR<br/>GPT-4o Vision<br/>Telegram photo handler"]
         LANGGRAPH <--> MEMORY
     end
 
@@ -262,11 +262,7 @@ class WFirmaCacheService {
 Data access is abstracted through Prisma models.
 
 ### Factory Pattern
-AI agents are created through factory functions.
-
-```typescript
-const agent = getRouterAgent('openai'); // or 'anthropic'
-```
+Services are created through factory functions and exported as singletons via `*.instance.ts` files.
 
 ## Security Measures
 

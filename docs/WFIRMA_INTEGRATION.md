@@ -39,7 +39,7 @@ Returns legal form, share capital, board members for limited companies (sp. z o.
 
 ### Receipt OCR (Telegram photo handler)
 
-Photographs of paragony / faktury sent to the Telegram bot are processed by `ReceiptOCRService` (Claude Vision) and replied with a structured markdown card. This is *not* a wFirma call — it's a separate service that lives in `packages/api/src/services/ocr/`. Direct creation of a wFirma expense from the recognized receipt is a planned follow-up; today the user copies the data into wFirma manually or asks the AI to log it by text.
+Photographs of paragony / faktury sent to the Telegram bot are processed by `ReceiptOCRService` (OpenAI GPT-4o vision) and replied with a structured markdown card. This is *not* a wFirma call — it's a separate service that lives in `packages/api/src/services/ocr/`. Direct creation of a wFirma expense from the recognized receipt is a planned follow-up; today the user copies the data into wFirma manually or asks the AI to log it by text.
 
 ## Configuration
 

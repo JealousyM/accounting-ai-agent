@@ -12,9 +12,8 @@ This project ships an in-app health monitoring system with three signal channels
 - `redis` — `redis.ping()`
 - `integrations.wfirma` — list-companies probe with dedicated `WFIRMA_HEALTH_*` credentials (subscription-covered, not user-billed)
 - `integrations.openai` — `GET /v1/models` (cost-free, no token charge)
-- `integrations.anthropic` — `GET /v1/models` (cost-free, no token charge)
 
-**Cost-free guarantee:** the OpenAI and Anthropic probes hit only the model-listing endpoints. They never call `/v1/chat/completions` or `/v1/messages`. Tests assert this.
+**Cost-free guarantee:** the OpenAI probe hits only the model-listing endpoint. It never calls `/v1/chat/completions`. Tests assert this.
 
 ## Status derivation
 
@@ -39,7 +38,6 @@ This project ships an in-app health monitoring system with three signal channels
 | `TELEGRAM_BOT_TOKEN`         | api      | Telegram alerts (existing)           |
 | `TELEGRAM_CHAT_ID`           | api      | Telegram alerts (existing)           |
 | `OPENAI_API_KEY`             | api      | OpenAI probe — leave empty to skip   |
-| `ANTHROPIC_API_KEY`          | api      | Anthropic probe                      |
 | `NEXT_PUBLIC_SENTRY_DSN`     | web      | Sentry on frontend                   |
 | `NEXT_PUBLIC_HEALTH_POLL_MS` | web      | Override 30s poll interval (testing) |
 
@@ -56,7 +54,7 @@ Both are unauthenticated.
 
 ## Common runbooks
 
-- **Banner says AI chat unavailable** — check Sentry for the `health-monitor` tag with `state: degraded`. Look at the `extra.snapshot` payload to see whether OpenAI or Anthropic failed.
+- **Banner says AI chat unavailable** — check Sentry for the `health-monitor` tag with `state: degraded`. Look at the `extra.snapshot` payload to see whether OpenAI failed.
 - **Telegram chat is silent during outage** — verify `TELEGRAM_CHAT_ID` (admin chat) is set; check `TelegramNotificationService` logs for delivery errors.
 - **Recovery message did not arrive** — possible if the API instance restarted during the outage (state is in-memory). The next-tick `ok` is treated as the baseline, no recovery transition fires.
 
