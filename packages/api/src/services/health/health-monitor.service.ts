@@ -10,7 +10,7 @@ export class HealthMonitorService {
   private currentState: State = 'ok';
   private consecutiveFailures = 0;
   private downSince: Date | null = null;
-  private timer: NodeJS.Timeout | null = null;
+  private timer: ReturnType<typeof setInterval> | null = null;
   private readonly FAIL_THRESHOLD = 2;
   private readonly POLL_INTERVAL_MS = 30_000;
 
