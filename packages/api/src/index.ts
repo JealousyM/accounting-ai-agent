@@ -1,6 +1,10 @@
 // IMPORTANT: Load environment variables FIRST before any other imports
 import './config/env';
 
+// IMPORTANT: Initialize Sentry BEFORE any other imports that may throw at boot
+import { initSentry, Sentry } from './lib/sentry';
+initSentry();
+
 import express, { Application, Request, Response } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
@@ -29,6 +33,7 @@ import { errorHandler, notFoundHandler } from './middleware/error-handler.middle
 import { logger } from './utils/logger';
 import { seedHelpTopicsIfEmpty } from './services/help-seed.service';
 import { ksefStatusPoller } from './services/ksef';
+import { healthMonitorService } from './services/health';
 
 const app: Application = express();
 const PORT = process.env.PORT || 3011;
@@ -62,9 +67,17 @@ app.use('/api', globalRateLimiter);
 // Audit log middleware (fire-and-forget, logs POST/PUT/PATCH/DELETE)
 app.use('/api', auditLogMiddleware);
 
-// Health check
-app.get('/health', (_req: Request, res: Response) => {
-  res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
+// Health check (full snapshot — used by frontend banner and uptime monitors)
+app.get('/health', async (_req: Request, res: Response) => {
+  const { healthService } = await import('./services/health');
+  const snapshot = await healthService.getSnapshot();
+  const code = snapshot.status === 'down' ? 503 : 200;
+  res.status(code).json(snapshot);
+});
+
+// Liveness probe (no dependency checks — for k8s/docker)
+app.get('/health/live', (_req: Request, res: Response) => {
+  res.status(200).json({ status: 'ok' });
 });
 
 // API routes
@@ -126,6 +139,10 @@ app.use('/api/telegram', telegramBotRoutes);
 // 404 handler
 app.use(notFoundHandler);
 
+// Sentry error handler must be registered BEFORE the application's error handler
+// so it captures errors first, then the existing handler responds to the user.
+Sentry.setupExpressErrorHandler(app);
+
 // Global error handler
 app.use(errorHandler);
 
@@ -139,6 +156,9 @@ const server = app.listen(PORT, async () => {
 
   // Start KSeF status poller for background invoice status updates
   ksefStatusPoller.start();
+
+  // Start health monitor (periodic dependency snapshot + alerting)
+  healthMonitorService.start();
 
   // Start Telegram chatbot
   if (telegramBotService.isInitialized()) {
@@ -165,6 +185,7 @@ const server = app.listen(PORT, async () => {
 const shutdown = () => {
   logger.info('Shutting down gracefully...');
   ksefStatusPoller.stop();
+  healthMonitorService.stop();
   telegramBotService.stop();
   server.close(() => {
     logger.info('Server closed');

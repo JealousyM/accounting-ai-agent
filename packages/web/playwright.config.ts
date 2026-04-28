@@ -81,5 +81,10 @@ export default defineConfig({
     url: 'http://localhost:3010',
     reuseExistingServer: !process.env.CI,
     timeout: 120000, // 2 minutes for Next.js to compile
+    env: {
+      // Force a short poll so availability-banner E2E doesn't wait 30s.
+      // Safe for other suites — only changes how often /health is fetched.
+      NEXT_PUBLIC_HEALTH_POLL_MS: '1000',
+    },
   },
 });

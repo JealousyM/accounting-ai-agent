@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { logger } from '../utils/logger';
+import { HealthSnapshot } from './health/types';
 
 export class TelegramNotificationService {
   private readonly botToken: string | undefined;
@@ -61,5 +62,49 @@ export class TelegramNotificationService {
       `Email: ${email}`;
 
     this.sendMessage(text).catch(() => {});
+  }
+
+  async notifyHealthAlert(prev: string, next: string, snap: HealthSnapshot): Promise<void> {
+    const failedChecks = Object.entries(snap.checks)
+      .filter(([, c]) => !c.ok)
+      .map(([k, c]) => `❌ ${k}: ${c.error ?? 'failed'} (${c.latencyMs}ms)`);
+    const okChecks = Object.entries(snap.checks)
+      .filter(([, c]) => c.ok)
+      .map(([k, c]) => `✅ ${k} (${c.latencyMs}ms)`);
+    const integrationLines = Object.entries(snap.integrations)
+      .map(([k, c]) => `  ${c.ok ? '✅' : '❌'} ${k}${c.ok ? '' : `: ${c.error ?? 'failed'}`}`);
+
+    const icon = next === 'down' ? '🚨' : '⚠️';
+    const text = [
+      `${icon} <b>ALERT — Service ${next}</b>`,
+      ``,
+      `State: ${prev} → ${next}`,
+      `Time: ${snap.timestamp}`,
+      `Failed checks:`,
+      ...failedChecks.map((l) => `  ${l}`),
+      ...okChecks.map((l) => `  ${l}`),
+      `Integrations:`,
+      ...integrationLines,
+      ``,
+      `Env: ${process.env.NODE_ENV ?? 'unknown'}`,
+    ].join('\n');
+
+    await this.sendMessage(text);
+  }
+
+  async notifyHealthRecovery(previousState: string, downtimeMs: number): Promise<void> {
+    const minutes = Math.floor(downtimeMs / 60_000);
+    const seconds = Math.floor((downtimeMs % 60_000) / 1000);
+    const downtime = `${minutes}m ${seconds}s`;
+
+    const text = [
+      `✅ <b>RECOVERED</b>`,
+      ``,
+      `Previous: ${previousState}`,
+      `Downtime: ${downtime}`,
+      `Time: ${new Date().toISOString()}`,
+    ].join('\n');
+
+    await this.sendMessage(text);
   }
 }
