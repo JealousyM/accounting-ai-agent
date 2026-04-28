@@ -107,7 +107,6 @@ export function createCreateContractorTool(
         const t = getContractorTranslations(locale);
 
         // Reject malformed NIPs early with a clear, specific message.
-        // (A user typing 5842872419 expects "checksum failed", not "name required".)
         if (nip && !validateNip(nip)) {
           return `## ❌ ${t.errorCreateTitle}
 
@@ -115,9 +114,10 @@ export function createCreateContractorTool(
         }
 
         // Auto-fill from public registry when NIP is provided and core fields are missing.
-        // Saves the user from re-typing what's already on Biała Lista MF.
+        // Best-effort: if the registry has no data we still proceed — the user's primary
+        // intent is "add this contractor", not "verify VAT registration".
         const autoFilledFields: string[] = [];
-        let registryHadEntry = false;
+        let usedPlaceholderName = false;
         if (
           enrichmentService &&
           nip &&
@@ -125,7 +125,6 @@ export function createCreateContractorTool(
         ) {
           const enriched = await enrichmentService.enrichByNip(nip, userId);
           if (enriched) {
-            registryHadEntry = true;
             if (!name && enriched.name) {
               name = enriched.name;
               autoFilledFields.push('name');
@@ -153,21 +152,23 @@ export function createCreateContractorTool(
           }
         }
 
-        // Distinguish three "no name" cases so the AI gives the user the right next step:
-        // 1. Valid NIP given but registry has no entry (likely non-VAT entity) → tell them why and ask for a name.
-        // 2. NIP given and registry had an entry but somehow no name came back (rare) → fall through to generic.
-        // 3. No NIP and no name → original generic error.
+        // wFirma requires `name`. If we still don't have one but the user gave a valid
+        // NIP, generate a locale-aware placeholder so creation succeeds; the success
+        // card will tell the user a placeholder was used and how to rename.
+        if ((!name || !name.trim()) && nip) {
+          const placeholderTemplate: Record<Locale, (n: string) => string> = {
+            pl: (n) => `Kontrahent (NIP ${n})`,
+            en: (n) => `Contractor (NIP ${n})`,
+            ru: (n) => `Контрагент (NIP ${n})`,
+          };
+          name = placeholderTemplate[locale](nip);
+          usedPlaceholderName = true;
+        }
+
         if (!name || !name.trim()) {
-          if (nip && !registryHadEntry) {
-            return `## ❌ ${t.errorCreateTitle}
-
-**${t.errorReason}:** ${t.nipValidButNotInRegistry}
-
-**NIP:** \`${nip}\``;
-          }
           return `## ❌ ${t.errorCreateTitle}
 
-**${t.errorReason}:** ${t.requiredFields}: name (and optionally NIP). When a NIP is provided, name and address are auto-filled from the public registry.
+**${t.errorReason}:** ${t.requiredFields}: name or NIP. Provide either a contractor name or a valid Polish NIP.
 
 ${t.tryAgain}`;
         }
@@ -198,7 +199,7 @@ ${t.tryAgain}`;
 
         await cacheService.invalidateCache(userId, 'contractor');
 
-        return formatContractorCreated(contractor, locale, autoFilledFields);
+        return formatContractorCreated(contractor, locale, autoFilledFields, usedPlaceholderName);
       } catch (error) {
         logger.error('Failed to create contractor', { error });
         const t = getContractorTranslations(locale);
