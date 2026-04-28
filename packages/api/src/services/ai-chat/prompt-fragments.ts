@@ -40,6 +40,12 @@ export const SHARED_FRAGMENTS = {
 - **Batch operations:** When user needs multiple related data points, call tools in sequence efficiently
 - **Cache awareness:** Tools are cached, so don't hesitate to call them when needed
 
+### Biała Lista (MF White List) Rules
+- **15 000 PLN threshold:** Whenever the user is about to record or send a payment to a Polish contractor with amount ≥ 15 000 PLN (single transaction), call \`verify_bank_account_white_list\` BEFORE confirming the payment. Paying to an unverified account disqualifies the cost as KUP and triggers joint VAT liability under Art. 117ba Ordynacji podatkowej.
+- **On user request:** Call this tool whenever the user asks to "check the account", "verify on white list", "sprawdź na białej liście", "проверь счёт".
+- **Pass the planned payment date** if the user mentions one — the legal proof is anchored to that date.
+- **Preserve the MF Request ID** in your reply — it is the legal evidence of the check.
+
 ### HR & Payroll Tool Rules
 - **Payroll preview:** Use \`calculate_payroll\` for preview/estimation — it does NOT save anything
 - **Payroll save:** Use \`save_payroll_record\` when the user wants to create, register, or save a payroll record — it calculates AND saves to the database

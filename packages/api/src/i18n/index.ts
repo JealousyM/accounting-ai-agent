@@ -714,6 +714,32 @@ export interface HRTranslations {
   tryAgain: string;
 }
 
+export interface BialaListaTranslations {
+  // Title
+  verificationTitle: string;
+  // Status
+  statusMatch: string;
+  statusNoMatch: string;
+  // Fields
+  field: string;
+  value: string;
+  nip: string;
+  accountNumber: string;
+  checkDate: string;
+  requestId: string;
+  // Hints
+  matchHint: string;
+  noMatchHint: string;
+  legalNote15k: string;
+  // Errors
+  invalidNip: string;
+  invalidAccount: string;
+  errorVerify: string;
+  errorReason: string;
+  // Disclaimer
+  disclaimer: string;
+}
+
 export interface KSeFTranslations {
   // Send
   sendSuccess: string;
@@ -920,6 +946,7 @@ export interface Translations {
   ledger: LedgerTranslations;
   hr: HRTranslations;
   ksef: KSeFTranslations;
+  bialaLista: BialaListaTranslations;
   taxCalendar: TaxCalendarTranslations;
   taxRegister: TaxRegisterTranslations;
 }
@@ -984,6 +1011,10 @@ export function getHRTranslations(locale: Locale = 'pl'): HRTranslations {
 
 export function getKSeFTranslations(locale: Locale = 'pl'): KSeFTranslations {
   return getTranslations(locale).ksef;
+}
+
+export function getBialaListaTranslations(locale: Locale = 'pl'): BialaListaTranslations {
+  return getTranslations(locale).bialaLista;
 }
 
 export function getCommonTranslations(locale: Locale = 'pl'): CommonTranslations {

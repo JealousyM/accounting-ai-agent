@@ -2,6 +2,7 @@ import {
   CompanyEnrichmentService,
   validateNip,
   parsePolishAddress,
+  normalizeBankAccount,
 } from '../company-enrichment.service';
 import axios from 'axios';
 
@@ -193,6 +194,131 @@ describe('CompanyEnrichmentService', () => {
 
       expect(result).toBeNull();
     });
+  });
+
+  describe('verifyBankAccount', () => {
+    const NIP = '5833510147';
+    const ACCOUNT = '12345678901234567890123456';
+    const USER = 'user-123';
+
+    it('returns accountAssigned=true when MF says TAK', async () => {
+      mockCacheService.getCachedData.mockResolvedValue(null);
+      mockCacheService.cacheData.mockResolvedValue(undefined);
+      mockedAxios.get.mockResolvedValue({
+        data: { result: { accountAssigned: 'TAK', requestId: 'aa-bb-cc' } },
+      });
+
+      const result = await service.verifyBankAccount(NIP, ACCOUNT, USER, '2026-04-28');
+
+      expect(result).toEqual({
+        nip: NIP,
+        accountNumber: ACCOUNT,
+        date: '2026-04-28',
+        accountAssigned: true,
+        requestId: 'aa-bb-cc',
+      });
+      const calledUrl = mockedAxios.get.mock.calls[0][0] as string;
+      expect(calledUrl).toContain(`/api/check/nip/${NIP}/bank-account/${ACCOUNT}`);
+      expect(calledUrl).toContain('date=2026-04-28');
+      expect(mockCacheService.cacheData).toHaveBeenCalledWith(
+        USER,
+        'public_registry',
+        `nip_${NIP}_acct_${ACCOUNT}_2026-04-28`,
+        expect.objectContaining({ accountAssigned: true }),
+      );
+    });
+
+    it('returns accountAssigned=false when MF says NIE', async () => {
+      mockCacheService.getCachedData.mockResolvedValue(null);
+      mockCacheService.cacheData.mockResolvedValue(undefined);
+      mockedAxios.get.mockResolvedValue({
+        data: { result: { accountAssigned: 'NIE', requestId: 'xx' } },
+      });
+
+      const result = await service.verifyBankAccount(NIP, ACCOUNT, USER, '2026-04-28');
+
+      expect(result).not.toBeNull();
+      expect(result!.accountAssigned).toBe(false);
+    });
+
+    it('returns cached result without calling MF if cache hit', async () => {
+      const cached = {
+        nip: NIP,
+        accountNumber: ACCOUNT,
+        date: '2026-04-28',
+        accountAssigned: true,
+        requestId: 'cached',
+      };
+      mockCacheService.getCachedData.mockResolvedValue(cached);
+
+      const result = await service.verifyBankAccount(NIP, ACCOUNT, USER, '2026-04-28');
+
+      expect(result).toEqual(cached);
+      expect(mockedAxios.get).not.toHaveBeenCalled();
+    });
+
+    it('falls back to stale cache when MF API fails', async () => {
+      const stale = {
+        nip: NIP,
+        accountNumber: ACCOUNT,
+        date: '2026-04-27',
+        accountAssigned: true,
+      };
+      mockCacheService.getCachedData.mockResolvedValue(null);
+      mockCacheService.getCachedDataAllowStale.mockResolvedValue(stale);
+      mockedAxios.get.mockRejectedValue(new Error('502 Bad Gateway'));
+
+      const result = await service.verifyBankAccount(NIP, ACCOUNT, USER, '2026-04-28');
+
+      expect(result).toEqual(stale);
+    });
+
+    it('returns null when MF response shape is unexpected', async () => {
+      mockCacheService.getCachedData.mockResolvedValue(null);
+      mockedAxios.get.mockResolvedValue({ data: { result: { unrelated: true } } });
+
+      const result = await service.verifyBankAccount(NIP, ACCOUNT, USER, '2026-04-28');
+
+      expect(result).toBeNull();
+    });
+  });
+});
+
+describe('normalizeBankAccount', () => {
+  it('accepts a 26-digit NRB without separators', () => {
+    expect(normalizeBankAccount('12345678901234567890123456')).toBe(
+      '12345678901234567890123456',
+    );
+  });
+
+  it('strips spaces from NRB-with-spaces', () => {
+    expect(normalizeBankAccount('12 3456 7890 1234 5678 9012 3456')).toBe(
+      '12345678901234567890123456',
+    );
+  });
+
+  it('strips PL prefix from IBAN', () => {
+    expect(normalizeBankAccount('PL12345678901234567890123456')).toBe(
+      '12345678901234567890123456',
+    );
+  });
+
+  it('strips PL prefix and spaces together', () => {
+    expect(normalizeBankAccount('PL 12 3456 7890 1234 5678 9012 3456')).toBe(
+      '12345678901234567890123456',
+    );
+  });
+
+  it('rejects too-short input', () => {
+    expect(normalizeBankAccount('123')).toBeNull();
+  });
+
+  it('rejects non-digit characters in body', () => {
+    expect(normalizeBankAccount('PL12345abcdef234567890123456')).toBeNull();
+  });
+
+  it('rejects empty input', () => {
+    expect(normalizeBankAccount('')).toBeNull();
   });
 });
 
