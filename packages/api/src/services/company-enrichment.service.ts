@@ -1,12 +1,17 @@
 /**
  * CompanyEnrichmentService
- * Enriches company data from Polish public registries (MF Biala Lista + KRS API)
+ * Enriches company data from Polish public registries:
+ *   - GUS BIR1.1 (REGON) — primary source for name/REGON/address (covers all NIP-registered entities)
+ *   - MF Biała Lista — VAT status + verified bank accounts (active VAT taxpayers only)
+ *   - KRS API — board members + share capital (companies only)
  */
 
 import axios from 'axios';
 import { logger } from '../utils/logger';
 import { PublicRegistryData, KrsData, BankAccountVerification } from '../types/wfirma.types';
 import { WFirmaCacheService } from './wfirma-cache.service';
+import { GusService } from './gus/gus.service';
+import type { GusBasicEntity } from './gus/types';
 
 const MF_API_BASE = 'https://wl-api.mf.gov.pl';
 const KRS_API_BASE = 'https://api-krs.ms.gov.pl';
@@ -60,6 +65,19 @@ export function normalizeBankAccount(input: string): string | null {
 }
 
 /**
+ * Combine GUS structured street fields ("Ulica" + "NrNieruchomosci" [+ "/NrLokalu"])
+ * into a single street string suitable for wFirma's contractor address.
+ */
+export function composeGusStreet(gus: GusBasicEntity | null | undefined): string | undefined {
+  if (!gus?.street) return undefined;
+  const parts: string[] = [gus.street];
+  if (gus.buildingNumber) parts.push(gus.buildingNumber);
+  let result = parts.join(' ');
+  if (gus.flatNumber) result += `/${gus.flatNumber}`;
+  return result.trim() || undefined;
+}
+
+/**
  * Validate Polish NIP with modulo 11 checksum
  */
 export function validateNip(nip: string): boolean {
@@ -73,7 +91,10 @@ export function validateNip(nip: string): boolean {
 }
 
 export class CompanyEnrichmentService {
-  constructor(private readonly cacheService: WFirmaCacheService) {}
+  constructor(
+    private readonly cacheService: WFirmaCacheService,
+    private readonly gusService?: GusService,
+  ) {}
 
   /**
    * Enrich company data by NIP from public registries
@@ -93,16 +114,31 @@ export class CompanyEnrichmentService {
       return cached;
     }
 
-    // 2. Fetch from APIs
+    // 2. Fetch from APIs in parallel.
+    // Three sources, three different jobs:
+    //   - GUS BIR1.1 → company directory: name, REGON, structured address.
+    //     Covers EVERY NIP-registered entity (companies + sole props + cywilne),
+    //     so this is the primary autofill source.
+    //   - Biała Lista MF → VAT-specific: status + verified accounts. Smaller
+    //     subset (only active VAT taxpayers) and we keep its data only for
+    //     compliance fields. Name/address from here are now a fallback.
+    //   - KRS → board members + share capital + legal-form name. Companies
+    //     only.
     try {
-      const [mfResult, krsResult] = await Promise.allSettled([
+      const [gusResult, mfResult, krsResult] = await Promise.allSettled([
+        this.gusService ? this.gusService.lookupByNip(nip) : Promise.resolve(null),
         this.fetchFromBialaLista(nip),
         this.fetchFromKRS(nip),
       ]);
 
+      const gusData: GusBasicEntity | null =
+        gusResult.status === 'fulfilled' ? gusResult.value : null;
       const mfData = mfResult.status === 'fulfilled' ? mfResult.value : null;
       const krsData = krsResult.status === 'fulfilled' ? krsResult.value : null;
 
+      if (gusResult.status === 'rejected') {
+        logger.warn('GUS BIR1.1 API failed', { nip, error: (gusResult.reason as Error)?.message });
+      }
       if (mfResult.status === 'rejected') {
         logger.warn('MF Biala Lista API failed', { nip, error: mfResult.reason?.message });
       }
@@ -110,25 +146,30 @@ export class CompanyEnrichmentService {
         logger.warn('KRS API failed', { nip, error: krsResult.reason?.message });
       }
 
-      // If both failed, try stale cache
-      if (!mfData && !krsData) {
+      // If all failed, try stale cache
+      if (!gusData && !mfData && !krsData) {
         logger.warn('All public APIs failed, trying stale cache', { nip });
         return this.cacheService.getCachedDataAllowStale<PublicRegistryData>(
           userId, 'public_registry', cacheKey
         );
       }
 
-      // 3. Merge results
+      // 3. Merge results — prefer GUS for identity/address, MF for VAT, KRS extras.
+      const street = composeGusStreet(gusData);
       const result: PublicRegistryData = {
         nip,
-        name: mfData?.name || undefined,
-        regon: mfData?.regon || undefined,
-        krs: mfData?.krs || undefined,
+        name: gusData?.name || mfData?.name || undefined,
+        regon: gusData?.regon || mfData?.regon || undefined,
+        krs: mfData?.krs || gusData?.krs || undefined,
         vatStatus: mfData?.vatStatus || undefined,
         vatStatusDate: mfData?.vatStatusDate || undefined,
         verifiedBankAccounts: mfData?.verifiedBankAccounts || undefined,
         workingAddress: mfData?.workingAddress || undefined,
         residenceAddress: mfData?.residenceAddress || undefined,
+        street: street || undefined,
+        city: gusData?.city || undefined,
+        zip: gusData?.zip || undefined,
+        entityType: gusData?.type || undefined,
         krsData: krsData || undefined,
       };
 
