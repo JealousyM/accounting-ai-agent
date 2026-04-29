@@ -106,13 +106,21 @@ export function createCreateContractorTool(
 
         const t = getContractorTranslations(locale);
 
+        // Reject malformed NIPs early with a clear, specific message.
+        if (nip && !validateNip(nip)) {
+          return `## ❌ ${t.errorCreateTitle}
+
+**${t.errorReason}:** ${t.nipInvalid} (NIP: \`${nip}\`)`;
+        }
+
         // Auto-fill from public registry when NIP is provided and core fields are missing.
-        // Saves the user from re-typing what's already on Biała Lista MF.
+        // Best-effort: if the registry has no data we still proceed — the user's primary
+        // intent is "add this contractor", not "verify VAT registration".
         const autoFilledFields: string[] = [];
+        let usedPlaceholderName = false;
         if (
           enrichmentService &&
           nip &&
-          validateNip(nip) &&
           (!name || !regon || !street || !city || !zip)
         ) {
           const enriched = await enrichmentService.enrichByNip(nip, userId);
@@ -144,10 +152,23 @@ export function createCreateContractorTool(
           }
         }
 
+        // wFirma requires `name`. If we still don't have one but the user gave a valid
+        // NIP, generate a locale-aware placeholder so creation succeeds; the success
+        // card will tell the user a placeholder was used and how to rename.
+        if ((!name || !name.trim()) && nip) {
+          const placeholderTemplate: Record<Locale, (n: string) => string> = {
+            pl: (n) => `Kontrahent (NIP ${n})`,
+            en: (n) => `Contractor (NIP ${n})`,
+            ru: (n) => `Контрагент (NIP ${n})`,
+          };
+          name = placeholderTemplate[locale](nip);
+          usedPlaceholderName = true;
+        }
+
         if (!name || !name.trim()) {
           return `## ❌ ${t.errorCreateTitle}
 
-**${t.errorReason}:** ${t.requiredFields}: name (and optionally NIP). When NIP is provided, name is auto-filled from the public registry — but here either no NIP was given or the NIP was not found.
+**${t.errorReason}:** ${t.requiredFields}: name or NIP. Provide either a contractor name or a valid Polish NIP.
 
 ${t.tryAgain}`;
         }
@@ -178,7 +199,7 @@ ${t.tryAgain}`;
 
         await cacheService.invalidateCache(userId, 'contractor');
 
-        return formatContractorCreated(contractor, locale, autoFilledFields);
+        return formatContractorCreated(contractor, locale, autoFilledFields, usedPlaceholderName);
       } catch (error) {
         logger.error('Failed to create contractor', { error });
         const t = getContractorTranslations(locale);

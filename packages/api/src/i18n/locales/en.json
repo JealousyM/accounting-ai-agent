@@ -72,7 +72,10 @@
     "similarContractors": "Similar contractors",
     "specifyNameUpdate": "Please specify exact name for update.",
     "specifyNameDelete": "Please specify exact name for deletion.",
-    "autoFilledFromRegistry": "Auto-filled from the Polish public registry (Biała Lista MF)"
+    "autoFilledFromRegistry": "Auto-filled from the Polish public registry (Biała Lista MF)",
+    "nipInvalid": "Invalid NIP — checksum failed. Please verify the 10 digits.",
+    "placeholderNameUsed": "Placeholder name used — entity is not on the official MF Biała Lista (likely a non-VAT-registered entity).",
+    "placeholderRenameHint": "Rename anytime: \"update contractor X: name = ...\""
   },
   "invoice": {
     "invoices": "Invoices",

@@ -44,6 +44,11 @@ export interface ContractorTranslations {
   specifyNameDelete: string;
   // Auto-fill from public registry
   autoFilledFromRegistry: string;
+  // NIP errors when creating
+  nipInvalid: string;
+  // Placeholder when NIP is valid but no name could be auto-filled
+  placeholderNameUsed: string;
+  placeholderRenameHint: string;
 }
 
 export interface InvoiceTranslations {
