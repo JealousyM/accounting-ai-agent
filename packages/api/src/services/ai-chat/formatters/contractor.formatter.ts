@@ -54,15 +54,19 @@ export function formatContractorCreated(
   contractor: WFirmaContractor,
   locale: Locale = 'pl',
   autoFilledFields: string[] = [],
+  usedPlaceholderName = false,
 ): string {
   const t = getContractorTranslations(locale);
   const autofillNote = autoFilledFields.length > 0
     ? `\n> ✨ ${t.autoFilledFromRegistry}: ${autoFilledFields.join(', ')}\n`
     : '';
+  const placeholderNote = usedPlaceholderName
+    ? `\n> ℹ️ ${t.placeholderNameUsed}\n> 💡 ${t.placeholderRenameHint}\n`
+    : '';
   return `## ✅ ${t.created}
 
 ${formatContractorDetails(contractor, locale)}
-${autofillNote}
+${autofillNote}${placeholderNote}
 > ${t.createdHint}`;
 }
 
