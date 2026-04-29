@@ -133,9 +133,23 @@ export function createCreateContractorTool(
               regon = enriched.regon;
               autoFilledFields.push('regon');
             }
-            const sourceAddress = enriched.workingAddress || enriched.residenceAddress;
-            if (sourceAddress) {
-              const parsed = parsePolishAddress(sourceAddress);
+            // Prefer structured fields from GUS BIR1.1; only fall back to
+            // parsing Biała Lista's single-string address when GUS has nothing.
+            if (!street && enriched.street) {
+              street = enriched.street;
+              autoFilledFields.push('street');
+            }
+            if (!city && enriched.city) {
+              city = enriched.city;
+              autoFilledFields.push('city');
+            }
+            if (!zip && enriched.zip) {
+              zip = enriched.zip;
+              autoFilledFields.push('zip');
+            }
+            const fallbackAddress = enriched.workingAddress || enriched.residenceAddress;
+            if (fallbackAddress && (!street || !city || !zip)) {
+              const parsed = parsePolishAddress(fallbackAddress);
               if (!street && parsed.street) {
                 street = parsed.street;
                 autoFilledFields.push('street');
