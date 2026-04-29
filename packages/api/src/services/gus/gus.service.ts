@@ -129,7 +129,8 @@ export class GusService {
       timeout: REQUEST_TIMEOUT_MS,
     });
 
-    const parsed = await parseStringPromise(response.data, { explicitArray: false });
+    const xml = unwrapSoapBody(response.data, response.headers?.['content-type']);
+    const parsed = await parseStringPromise(xml, { explicitArray: false });
     const sid = extractFirstString(parsed, 'ZalogujResult');
     if (!sid) {
       throw new Error('GUS Zaloguj returned no session id');
@@ -167,7 +168,8 @@ export class GusService {
       timeout: REQUEST_TIMEOUT_MS,
     });
 
-    const outer = await parseStringPromise(response.data, { explicitArray: false });
+    const xml = unwrapSoapBody(response.data, response.headers?.['content-type']);
+    const outer = await parseStringPromise(xml, { explicitArray: false });
     const innerXml = extractFirstString(outer, 'DaneSzukajPodmiotyResult');
     if (!innerXml) {
       // Empty result body → NIP not found.
@@ -191,6 +193,50 @@ export class GusService {
 // ---------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------
+
+/**
+ * Unwrap a SOAP body from the response.
+ *
+ * GUS BIR1.1 PRODUCTION returns MTOM-wrapped SOAP (`multipart/related;
+ * type="application/xop+xml"`) by default. The actual envelope is one
+ * of several MIME parts. The TEST environment returns plain SOAP.
+ *
+ * Returns the inner XML string ready for xml2js parsing.
+ */
+export function unwrapSoapBody(
+  raw: string | Buffer | ArrayBuffer | undefined,
+  contentType: string | undefined,
+): string {
+  let body = '';
+  if (typeof raw === 'string') body = raw;
+  else if (Buffer.isBuffer(raw)) body = raw.toString('utf8');
+  else if (raw instanceof ArrayBuffer) body = Buffer.from(raw).toString('utf8');
+  else if (raw && typeof raw === 'object' && 'toString' in raw) body = String(raw);
+
+  const ct = (contentType || '').toLowerCase();
+  if (!ct.startsWith('multipart/')) {
+    // Plain SOAP — strip a stray BOM if any and we're done.
+    return body.replace(/^﻿/, '');
+  }
+
+  // Pull boundary out of the Content-Type header.
+  const match = ct.match(/boundary="?([^";]+)"?/);
+  if (!match) return body;
+  const boundary = match[1];
+
+  // Split into MIME parts and pick the one that actually contains a SOAP
+  // envelope. We don't care about other XOP attachments.
+  const parts = body.split(`--${boundary}`);
+  for (const part of parts) {
+    const headerEnd = part.indexOf('\r\n\r\n');
+    if (headerEnd < 0) continue;
+    const partBody = part.slice(headerEnd + 4).trimEnd();
+    if (partBody.includes('<') && partBody.toLowerCase().includes('envelope')) {
+      return partBody.replace(/^﻿/, '');
+    }
+  }
+  return body;
+}
 
 /**
  * Walk a parsed SOAP envelope looking for the first leaf node whose key

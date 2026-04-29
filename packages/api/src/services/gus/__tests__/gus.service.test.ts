@@ -1,4 +1,4 @@
-import { GusService, extractFirstString, parseBasicEntity } from '../gus.service';
+import { GusService, extractFirstString, parseBasicEntity, unwrapSoapBody } from '../gus.service';
 import axios from 'axios';
 
 jest.mock('axios');
@@ -190,6 +190,46 @@ describe('extractFirstString', () => {
   it('returns null for nullish input', () => {
     expect(extractFirstString(null, 'x')).toBeNull();
     expect(extractFirstString(undefined, 'x')).toBeNull();
+  });
+});
+
+describe('unwrapSoapBody', () => {
+  it('returns plain SOAP body unchanged', () => {
+    const body = '<?xml version="1.0"?><Envelope/>';
+    expect(unwrapSoapBody(body, 'application/soap+xml; charset=utf-8')).toBe(body);
+  });
+
+  it('strips a UTF-8 BOM from plain SOAP', () => {
+    const body = '﻿<?xml version="1.0"?><Envelope/>';
+    const out = unwrapSoapBody(body, 'application/soap+xml; charset=utf-8');
+    expect(out.startsWith('﻿')).toBe(false);
+    expect(out).toContain('<Envelope/>');
+  });
+
+  it('extracts the SOAP envelope from a multipart/related (MTOM) response', () => {
+    // Real GUS prod returns this shape — boundary, MIME headers, blank line, then SOAP.
+    const boundary = 'uuid:abc123';
+    const innerSoap = '<s:Envelope xmlns:s="http://www.w3.org/2003/05/soap-envelope"><s:Body>HELLO</s:Body></s:Envelope>';
+    const body =
+      `\r\n--${boundary}\r\n` +
+      `Content-ID: <http://tempuri.org/0>\r\n` +
+      `Content-Transfer-Encoding: 8bit\r\n` +
+      `Content-Type: application/xop+xml;charset=utf-8;type="application/soap+xml"\r\n` +
+      `\r\n` +
+      innerSoap +
+      `\r\n--${boundary}--\r\n`;
+    const ct = `multipart/related; type="application/xop+xml"; boundary="${boundary}"`;
+    expect(unwrapSoapBody(body, ct)).toBe(innerSoap);
+  });
+
+  it('handles Buffer input', () => {
+    const body = '<?xml version="1.0"?><Envelope/>';
+    expect(unwrapSoapBody(Buffer.from(body, 'utf8'), 'application/soap+xml')).toBe(body);
+  });
+
+  it('falls back to raw body when boundary is missing from Content-Type', () => {
+    const body = 'something';
+    expect(unwrapSoapBody(body, 'multipart/related; type="application/xop+xml"')).toBe(body);
   });
 });
 
