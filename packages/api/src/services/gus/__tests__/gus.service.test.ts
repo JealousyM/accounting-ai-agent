@@ -200,9 +200,9 @@ describe('unwrapSoapBody', () => {
   });
 
   it('strips a UTF-8 BOM from plain SOAP', () => {
-    const body = '﻿<?xml version="1.0"?><Envelope/>';
+    const body = '\uFEFF<?xml version="1.0"?><Envelope/>';
     const out = unwrapSoapBody(body, 'application/soap+xml; charset=utf-8');
-    expect(out.startsWith('﻿')).toBe(false);
+    expect(out.startsWith('\uFEFF')).toBe(false);
     expect(out).toContain('<Envelope/>');
   });
 
