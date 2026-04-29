@@ -216,7 +216,7 @@ export function unwrapSoapBody(
   const ct = (contentType || '').toLowerCase();
   if (!ct.startsWith('multipart/')) {
     // Plain SOAP — strip a stray BOM if any and we're done.
-    return body.replace(/^﻿/, '');
+    return body.replace(/^\uFEFF/, '');
   }
 
   // Pull boundary out of the Content-Type header.
@@ -232,7 +232,7 @@ export function unwrapSoapBody(
     if (headerEnd < 0) continue;
     const partBody = part.slice(headerEnd + 4).trimEnd();
     if (partBody.includes('<') && partBody.toLowerCase().includes('envelope')) {
-      return partBody.replace(/^﻿/, '');
+      return partBody.replace(/^\uFEFF/, '');
     }
   }
   return body;
