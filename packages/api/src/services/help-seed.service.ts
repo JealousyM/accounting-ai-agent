@@ -1609,7 +1609,7 @@ Telegram-бот позволяет использовать AI-ассистен�
 
 ## Co dalej
 
-Sprawdź kwoty na karcie. Jeśli wszystko się zgadza, przepisz dane do wFirmy ręcznie albo poproś AI w czacie o utworzenie wydatku.
+Pod kartą znajdziesz przycisk **«✅ Dodaj jako wydatek»** — kliknięcie utworzy wydatek w wFirma na podstawie odczytanych danych. Kontrahent jest dopasowywany po NIP-ie (z auto-uzupełnieniem z rejestru GUS, jeśli to nowy sprzedawca). Zawsze możesz potem otworzyć wydatek w wFirma i poprawić kategorię, datę płatności lub podzielić na pozycje.
 
 ## Język odpowiedzi
 
@@ -1648,7 +1648,7 @@ Rozpoznanie wykorzystuje **GPT-4o Vision** (OpenAI) i działa na **Twoim kluczu 
 
 ## What's next
 
-Verify the amounts on the card. If everything looks right, copy the data into wFirma manually, or ask the AI in chat to log the expense.
+Below the card you'll see an **"✅ Add as expense"** button — tapping it creates an expense in wFirma from the recognized data. The seller is matched by NIP (with auto-fill from the Polish public registry when it's a new vendor). You can always open the expense in wFirma afterwards to adjust the category, payment date, or split it into line items.
 
 ## Reply language
 
@@ -1687,7 +1687,7 @@ Recognition uses **GPT-4o Vision** (OpenAI) and runs on **your OpenAI key** from
 
 ## Что дальше
 
-Проверь суммы на карточке. Если всё верно — перенеси данные в wFirma вручную или попроси AI в чате занести расход.
+Под карточкой появится кнопка **«✅ Добавить в расходы»** — по нажатию расход сразу заносится в wFirma на основе распознанных данных. Контрагент подбирается по NIP (для нового продавца поля автоматически подтягиваются из реестра GUS). Открой расход в wFirma позже, если захочется поправить категорию, дату оплаты или разбить на позиции.
 
 ## Язык ответа
 

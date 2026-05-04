@@ -37,6 +37,7 @@ import {
   PaymentUpdateData,
   WFirmaExpense,
   ExpenseFilters,
+  CreateExpenseData,
   WFirmaVehicle,
   VehicleFilters,
   VehicleData,
@@ -355,6 +356,10 @@ export class WFirmaIntegrationService {
 
   async getExpense(id: string): Promise<WFirmaExpense | null> {
     return this.expenseService.getExpense(id);
+  }
+
+  async createExpense(data: CreateExpenseData): Promise<WFirmaExpense> {
+    return this.expenseService.createExpense(data);
   }
 
   // ============================================

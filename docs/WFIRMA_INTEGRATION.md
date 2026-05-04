@@ -37,9 +37,9 @@ Two distinct uses:
 
 Returns legal form, share capital, board members for limited companies (sp. z o.o., S.A.). Sole proprietors are not in KRS — for those, Biała Lista is the only source.
 
-### Receipt OCR (Telegram photo handler)
+### Receipt OCR → expense (Telegram photo handler)
 
-Photographs of paragony / faktury sent to the Telegram bot are processed by `ReceiptOCRService` (OpenAI GPT-4o vision) and replied with a structured markdown card. This is *not* a wFirma call — it's a separate service that lives in `packages/api/src/services/ocr/`. Direct creation of a wFirma expense from the recognized receipt is a planned follow-up; today the user copies the data into wFirma manually or asks the AI to log it by text.
+Photographs of paragony / faktury sent to the Telegram bot are processed by `ReceiptOCRService` (OpenAI GPT-4o vision; runs on the user's per-user OpenAI key from `UserApiCredentials.llmApiKey`, mirroring the AI chat) and replied with a structured markdown card. The card now carries an inline **"✅ Add as expense"** button: pressing it dispatches to `createExpenseFromParsedReceipt` (in `packages/api/src/services/ai-chat/tools/expense.tools.ts`), which resolves the seller via `WFirmaContractorService.getContractors({ nip })` (creating the contractor with GUS BIR1.1 enrichment when missing) and then calls `WFirmaExpenseService.createExpense`. The same path is exposed to the AI chat as the `create_expense_from_receipt` tool, so the user can also book a receipt by asking in text.
 
 ## Configuration
 
@@ -298,12 +298,13 @@ const stats = await wfirmaCacheService.getCacheStats('user-123');
 | `update_payment` | Update payment |
 | `delete_payment` | Delete payment |
 
-### Expense Tools (2)
+### Expense Tools (3)
 
 | Tool | Description |
 |------|-------------|
 | `get_expenses` | List expenses |
 | `get_expense_details` | Expense details with items |
+| `create_expense_from_receipt` | Book a wFirma expense from a parsed receipt/faktura (resolves seller by NIP with GUS auto-fill) |
 
 ### Vehicle Tools (5)
 

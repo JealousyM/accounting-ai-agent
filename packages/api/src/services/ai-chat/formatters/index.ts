@@ -43,6 +43,7 @@ export {
 export {
   formatExpensesList,
   formatExpenseDetails,
+  formatExpenseCreated,
 } from './expense.formatter';
 export {
   formatVehiclesList,

@@ -8,6 +8,13 @@
     "recognizing": "Recognizing receipt…",
     "recognizeFailed": "Could not read this image. Please try a clearer photo (good lighting, no blur, full receipt visible).",
     "noApiKey": "To recognize receipts, please add your OpenAI API key in Settings → API Credentials.",
+    "addAsExpense": "✅ Add as expense",
+    "cancel": "❌ Cancel",
+    "expenseCreating": "Creating expense in wFirma…",
+    "expenseCreated": "✅ Expense added to wFirma. Check it in the app — you can edit it before booking.",
+    "expenseCreateFailed": "⚠️ Could not create expense: {error}",
+    "expenseCancelled": "Cancelled. Send the photo again to retry.",
+    "expenseExpired": "This card has expired (we keep parsed data for 10 minutes). Send the photo again.",
     "title": "Recognized receipt",
     "field": "Field",
     "value": "Value",
@@ -33,7 +40,7 @@
     "itemVatRate": "VAT",
     "itemTotal": "Total",
     "notes": "Notes",
-    "confirmHint": "Verify the totals — if everything looks right, copy the data into wFirma or ask the AI to log this expense."
+    "confirmHint": "Verify the totals — if everything looks right, tap the button below to add it to wFirma."
   },
   "contractor": {
     "notFound": "No contractors found.",
@@ -351,7 +358,13 @@
     "notFoundById": "Expense not found.",
     "contractorNotFound": "Contractor not found.",
     "errorFetch": "Error fetching expenses from wFirma",
-    "errorFetchDetails": "Error fetching expense details"
+    "errorFetchDetails": "Error fetching expense details",
+    "created": "Expense added to wFirma",
+    "createdHint": "Check the expense in wFirma — you can edit fields or category before booking.",
+    "errorCreate": "Could not create expense in wFirma",
+    "errorCreateTitle": "Could not create expense",
+    "errorReason": "Reason",
+    "cannotResolveSeller": "No seller NIP or name found — can't identify the contractor. Try a clearer photo or enter the data manually."
   },
   "vehicle": {
     "vehiclesTitle": "Vehicles",

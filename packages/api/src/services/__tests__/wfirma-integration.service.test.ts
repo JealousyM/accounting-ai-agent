@@ -265,6 +265,106 @@ describe('WFirmaIntegrationService', () => {
     });
   });
 
+  describe('createExpense', () => {
+    const baseExpenseInput = {
+      type: 'invoice' as const,
+      date: '2026-05-01',
+      currency: 'PLN',
+      description: 'FV 21101000220526',
+      contractorId: 'contractor-77',
+      items: [
+        {
+          name: 'BENZYNA PB95',
+          totalNet: 138.89,
+          totalVat: 11.11,
+          totalGross: 150.0,
+          vat: '8',
+        },
+      ],
+    };
+
+    it('should create expense successfully and return mapped data', async () => {
+      mockAxiosInstance.request.mockResolvedValue({
+        status: 200,
+        data: {
+          status: { code: 'OK' },
+          expenses: {
+            '0': {
+              expense: {
+                id: 'expense-42',
+                type: 'invoice',
+                date: '2026-05-01',
+                currency: 'PLN',
+                netto: '138.89',
+                vat: '11.11',
+                brutto: '150.00',
+                contractor_id: 'contractor-77',
+              },
+            },
+          },
+        },
+      });
+
+      const result = await service.createExpense(baseExpenseInput);
+
+      expect(result.id).toBe('expense-42');
+      expect(result.total).toBe(150);
+      expect(result.totalNet).toBeCloseTo(138.89, 2);
+      expect(result.contractorId).toBe('contractor-77');
+    });
+
+    it('should POST to /expenses/add with the wFirma payload shape', async () => {
+      mockAxiosInstance.request.mockResolvedValue({
+        status: 200,
+        data: {
+          status: { code: 'OK' },
+          expenses: { '0': { expense: { id: 'expense-1', type: 'invoice', brutto: '150.00' } } },
+        },
+      });
+
+      await service.createExpense(baseExpenseInput);
+
+      expect(mockAxiosInstance.request).toHaveBeenCalledTimes(1);
+      const call = mockAxiosInstance.request.mock.calls[0][0];
+      expect(call.method).toBe('POST');
+      expect(call.url).toBe('/expenses/add');
+      // payload must wrap expense in api.expenses.expense
+      const expensePayload = call.data.api.expenses.expense;
+      expect(expensePayload.type).toBe('invoice');
+      expect(expensePayload.contractor).toEqual({ id: 'contractor-77' });
+      // line items must be keyed numerically with nested expense_part objects
+      expect(expensePayload.expense_parts['0'].expense_part).toMatchObject({
+        name: 'BENZYNA PB95',
+        vat: '8',
+      });
+    });
+
+    it('should throw validation error when items array is empty', async () => {
+      await expect(
+        service.createExpense({ ...baseExpenseInput, items: [] }),
+      ).rejects.toThrow(WFirmaValidationError);
+    });
+
+    it('should throw validation error when contractorId is missing', async () => {
+      await expect(
+        service.createExpense({ ...baseExpenseInput, contractorId: '' }),
+      ).rejects.toThrow(WFirmaValidationError);
+    });
+
+    it('should surface wFirma error responses', async () => {
+      mockAxiosInstance.request.mockResolvedValue({
+        status: 200,
+        data: {
+          status: { code: 'ERROR', message: 'Invalid contractor' },
+        },
+      });
+
+      await expect(service.createExpense(baseExpenseInput)).rejects.toThrow(
+        /Invalid contractor|wFirma/i,
+      );
+    });
+  });
+
   describe('getFinancialData', () => {
     it('should fetch financial data for a year', async () => {
       mockAxiosInstance.request.mockResolvedValue({
