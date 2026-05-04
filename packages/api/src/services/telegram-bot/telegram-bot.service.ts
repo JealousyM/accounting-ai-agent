@@ -19,6 +19,7 @@ import { receiptOCRService } from '../ocr/receipt-ocr.instance';
 import { formatParsedReceipt } from '../ocr/formatter';
 import { getOcrTranslations, Locale } from '../../i18n';
 import { detectLocale } from '../ai-chat/utils';
+import { credentialsService } from '../credentials.instance';
 
 const RATE_LIMIT_WINDOW_SECONDS = 60;
 const RATE_LIMIT_MAX_MESSAGES = 10;
@@ -375,9 +376,31 @@ export class TelegramBotService {
     }
     const buffer = Buffer.from(await response.arrayBuffer());
 
+    // Vision OCR runs on the user's own OpenAI quota — same per-user
+    // credential model as the AI chat (see ai-chat.service.ts:runAgent).
+    // Vision is currently OpenAI-only (gpt-4o); for users on a non-OpenAI
+    // provider we surface the same actionable "add OpenAI key" message.
+    const userCreds = await credentialsService.getLLMCredentials(link.userId);
+    if (!userCreds || userCreds.provider !== 'openai' || !userCreds.apiKey) {
+      logger.warn('[TelegramBot] OCR skipped — no OpenAI credentials', {
+        telegramUserId,
+        userId: link.userId,
+        provider: userCreds?.provider ?? null,
+      });
+      try {
+        await ctx.telegram.deleteMessage(ackMsg.chat.id, ackMsg.message_id);
+      } catch {
+        /* best effort */
+      }
+      await ctx.reply(`⚠️ ${t.noApiKey}`);
+      return;
+    }
+
     let markdown: string;
     try {
-      const parsed = await receiptOCRService.extractFromImage(buffer, 'image/jpeg', locale);
+      const parsed = await receiptOCRService.extractFromImage(buffer, 'image/jpeg', locale, {
+        apiKey: userCreds.apiKey,
+      });
       // detectLocale on parsed seller name lets us refine: a receipt clearly in PL
       // but user has language_code=en → still use 'pl' formatting? No — keep user
       // locale for table headers, the data itself is locale-neutral.

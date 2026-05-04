@@ -1,5 +1,15 @@
 import { ReceiptOCRService, extractJsonObject } from '../receipt-ocr.service';
 
+// Mock the OpenAI client so we can assert the api key gets forwarded without a network call.
+// Tests that inject a mock model via the constructor bypass this path entirely.
+jest.mock('@langchain/openai', () => ({
+  ChatOpenAI: jest.fn().mockImplementation(() => ({
+    invoke: jest.fn().mockResolvedValue({
+      content: JSON.stringify({ totalGross: 1, currency: 'PLN', documentType: 'paragon' }),
+    }),
+  })),
+}));
+
 describe('extractJsonObject', () => {
   it('parses a clean JSON object', () => {
     expect(extractJsonObject('{"a": 1}')).toEqual({ a: 1 });
@@ -123,5 +133,25 @@ describe('ReceiptOCRService.extractFromImage', () => {
     const result = await service.extractFromImage(sampleBuffer, 'image/jpeg');
     expect(result.totalGross).toBe(50);
     expect(result.currency).toBe('EUR');
+  });
+
+  it('forwards user-provided apiKey to ChatOpenAI when no model is injected', async () => {
+    const { ChatOpenAI } = jest.requireMock('@langchain/openai');
+    ChatOpenAI.mockClear();
+
+    const service = new ReceiptOCRService();
+    await service.extractFromImage(sampleBuffer, 'image/jpeg', 'pl', { apiKey: 'sk-user-key' });
+
+    expect(ChatOpenAI).toHaveBeenCalledTimes(1);
+    expect(ChatOpenAI).toHaveBeenCalledWith(
+      expect.objectContaining({ openAIApiKey: 'sk-user-key' }),
+    );
+  });
+
+  it('throws a clear error when no apiKey is provided and no model is injected', async () => {
+    const service = new ReceiptOCRService();
+    await expect(
+      service.extractFromImage(sampleBuffer, 'image/jpeg', 'pl'),
+    ).rejects.toThrow(/api key/i);
   });
 });

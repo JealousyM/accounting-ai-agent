@@ -1617,7 +1617,7 @@ Bot dopasowuje język karty do ustawień Twojego klienta Telegram (PL / EN / RU)
 
 ## Technologia
 
-Rozpoznanie wykorzystuje **GPT-4o Vision** (OpenAI). Koszt jednego zdjęcia jest minimalny i mieści się w Twoim limicie subskrypcji.`,
+Rozpoznanie wykorzystuje **GPT-4o Vision** (OpenAI) i działa na **Twoim kluczu OpenAI** z Ustawień → Poświadczenia API (ten sam klucz, którego używa czat AI). Jeśli korzystasz z innego dostawcy LLM, dodaj klucz OpenAI, aby włączyć rozpoznawanie. Koszt jednego zdjęcia jest minimalny.`,
     contentEn: `Send a photo of a receipt (paragon) or VAT invoice (faktura) to the Telegram bot and you'll get back the extracted data ready to enter into your accounting.
 
 ## How to use
@@ -1656,7 +1656,7 @@ The bot picks the card language from your Telegram client's settings (PL / EN / 
 
 ## Technology
 
-Recognition uses **GPT-4o Vision** (OpenAI). The cost per photo is minimal and fits within your subscription quota.`,
+Recognition uses **GPT-4o Vision** (OpenAI) and runs on **your OpenAI key** from Settings → API Credentials (the same key the AI chat uses). If you're on a different LLM provider, add an OpenAI key to enable recognition. The cost per photo is minimal.`,
     contentRu: `Отправь фотографию чека (paragon) или счёта-фактуры (faktura) в Telegram-бот — получишь распознанные данные, готовые к занесению в бухгалтерию.
 
 ## Как пользоваться
@@ -1695,7 +1695,7 @@ Recognition uses **GPT-4o Vision** (OpenAI). The cost per photo is minimal and f
 
 ## Технология
 
-Распознавание использует **GPT-4o Vision** (OpenAI). Стоимость одного фото минимальна и укладывается в лимит твоей подписки.`,
+Распознавание использует **GPT-4o Vision** (OpenAI) и работает на **твоём ключе OpenAI** из Настроек → API-ключи (тот же, что и AI-чат). Если у тебя другой LLM-провайдер, добавь ключ OpenAI, чтобы включить распознавание. Стоимость одного фото минимальна.`,
     searchKeywordsPl: ['ocr', 'paragon', 'skan', 'zdjęcie', 'faktura', 'telegram', 'rozpoznawanie', 'wydatek', 'foto'],
     searchKeywordsEn: ['ocr', 'paragon', 'receipt', 'photo', 'scan', 'invoice', 'telegram', 'recognition', 'expense'],
     searchKeywordsRu: ['ocr', 'чек', 'скан', 'фото', 'снимок', 'счёт', 'телеграм', 'распознавание', 'расход'],
