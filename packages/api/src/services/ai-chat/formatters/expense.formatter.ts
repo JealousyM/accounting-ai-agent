@@ -185,3 +185,30 @@ export function formatExpenseDetails(
 
   return result;
 }
+
+/**
+ * Format a successful "expense created from receipt" reply.
+ * Compact card with id, contractor, date and totals — the full detail
+ * view is one tap away in the wFirma UI.
+ */
+export function formatExpenseCreated(
+  expense: WFirmaExpense,
+  locale: Locale = 'pl',
+): string {
+  const t = getExpenseTranslations(locale);
+  const contractor = expense.contractorName
+    ? `${expense.contractorName}${expense.contractorNip ? ` (NIP ${expense.contractorNip})` : ''}`
+    : '-';
+  return `## ✅ ${t.created}
+
+| ${t.field} | ${t.value} |
+|-------|-------|
+| **${t.id}** | \`${expense.id}\` |
+| **${t.contractor}** | ${contractor} |
+| **${t.date}** | ${formatDate(expense.date, locale)} |
+| **${t.totalNet}** | ${formatNumber(expense.totalNet)} ${expense.currency} |
+| **${t.totalVat}** | ${formatNumber(expense.totalVat)} ${expense.currency} |
+| **${t.totalGross}** | ${formatNumber(expense.total)} ${expense.currency} |
+
+> ${t.createdHint}`;
+}

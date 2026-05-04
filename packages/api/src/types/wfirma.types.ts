@@ -637,6 +637,53 @@ export interface ExpenseFilters {
   offset?: number;
 }
 
+/** Single line item for `WFirmaExpenseService.createExpense`. */
+export interface CreateExpenseItem {
+  /** Free-text item name shown on the expense */
+  name: string;
+  /** Total NET amount for this line in the document's currency */
+  totalNet: number;
+  /** Total VAT amount for this line in the document's currency */
+  totalVat: number;
+  /** Total GROSS amount for this line in the document's currency */
+  totalGross: number;
+  /**
+   * VAT rate as a string, matching wFirma's invoice payload convention
+   * (e.g. '23', '8', '5', '0', 'zw', 'np'). Defaults to '23' if omitted.
+   */
+  vat?: string;
+  /** Quantity (defaults to 1) */
+  count?: number;
+  /**
+   * wFirma expense schema for this line. 'cost' is the safe default for
+   * generic receipt purchases; 'vehicle_fuel' / 'vehicle_expense' would
+   * be used by future vehicle-aware flows.
+   */
+  schema?: ExpenseSchema;
+  /** wFirma expense_part type — 'rates' (rate-based) or 'positions' (item-based) */
+  expensePartType?: ExpensePartType;
+}
+
+/** Input for `WFirmaExpenseService.createExpense`. */
+export interface CreateExpenseData {
+  type: ExpenseType;
+  /** Issue date YYYY-MM-DD; defaults to today on the wFirma side if omitted */
+  date?: string;
+  /** Payment due date YYYY-MM-DD */
+  paymentDate?: string;
+  paymentMethod?: PaymentMethod;
+  currency?: string;
+  /** Free-text description / number of the source document (faktura number, paragon hash, etc.) */
+  description?: string;
+  /** wFirma assumes 'kpir_and_vat' for VAT-registered users; override for special cases */
+  accountingEffect?: AccountingEffect;
+  /** 'netto' (default) means line totals are NET and VAT gets added; 'brutto' means lines are GROSS */
+  taxEvaluationMethod?: TaxEvaluationMethod;
+  /** wFirma contractor id — REQUIRED. Caller is responsible for resolving by NIP first. */
+  contractorId: string;
+  items: CreateExpenseItem[];
+}
+
 // ============================================
 // VEHICLE TYPES
 // ============================================
