@@ -50,21 +50,36 @@ Rules:
 - Polish VAT rates: 23, 8, 5, 0, ZW (use 0 for ZW), NP (use 0 for NP).
 - Do not invent numbers. If unsure, omit the field rather than guess.`;
 
+export interface ExtractFromImageOptions {
+  /**
+   * User's OpenAI API key (decrypted, from `UserApiCredentials.llmApiKey`).
+   * Required in production — vision calls go on the user's own quota,
+   * matching how `AIChatService` routes per-user LLM credentials.
+   * Tests that inject a mock model via the constructor may omit this.
+   */
+  apiKey?: string;
+}
+
 export class ReceiptOCRService {
   /**
    * Constructor accepts an optional pre-built model so tests can inject a mock.
-   * In production we lazily instantiate ChatOpenAI on first use.
+   * In production we lazily instantiate ChatOpenAI on each call with the
+   * caller-supplied apiKey.
    */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   constructor(private readonly model?: { invoke: (messages: any[]) => Promise<any> }) {}
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private getModel(): { invoke: (messages: any[]) => Promise<any> } {
+  private getModel(apiKey?: string): { invoke: (messages: any[]) => Promise<any> } {
     if (this.model) return this.model;
+    if (!apiKey) {
+      throw new Error('ReceiptOCR requires an OpenAI API key (per-user llmApiKey).');
+    }
     return new ChatOpenAI({
       modelName: VISION_MODEL,
       maxTokens: MAX_TOKENS,
       temperature: TEMPERATURE,
+      openAIApiKey: apiKey,
     });
   }
 
@@ -74,11 +89,13 @@ export class ReceiptOCRService {
    * @param imageBuffer raw image bytes
    * @param mimeType e.g. "image/jpeg"
    * @param locale used only for log context — output JSON is locale-agnostic
+   * @param options.apiKey user's OpenAI API key — required in production
    */
   async extractFromImage(
     imageBuffer: Buffer,
     mimeType: string,
     locale: Locale = 'pl',
+    options: ExtractFromImageOptions = {},
   ): Promise<ParsedReceipt> {
     const base64 = imageBuffer.toString('base64');
     const messages = [
@@ -103,7 +120,7 @@ export class ReceiptOCRService {
       locale,
     });
 
-    const response = await this.getModel().invoke(messages);
+    const response = await this.getModel(options.apiKey).invoke(messages);
     const text = typeof response.content === 'string'
       ? response.content
       : Array.isArray(response.content)

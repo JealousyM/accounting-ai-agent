@@ -906,6 +906,7 @@ export interface OcrTranslations {
   // Bot status
   recognizing: string;
   recognizeFailed: string;
+  noApiKey: string;
   // Card
   title: string;
   field: string;
