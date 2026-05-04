@@ -7,6 +7,7 @@
   "ocr": {
     "recognizing": "Rozpoznaję paragon…",
     "recognizeFailed": "Nie udało się odczytać tego zdjęcia. Spróbuj wyraźniejszego ujęcia (dobre oświetlenie, bez rozmycia, cały paragon w kadrze).",
+    "noApiKey": "Aby rozpoznawać paragony, dodaj swój klucz OpenAI w Ustawieniach → Poświadczenia API.",
     "title": "Rozpoznany dokument",
     "field": "Pole",
     "value": "Wartość",
