@@ -56,6 +56,7 @@ import {
 import {
   createGetExpensesTool,
   createGetExpenseDetailsTool,
+  createCreateExpenseFromReceiptTool,
 } from './expense.tools';
 import {
   createGetVehiclesTool,
@@ -167,6 +168,7 @@ export {
 export {
   createGetExpensesTool,
   createGetExpenseDetailsTool,
+  createCreateExpenseFromReceiptTool,
 } from './expense.tools';
 export {
   createGetVehiclesTool,
@@ -295,6 +297,7 @@ export function createAllTools(
     // Expense tools
     createGetExpensesTool(wfirmaService, userId, locale, subscriptionService),
     createGetExpenseDetailsTool(wfirmaService, userId, locale, subscriptionService),
+    createCreateExpenseFromReceiptTool(wfirmaService, cacheService, userId, locale, subscriptionService, enrichmentService),
 
     // Vehicle tools
     createGetVehiclesTool(wfirmaService, userId, locale, subscriptionService),

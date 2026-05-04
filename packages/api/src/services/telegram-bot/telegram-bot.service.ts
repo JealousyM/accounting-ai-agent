@@ -17,21 +17,41 @@ import { AIChatService } from '../ai-chat/ai-chat.service';
 import { convertToTelegramMarkdown, splitMessage } from './markdown-converter';
 import { receiptOCRService } from '../ocr/receipt-ocr.instance';
 import { formatParsedReceipt } from '../ocr/formatter';
-import { getOcrTranslations, Locale } from '../../i18n';
+import { ParsedReceipt } from '../ocr/types';
+import { getOcrTranslations, getExpenseTranslations, Locale } from '../../i18n';
 import { detectLocale } from '../ai-chat/utils';
 import { credentialsService } from '../credentials.instance';
+import { WFirmaServiceFactory } from '../wfirma-integration.factory';
+import { CompanyEnrichmentService } from '../company-enrichment.service';
+import { WFirmaCacheService } from '../wfirma-cache.service';
+import { createExpenseFromParsedReceipt } from '../ai-chat/tools/expense.tools';
+import { formatExpenseCreated } from '../ai-chat/formatters';
 
 const RATE_LIMIT_WINDOW_SECONDS = 60;
 const RATE_LIMIT_MAX_MESSAGES = 10;
 const LINK_CODE_TTL_SECONDS = 300; // 5 minutes
+// Parsed-receipt cache for the OCR inline-button flow. Long enough to read
+// the card and decide; short enough that stale cards expire on their own.
+const OCR_PARSED_TTL_SECONDS = 600; // 10 minutes
 
 export class TelegramBotService {
   private bot: Telegraf | null = null;
   private aiChatService: AIChatService;
+  private wfirmaFactory?: WFirmaServiceFactory;
+  private enrichmentService?: CompanyEnrichmentService;
+  private cacheService?: WFirmaCacheService;
   private initialized = false;
 
-  constructor(aiChatService: AIChatService) {
+  constructor(
+    aiChatService: AIChatService,
+    wfirmaFactory?: WFirmaServiceFactory,
+    enrichmentService?: CompanyEnrichmentService,
+    cacheService?: WFirmaCacheService,
+  ) {
     this.aiChatService = aiChatService;
+    this.wfirmaFactory = wfirmaFactory;
+    this.enrichmentService = enrichmentService;
+    this.cacheService = cacheService;
 
     const token = process.env.TELEGRAM_CHATBOT_TOKEN;
     if (!token) {
@@ -207,7 +227,18 @@ export class TelegramBotService {
   private async handleCallbackQuery(ctx: Context): Promise<void> {
     try {
       const data = (ctx.callbackQuery as any)?.data as string | undefined;
-      if (!data || !data.startsWith('chat:')) return;
+      if (!data) return;
+
+      if (data.startsWith('ocr:add:')) {
+        await this.handleOcrAddCallback(ctx, data.substring('ocr:add:'.length));
+        return;
+      }
+      if (data.startsWith('ocr:cancel:')) {
+        await this.handleOcrCancelCallback(ctx, data.substring('ocr:cancel:'.length));
+        return;
+      }
+
+      if (!data.startsWith('chat:')) return;
 
       const conversationId = data.substring(5);
       const telegramUserId = String(ctx.from?.id);
@@ -274,6 +305,111 @@ export class TelegramBotService {
         await ctx.answerCbQuery('An error occurred.');
       } catch { /* ignore */ }
     }
+  }
+
+  /**
+   * Inline-button callback for "✅ Add as expense" on the OCR card. Pulls
+   * the parsed receipt out of Redis (set in handlePhoto) and pushes it
+   * into wFirma as an expense via the same path the AI tool uses.
+   */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private async handleOcrAddCallback(ctx: any, ocrId: string): Promise<void> {
+    const telegramUserId = String(ctx.from?.id);
+    const langCode: string = ctx.from?.language_code || 'pl';
+    const locale: Locale = langCode.startsWith('ru') ? 'ru' : langCode.startsWith('en') ? 'en' : 'pl';
+    const t = getOcrTranslations(locale);
+
+    const link = await prisma.telegramLink.findUnique({ where: { telegramUserId } });
+    if (!link) {
+      await ctx.answerCbQuery('Account not linked.');
+      return;
+    }
+
+    const cacheKey = `telegram:ocr:${telegramUserId}:${ocrId}`;
+    const raw = await redis.get(cacheKey);
+    if (!raw) {
+      await ctx.answerCbQuery();
+      await ctx.reply(`⚠️ ${t.expenseExpired}`);
+      return;
+    }
+
+    if (!this.wfirmaFactory) {
+      logger.error('[TelegramBot] wfirmaFactory not configured — cannot create expense from OCR');
+      await ctx.answerCbQuery();
+      await ctx.reply(`⚠️ ${t.expenseCreateFailed.replace('{error}', 'wFirma not configured')}`);
+      return;
+    }
+
+    let parsed: ParsedReceipt;
+    try {
+      parsed = JSON.parse(raw) as ParsedReceipt;
+    } catch (err) {
+      logger.error('[TelegramBot] Failed to parse cached receipt', { err });
+      await ctx.answerCbQuery();
+      await ctx.reply(`⚠️ ${t.expenseExpired}`);
+      return;
+    }
+
+    await ctx.answerCbQuery(t.expenseCreating);
+    // Disable buttons on the original card so the user can't double-click.
+    try {
+      await ctx.editMessageReplyMarkup({ inline_keyboard: [] });
+    } catch {
+      /* best effort */
+    }
+
+    try {
+      const wfirmaService = await this.wfirmaFactory.getServiceForUser(link.userId);
+      const expense = await createExpenseFromParsedReceipt(parsed, wfirmaService, {
+        userId: link.userId,
+        locale,
+        enrichmentService: this.enrichmentService,
+        cacheService: this.cacheService,
+      });
+
+      // Drop the cached parsed receipt — it's been booked.
+      await redis.del(cacheKey);
+
+      const successText = `${t.expenseCreated}\n\n${formatExpenseCreated(expense, locale)}`;
+      const tgText = convertToTelegramMarkdown(successText);
+      const chunks = splitMessage(tgText);
+      for (const chunk of chunks) {
+        try {
+          await ctx.reply(chunk, { parse_mode: 'MarkdownV2' });
+        } catch {
+          // eslint-disable-next-line no-useless-escape
+          const plainText = chunk.replace(/\\([_*\[\]()~`>#\+\-=|{}.!\\])/g, '$1');
+          await ctx.reply(plainText);
+        }
+      }
+    } catch (error) {
+      const msg = error instanceof Error ? error.message : 'unknown';
+      const exT = getExpenseTranslations(locale);
+      const human = msg === 'cannotResolveSeller' ? exT.cannotResolveSeller : msg;
+      logger.error('[TelegramBot] Failed to create expense from OCR', {
+        userId: link.userId,
+        telegramUserId,
+        error: msg,
+      });
+      await ctx.reply(`${t.expenseCreateFailed.replace('{error}', human)}`);
+    }
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private async handleOcrCancelCallback(ctx: any, ocrId: string): Promise<void> {
+    const telegramUserId = String(ctx.from?.id);
+    const langCode: string = ctx.from?.language_code || 'pl';
+    const locale: Locale = langCode.startsWith('ru') ? 'ru' : langCode.startsWith('en') ? 'en' : 'pl';
+    const t = getOcrTranslations(locale);
+
+    await redis.del(`telegram:ocr:${telegramUserId}:${ocrId}`);
+    await ctx.answerCbQuery();
+    try {
+      await ctx.editMessageReplyMarkup({ inline_keyboard: [] });
+    } catch {
+      /* best effort */
+    }
+    await ctx.reply(t.expenseCancelled);
   }
 
   private async handleHelp(ctx: Context): Promise<void> {
@@ -397,8 +533,9 @@ export class TelegramBotService {
     }
 
     let markdown: string;
+    let parsed: ParsedReceipt;
     try {
-      const parsed = await receiptOCRService.extractFromImage(buffer, 'image/jpeg', locale, {
+      parsed = await receiptOCRService.extractFromImage(buffer, 'image/jpeg', locale, {
         apiKey: userCreds.apiKey,
       });
       // detectLocale on parsed seller name lets us refine: a receipt clearly in PL
@@ -422,15 +559,33 @@ export class TelegramBotService {
       }
     }
 
+    // Stash the parsed receipt in Redis so the inline-button callback can
+    // turn it into a wFirma expense without re-running OCR. Short id keeps
+    // the callback_data well under Telegram's 64-byte limit.
+    const ocrId = crypto.randomBytes(6).toString('hex');
+    const cacheKey = `telegram:ocr:${telegramUserId}:${ocrId}`;
+    await redis.setEx(cacheKey, OCR_PARSED_TTL_SECONDS, JSON.stringify(parsed));
+
+    const keyboard = Markup.inlineKeyboard([
+      [Markup.button.callback(t.addAsExpense, `ocr:add:${ocrId}`)],
+      [Markup.button.callback(t.cancel, `ocr:cancel:${ocrId}`)],
+    ]);
+
     const telegramText = convertToTelegramMarkdown(markdown);
     const chunks = splitMessage(telegramText);
-    for (const chunk of chunks) {
+    // Attach the keyboard only to the last chunk so all parts stay readable
+    // and only one message carries the action buttons.
+    for (let i = 0; i < chunks.length; i++) {
+      const isLast = i === chunks.length - 1;
+      const opts = isLast
+        ? { parse_mode: 'MarkdownV2' as const, reply_markup: keyboard.reply_markup }
+        : { parse_mode: 'MarkdownV2' as const };
       try {
-        await ctx.reply(chunk, { parse_mode: 'MarkdownV2' });
+        await ctx.reply(chunks[i], opts);
       } catch {
         // eslint-disable-next-line no-useless-escape
-        const plainText = chunk.replace(/\\([_*\[\]()~`>#\+\-=|{}.!\\])/g, '$1');
-        await ctx.reply(plainText);
+        const plainText = chunks[i].replace(/\\([_*\[\]()~`>#\+\-=|{}.!\\])/g, '$1');
+        await ctx.reply(plainText, isLast ? { reply_markup: keyboard.reply_markup } : undefined);
       }
     }
   }

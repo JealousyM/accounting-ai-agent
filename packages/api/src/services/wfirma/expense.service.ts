@@ -1,6 +1,6 @@
 /**
  * wFirma Expense Service
- * Handles expense operations (read-only)
+ * Handles expense operations (find/get + receipt-driven create)
  */
 
 import { logger } from '../../utils/logger';
@@ -14,6 +14,7 @@ import {
   ExpensePartType,
   ExpenseSchema,
   PaymentMethod,
+  CreateExpenseData,
 } from '../../types/wfirma.types';
 import { WFirmaClient } from './client';
 import { WFirmaError, WFirmaValidationError } from './errors';
@@ -254,6 +255,153 @@ export class WFirmaExpenseService {
         throw error;
       }
     });
+  }
+
+  /**
+   * Create a new expense in wFirma.
+   * Mirrors `WFirmaInvoiceService.createInvoice` payload conventions —
+   * line items keyed numerically with nested `expense_part` objects, and
+   * the contractor referenced by id (caller resolves NIP → id beforehand).
+   */
+  async createExpense(data: CreateExpenseData): Promise<WFirmaExpense> {
+    logger.info('Creating expense in wFirma', {
+      type: data.type,
+      contractorId: data.contractorId,
+      itemCount: data.items?.length,
+    });
+
+    return this.client.withRetry(async () => {
+      try {
+        if (!data.contractorId) {
+          throw new WFirmaValidationError('Contractor ID is required');
+        }
+        if (!data.type) {
+          throw new WFirmaValidationError('Expense type is required');
+        }
+        if (!data.items || data.items.length === 0) {
+          throw new WFirmaValidationError('At least one expense item is required');
+        }
+
+        const expensePayload = this.buildCreateExpensePayload(data);
+
+        const payload = {
+          api: {
+            expenses: {
+              expense: expensePayload,
+            },
+          },
+        };
+
+        logger.debug('wFirma create expense payload', { payload });
+
+        const response = await this.client.apiClient.request({
+          method: 'POST',
+          url: '/expenses/add',
+          params: this.client.buildQueryParams(),
+          data: payload,
+        });
+
+        const responseData = response.data;
+
+        if (responseData.status?.code !== 'OK') {
+          const expenseResponse = responseData.expenses?.['0']?.expense;
+          const expenseErrors = expenseResponse?.errors;
+
+          const errorMessages: string[] = [];
+          if (expenseErrors) {
+            for (const key of Object.keys(expenseErrors)) {
+              const err = expenseErrors[key]?.error;
+              if (err?.message) {
+                errorMessages.push(`${err.field || 'unknown'}: ${err.message}`);
+              }
+            }
+          }
+
+          const errorMessage = errorMessages.length > 0
+            ? errorMessages.join('; ')
+            : responseData.status?.message || 'Unknown error';
+
+          logger.error('wFirma create expense failed', {
+            errorMessage,
+            parsedErrors: errorMessages,
+            expenseErrors,
+            fullStatus: responseData.status,
+          });
+
+          throw new WFirmaError(
+            'WFIRMA_API_ERROR',
+            `wFirma error: ${errorMessage}`,
+            { status: responseData.status, errors: expenseErrors }
+          );
+        }
+
+        const createdExpense = this.extractExpenseFromResponse(responseData);
+        if (!createdExpense) {
+          throw new WFirmaError('WFIRMA_API_ERROR', 'No expense data in response', responseData);
+        }
+
+        const expense = this.mapExpenseData(createdExpense);
+        logger.info('Successfully created expense in wFirma', {
+          expenseId: expense.id,
+        });
+
+        return expense;
+      } catch (error) {
+        logger.error('Failed to create expense', { error });
+        throw error;
+      }
+    });
+  }
+
+  private buildCreateExpensePayload(data: CreateExpenseData): Record<string, any> {
+    const payload: Record<string, any> = {
+      type: data.type,
+      contractor: { id: data.contractorId },
+    };
+
+    if (data.date) payload.date = data.date;
+    if (data.paymentDate) payload.payment_date = data.paymentDate;
+    if (data.paymentMethod) payload.payment_method = data.paymentMethod;
+    if (data.currency) payload.currency = data.currency;
+    if (data.description) payload.description = data.description;
+    if (data.accountingEffect) payload.accounting_effect = data.accountingEffect;
+    if (data.taxEvaluationMethod) payload.tax_evaluation_method = data.taxEvaluationMethod;
+
+    const expensePartsObj: Record<string, any> = {};
+    data.items.forEach((item, index) => {
+      expensePartsObj[index.toString()] = {
+        expense_part: {
+          name: item.name,
+          count: (item.count ?? 1).toString(),
+          totalnet: item.totalNet.toFixed(2),
+          totalvat: item.totalVat.toFixed(2),
+          totalgross: item.totalGross.toFixed(2),
+          vat: item.vat ?? '23',
+          schema: item.schema ?? 'cost',
+          expense_part_type: item.expensePartType ?? 'rates',
+        },
+      };
+    });
+    payload.expense_parts = expensePartsObj;
+
+    return payload;
+  }
+
+  private extractExpenseFromResponse(responseData: any): any {
+    let expense = responseData.expenses?.['0']?.expense;
+    if (!expense) expense = responseData.expense;
+    if (!expense && responseData.expenses?.expense) {
+      expense = responseData.expenses.expense;
+    }
+    if (!expense && responseData.expenses) {
+      for (const key in responseData.expenses) {
+        if (!isNaN(Number(key)) && responseData.expenses[key]?.expense) {
+          expense = responseData.expenses[key].expense;
+          break;
+        }
+      }
+    }
+    return expense;
   }
 
   /**
