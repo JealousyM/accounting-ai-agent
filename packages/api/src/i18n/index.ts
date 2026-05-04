@@ -380,6 +380,14 @@ export interface ExpenseTranslations {
   // Errors
   errorFetch: string;
   errorFetchDetails: string;
+
+  // Receipt → expense flow
+  created: string;
+  createdHint: string;
+  errorCreate: string;
+  errorCreateTitle: string;
+  errorReason: string;
+  cannotResolveSeller: string;
 }
 
 export interface VehicleTranslations {
@@ -907,6 +915,14 @@ export interface OcrTranslations {
   recognizing: string;
   recognizeFailed: string;
   noApiKey: string;
+  // Inline-button flow (Telegram bot)
+  addAsExpense: string;
+  cancel: string;
+  expenseCreating: string;
+  expenseCreated: string;
+  expenseCreateFailed: string;
+  expenseCancelled: string;
+  expenseExpired: string;
   // Card
   title: string;
   field: string;

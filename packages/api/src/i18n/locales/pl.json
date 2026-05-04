@@ -8,6 +8,13 @@
     "recognizing": "Rozpoznaję paragon…",
     "recognizeFailed": "Nie udało się odczytać tego zdjęcia. Spróbuj wyraźniejszego ujęcia (dobre oświetlenie, bez rozmycia, cały paragon w kadrze).",
     "noApiKey": "Aby rozpoznawać paragony, dodaj swój klucz OpenAI w Ustawieniach → Poświadczenia API.",
+    "addAsExpense": "✅ Dodaj jako wydatek",
+    "cancel": "❌ Anuluj",
+    "expenseCreating": "Tworzę wydatek w wFirma…",
+    "expenseCreated": "✅ Wydatek dodany do wFirma. Sprawdź w aplikacji — możesz edytować przed zaksięgowaniem.",
+    "expenseCreateFailed": "⚠️ Nie udało się utworzyć wydatku: {error}",
+    "expenseCancelled": "Anulowano. Możesz wysłać zdjęcie ponownie.",
+    "expenseExpired": "Karta wygasła (zachowujemy dane przez 10 minut). Wyślij zdjęcie jeszcze raz.",
     "title": "Rozpoznany dokument",
     "field": "Pole",
     "value": "Wartość",
@@ -33,7 +40,7 @@
     "itemVatRate": "VAT",
     "itemTotal": "Razem",
     "notes": "Uwagi",
-    "confirmHint": "Sprawdź kwoty — jeśli wszystko się zgadza, wprowadź dane do wFirma lub poproś AI o zaksięgowanie wydatku."
+    "confirmHint": "Sprawdź kwoty — jeśli wszystko się zgadza, kliknij przycisk poniżej, aby dodać do wFirma."
   },
   "contractor": {
     "notFound": "Nie znaleziono kontrahentów.",
@@ -351,7 +358,13 @@
     "notFoundById": "Wydatek nie został znaleziony.",
     "contractorNotFound": "Kontrahent nie został znaleziony.",
     "errorFetch": "Błąd pobierania wydatków z wFirma",
-    "errorFetchDetails": "Błąd pobierania szczegółów wydatku"
+    "errorFetchDetails": "Błąd pobierania szczegółów wydatku",
+    "created": "Wydatek dodany do wFirma",
+    "createdHint": "Sprawdź wydatek w wFirma — możesz edytować pola lub kategorię przed zaksięgowaniem.",
+    "errorCreate": "Nie udało się utworzyć wydatku w wFirma",
+    "errorCreateTitle": "Nie można utworzyć wydatku",
+    "errorReason": "Powód",
+    "cannotResolveSeller": "Brak NIP-u i nazwy sprzedawcy — nie można zidentyfikować kontrahenta. Powtórz zdjęcie lub uzupełnij dane ręcznie."
   },
   "vehicle": {
     "vehiclesTitle": "Pojazdy",
