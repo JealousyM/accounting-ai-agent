@@ -272,6 +272,15 @@ export class LangSmithService {
     return `${params.userId}:${params.timeRange || 'month'}`;
   }
 
+  private cleanExpired(): void {
+    const now = Date.now();
+    for (const [key, entry] of this.runsCache) {
+      if (entry.expiresAt < now) {
+        this.runsCache.delete(key);
+      }
+    }
+  }
+
   /**
    * Fetch all LLM runs for a user from LangSmith (with caching)
    */
@@ -348,7 +357,8 @@ export class LangSmithService {
           metricsCount: metrics.length,
         });
 
-        // Store in cache
+        // Store in cache, evicting expired entries first
+        this.cleanExpired();
         this.runsCache.set(cacheKey, {
           data: metrics,
           expiresAt: Date.now() + this.CACHE_TTL_MS,
@@ -471,7 +481,8 @@ export class LangSmithService {
           metricsCount: metrics.length,
         });
 
-        // Cache for 60 seconds
+        // Cache for 60 seconds, evicting expired entries first
+        this.cleanExpired();
         this.runsCache.set(cacheKey, {
           data: metrics,
           expiresAt: Date.now() + 60000,
