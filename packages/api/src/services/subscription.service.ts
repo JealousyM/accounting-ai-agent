@@ -15,6 +15,30 @@ import { telegramService } from './telegram.instance';
 import { referralService } from './referral.instance';
 import { logger } from '../utils/logger';
 
+type ResourceType = 'ai' | 'wfirma';
+
+interface ResourceConfig {
+  usedField: 'aiMessagesUsed' | 'wfirmaRequestsUsed';
+  limitField: 'aiMessagesLimit' | 'wfirmaRequestsLimit';
+  resetAtField: 'aiMessagesResetAt' | 'wfirmaRequestsResetAt';
+  limitReachedReason: string;
+}
+
+const RESOURCE_CONFIGS: Record<ResourceType, ResourceConfig> = {
+  ai: {
+    usedField: 'aiMessagesUsed',
+    limitField: 'aiMessagesLimit',
+    resetAtField: 'aiMessagesResetAt',
+    limitReachedReason: 'AI_LIMIT_REACHED',
+  },
+  wfirma: {
+    usedField: 'wfirmaRequestsUsed',
+    limitField: 'wfirmaRequestsLimit',
+    resetAtField: 'wfirmaRequestsResetAt',
+    limitReachedReason: 'WFIRMA_LIMIT_REACHED',
+  },
+};
+
 export class SubscriptionService {
   constructor(
     private readonly prisma: PrismaClient,
@@ -481,71 +505,26 @@ export class SubscriptionService {
   ): Promise<{ allowed: boolean; reason?: string; usage?: UsageLimits['aiMessages'] }> {
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
-      select: {
-        role: true,
-        subscriptionPlan: true,
-        useOwnLLMKey: true,
-        aiMessagesUsed: true,
-        aiMessagesLimit: true,
-        aiMessagesResetAt: true,
-      },
+      select: { role: true, subscriptionPlan: true, useOwnLLMKey: true },
     });
 
-    if (!user) {
-      return { allowed: false, reason: 'User not found' };
-    }
+    if (!user) return { allowed: false, reason: 'User not found' };
+    if (user.role === 'admin') return { allowed: true };
 
-    // Admin bypasses all checks
-    if (user.role === 'admin') {
-      return { allowed: true };
-    }
-
-    // Free plan - must have own key (checked in middleware)
     if (user.subscriptionPlan === 'free') {
       const creds = await this.credentialsService.getLLMCredentials(userId);
-      if (!creds?.apiKey) {
-        return { allowed: false, reason: 'LLM_KEY_REQUIRED' };
-      }
+      if (!creds?.apiKey) return { allowed: false, reason: 'LLM_KEY_REQUIRED' };
       return { allowed: true };
     }
 
     // Pro with own key - unlimited
     if (user.subscriptionPlan === 'pro' && user.useOwnLLMKey) {
       const creds = await this.credentialsService.getLLMCredentials(userId);
-      if (creds?.apiKey) {
-        return { allowed: true };
-      }
+      if (creds?.apiKey) return { allowed: true };
       // Fall through to check app key limits
     }
 
-    // Pro with app keys - check limit
-    await this.checkAndResetLimits(userId, 'ai');
-
-    // Re-fetch after potential reset
-    const updatedUser = await this.prisma.user.findUnique({
-      where: { id: userId },
-      select: {
-        aiMessagesUsed: true,
-        aiMessagesLimit: true,
-        aiMessagesResetAt: true,
-      },
-    });
-
-    if (!updatedUser) {
-      return { allowed: false, reason: 'User not found' };
-    }
-
-    const usage = {
-      used: updatedUser.aiMessagesUsed,
-      limit: updatedUser.aiMessagesLimit,
-      resetAt: updatedUser.aiMessagesResetAt,
-    };
-
-    if (updatedUser.aiMessagesUsed >= updatedUser.aiMessagesLimit) {
-      return { allowed: false, reason: 'AI_LIMIT_REACHED', usage };
-    }
-
-    return { allowed: true, usage };
+    return this.checkResourceLimit(userId, 'ai');
   }
 
   /**
@@ -556,57 +535,14 @@ export class SubscriptionService {
   ): Promise<{ allowed: boolean; reason?: string; usage?: UsageLimits['wfirmaRequests'] }> {
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
-      select: {
-        role: true,
-        subscriptionPlan: true,
-        wfirmaRequestsUsed: true,
-        wfirmaRequestsLimit: true,
-        wfirmaRequestsResetAt: true,
-      },
+      select: { role: true, subscriptionPlan: true },
     });
 
-    if (!user) {
-      return { allowed: false, reason: 'User not found' };
-    }
+    if (!user) return { allowed: false, reason: 'User not found' };
+    if (user.role === 'admin') return { allowed: true };
+    if (user.subscriptionPlan === 'pro') return { allowed: true };
 
-    // Admin bypasses all checks
-    if (user.role === 'admin') {
-      return { allowed: true };
-    }
-
-    // Pro plan - unlimited
-    if (user.subscriptionPlan === 'pro') {
-      return { allowed: true };
-    }
-
-    // Free plan - check limit
-    await this.checkAndResetLimits(userId, 'wfirma');
-
-    // Re-fetch after potential reset
-    const updatedUser = await this.prisma.user.findUnique({
-      where: { id: userId },
-      select: {
-        wfirmaRequestsUsed: true,
-        wfirmaRequestsLimit: true,
-        wfirmaRequestsResetAt: true,
-      },
-    });
-
-    if (!updatedUser) {
-      return { allowed: false, reason: 'User not found' };
-    }
-
-    const usage = {
-      used: updatedUser.wfirmaRequestsUsed,
-      limit: updatedUser.wfirmaRequestsLimit,
-      resetAt: updatedUser.wfirmaRequestsResetAt,
-    };
-
-    if (updatedUser.wfirmaRequestsUsed >= updatedUser.wfirmaRequestsLimit) {
-      return { allowed: false, reason: 'WFIRMA_LIMIT_REACHED', usage };
-    }
-
-    return { allowed: true, usage };
+    return this.checkResourceLimit(userId, 'wfirma');
   }
 
   /**
@@ -618,7 +554,6 @@ export class SubscriptionService {
       select: { role: true, subscriptionPlan: true, useOwnLLMKey: true },
     });
 
-    // Don't count for admin, free plan, or pro with own key
     if (!user) return;
     if (user.role === 'admin') return;
     if (user.subscriptionPlan === 'free') return;
@@ -627,10 +562,7 @@ export class SubscriptionService {
       if (creds?.apiKey) return;
     }
 
-    await this.prisma.user.update({
-      where: { id: userId },
-      data: { aiMessagesUsed: { increment: 1 } },
-    });
+    await this.incrementUsage(userId, 'ai');
   }
 
   /**
@@ -642,61 +574,79 @@ export class SubscriptionService {
       select: { role: true, subscriptionPlan: true },
     });
 
-    // Don't count for admin or pro plan
     if (!user) return;
     if (user.role === 'admin') return;
     if (user.subscriptionPlan === 'pro') return;
 
-    await this.prisma.user.update({
-      where: { id: userId },
-      data: { wfirmaRequestsUsed: { increment: 1 } },
-    });
+    await this.incrementUsage(userId, 'wfirma');
   }
 
-  /**
-   * Check and reset limits if needed
-   */
-  private async checkAndResetLimits(userId: string, type: 'ai' | 'wfirma'): Promise<void> {
+  private async checkAndResetLimits(userId: string, resource: ResourceType): Promise<void> {
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
-      select: {
-        aiMessagesResetAt: true,
-        wfirmaRequestsResetAt: true,
-      },
+      select: { aiMessagesResetAt: true, wfirmaRequestsResetAt: true },
     });
 
     if (!user) return;
 
     const now = new Date();
-    const resetAt = type === 'ai' ? user.aiMessagesResetAt : user.wfirmaRequestsResetAt;
+    const resetAt = resource === 'ai' ? user.aiMessagesResetAt : user.wfirmaRequestsResetAt;
 
-    // If no reset date or reset date is in the past, reset limits
     if (!resetAt || resetAt < now) {
       const nextReset = new Date();
       nextReset.setMonth(nextReset.getMonth() + 1);
       nextReset.setDate(1);
       nextReset.setHours(0, 0, 0, 0);
 
-      if (type === 'ai') {
-        await this.prisma.user.update({
-          where: { id: userId },
-          data: {
-            aiMessagesUsed: 0,
-            aiMessagesResetAt: nextReset,
-          },
-        });
-      } else {
-        await this.prisma.user.update({
-          where: { id: userId },
-          data: {
-            wfirmaRequestsUsed: 0,
-            wfirmaRequestsResetAt: nextReset,
-          },
-        });
-      }
+      await this.prisma.user.update({
+        where: { id: userId },
+        data: resource === 'ai'
+          ? { aiMessagesUsed: 0, aiMessagesResetAt: nextReset }
+          : { wfirmaRequestsUsed: 0, wfirmaRequestsResetAt: nextReset },
+      });
 
-      logger.debug(`[Subscription] Reset ${type} limits for user`, { userId, nextReset });
+      logger.debug(`[Subscription] Reset ${resource} limits for user`, { userId, nextReset });
     }
+  }
+
+  private async checkResourceLimit(
+    userId: string,
+    resource: ResourceType
+  ): Promise<{ allowed: boolean; reason?: string; usage?: { used: number; limit: number; resetAt: Date | null } }> {
+    const cfg = RESOURCE_CONFIGS[resource];
+
+    await this.checkAndResetLimits(userId, resource);
+
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        aiMessagesUsed: true,
+        aiMessagesLimit: true,
+        aiMessagesResetAt: true,
+        wfirmaRequestsUsed: true,
+        wfirmaRequestsLimit: true,
+        wfirmaRequestsResetAt: true,
+      },
+    });
+
+    if (!user) return { allowed: false, reason: 'User not found' };
+
+    const used = user[cfg.usedField];
+    const limit = user[cfg.limitField];
+    const resetAt = user[cfg.resetAtField];
+    const usage = { used, limit, resetAt };
+
+    if (used >= limit) return { allowed: false, reason: cfg.limitReachedReason, usage };
+    return { allowed: true, usage };
+  }
+
+  private async incrementUsage(userId: string, resource: ResourceType): Promise<void> {
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: resource === 'ai'
+        ? { aiMessagesUsed: { increment: 1 } }
+        : { wfirmaRequestsUsed: { increment: 1 } },
+    });
   }
 
   /**
