@@ -5,6 +5,8 @@
 
 // Main service
 export { AIChatService } from './ai-chat.service';
+export { ConversationRepository } from './conversation-repository';
+export { LangGraphAgentRunner } from './langgraph-agent-runner';
 
 // Constants
 export { SYSTEM_PROMPT } from './constants';
