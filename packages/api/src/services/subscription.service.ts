@@ -608,7 +608,8 @@ export class SubscriptionService {
     data: { used: number; limit: number; resetAt: Date | null }
   ): Promise<{ allowed: boolean; reason?: string; usage?: { used: number; limit: number; resetAt: Date | null } }> {
     const cfg = RESOURCE_CONFIGS[resource];
-    let { used, limit, resetAt } = data;
+    const { limit } = data;
+    let { used, resetAt } = data;
 
     const now = new Date();
     if (!resetAt || resetAt < now) {
