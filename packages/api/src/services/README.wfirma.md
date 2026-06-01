@@ -273,6 +273,56 @@ validateNip('5833510147'); // true
 - Stale cache fallback: `getCachedDataAllowStale()` returns expired entries when APIs fail
 - Both MF and KRS called via `Promise.allSettled()` — partial results returned on partial failure
 
+## Cache Integration Pattern
+
+Use `WFirmaCacheService` alongside `WFirmaIntegrationService` to avoid redundant API calls. The pattern: check cache → on miss fetch from wFirma → store result; on write mutations, invalidate the relevant cache key.
+
+```typescript
+import { wfirmaIntegrationService } from './wfirma-integration.instance';
+import { WFirmaCacheService } from './wfirma-cache.service';
+import { prisma } from '../lib/prisma';
+
+const wfirmaService = wfirmaIntegrationService;
+const cacheService = new WFirmaCacheService(prisma);
+
+// Read-through: company data
+async function getCompanyData(userId: string, forceRefresh = false) {
+  const cached = await cacheService.getCachedData<WFirmaCompany>(
+    userId, 'company', 'main-company', { forceRefresh }
+  );
+  if (cached) return cached;
+
+  const data = await wfirmaService.getCompanyData();
+  await cacheService.cacheData(userId, 'company', 'main-company', data);
+  return data;
+}
+
+// Write-through: create contractor and invalidate list cache
+async function createContractor(userId: string, data: ContractorData) {
+  const contractor = await wfirmaService.createContractor(data);
+  await cacheService.invalidateCache(userId, 'contractor');
+  await cacheService.cacheData(userId, 'contractor', contractor.id, contractor);
+  return contractor;
+}
+
+// Bulk sync: invalidate all, then repopulate
+async function syncAllData(userId: string) {
+  await cacheService.invalidateAllCache(userId);
+  const [company, contractors] = await Promise.all([
+    getCompanyData(userId, true),
+    wfirmaService.getContractors(),
+  ]);
+  await cacheService.cacheData(userId, 'contractor', 'all-contractors', contractors);
+  return { company, contractors };
+}
+```
+
+Cache key conventions used in this project:
+- Company: `'company'` / `'main-company'`
+- Contractors list: `'contractor'` / `'all-contractors'`
+- Individual contractor: `'contractor'` / `contractor.id`
+- Financial year: `'financial'` / `'financial-{year}'`
+
 ## Testing
 
 Run the test suite:
