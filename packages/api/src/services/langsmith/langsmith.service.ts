@@ -282,7 +282,7 @@ export class LangSmithService {
     // Check cache first
     const cached = this.runsCache.get(cacheKey);
     if (cached && cached.expiresAt > now) {
-      logger.info('=== LangSmith fetchUserRuns CACHE HIT ===', {
+      logger.debug('LangSmith fetchUserRuns cache hit', {
         userId: params.userId,
         timeRange: params.timeRange,
         metricsCount: cached.data.length,
@@ -295,7 +295,7 @@ export class LangSmithService {
       // Double-check cache after acquiring lock (another request might have filled it)
       const cachedAfterLock = this.runsCache.get(cacheKey);
       if (cachedAfterLock && cachedAfterLock.expiresAt > Date.now()) {
-        logger.info('=== LangSmith fetchUserRuns CACHE HIT (after lock) ===', {
+        logger.debug('LangSmith fetchUserRuns cache hit (after lock)', {
           userId: params.userId,
           timeRange: params.timeRange,
           metricsCount: cachedAfterLock.data.length,
@@ -306,7 +306,7 @@ export class LangSmithService {
       const { start, end } = this.getDateRange(params);
       const metrics: LangSmithRunMetrics[] = [];
 
-      logger.info('=== LangSmith fetchUserRuns START === ', {
+      logger.debug('LangSmith fetchUserRuns start', {
         userId: params.userId,
         start: start.toISOString(),
         end: end.toISOString(),
@@ -341,7 +341,7 @@ export class LangSmithService {
           }
         }
 
-        logger.info('=== LangSmith fetchUserRuns END ===', {
+        logger.debug('LangSmith fetchUserRuns end', {
           userId: params.userId,
           rawRunCount,
           skippedByDate,
@@ -417,7 +417,7 @@ export class LangSmithService {
     // Check cache first (use longer TTL for all runs - 60 seconds)
     const cached = this.runsCache.get(cacheKey);
     if (cached && cached.expiresAt > now) {
-      logger.info('=== LangSmith fetchAllRuns CACHE HIT ===', {
+      logger.debug('LangSmith fetchAllRuns cache hit', {
         timeRange,
         metricsCount: cached.data.length,
       });
@@ -434,7 +434,7 @@ export class LangSmithService {
       const { start, end } = this.getDateRange({ timeRange: timeRange as any, userId: '' });
       const metrics: LangSmithRunMetrics[] = [];
 
-      logger.info('=== LangSmith fetchAllRuns START ===', {
+      logger.debug('LangSmith fetchAllRuns start', {
         start: start.toISOString(),
         end: end.toISOString(),
         projectName: this.projectName,
@@ -465,7 +465,7 @@ export class LangSmithService {
           }
         }
 
-        logger.info('=== LangSmith fetchAllRuns END ===', {
+        logger.debug('LangSmith fetchAllRuns end', {
           rawRunCount,
           skippedByDate,
           metricsCount: metrics.length,
