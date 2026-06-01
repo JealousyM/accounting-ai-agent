@@ -79,6 +79,7 @@ export class TelegramBotService {
     this.bot.command('unlink', (ctx) => this.handleUnlink(ctx));
     this.bot.command('new', (ctx) => this.handleNew(ctx));
     this.bot.command('chats', (ctx) => this.handleChats(ctx));
+    this.bot.command('reminders', (ctx) => this.handleReminders(ctx));
     this.bot.command('help', (ctx) => this.handleHelp(ctx));
 
     // Callback queries for inline keyboard (chat switching)
@@ -421,11 +422,77 @@ export class TelegramBotService {
           '/unlink - Unlink your Telegram account\n' +
           '/new - Start a new conversation\n' +
           '/chats - Switch between conversations\n' +
+          '/reminders - Manage tax deadline reminders\n' +
           '/help - Show this help message\n\n' +
           'Just send any text message to chat with the AI accountant.'
       );
     } catch (error) {
       logger.error('[TelegramBot] Error in /help', { error: (error as Error).message });
+    }
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private async handleReminders(ctx: Context): Promise<void> {
+    try {
+      const telegramUserId = String(ctx.from?.id);
+      const text = (ctx.message as { text?: string })?.text ?? '';
+      const arg = text.trim().split(/\s+/)[1]?.toLowerCase();
+
+      // Cast to `any` until `prisma generate` is run after migration
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const link = (await prisma.telegramLink.findUnique({ where: { telegramUserId } })) as any;
+      if (!link) {
+        await ctx.reply('Please link your account first with /link');
+        return;
+      }
+
+      if (!arg) {
+        const status = link.reminderEnabled ? 'on ✅' : 'off ❌';
+        await ctx.reply(
+          `Tax deadline reminders: ${status}\n` +
+            `Lead time: ${link.reminderLeadDays} day(s) before deadline\n\n` +
+            'Commands:\n' +
+            '/reminders on — enable reminders\n' +
+            '/reminders off — disable reminders\n' +
+            '/reminders 1 — remind 1 day before\n' +
+            '/reminders 3 — remind 3 days before\n' +
+            '/reminders 7 — remind 7 days before'
+        );
+        return;
+      }
+
+      if (arg === 'off') {
+        await (prisma.telegramLink.update as any)({
+          where: { id: link.id },
+          data: { reminderEnabled: false },
+        });
+        await ctx.reply('Tax deadline reminders disabled. Use /reminders on to re-enable.');
+        return;
+      }
+
+      if (arg === 'on') {
+        await (prisma.telegramLink.update as any)({
+          where: { id: link.id },
+          data: { reminderEnabled: true },
+        });
+        await ctx.reply('Tax deadline reminders enabled.');
+        return;
+      }
+
+      const days = parseInt(arg, 10);
+      if ([1, 3, 7].includes(days)) {
+        await (prisma.telegramLink.update as any)({
+          where: { id: link.id },
+          data: { reminderLeadDays: days },
+        });
+        await ctx.reply(`Reminder lead time set to ${days} day(s) before deadline.`);
+        return;
+      }
+
+      await ctx.reply('Usage: /reminders [on|off|1|3|7]');
+    } catch (error) {
+      logger.error('[TelegramBot] Error in /reminders', { error: (error as Error).message });
+      await ctx.reply('An error occurred. Please try again later.');
     }
   }
 
@@ -660,6 +727,31 @@ export class TelegramBotService {
         const plainText = chunk.replace(/\\([_*\[\]()~`>#\+\-=|{}.!\\])/g, '$1');
         await ctx.reply(plainText);
       }
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // Proactive messaging
+  // ---------------------------------------------------------------------------
+
+  /**
+   * Send a plain-text message to a Telegram user without an incoming context.
+   * Used by TaxDeadlineReminderService for proactive deadline notifications.
+   */
+  async sendProactiveMessage(telegramUserId: string, text: string): Promise<void> {
+    if (!this.bot || !this.initialized) {
+      logger.warn('[TelegramBot] Cannot send proactive message: bot not initialized');
+      return;
+    }
+
+    try {
+      await this.bot.telegram.sendMessage(telegramUserId, text);
+    } catch (error) {
+      logger.error('[TelegramBot] Failed to send proactive message', {
+        telegramUserId,
+        error: (error as Error).message,
+      });
+      throw error;
     }
   }
 
