@@ -40,3 +40,6 @@ Thumbs.db
 .tmp-files/
 test-results/
 .env.production.example
+docs/product-ideas
+docs/tech-debt
+docs/plans
