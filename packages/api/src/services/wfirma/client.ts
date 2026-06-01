@@ -127,6 +127,19 @@ export class WFirmaClient {
   }
 
   /**
+   * Normalise a Date | string value to YYYY-MM-DD and return a single wFirma
+   * condition object. Use with `buildConditions()`.
+   */
+  buildDateCondition(
+    field: string,
+    operator: 'ge' | 'le',
+    value: Date | string,
+  ): Record<string, unknown> {
+    const dateStr = value instanceof Date ? value.toISOString().split('T')[0] : value;
+    return { field, operator, value: dateStr };
+  }
+
+  /**
    * wFirma's JSON API ignores `conditions.condition` when sent as an array
    * (silently returns all records). It expects the XML-style repeated
    * element shape, encoded in JSON as numbered keys, each wrapping a

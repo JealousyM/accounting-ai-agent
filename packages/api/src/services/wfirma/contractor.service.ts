@@ -25,7 +25,7 @@ export class WFirmaContractorService {
 
     return this.client.withRetry(async () => {
       try {
-        const conditions: any[] = [];
+        const conditions: Array<Record<string, unknown>> = [];
 
         if (filters?.search) {
           conditions.push({

@@ -31,28 +31,14 @@ export class WFirmaInvoiceService {
 
     return this.client.withRetry(async () => {
       try {
-        const conditions: any[] = [];
+        const conditions: Array<Record<string, unknown>> = [];
 
         if (filters?.dateFrom) {
-          const dateFrom = filters.dateFrom instanceof Date
-            ? filters.dateFrom.toISOString().split('T')[0]
-            : filters.dateFrom;
-          conditions.push({
-            field: 'date',
-            operator: 'ge',
-            value: dateFrom,
-          });
+          conditions.push(this.client.buildDateCondition('date', 'ge', filters.dateFrom));
         }
 
         if (filters?.dateTo) {
-          const dateTo = filters.dateTo instanceof Date
-            ? filters.dateTo.toISOString().split('T')[0]
-            : filters.dateTo;
-          conditions.push({
-            field: 'date',
-            operator: 'le',
-            value: dateTo,
-          });
+          conditions.push(this.client.buildDateCondition('date', 'le', filters.dateTo));
         }
 
         if (filters?.type) {
