@@ -323,6 +323,10 @@ model TelegramLink {
   activeConversationId String?  @db.Uuid // current conversation
   linkedAt             DateTime @default(now())
 
+  // Tax deadline reminder preferences
+  reminderEnabled  Boolean @default(true) // send proactive tax deadline reminders
+  reminderLeadDays Int     @default(3)    // days before deadline to remind (1, 3, or 7)
+
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([telegramUserId])

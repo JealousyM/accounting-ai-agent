@@ -26,7 +26,7 @@ import aiMemoryRoutes from './routes/ai-memory.routes';
 import organizationRoutes from './routes/organization.routes';
 import referralRoutes from './routes/referral.routes';
 import telegramBotRoutes from './routes/telegram-bot.routes';
-import { telegramBotService } from './services/telegram-bot';
+import { telegramBotService, taxDeadlineReminderService } from './services/telegram-bot';
 import { globalRateLimiter } from './middleware/rate-limiter.middleware';
 import { auditLogMiddleware } from './middleware/audit-log.middleware';
 import { errorHandler, notFoundHandler } from './middleware/error-handler.middleware';
@@ -160,6 +160,9 @@ const server = app.listen(PORT, async () => {
   // Start health monitor (periodic dependency snapshot + alerting)
   healthMonitorService.start();
 
+  // Start tax deadline reminder service (proactive Telegram notifications)
+  taxDeadlineReminderService.start();
+
   // Start Telegram chatbot
   if (telegramBotService.isInitialized()) {
     const webhookUrl = process.env.TELEGRAM_WEBHOOK_URL;
@@ -186,6 +189,7 @@ const shutdown = () => {
   logger.info('Shutting down gracefully...');
   ksefStatusPoller.stop();
   healthMonitorService.stop();
+  taxDeadlineReminderService.stop();
   telegramBotService.stop();
   server.close(() => {
     logger.info('Server closed');
