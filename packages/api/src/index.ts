@@ -26,6 +26,7 @@ import aiMemoryRoutes from './routes/ai-memory.routes';
 import organizationRoutes from './routes/organization.routes';
 import referralRoutes from './routes/referral.routes';
 import telegramBotRoutes from './routes/telegram-bot.routes';
+import taxCalendarRoutes from './routes/tax-calendar.routes';
 import { telegramBotService, taxDeadlineReminderService } from './services/telegram-bot';
 import { globalRateLimiter } from './middleware/rate-limiter.middleware';
 import { auditLogMiddleware } from './middleware/audit-log.middleware';
@@ -135,6 +136,9 @@ app.use('/api/referral', referralRoutes);
 
 // Telegram bot routes (account linking)
 app.use('/api/telegram', telegramBotRoutes);
+
+// Tax calendar routes (upcoming deadlines widget)
+app.use('/api/tax-calendar', taxCalendarRoutes);
 
 // 404 handler
 app.use(notFoundHandler);

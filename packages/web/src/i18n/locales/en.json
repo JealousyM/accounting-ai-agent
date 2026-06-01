@@ -264,7 +264,15 @@
       "sharedBadge": "Shared",
       "noOrganization": "Join an organization to share conversations"
     },
-    "aiCosts": "AI Costs"
+    "aiCosts": "AI Costs",
+    "taxDeadlineNudges": {
+      "title": "Upcoming Deadlines",
+      "overdue": "Overdue",
+      "today": "Today",
+      "daysLeft": "in {days}d",
+      "daysOverdue": "{days}d overdue",
+      "promptTemplate": "My {name} deadline is in {days} days. What do I need to check before filing?"
+    }
   },
   "profile": {
     "title": "Edit Profile",

@@ -264,7 +264,15 @@
       "sharedBadge": "Udostępniony",
       "noOrganization": "Dołącz do organizacji, aby udostępniać rozmowy"
     },
-    "aiCosts": "Koszty AI"
+    "aiCosts": "Koszty AI",
+    "taxDeadlineNudges": {
+      "title": "Nadchodzące terminy",
+      "overdue": "Po terminie",
+      "today": "Dziś",
+      "daysLeft": "za {days} dni",
+      "daysOverdue": "{days} dni po terminie",
+      "promptTemplate": "Mam termin {name} za {days} dni. Co powinienem sprawdzić przed złożeniem deklaracji?"
+    }
   },
   "profile": {
     "title": "Edytuj profil",
