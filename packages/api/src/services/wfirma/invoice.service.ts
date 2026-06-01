@@ -7,7 +7,6 @@ import { logger } from '../../utils/logger';
 import {
   WFirmaInvoice,
   WFirmaInvoiceFilters,
-  WFirmaInvoiceItem,
   SendInvoiceOptions,
   SendInvoiceResult,
   DeleteResult,
@@ -19,6 +18,7 @@ import {
 } from '../../types/wfirma.types';
 import { WFirmaClient } from './client';
 import { WFirmaError, WFirmaValidationError } from './errors';
+import { mapInvoiceData, extractInvoiceFromResponse } from './invoice.mapper';
 
 export class WFirmaInvoiceService {
   constructor(private readonly client: WFirmaClient) {}
@@ -169,7 +169,7 @@ export class WFirmaInvoiceService {
           });
         }
 
-        let invoices: WFirmaInvoice[] = invoicesData.map((inv: any) => this.mapInvoiceData(inv));
+        let invoices: WFirmaInvoice[] = invoicesData.map((inv: any) => mapInvoiceData(inv));
 
         if (filters?.status) {
           invoices = invoices.filter(inv => inv.status === filters.status);
@@ -249,7 +249,7 @@ export class WFirmaInvoiceService {
           },
         });
 
-        const invoice = this.mapInvoiceData(invoiceData);
+        const invoice = mapInvoiceData(invoiceData);
 
         logger.info('Successfully fetched invoice by ID', {
           invoiceId: invoice.id,
@@ -562,12 +562,12 @@ export class WFirmaInvoiceService {
         }
 
         // Extract created invoice from response
-        const createdInvoice = this.extractInvoiceFromResponse(responseData);
+        const createdInvoice = extractInvoiceFromResponse(responseData);
         if (!createdInvoice) {
           throw new WFirmaError('WFIRMA_API_ERROR', 'No invoice data in response', responseData);
         }
 
-        const invoice = this.mapInvoiceData(createdInvoice);
+        const invoice = mapInvoiceData(createdInvoice);
         logger.info('Successfully created invoice in wFirma', {
           invoiceId: invoice.id,
           invoiceNumber: invoice.invoiceNumber,
@@ -626,12 +626,12 @@ export class WFirmaInvoiceService {
           );
         }
 
-        const updatedInvoice = this.extractInvoiceFromResponse(responseData);
+        const updatedInvoice = extractInvoiceFromResponse(responseData);
         if (!updatedInvoice) {
           throw new WFirmaError('WFIRMA_API_ERROR', 'No invoice data in response', responseData);
         }
 
-        const invoice = this.mapInvoiceData(updatedInvoice);
+        const invoice = mapInvoiceData(updatedInvoice);
         logger.info('Successfully updated invoice', {
           invoiceId: invoice.id,
           invoiceNumber: invoice.invoiceNumber,
@@ -865,27 +865,6 @@ export class WFirmaInvoiceService {
   }
 
   /**
-   * Extract invoice from API response
-   */
-  private extractInvoiceFromResponse(responseData: any): any {
-    let invoice = responseData.invoices?.['0']?.invoice;
-    if (!invoice) invoice = responseData.invoice;
-    if (!invoice && responseData.invoices?.invoice) {
-      invoice = responseData.invoices.invoice;
-    }
-    // Handle numeric key format
-    if (!invoice && responseData.invoices) {
-      for (const key in responseData.invoices) {
-        if (!isNaN(Number(key)) && responseData.invoices[key]?.invoice) {
-          invoice = responseData.invoices[key].invoice;
-          break;
-        }
-      }
-    }
-    return invoice;
-  }
-
-  /**
    * Map sort field name to wFirma field
    */
   private mapInvoiceSortField(sortBy: string): string {
@@ -898,99 +877,7 @@ export class WFirmaInvoiceService {
     return fieldMap[sortBy] || 'Invoice.id';
   }
 
-  /**
-   * Map wFirma invoice data to our WFirmaInvoice type
-   */
-  mapInvoiceData(inv: any): WFirmaInvoice {
-    const items: WFirmaInvoiceItem[] = [];
-    if (inv.invoicecontents) {
-      let contentsData = inv.invoicecontents.invoicecontent;
-      if (!contentsData) {
-        const contentsObj = inv.invoicecontents;
-        contentsData = [];
-        for (const key in contentsObj) {
-          if (!isNaN(Number(key)) && contentsObj[key]?.invoicecontent) {
-            contentsData.push(contentsObj[key].invoicecontent);
-          }
-        }
-      }
-      if (contentsData && !Array.isArray(contentsData)) {
-        contentsData = [contentsData];
-      }
-      if (contentsData) {
-        for (const item of contentsData) {
-          items.push({
-            name: item.name || '',
-            quantity: parseFloat(item.count || '1'),
-            unit: item.unit || 'szt.',
-            priceNet: parseFloat(item.price || '0'),
-            vatRate: parseFloat(item.vat || '23'),
-            totalNet: parseFloat(item.netto || '0'),
-            totalVat: parseFloat(item.vat_price || '0'),
-            totalGross: parseFloat(item.brutto || '0'),
-          });
-        }
-      }
-    }
-
-    let status: 'draft' | 'issued' | 'sent' | 'paid' | 'overdue' | 'cancelled' = 'issued';
-    const alreadyPaid = parseFloat(inv.alreadypaid || '0');
-    const total = parseFloat(inv.total || inv.brutto || '0');
-    const paymentDate = inv.paymentdate ? new Date(inv.paymentdate) : null;
-    const now = new Date();
-
-    if (inv.disposaldate_empty === '1' || inv.type === 'proforma') {
-      status = 'draft';
-    } else if (alreadyPaid >= total && total > 0) {
-      status = 'paid';
-    } else if (paymentDate && paymentDate < now && alreadyPaid < total) {
-      status = 'overdue';
-    } else if (inv.sended === '1') {
-      status = 'sent';
-    }
-
-    // Extract contractor name from various possible fields
-    const contractorName =
-      inv.contractor_name ||
-      inv.contractorDetail?.name ||
-      inv.contractor_detail?.name ||
-      inv.contractors?.contractor?.name ||
-      inv.contractors?.['0']?.contractor?.name ||
-      '';
-
-    // Extract contractor NIP from various possible fields
-    const contractorNip =
-      inv.contractor_nip ||
-      inv.contractorDetail?.nip ||
-      inv.contractor_detail?.nip ||
-      inv.contractors?.contractor?.nip ||
-      inv.contractors?.['0']?.contractor?.nip;
-
-    // Extract currency - wFirma may return it in different formats
-    // Default to PLN only if explicitly not set
-    const currency = inv.currency || inv.currency_name || inv.currency_code || 'PLN';
-
-    return {
-      id: inv.id || '',
-      invoiceNumber: inv.fullnumber || inv.number || '',
-      issueDate: new Date(inv.date || Date.now()),
-      dueDate: paymentDate || new Date(inv.date || Date.now()),
-      sellDate: inv.disposaldate ? new Date(inv.disposaldate) : undefined,
-      contractorId: inv.contractor || '',
-      contractorName,
-      contractorNip,
-      items,
-      total: parseFloat(inv.total || inv.brutto || '0'),
-      totalNet: parseFloat(inv.netto || '0'),
-      totalVat: parseFloat(inv.tax || '0'),
-      currency,
-      status,
-      paymentMethod: inv.paymentmethod,
-      notes: inv.notes,
-      createdAt: new Date(inv.created || Date.now()),
-      updatedAt: new Date(inv.modified || Date.now()),
-      ksefReferenceNumber: inv.ksef_number || inv.ksef_reference_number || undefined,
-      ksefStatus: inv.ksef_status || undefined,
-    };
-  }
 }
+
+// Re-export for callers that used to call invoiceService.mapInvoiceData directly
+export { mapInvoiceData } from './invoice.mapper';
