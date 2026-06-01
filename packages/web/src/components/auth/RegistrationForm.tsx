@@ -1,35 +1,28 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Eye, EyeOff, Check, X, Globe, Crown, Zap, Gift } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { AppVersion } from '@/components/ui/app-version';
 import { registrationSchema, type RegistrationFormData, checkPasswordStrength } from '@/lib/validations/auth';
-import { registerUser, type ErrorResponse, getPublicLLMModels, type LLMModelInfo } from '@/lib/api/auth';
+import { registerUser, type ErrorResponse } from '@/lib/api/auth';
 import { ApiError } from '@/lib/api/api-client';
-import { validateReferralCode } from '@/lib/api/referral';
 import { useAuth } from '@/contexts/AuthContext';
 import { useGoogleAuth } from '@/hooks/useGoogleAuth';
+import { useRegistrationLocale } from '@/hooks/useRegistrationLocale';
+import { usePlanSelection } from '@/hooks/usePlanSelection';
+import { useReferralCode } from '@/hooks/useReferralCode';
+import { useLLMProviderSelector } from '@/hooks/useLLMProviderSelector';
 import { cn } from '@/lib/utils';
 import { LegalModal } from '@/components/legal/LegalModal';
-import enTranslations from '@/i18n/locales/en.json';
-import plTranslations from '@/i18n/locales/pl.json';
-import ruTranslations from '@/i18n/locales/ru.json';
 
-
-const translations = {
-  en: enTranslations,
-  pl: plTranslations,
-  ru: ruTranslations,
-};
 
 export function RegistrationForm() {
-  const [selectedLocale, setSelectedLocale] = useState<'en' | 'pl' | 'ru'>('en');
   const router = useRouter();
   const { login } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
@@ -39,22 +32,6 @@ export function RegistrationForm() {
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [showTermsModal, setShowTermsModal] = useState(false);
   const [showPrivacyModal, setShowPrivacyModal] = useState(false);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const legalLinks = (translations[selectedLocale] as any)?.legal?.footer?.links;
-  const [availableModels, setAvailableModels] = useState<LLMModelInfo[]>([]);
-  const [isLoadingModels, setIsLoadingModels] = useState(false);
-  const searchParams = useSearchParams();
-  const refCode = searchParams.get('ref');
-  const [referrerName, setReferrerName] = useState<string | null>(null);
-
-  // OAuth hooks
-  const { login: googleLogin, isLoading: googleLoading, error: googleError } = useGoogleAuth();
-
-  // Show OAuth errors
-  const oauthError = googleError;
-
-  // Get translations based on selected locale
-  const t = translations[selectedLocale].auth.register;
 
   const {
     register,
@@ -66,76 +43,38 @@ export function RegistrationForm() {
     resolver: zodResolver(registrationSchema),
     mode: 'onChange',
     defaultValues: {
-      locale: selectedLocale,
+      locale: 'en',
       subscribeToPro: false,
       billingPeriod: 'monthly',
     },
   });
+
+  const { selectedLocale, handleLocaleChange, t, legalLinks, tReferral } = useRegistrationLocale(setValue);
+  const { subscribeToPro, billingPeriod, selectFreePlan, selectProPlan, selectMonthly, selectYearly } = usePlanSelection(watch, setValue);
+  const { referrerName } = useReferralCode(setValue);
+  const { availableModels, isLoadingModels, llmProvider } = useLLMProviderSelector(watch);
+
+  // OAuth hooks
+  const { login: googleLogin, isLoading: googleLoading, error: googleError } = useGoogleAuth();
+
+  const oauthError = googleError;
 
   const password = watch('password', '');
   const agreeToTermsValue = watch('agreeToTerms', false);
   const errorRef = React.useRef<HTMLDivElement>(null);
   const passwordStrength = checkPasswordStrength(password);
 
-  // Validate referral code from URL
-  useEffect(() => {
-    if (refCode && refCode.length === 8) {
-      validateReferralCode(refCode)
-        .then((result) => {
-          if (result.valid) {
-            setReferrerName(result.referrerFirstName || null);
-            setValue('referredByCode', refCode);
-          }
-        })
-        .catch(() => {/* ignore invalid codes */});
-    }
-  }, [refCode, setValue]);
-
-  // Update locale in form when user changes language
-  const handleLocaleChange = (locale: 'en' | 'pl' | 'ru') => {
-    setSelectedLocale(locale);
-    setValue('locale', locale);
-  };
-
-  // Watch LLM provider and API key for model fetching
-  const watchedLlmProvider = watch('llmProvider');
-  const watchedLlmApiKey = watch('llmApiKey');
-
-  // Fetch available models when API key is entered
-  useEffect(() => {
-    const fetchModels = async () => {
-      if (!watchedLlmProvider || !watchedLlmApiKey || watchedLlmApiKey.length < 10) {
-        setAvailableModels([]);
-        return;
-      }
-
-      setIsLoadingModels(true);
-      try {
-        const models = await getPublicLLMModels(watchedLlmProvider as 'openai' | 'google', watchedLlmApiKey);
-        setAvailableModels(models);
-      } catch {
-        setAvailableModels([]);
-      } finally {
-        setIsLoadingModels(false);
-      }
-    };
-
-    const timer = setTimeout(fetchModels, 500); // Debounce
-    return () => clearTimeout(timer);
-  }, [watchedLlmProvider, watchedLlmApiKey]);
-
   const onSubmit = async (data: RegistrationFormData) => {
     try {
       setIsSubmitting(true);
       setApiError(null);
 
-      const { confirmPassword, agreeToTerms, llmProvider, llmModel, ...restData } = data;
+      const { confirmPassword, agreeToTerms, llmProvider: provider, llmModel, ...restData } = data;
 
       void confirmPassword;
       void agreeToTerms;
 
-      // Clean up llmProvider - only pass valid values
-      const validProvider = llmProvider === 'openai' || llmProvider === 'google' ? llmProvider : undefined;
+      const validProvider = provider === 'openai' || provider === 'google' ? provider : undefined;
       const registerData = {
         ...restData,
         llmProvider: validProvider,
@@ -143,54 +82,43 @@ export function RegistrationForm() {
       };
 
       const response = await registerUser(registerData);
-      console.log('Registration successful:', response);
       setSuccessMessage(t.successMessage);
 
-      // Auto-login using returned tokens (apiClient unwraps response, so tokens are directly on response)
       if (response.token && response.refreshToken) {
         await login(response.token, response.refreshToken, selectedLocale);
 
-        // Store flag for welcome modal if wFirma is enabled (check both checkbox and credentials)
         const wfirmaEnabled = data.useWfirma || (data.wfirmaAccessKey && data.wfirmaSecretKey && data.wfirmaCompanyId);
         if (wfirmaEnabled) {
           localStorage.setItem('showWfirmaWelcome', 'true');
         }
 
-        // Redirect based on subscription choice
         setTimeout(() => {
           if (data.subscribeToPro) {
-            // Redirect to pricing page to complete Pro subscription
             const billingParam = data.billingPeriod || 'monthly';
             router.push(`/pricing?autoCheckout=true&billingPeriod=${billingParam}`);
           } else {
-            // Redirect to chat for Free plan users
             router.push('/chat');
           }
         }, 1500);
       } else {
-        // Fallback: redirect to login if tokens not returned
         setTimeout(() => {
           router.push('/login');
         }, 2000);
       }
     } catch (error: unknown) {
-      // Handle ApiError (from our API client)
       if (error instanceof ApiError) {
-        // Check for duplicate email error
         if (error.message.toLowerCase().includes('already registered')) {
           setApiError(t.emailAlreadyExists || 'This email is already registered. Please use a different email or sign in.');
         } else {
           setApiError(error.message);
         }
       } else if (error && typeof error === 'object' && 'response' in error) {
-        // Handle axios-style errors
         const axiosError = error as { response?: { data?: ErrorResponse } };
         const errorData = axiosError.response?.data;
         setApiError(errorData?.message || 'Registration failed');
       } else {
         setApiError(t.unexpectedError || 'An unexpected error occurred. Please try again.');
       }
-      // Scroll to error message
       setTimeout(() => {
         errorRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
       }, 100);
@@ -419,15 +347,15 @@ export function RegistrationForm() {
             {/* Free Plan */}
             <label className={cn(
               "relative flex flex-col p-4 border-2 rounded-lg cursor-pointer transition-all",
-              !watch('subscribeToPro')
+              !subscribeToPro
                 ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20"
                 : "border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500"
             )}>
               <input
                 type="radio"
                 className="sr-only"
-                checked={!watch('subscribeToPro')}
-                onChange={() => setValue('subscribeToPro', false)}
+                checked={!subscribeToPro}
+                onChange={selectFreePlan}
               />
               <div className="flex items-center gap-2 mb-2">
                 <Zap className="w-5 h-5 text-gray-600 dark:text-gray-400" />
@@ -444,15 +372,15 @@ export function RegistrationForm() {
             {/* Pro Plan */}
             <label className={cn(
               "relative flex flex-col p-4 border-2 rounded-lg cursor-pointer transition-all",
-              watch('subscribeToPro')
+              subscribeToPro
                 ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20"
                 : "border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500"
             )}>
               <input
                 type="radio"
                 className="sr-only"
-                checked={watch('subscribeToPro') || false}
-                onChange={() => setValue('subscribeToPro', true)}
+                checked={subscribeToPro || false}
+                onChange={selectProPlan}
               />
               <div className="absolute top-2 right-2">
                 <span className="bg-blue-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
@@ -475,7 +403,7 @@ export function RegistrationForm() {
           </div>
 
           {/* Billing Period Selector - shown only when Pro is selected */}
-          {watch('subscribeToPro') && (
+          {subscribeToPro && (
             <div className="mt-4">
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
                 {t.billingPeriod}
@@ -483,10 +411,10 @@ export function RegistrationForm() {
               <div className="bg-gray-100 dark:bg-gray-800 p-1 rounded-lg grid grid-cols-2 gap-1">
                 <button
                   type="button"
-                  onClick={() => setValue('billingPeriod', 'monthly')}
+                  onClick={selectMonthly}
                   className={cn(
                     'px-4 py-3 text-sm font-medium rounded-md transition-all',
-                    watch('billingPeriod') === 'monthly'
+                    billingPeriod === 'monthly'
                       ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm'
                       : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
                   )}
@@ -498,10 +426,10 @@ export function RegistrationForm() {
                 </button>
                 <button
                   type="button"
-                  onClick={() => setValue('billingPeriod', 'yearly')}
+                  onClick={selectYearly}
                   className={cn(
                     'px-4 py-3 text-sm font-medium rounded-md transition-all',
-                    watch('billingPeriod') === 'yearly'
+                    billingPeriod === 'yearly'
                       ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm'
                       : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
                   )}
@@ -520,7 +448,7 @@ export function RegistrationForm() {
             </div>
           )}
 
-          {watch('subscribeToPro') && (
+          {subscribeToPro && (
             <p className="mt-3 text-xs text-gray-600 dark:text-gray-400 bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg">
               ℹ️ {t.proCheckoutInfo}
             </p>
@@ -596,7 +524,7 @@ export function RegistrationForm() {
         </div>
 
         {/* LLM Provider Section (Required for Free plan) */}
-        {!watch('subscribeToPro') && (
+        {!subscribeToPro && (
           <div className="border-t border-gray-200 dark:border-gray-700 pt-5">
             <label htmlFor="llmProvider" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
               {t.llmProvider || 'AI Provider'} <span className="text-red-500">*</span>
@@ -620,7 +548,7 @@ export function RegistrationForm() {
             {t.llmProviderHelp || 'Select your AI provider. You will need to provide your own API key.'}
           </p>
 
-          {watch('llmProvider') && (
+          {llmProvider && (
             <div className="mt-4 space-y-4">
               <div>
                 <label htmlFor="llmApiKey" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
@@ -629,7 +557,7 @@ export function RegistrationForm() {
                 <Input
                   id="llmApiKey"
                   type="password"
-                  placeholder={watch('llmProvider') === 'openai' ? 'sk-...' : 'AIza...'}
+                  placeholder={llmProvider === 'openai' ? 'sk-...' : 'AIza...'}
                   error={!!errors.llmApiKey}
                   {...register('llmApiKey')}
                 />
@@ -637,21 +565,19 @@ export function RegistrationForm() {
                   <p className="mt-1.5 text-sm text-red-600 dark:text-red-400">{errors.llmApiKey.message}</p>
                 )}
                 <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                  {watch('llmProvider') === 'openai'
+                  {llmProvider === 'openai'
                     ? (t.llmApiKeyHelpOpenai || 'Get your API key from platform.openai.com')
                     : 'Get your API key from ai.google.dev'
                   }
                 </p>
               </div>
 
-              {/* Model loading indicator */}
               {isLoadingModels && (
                 <p className="text-sm text-gray-500 dark:text-gray-400">
                   Loading available models...
                 </p>
               )}
 
-              {/* Model selection dropdown */}
               {availableModels.length > 0 && (
                 <div>
                   <label htmlFor="llmModel" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
@@ -819,7 +745,7 @@ export function RegistrationForm() {
           <div className="flex items-center gap-2 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
             <Gift className="w-4 h-4 text-blue-500" />
             <span className="text-sm text-blue-700 dark:text-blue-300">
-              {(translations[selectedLocale].referral.invitedBy || 'Invited by {name}').replace('{name}', referrerName)}
+              {(tReferral.invitedBy || 'Invited by {name}').replace('{name}', referrerName)}
             </span>
           </div>
         )}
