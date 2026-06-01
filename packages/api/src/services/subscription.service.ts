@@ -505,7 +505,14 @@ export class SubscriptionService {
   ): Promise<{ allowed: boolean; reason?: string; usage?: UsageLimits['aiMessages'] }> {
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
-      select: { role: true, subscriptionPlan: true, useOwnLLMKey: true },
+      select: {
+        role: true,
+        subscriptionPlan: true,
+        useOwnLLMKey: true,
+        aiMessagesUsed: true,
+        aiMessagesLimit: true,
+        aiMessagesResetAt: true,
+      },
     });
 
     if (!user) return { allowed: false, reason: 'User not found' };
@@ -524,7 +531,11 @@ export class SubscriptionService {
       // Fall through to check app key limits
     }
 
-    return this.checkResourceLimit(userId, 'ai');
+    return this.checkResourceLimitFromData(userId, 'ai', {
+      used: user.aiMessagesUsed,
+      limit: user.aiMessagesLimit,
+      resetAt: user.aiMessagesResetAt,
+    });
   }
 
   /**
@@ -535,14 +546,24 @@ export class SubscriptionService {
   ): Promise<{ allowed: boolean; reason?: string; usage?: UsageLimits['wfirmaRequests'] }> {
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
-      select: { role: true, subscriptionPlan: true },
+      select: {
+        role: true,
+        subscriptionPlan: true,
+        wfirmaRequestsUsed: true,
+        wfirmaRequestsLimit: true,
+        wfirmaRequestsResetAt: true,
+      },
     });
 
     if (!user) return { allowed: false, reason: 'User not found' };
     if (user.role === 'admin') return { allowed: true };
     if (user.subscriptionPlan === 'pro') return { allowed: true };
 
-    return this.checkResourceLimit(userId, 'wfirma');
+    return this.checkResourceLimitFromData(userId, 'wfirma', {
+      used: user.wfirmaRequestsUsed,
+      limit: user.wfirmaRequestsLimit,
+      resetAt: user.wfirmaRequestsResetAt,
+    });
   }
 
   /**
@@ -581,17 +602,15 @@ export class SubscriptionService {
     await this.incrementUsage(userId, 'wfirma');
   }
 
-  private async checkAndResetLimits(userId: string, resource: ResourceType): Promise<void> {
-    const user = await this.prisma.user.findUnique({
-      where: { id: userId },
-      select: { aiMessagesResetAt: true, wfirmaRequestsResetAt: true },
-    });
-
-    if (!user) return;
+  private async checkResourceLimitFromData(
+    userId: string,
+    resource: ResourceType,
+    data: { used: number; limit: number; resetAt: Date | null }
+  ): Promise<{ allowed: boolean; reason?: string; usage?: { used: number; limit: number; resetAt: Date | null } }> {
+    const cfg = RESOURCE_CONFIGS[resource];
+    let { used, limit, resetAt } = data;
 
     const now = new Date();
-    const resetAt = resource === 'ai' ? user.aiMessagesResetAt : user.wfirmaRequestsResetAt;
-
     if (!resetAt || resetAt < now) {
       const nextReset = new Date();
       nextReset.setMonth(nextReset.getMonth() + 1);
@@ -606,36 +625,11 @@ export class SubscriptionService {
       });
 
       logger.debug(`[Subscription] Reset ${resource} limits for user`, { userId, nextReset });
+      used = 0;
+      resetAt = nextReset;
     }
-  }
 
-  private async checkResourceLimit(
-    userId: string,
-    resource: ResourceType
-  ): Promise<{ allowed: boolean; reason?: string; usage?: { used: number; limit: number; resetAt: Date | null } }> {
-    const cfg = RESOURCE_CONFIGS[resource];
-
-    await this.checkAndResetLimits(userId, resource);
-
-    const user = await this.prisma.user.findUnique({
-      where: { id: userId },
-      select: {
-        aiMessagesUsed: true,
-        aiMessagesLimit: true,
-        aiMessagesResetAt: true,
-        wfirmaRequestsUsed: true,
-        wfirmaRequestsLimit: true,
-        wfirmaRequestsResetAt: true,
-      },
-    });
-
-    if (!user) return { allowed: false, reason: 'User not found' };
-
-    const used = user[cfg.usedField];
-    const limit = user[cfg.limitField];
-    const resetAt = user[cfg.resetAtField];
     const usage = { used, limit, resetAt };
-
     if (used >= limit) return { allowed: false, reason: cfg.limitReachedReason, usage };
     return { allowed: true, usage };
   }
