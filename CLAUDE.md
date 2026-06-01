@@ -121,6 +121,7 @@ Specialized subagent configurations for different development tasks are availabl
 | **test-runner** | `.claude/agents/test-runner.md` | Testing (Jest, Vitest, Playwright) |
 | **prisma** | `.claude/agents/prisma.md` | Database operations (Prisma ORM, PostgreSQL) |
 | **code-simplifier** | `.claude/agents/code-simplifier.md` | Code refactoring for clarity and maintainability |
+| **security** | `.claude/agents/security.md` | Application security: auth, validation, secrets, OWASP, AI/tool safety, deps |
 
 ### Using Subagents
 

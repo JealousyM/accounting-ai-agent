@@ -263,6 +263,48 @@ export interface FinancialData {
 // INVOICE TYPES
 // ============================================
 
+/**
+ * Raw invoice object as returned by the wFirma API before mapping.
+ * Fields are strings because wFirma serialises all numbers as strings.
+ */
+export interface WFirmaRawInvoice {
+  id?: string;
+  fullnumber?: string;
+  number?: string;
+  date?: string;
+  disposaldate?: string;
+  disposaldate_empty?: string;
+  paymentdate?: string;
+  paymentmethod?: string;
+  type?: string;
+  currency?: string;
+  currency_name?: string;
+  currency_code?: string;
+  total?: string;
+  brutto?: string;
+  netto?: string;
+  tax?: string;
+  alreadypaid?: string;
+  sended?: string;
+  contractor?: string;
+  contractor_name?: string;
+  contractor_nip?: string;
+  contractor_detail?: { name?: string; nip?: string };
+  contractorDetail?: { name?: string; nip?: string };
+  contractors?: {
+    contractor?: { name?: string; nip?: string };
+    '0'?: { contractor?: { name?: string; nip?: string } };
+  };
+  notes?: string;
+  created?: string;
+  modified?: string;
+  ksef_number?: string;
+  ksef_reference_number?: string;
+  ksef_status?: string;
+  invoicecontents?: Record<string, unknown>;
+  [key: string]: unknown;
+}
+
 export interface WFirmaInvoice {
   id: string;
   invoiceNumber: string;

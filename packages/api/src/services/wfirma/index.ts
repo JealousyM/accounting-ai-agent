@@ -98,6 +98,7 @@ export { WFirmaClient, RetryConfig, DEFAULT_RETRY_CONFIG } from './client';
 export { WFirmaCompanyService } from './company.service';
 export { WFirmaContractorService } from './contractor.service';
 export { WFirmaInvoiceService } from './invoice.service';
+export { mapInvoiceData, extractInvoiceFromResponse } from './invoice.mapper';
 export { WFirmaNoteService } from './note.service';
 export { WFirmaFinancialService } from './financial.service';
 export { WFirmaSyncService } from './sync.service';
