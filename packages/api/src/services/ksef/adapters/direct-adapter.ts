@@ -32,14 +32,17 @@ import type {
   BulkSendToKSeFResult,
   KSeFInvoiceStatus,
   KSeFEnvironment,
-  FA3Address,
 } from '../../../types/ksef.types';
 import { KSeFError } from '../errors';
 import { parseFA3XML, generateInvoicePDF, createPDFDataFromMetadata, extractSkrotFromUPO, buildKSeFVerificationUrl, computeXmlSkrot } from '../invoice-pdf-generator';
 import { WFirmaIntegrationService } from '../../wfirma';
+import { KSeFInvoiceBuilder } from '../invoice-builder';
+import { KSeFStatusHelper } from '../status-helper';
 
 export class DirectKSeFAdapter implements IKSeFAdapter {
   private readonly xmlGenerator = new KSeFXMLGenerator();
+  private readonly invoiceBuilder: KSeFInvoiceBuilder;
+  private readonly statusHelper: KSeFStatusHelper;
 
   constructor(
     private readonly prisma: PrismaClient,
@@ -47,6 +50,8 @@ export class DirectKSeFAdapter implements IKSeFAdapter {
     // Certificate service will be used for session auth when implemented
     readonly certificateService: KSeFCertificateService
   ) {
+    this.invoiceBuilder = new KSeFInvoiceBuilder(wfirmaService);
+    this.statusHelper = new KSeFStatusHelper(prisma);
     logger.info('DirectKSeFAdapter initialized');
   }
 
@@ -81,38 +86,7 @@ export class DirectKSeFAdapter implements IKSeFAdapter {
           );
         }
         const company = await this.wfirmaService.getCompanyData();
-        fa3Data = {
-          invoiceNumber: invoice.invoiceNumber,
-          issueDate: invoice.issueDate,
-          sellDate: invoice.sellDate || invoice.issueDate,
-          dueDate: invoice.dueDate,
-          sellerName: company?.name || '',
-          sellerNip: company?.nip || '',
-          sellerAddress: {
-            street: company?.address?.street || '',
-            city: company?.address?.city || '',
-            zip: company?.address?.zip || '',
-            country: company?.address?.country || 'PL',
-          },
-          buyerName: invoice.contractorName,
-          buyerNip: invoice.contractorNip || '',
-          buyerAddress: await this.fetchBuyerAddress(invoice.contractorId),
-          items: invoice.items.map((item) => ({
-            name: item.name,
-            quantity: item.quantity,
-            unit: item.unit,
-            priceNet: item.priceNet,
-            vatRate: item.vatRate === 0 ? '0 KR' : String(item.vatRate),
-            totalNet: item.totalNet,
-            totalVat: item.totalVat,
-            totalGross: item.totalGross,
-          })),
-          totalNet: invoice.totalNet,
-          totalVat: invoice.totalVat,
-          totalGross: invoice.total,
-          currency: invoice.currency,
-          paymentMethod: invoice.paymentMethod || 'transfer',
-        };
+        fa3Data = await this.invoiceBuilder.buildFromWFirma(invoice, company);
         invoiceNumber = invoice.invoiceNumber;
       } else {
         throw new KSeFError(
@@ -203,29 +177,12 @@ export class DirectKSeFAdapter implements IKSeFAdapter {
               sendResult.elementReferenceNumber,
             );
 
+            await this.statusHelper.applyStatusResult(record, statusResult);
+
             if (statusResult.processingCode === 200) {
               finalStatus = 'accepted';
-              await this.prisma.kSeFInvoiceStatus.update({
-                where: { id: record.id },
-                data: {
-                  status: 'accepted',
-                  // Store canonical reference in both fields for download compatibility
-                  ksefReferenceNumber: statusResult.ksefReferenceNumber ?? undefined,
-                  ksefInvoiceNumber: statusResult.ksefReferenceNumber ?? undefined,
-                  acceptedAt: new Date(),
-                },
-              });
             } else if (statusResult.processingCode >= 400) {
               finalStatus = 'rejected';
-              await this.prisma.kSeFInvoiceStatus.update({
-                where: { id: record.id },
-                data: {
-                  status: 'rejected',
-                  rejectedAt: new Date(),
-                  errorCode: String(statusResult.processingCode),
-                  errorMessage: statusResult.processingDescription,
-                },
-              });
             }
           } catch (statusError) {
             logger.warn('Could not check invoice status within session, will rely on poller', {
@@ -342,7 +299,7 @@ export class DirectKSeFAdapter implements IKSeFAdapter {
           await ksefClient.openSessionWithToken(ksefConfig.ksefNip, ksefConfig.ksefToken);
 
           try {
-            await this.checkLiveStatus(ksefClient, record);
+            await this.statusHelper.checkLiveStatus(ksefClient, record);
           } finally {
             await ksefClient.closeSession().catch(() => {});
           }
@@ -1036,147 +993,6 @@ export class DirectKSeFAdapter implements IKSeFAdapter {
         undefined,
         500
       );
-    }
-  }
-
-  // ------------------------------------------
-  // PRIVATE HELPERS
-  // ------------------------------------------
-
-  /**
-   * Fetch buyer address from wFirma contractor data.
-   * Falls back to placeholder values if contractor or address is not available,
-   * since FA(3) AdresL1/AdresL2 must not be empty.
-   */
-  private async fetchBuyerAddress(contractorId?: string): Promise<FA3Address> {
-    const fallback: FA3Address = { street: '-', city: '-', zip: '00-000', country: 'PL' };
-
-    if (!contractorId) return fallback;
-
-    try {
-      const contractor = await this.wfirmaService.getContractorById(contractorId);
-      if (!contractor?.address) return fallback;
-
-      return {
-        street: contractor.address.street?.trim() || fallback.street,
-        city: contractor.address.city?.trim() || fallback.city,
-        zip: contractor.address.zip?.trim() || fallback.zip,
-        country: contractor.address.country?.trim() || 'PL',
-      };
-    } catch (err) {
-      logger.warn('Failed to fetch buyer address from wFirma, using fallback', {
-        contractorId,
-        error: err instanceof Error ? err.message : 'Unknown',
-      });
-      return fallback;
-    }
-  }
-
-  /**
-   * Check live KSeF status for an invoice record and update DB if changed.
-   * Uses stored ksefSessionRef to query the original session.
-   * Falls back to session-level status check if invoice-level fails.
-   */
-  private async checkLiveStatus(
-    ksefClient: DirectKSeFClient,
-    record: any,
-  ): Promise<void> {
-    const invoiceRef = record.ksefReferenceNumber;
-    const sessionRef = record.ksefSessionRef;
-
-    // Strategy 1: Query invoice status within the original session
-    if (sessionRef) {
-      try {
-        const statusResult = await ksefClient.getInvoiceStatus(invoiceRef, sessionRef);
-        await this.applyStatusResult(record, statusResult);
-        return;
-      } catch (invoiceErr) {
-        logger.debug('Invoice-level status check failed, trying session status', {
-          error: invoiceErr instanceof Error ? invoiceErr.message : 'Unknown',
-          invoiceRef,
-          sessionRef,
-        });
-      }
-
-      // Strategy 2: Check the session-level status
-      try {
-        const sessionStatus = await ksefClient.getSessionStatus(sessionRef);
-        // Session processingCode >= 400 means the session had errors
-        if (sessionStatus.processingCode >= 400) {
-          await this.prisma.kSeFInvoiceStatus.update({
-            where: { id: record.id },
-            data: {
-              status: 'rejected',
-              rejectedAt: new Date(),
-              errorCode: String(sessionStatus.processingCode),
-              errorMessage: sessionStatus.processingDescription,
-            },
-          });
-          record.status = 'rejected';
-          record.rejectedAt = new Date();
-          record.errorCode = String(sessionStatus.processingCode);
-          record.errorMessage = sessionStatus.processingDescription;
-          return;
-        }
-
-      } catch (sessionErr) {
-        logger.debug('Session-level status check failed', {
-          error: sessionErr instanceof Error ? sessionErr.message : 'Unknown',
-          sessionRef,
-        });
-      }
-    }
-
-    // Strategy 3: No stored sessionRef — try invoice status in current session (unlikely to work)
-    try {
-      const statusResult = await ksefClient.getInvoiceStatus(invoiceRef);
-      await this.applyStatusResult(record, statusResult);
-    } catch {
-      // All strategies exhausted
-      logger.debug('All status check strategies failed', { invoiceRef });
-    }
-  }
-
-  /**
-   * Apply a KSeF processing result to a DB record.
-   */
-  private async applyStatusResult(
-    record: any,
-    result: {
-      processingCode: number;
-      processingDescription: string;
-      ksefReferenceNumber?: string;
-    },
-  ): Promise<void> {
-    if (result.processingCode === 200) {
-      await this.prisma.kSeFInvoiceStatus.update({
-        where: { id: record.id },
-        data: {
-          status: 'accepted',
-          // Store canonical reference in both fields for download compatibility
-          ksefReferenceNumber: result.ksefReferenceNumber ?? undefined,
-          ksefInvoiceNumber: result.ksefReferenceNumber ?? undefined,
-          acceptedAt: new Date(),
-        },
-      });
-      record.status = 'accepted';
-      record.acceptedAt = new Date();
-      record.ksefReferenceNumber = result.ksefReferenceNumber ?? record.ksefReferenceNumber;
-      record.ksefInvoiceNumber = result.ksefReferenceNumber ?? null;
-    } else if (result.processingCode >= 400) {
-      await this.prisma.kSeFInvoiceStatus.update({
-        where: { id: record.id },
-        data: {
-          status: 'rejected',
-          rejectedAt: new Date(),
-          errorCode: String(result.processingCode),
-          errorMessage: result.processingDescription,
-        },
-      });
-      record.status = 'rejected';
-      record.rejectedAt = new Date();
-      record.errorCode = String(result.processingCode);
-      record.errorMessage = result.processingDescription;
     }
   }
 }
