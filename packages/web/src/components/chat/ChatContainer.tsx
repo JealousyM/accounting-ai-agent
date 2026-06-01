@@ -18,7 +18,9 @@ import { CurrentPlanBadge, UsageWidget } from '@/components/subscription';
 import { useSubscription } from '@/hooks/useSubscription';
 import { TTSProvider, useAutoSpeak, useTTS } from '@/contexts/TTSContext';
 import { AIMemoryPanel } from './AIMemoryPanel';
+import { TaxDeadlineNudges } from './TaxDeadlineNudges';
 import { OrganizationPanel } from '@/components/organization/OrganizationPanel';
+import { useTaxDeadlines } from '@/hooks/useTaxDeadlines';
 import enTranslations from '@/i18n/locales/en.json';
 import plTranslations from '@/i18n/locales/pl.json';
 import ruTranslations from '@/i18n/locales/ru.json';
@@ -63,6 +65,7 @@ function ChatContainerInner() {
   const t = translations[locale].chat;
   const onboardingTranslations = translations[locale].onboarding;
   const { isPro, isLoading: isLoadingSubscription } = useSubscription();
+  const { deadlines: taxDeadlines, isLoading: isLoadingTaxDeadlines } = useTaxDeadlines(locale);
 
   // Auto-speak functionality for new AI messages
   const { triggerAutoSpeak, shouldAutoSpeak } = useAutoSpeak();
@@ -170,6 +173,11 @@ function ChatContainerInner() {
     await sendMessage(content, undefined, ttsEnabled);
   };
 
+  const handleNudgeClick = (prompt: string) => {
+    setIsSidebarOpen(false);
+    sendMessage(prompt, undefined, ttsEnabled);
+  };
+
   const handleNewChat = async () => {
     await createConversation();
     setIsSidebarOpen(false);
@@ -235,6 +243,16 @@ function ChatContainerInner() {
               isLoading={isLoadingConversations}
               translations={t.sidebar}
               sharedTranslations={t.shared}
+            />
+          </div>
+
+          {/* Tax deadline nudges */}
+          <div className="border-t border-gray-200 dark:border-gray-700">
+            <TaxDeadlineNudges
+              deadlines={taxDeadlines}
+              isLoading={isLoadingTaxDeadlines}
+              translations={t.taxDeadlineNudges}
+              onNudgeClick={handleNudgeClick}
             />
           </div>
 

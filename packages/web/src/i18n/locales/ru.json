@@ -264,7 +264,15 @@
       "sharedBadge": "Общий",
       "noOrganization": "Присоединитесь к организации, чтобы делиться чатами"
     },
-    "aiCosts": "Затраты ИИ"
+    "aiCosts": "Затраты ИИ",
+    "taxDeadlineNudges": {
+      "title": "Ближайшие сроки",
+      "overdue": "Просрочено",
+      "today": "Сегодня",
+      "daysLeft": "через {days} д.",
+      "daysOverdue": "{days} д. просрочено",
+      "promptTemplate": "Мой срок {name} через {days} дней. Что нужно проверить перед подачей?"
+    }
   },
   "profile": {
     "title": "Редактировать профиль",

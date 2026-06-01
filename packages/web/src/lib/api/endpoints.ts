@@ -69,4 +69,9 @@ export const API_ENDPOINTS = {
   DASHBOARD: {
     SUMMARY: '/api/dashboard/summary',
   },
+
+  // Tax Calendar
+  TAX_CALENDAR: {
+    UPCOMING: '/api/tax-calendar/upcoming',
+  },
 } as const;
