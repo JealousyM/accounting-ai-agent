@@ -53,13 +53,15 @@ routes/      → controllers/      → services/      → Prisma/Redis
 ### Key Services
 - **WFirmaIntegrationService** - wFirma API calls with retry logic
 - **WFirmaCacheService** - PostgreSQL caching layer (TTL-based)
-- **AIChatService** - LangChain/LangGraph single agent with 50+ domain tools
+- **AIChatService** - Thin orchestrator for AI chat; delegates to `LangGraphAgentRunner` (LangGraph single agent, 58 domain tools — up to 82 with HR + KSeF), `ConversationRepository` (Prisma CRUD + access control), and `TTSIntegration` (audio + cost tracking)
+- **LangGraphAgentRunner** - Builds and runs the LangGraph `StateGraph` (agent → tools loop), model selection, tool binding
 - **AIMemoryService** - Persistent cross-session AI context memory (CRUD + prompt injection)
 - **AIMemoryExtractionService** - Fire-and-forget memory extraction from conversations (pattern-based, zero LLM cost)
-- **AuthService** - JWT + OAuth (Google)
+- **AuthService** - JWT + OAuth (Google); HTTP layer split into AuthCore/OAuth/Token/Profile controllers
 - **TTSService** - Text-to-speech via OpenAI TTS API
 - **OrganizationService** - Company grouping with admin/member roles and membership approval
-- **TelegramBotService** - Telegraf-based AI chatbot with account linking via 6-digit codes
+- **TelegramBotService** - Telegraf chatbot orchestrator; account linking via 6-digit codes. Delegates to sub-modules: `AIChatRouter` (text → AIChatService), `OcrFlowHandler` (photo → receipt OCR → expense), `TelegramRateLimiter` (Redis-backed per-user limits)
+- **TaxDeadlineReminderService** - Hourly scheduler (started in `index.ts`) that proactively DMs linked Telegram users about upcoming Polish tax deadlines; deduped per day via Redis
 - **ReferralService** - Referral program with Stripe credit rewards and coupon discounts
 - **TaxCalendarService** - Polish statutory tax deadlines (VAT, CIT, PIT, ZUS, PCC, dividends) with weekend/holiday shifting
 

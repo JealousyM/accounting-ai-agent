@@ -6,7 +6,12 @@ Handles user registration, login, password reset, Google OAuth, and per-session 
 ## Entry points
 - `packages/api/src/services/auth.service.ts` — core auth logic (register, login, password reset, Google OAuth)
 - `packages/api/src/middleware/auth.middleware.ts` — JWT verification middleware; attaches `req.user`
-- `packages/api/src/routes/auth.routes.ts` — `/api/auth/*` endpoints
+- `packages/api/src/routes/auth.routes.ts` — `/api/auth/*` endpoints; wires four controllers (split out of the former monolithic `AuthController`):
+  - `controllers/auth-core.controller.ts` — register, login, password recovery, email verification
+  - `controllers/oauth.controller.ts` — Google OAuth flow, account creation/link
+  - `controllers/token.controller.ts` — JWT refresh
+  - `controllers/profile.controller.ts` — `getConfig` (auth-provider visibility) and current-user info
+- `packages/api/src/controllers/helpers/ksef-login-sync.ts` — schedules a KSeF contractor sync after login/OAuth
 - `packages/api/src/services/credentials.service.ts` — encrypted storage of wFirma/OpenAI credentials
 - `packages/api/src/services/crypto.service.ts` — AES-256 encryption for credentials at rest
 

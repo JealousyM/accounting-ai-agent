@@ -1,10 +1,13 @@
 # AI Chat Agent
 
 ## What this is
-The core product feature: a LangGraph-based AI accounting assistant with 50+ domain tools. Users interact via the web chat UI or Telegram. The agent auto-detects language (pl/en/ru), calls wFirma APIs as needed, and streams replies back to the client.
+The core product feature: a LangGraph-based AI accounting assistant with 58 domain tools (up to 82 when HR and KSeF services are available). Users interact via the web chat UI or Telegram. The agent auto-detects language (pl/en/ru), calls wFirma APIs as needed, and streams replies back to the client.
 
 ## Entry points
-- `packages/api/src/services/ai-chat/ai-chat.service.ts` — `AIChatService`; the main entry point: `processMessage()`, `getConversations()`, `getMessages()`
+- `packages/api/src/services/ai-chat/ai-chat.service.ts` — `AIChatService`; a **thin orchestrator** exposing `processMessage()`, `getConversations()`, `getMessages()`. Delegates the actual work to the three pieces below.
+- `packages/api/src/services/ai-chat/langgraph-agent-runner.ts` — `LangGraphAgentRunner`; builds and runs the `StateGraph` (model selection, tool binding, agent → tools loop). This is where the LLM agent logic lives (extracted out of `AIChatService`).
+- `packages/api/src/services/ai-chat/conversation-repository.ts` — `ConversationRepository`; Prisma-based conversation/message CRUD plus owner / org-shared access control.
+- `packages/api/src/services/ai-chat/tts-integration.ts` — `TTSIntegration`; post-processes replies for TTS and tracks audio cost.
 - `packages/api/src/services/ai-chat/tools/` — all LangChain tool definitions (one file per domain)
 - `packages/api/src/services/ai-chat/formatters/` — markdown formatters that turn wFirma API responses into readable AI replies
 - `packages/api/src/services/ai-chat/constants.ts` — system prompt template
@@ -30,4 +33,4 @@ The core product feature: a LangGraph-based AI accounting assistant with 50+ dom
 - Used by: `telegram-bot` which calls `processMessage` for each Telegram message
 
 ## Where to look first
-`packages/api/src/services/ai-chat/ai-chat.service.ts` method `processMessage()` to understand the full request lifecycle; `packages/api/src/services/ai-chat/tools/contractor.tools.ts` as the canonical tool example.
+`packages/api/src/services/ai-chat/ai-chat.service.ts` method `processMessage()` to see how the orchestrator wires `ConversationRepository` + `LangGraphAgentRunner` + `TTSIntegration`, then `packages/api/src/services/ai-chat/langgraph-agent-runner.ts` for the agent loop itself; `packages/api/src/services/ai-chat/tools/contractor.tools.ts` as the canonical tool example.

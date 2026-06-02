@@ -8,11 +8,12 @@ Domain wiki for the Accounting AI Agent monorepo. Each page covers one coherent 
 | [web-frontend](web-frontend.md) | Next.js 15 frontend: App Router pages, React contexts, API client wrappers |
 | [auth](auth.md) | JWT + Google OAuth authentication, per-user API credential storage |
 | [wfirma-integration](wfirma-integration.md) | wFirma Polish accounting API: retry client, per-module services, PostgreSQL cache |
-| [ai-chat](ai-chat.md) | LangGraph AI agent with 50+ domain tools, locale auto-detect, LangSmith tracing |
+| [ai-chat](ai-chat.md) | LangGraph AI agent (58 tools, up to 82 with HR+KSeF), orchestrator + agent-runner + repository split, locale auto-detect |
 | [ai-memory](ai-memory.md) | Persistent cross-session memory injected into AI system prompt; pattern-based extraction |
 | [ksef](ksef.md) | KSeF e-invoice integration: FA(3) XML, adapter pattern (wFirma/direct), status polling |
 | [organizations](organizations.md) | Multi-tenant company grouping, shared conversations, admin/member roles |
-| [telegram-bot](telegram-bot.md) | Telegraf chatbot: AI chat, photo OCR, account linking via 6-digit codes |
+| [telegram-bot](telegram-bot.md) | Telegraf chatbot orchestrator + AIChatRouter / OcrFlowHandler / RateLimiter sub-modules; account linking via 6-digit codes |
+| [tax-reminders](tax-reminders.md) | Proactive Telegram + in-chat reminders for upcoming Polish tax deadlines; hourly scheduler |
 | [ocr](ocr.md) | Receipt/invoice OCR via GPT-4o vision; structured `ParsedReceipt` output |
 | [subscriptions](subscriptions.md) | Stripe billing (free/pro plans), webhooks, referral program |
 | [hr](hr.md) | Employee management, Polish payroll calculations, contracts, absences |

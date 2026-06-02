@@ -15,7 +15,7 @@ graph TD
     end
 
     subgraph AI["AI Layer"]
-        LANGGRAPH["LangGraph Single Agent<br/>55+ Domain Tools"]
+        LANGGRAPH["LangGraph Single Agent<br/>58 Domain Tools (up to 82)"]
         MEMORY["AI Context Memory<br/>AIMemoryService<br/>AIMemoryExtractionService"]
         OCR["Receipt OCR<br/>GPT-4o Vision<br/>Telegram photo handler"]
         LANGGRAPH <--> MEMORY
@@ -156,13 +156,13 @@ Prisma ORM for database operations, Redis for caching.
 
 ## AI Agent Architecture
 
-The system uses a single LangGraph agent with 50+ domain tools. There is no multi-agent router -- one agent receives the user message, decides which tools to call, and composes the final response. AI Context Memory is loaded into the system prompt so the agent has long-term awareness of user preferences, business facts, and frequently referenced entities.
+The system uses a single LangGraph agent with 58 domain tools (up to 82 when HR and KSeF services are available). There is no multi-agent router -- one agent receives the user message, decides which tools to call, and composes the final response. AI Context Memory is loaded into the system prompt so the agent has long-term awareness of user preferences, business facts, and frequently referenced entities.
 
 ```mermaid
 graph LR
     USER["User Message"] --> AGENT["LangGraph Agent<br/>(single ReAct loop)"]
 
-    AGENT --> TOOLS["50+ Domain Tools"]
+    AGENT --> TOOLS["58 Domain Tools"]
 
     subgraph TOOLS["Domain Tools"]
         direction TB
@@ -218,7 +218,7 @@ sequenceDiagram
     participant Memory as AIMemoryService
     participant Prompt as System Prompt Builder
     participant Agent as LangGraph Agent
-    participant Tools as Domain Tools (50+)
+    participant Tools as Domain Tools (58)
     participant Extraction as AIMemoryExtractionService
 
     User->>Controller: Send message
