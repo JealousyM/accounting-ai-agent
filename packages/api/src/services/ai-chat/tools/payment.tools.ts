@@ -3,7 +3,7 @@
  * LangChain tools for payment operations
  */
 
-import { tool, StructuredToolInterface } from '@langchain/core/tools';
+import { DynamicStructuredTool, StructuredToolInterface } from '@langchain/core/tools';
 import { z } from 'zod';
 import { logger } from '../../../utils/logger';
 import { getPaymentTranslations, Locale } from '../../../i18n';
@@ -28,8 +28,30 @@ export function createGetPaymentsTool(
   locale: Locale,
   subscriptionService?: SubscriptionService
 ): StructuredToolInterface {
-  return (tool as any)(
-    async ({
+  return new DynamicStructuredTool({
+    name: 'get_payments',
+    description:
+      'Get list of payments from wFirma. Can filter by invoice number, object type (invoice/expense), date range, and payment method.',
+    schema: z.object({
+      invoiceNumber: z
+        .string()
+        .nullable().optional()
+        .describe('Invoice number to get payments for'),
+      objectType: z
+        .enum(['invoice', 'expense'])
+        .nullable().optional()
+        .describe('Filter by object type'),
+      dateFrom: z
+        .string()
+        .nullable().optional()
+        .describe('Start date (YYYY-MM-DD)'),
+      dateTo: z.string().nullable().optional().describe('End date (YYYY-MM-DD)'),
+      paymentMethod: z
+        .enum(['transfer', 'cash', 'card', 'compensation', 'other'])
+        .nullable().optional()
+        .describe('Payment method'),
+    }),
+    func: async ({
       invoiceNumber,
       objectType,
       dateFrom,
@@ -122,31 +144,8 @@ export function createGetPaymentsTool(
         return `Error: ${getPaymentTranslations(locale).errorFetch}`;
       }
     },
-    {
-      name: 'get_payments',
-      description:
-        'Get list of payments from wFirma. Can filter by invoice number, object type (invoice/expense), date range, and payment method.',
-      schema: z.object({
-        invoiceNumber: z
-          .string()
-          .nullable().optional()
-          .describe('Invoice number to get payments for'),
-        objectType: z
-          .enum(['invoice', 'expense'])
-          .nullable().optional()
-          .describe('Filter by object type'),
-        dateFrom: z
-          .string()
-          .nullable().optional()
-          .describe('Start date (YYYY-MM-DD)'),
-        dateTo: z.string().nullable().optional().describe('End date (YYYY-MM-DD)'),
-        paymentMethod: z
-          .enum(['transfer', 'cash', 'card', 'compensation', 'other'])
-          .nullable().optional()
-          .describe('Payment method'),
-      }),
-    }
-  );
+  });
+
 }
 
 /**
@@ -158,8 +157,14 @@ export function createGetPaymentDetailsTool(
   locale: Locale,
   subscriptionService?: SubscriptionService
 ): StructuredToolInterface {
-  return (tool as any)(
-    async ({ paymentId }: { paymentId: string }) => {
+  return new DynamicStructuredTool({
+    name: 'get_payment_details',
+    description:
+      'Get detailed information about a specific payment by ID.',
+    schema: z.object({
+      paymentId: z.string().describe('Payment ID'),
+    }),
+    func: async ({ paymentId }: { paymentId: string }) => {
       try {
         const limitError = await checkWFirmaLimit(subscriptionService, userId, locale);
         if (limitError) return limitError;
@@ -198,15 +203,8 @@ export function createGetPaymentDetailsTool(
         return `Error: ${getPaymentTranslations(locale).errorFetchDetails}`;
       }
     },
-    {
-      name: 'get_payment_details',
-      description:
-        'Get detailed information about a specific payment by ID.',
-      schema: z.object({
-        paymentId: z.string().describe('Payment ID'),
-      }),
-    }
-  );
+  });
+
 }
 
 /**
@@ -219,8 +217,22 @@ export function createAddPaymentTool(
   locale: Locale,
   subscriptionService?: SubscriptionService
 ): StructuredToolInterface {
-  return (tool as any)(
-    async ({
+  return new DynamicStructuredTool({
+    name: 'add_payment',
+    description:
+      'Add/create/register a new payment to an invoice. Use this when user wants to ADD, CREATE, REGISTER, RECORD a payment (keywords: добавить, создать, зарегистрировать оплату/платеж). Records that a payment has been received for an invoice.',
+    schema: z.object({
+      invoiceNumber: z
+        .string()
+        .describe('Invoice number to add payment to (e.g., FV 1/2026)'),
+      amount: z.number().describe('Payment amount in invoice currency (e.g., 100 for 100 EUR)'),
+      date: z.string().describe('Payment date (YYYY-MM-DD format, e.g., 2026-01-20)'),
+      paymentMethod: z
+        .enum(['transfer', 'cash', 'card', 'compensation', 'other'])
+        .nullable().optional()
+        .describe('Payment method (default: transfer)'),
+    }),
+    func: async ({
       invoiceNumber,
       amount,
       date,
@@ -279,23 +291,8 @@ export function createAddPaymentTool(
         return `Error: ${getPaymentTranslations(locale).errorCreate}`;
       }
     },
-    {
-      name: 'add_payment',
-      description:
-        'Add/create/register a new payment to an invoice. Use this when user wants to ADD, CREATE, REGISTER, RECORD a payment (keywords: добавить, создать, зарегистрировать оплату/платеж). Records that a payment has been received for an invoice.',
-      schema: z.object({
-        invoiceNumber: z
-          .string()
-          .describe('Invoice number to add payment to (e.g., FV 1/2026)'),
-        amount: z.number().describe('Payment amount in invoice currency (e.g., 100 for 100 EUR)'),
-        date: z.string().describe('Payment date (YYYY-MM-DD format, e.g., 2026-01-20)'),
-        paymentMethod: z
-          .enum(['transfer', 'cash', 'card', 'compensation', 'other'])
-          .nullable().optional()
-          .describe('Payment method (default: transfer)'),
-      }),
-    }
-  );
+  });
+
 }
 
 /**
@@ -308,8 +305,20 @@ export function createUpdatePaymentTool(
   locale: Locale,
   subscriptionService?: SubscriptionService
 ): StructuredToolInterface {
-  return (tool as any)(
-    async ({
+  return new DynamicStructuredTool({
+    name: 'update_payment',
+    description:
+      'Update an existing payment. Can update amount, date, or payment method.',
+    schema: z.object({
+      paymentId: z.string().describe('Payment ID to update'),
+      amount: z.number().nullable().optional().describe('New payment amount'),
+      date: z.string().nullable().optional().describe('New payment date (YYYY-MM-DD)'),
+      paymentMethod: z
+        .enum(['transfer', 'cash', 'card', 'compensation', 'other'])
+        .nullable().optional()
+        .describe('New payment method'),
+    }),
+    func: async ({
       paymentId,
       amount,
       date,
@@ -353,21 +362,8 @@ export function createUpdatePaymentTool(
         return `Error: ${getPaymentTranslations(locale).errorUpdate}`;
       }
     },
-    {
-      name: 'update_payment',
-      description:
-        'Update an existing payment. Can update amount, date, or payment method.',
-      schema: z.object({
-        paymentId: z.string().describe('Payment ID to update'),
-        amount: z.number().nullable().optional().describe('New payment amount'),
-        date: z.string().nullable().optional().describe('New payment date (YYYY-MM-DD)'),
-        paymentMethod: z
-          .enum(['transfer', 'cash', 'card', 'compensation', 'other'])
-          .nullable().optional()
-          .describe('New payment method'),
-      }),
-    }
-  );
+  });
+
 }
 
 /**
@@ -380,8 +376,14 @@ export function createDeletePaymentTool(
   locale: Locale,
   subscriptionService?: SubscriptionService
 ): StructuredToolInterface {
-  return (tool as any)(
-    async ({ paymentId }: { paymentId: string }) => {
+  return new DynamicStructuredTool({
+    name: 'delete_payment',
+    description:
+      'Delete a payment by ID. WARNING: This action cannot be undone.',
+    schema: z.object({
+      paymentId: z.string().describe('Payment ID to delete'),
+    }),
+    func: async ({ paymentId }: { paymentId: string }) => {
       try {
         const limitError = await checkWFirmaLimit(subscriptionService, userId, locale);
         if (limitError) return limitError;
@@ -409,13 +411,6 @@ export function createDeletePaymentTool(
         return `Error: ${getPaymentTranslations(locale).errorDelete}`;
       }
     },
-    {
-      name: 'delete_payment',
-      description:
-        'Delete a payment by ID. WARNING: This action cannot be undone.',
-      schema: z.object({
-        paymentId: z.string().describe('Payment ID to delete'),
-      }),
-    }
-  );
+  });
+
 }

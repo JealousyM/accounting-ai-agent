@@ -3,7 +3,7 @@
  * LangChain tool for fetching financial data
  */
 
-import { tool, StructuredToolInterface } from '@langchain/core/tools';
+import { DynamicStructuredTool, StructuredToolInterface } from '@langchain/core/tools';
 import { z } from 'zod';
 import { logger } from '../../../utils/logger';
 import { FinancialData } from '../../../types/wfirma.types';
@@ -19,9 +19,13 @@ export function createGetFinancialSummaryTool(
   userId: string,
   subscriptionService?: SubscriptionService
 ): StructuredToolInterface {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return (tool as any)(
-    async ({ year }: { year: number }) => {
+  return new DynamicStructuredTool({
+    name: 'get_financial_summary',
+    description: 'Get financial summary for a specific year (revenue, expenses, profit). Use when user asks about their income, expenses, or profit.',
+    schema: z.object({
+      year: z.number().describe('Fiscal year (e.g., 2024)'),
+    }),
+    func: async ({ year }: { year: number }) => {
       try {
         const limitError = await checkWFirmaLimit(subscriptionService, userId, 'en');
         if (limitError) return limitError;
@@ -48,12 +52,6 @@ export function createGetFinancialSummaryTool(
         return 'Error: Failed to fetch financial data from wFirma';
       }
     },
-    {
-      name: 'get_financial_summary',
-      description: 'Get financial summary for a specific year (revenue, expenses, profit). Use when user asks about their income, expenses, or profit.',
-      schema: z.object({
-        year: z.number().describe('Fiscal year (e.g., 2024)'),
-      }),
-    }
-  );
+  });
+
 }

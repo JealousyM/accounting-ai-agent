@@ -3,7 +3,7 @@
  * LangChain tools for vehicle CRUD operations
  */
 
-import { tool, StructuredToolInterface } from '@langchain/core/tools';
+import { DynamicStructuredTool, StructuredToolInterface } from '@langchain/core/tools';
 import { z } from 'zod';
 import { logger } from '../../../utils/logger';
 import { getVehicleTranslations, Locale } from '../../../i18n';
@@ -29,9 +29,26 @@ export function createGetVehiclesTool(
   locale: Locale,
   subscriptionService?: SubscriptionService
 ): StructuredToolInterface {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return (tool as any)(
-    async ({
+  return new DynamicStructuredTool({
+    name: 'get_vehicles',
+    description:
+      'Get list of vehicles from wFirma. Can filter by type (truck/car/motor/motor-bike), ownership (leasing/private/other), or search by name/registration number.',
+    schema: z.object({
+      search: z
+        .string()
+        .nullable().optional()
+        .describe('Search by vehicle name or registration number'),
+      type: z
+        .enum(['truck', 'car', 'motor', 'motor-bike'])
+        .nullable().optional()
+        .describe('Filter by vehicle type'),
+      ownership: z
+        .enum(['leasing', 'private', 'other'])
+        .nullable().optional()
+        .describe('Filter by ownership form'),
+      limit: z.number().nullable().optional().describe('Maximum number of results (default 100)'),
+    }),
+    func: async ({
       search,
       type,
       ownership,
@@ -63,27 +80,8 @@ export function createGetVehiclesTool(
         return `Error: ${t.errorFetch}`;
       }
     },
-    {
-      name: 'get_vehicles',
-      description:
-        'Get list of vehicles from wFirma. Can filter by type (truck/car/motor/motor-bike), ownership (leasing/private/other), or search by name/registration number.',
-      schema: z.object({
-        search: z
-          .string()
-          .nullable().optional()
-          .describe('Search by vehicle name or registration number'),
-        type: z
-          .enum(['truck', 'car', 'motor', 'motor-bike'])
-          .nullable().optional()
-          .describe('Filter by vehicle type'),
-        ownership: z
-          .enum(['leasing', 'private', 'other'])
-          .nullable().optional()
-          .describe('Filter by ownership form'),
-        limit: z.number().nullable().optional().describe('Maximum number of results (default 100)'),
-      }),
-    }
-  );
+  });
+
 }
 
 /**
@@ -95,9 +93,18 @@ export function createGetVehicleDetailsTool(
   locale: Locale,
   subscriptionService?: SubscriptionService
 ): StructuredToolInterface {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return (tool as any)(
-    async ({
+  return new DynamicStructuredTool({
+    name: 'get_vehicle_details',
+    description:
+      'Get detailed information about a specific vehicle by ID or registration number. If registration number provided, will search for exact match.',
+    schema: z.object({
+      vehicleId: z.string().nullable().optional().describe('Vehicle ID from wFirma'),
+      register: z
+        .string()
+        .nullable().optional()
+        .describe('Vehicle registration number (e.g., WA12345)'),
+    }),
+    func: async ({
       vehicleId,
       register,
     }: {
@@ -153,19 +160,8 @@ export function createGetVehicleDetailsTool(
         return `Error: ${t.errorFetchDetails}`;
       }
     },
-    {
-      name: 'get_vehicle_details',
-      description:
-        'Get detailed information about a specific vehicle by ID or registration number. If registration number provided, will search for exact match.',
-      schema: z.object({
-        vehicleId: z.string().nullable().optional().describe('Vehicle ID from wFirma'),
-        register: z
-          .string()
-          .nullable().optional()
-          .describe('Vehicle registration number (e.g., WA12345)'),
-      }),
-    }
-  );
+  });
+
 }
 
 /**
@@ -178,9 +174,41 @@ export function createAddVehicleTool(
   locale: Locale,
   subscriptionService?: SubscriptionService
 ): StructuredToolInterface {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return (tool as any)(
-    async ({
+  return new DynamicStructuredTool({
+    name: 'add_vehicle',
+    description:
+      'Create a new vehicle in wFirma. Required: name, register, type, ownership. Optional: truckType (for trucks), taxPurpose, leasing information.',
+    schema: z.object({
+      name: z.string().describe('Vehicle name/description (required)'),
+      register: z.string().describe('Registration number (e.g., WA12345) (required)'),
+      type: z
+        .enum(['truck', 'car', 'motor', 'motor-bike'])
+        .describe('Vehicle type (required)'),
+      ownership: z
+        .enum(['leasing', 'private', 'other'])
+        .describe('Ownership form (required)'),
+      truckType: z
+        .enum(['normal', 'quasi'])
+        .nullable().optional()
+        .describe('Truck type: normal (above 3.5t) or quasi (below 3.5t)'),
+      taxPurpose: z
+        .enum(['mixed', 'company'])
+        .nullable().optional()
+        .describe('Usage: mixed or company only'),
+      vatLeasingBelowLimit: z
+        .boolean()
+        .nullable().optional()
+        .describe('Is vehicle value below 150k PLN?'),
+      vatLeasingDate: z
+        .string()
+        .nullable().optional()
+        .describe('Lease agreement date in YYYY-MM-DD format'),
+      vatLeasingValue: z
+        .number()
+        .nullable().optional()
+        .describe('Vehicle value (for leasing)'),
+    }),
+    func: async ({
       name,
       register,
       type,
@@ -243,42 +271,8 @@ ${t.tryAgain}`;
         return `Error: ${t.errorCreate}`;
       }
     },
-    {
-      name: 'add_vehicle',
-      description:
-        'Create a new vehicle in wFirma. Required: name, register, type, ownership. Optional: truckType (for trucks), taxPurpose, leasing information.',
-      schema: z.object({
-        name: z.string().describe('Vehicle name/description (required)'),
-        register: z.string().describe('Registration number (e.g., WA12345) (required)'),
-        type: z
-          .enum(['truck', 'car', 'motor', 'motor-bike'])
-          .describe('Vehicle type (required)'),
-        ownership: z
-          .enum(['leasing', 'private', 'other'])
-          .describe('Ownership form (required)'),
-        truckType: z
-          .enum(['normal', 'quasi'])
-          .nullable().optional()
-          .describe('Truck type: normal (above 3.5t) or quasi (below 3.5t)'),
-        taxPurpose: z
-          .enum(['mixed', 'company'])
-          .nullable().optional()
-          .describe('Usage: mixed or company only'),
-        vatLeasingBelowLimit: z
-          .boolean()
-          .nullable().optional()
-          .describe('Is vehicle value below 150k PLN?'),
-        vatLeasingDate: z
-          .string()
-          .nullable().optional()
-          .describe('Lease agreement date in YYYY-MM-DD format'),
-        vatLeasingValue: z
-          .number()
-          .nullable().optional()
-          .describe('Vehicle value (for leasing)'),
-      }),
-    }
-  );
+  });
+
 }
 
 /**
@@ -291,9 +285,39 @@ export function createUpdateVehicleTool(
   locale: Locale,
   subscriptionService?: SubscriptionService
 ): StructuredToolInterface {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return (tool as any)(
-    async ({
+  return new DynamicStructuredTool({
+    name: 'update_vehicle',
+    description:
+      'Update an existing vehicle in wFirma. Identify vehicle by vehicleId or register. All fields are optional - only provided fields will be updated.',
+    schema: z.object({
+      vehicleId: z.string().nullable().optional().describe('Vehicle ID (if known)'),
+      register: z
+        .string()
+        .nullable().optional()
+        .describe('Current registration number (to find vehicle)'),
+      name: z.string().nullable().optional().describe('New vehicle name'),
+      newRegister: z.string().nullable().optional().describe('New registration number'),
+      type: z
+        .enum(['truck', 'car', 'motor', 'motor-bike'])
+        .nullable().optional()
+        .describe('New vehicle type'),
+      ownership: z
+        .enum(['leasing', 'private', 'other'])
+        .nullable().optional()
+        .describe('New ownership form'),
+      truckType: z.enum(['normal', 'quasi']).nullable().optional().describe('New truck type'),
+      taxPurpose: z.enum(['mixed', 'company']).nullable().optional().describe('New usage purpose'),
+      vatLeasingBelowLimit: z
+        .boolean()
+        .nullable().optional()
+        .describe('Update value below 150k PLN'),
+      vatLeasingDate: z
+        .string()
+        .nullable().optional()
+        .describe('New lease date (YYYY-MM-DD)'),
+      vatLeasingValue: z.number().nullable().optional().describe('New vehicle value'),
+    }),
+    func: async ({
       vehicleId,
       register,
       name,
@@ -388,40 +412,8 @@ ${t.tryAgain}`;
         return `Error: ${t.errorUpdate}`;
       }
     },
-    {
-      name: 'update_vehicle',
-      description:
-        'Update an existing vehicle in wFirma. Identify vehicle by vehicleId or register. All fields are optional - only provided fields will be updated.',
-      schema: z.object({
-        vehicleId: z.string().nullable().optional().describe('Vehicle ID (if known)'),
-        register: z
-          .string()
-          .nullable().optional()
-          .describe('Current registration number (to find vehicle)'),
-        name: z.string().nullable().optional().describe('New vehicle name'),
-        newRegister: z.string().nullable().optional().describe('New registration number'),
-        type: z
-          .enum(['truck', 'car', 'motor', 'motor-bike'])
-          .nullable().optional()
-          .describe('New vehicle type'),
-        ownership: z
-          .enum(['leasing', 'private', 'other'])
-          .nullable().optional()
-          .describe('New ownership form'),
-        truckType: z.enum(['normal', 'quasi']).nullable().optional().describe('New truck type'),
-        taxPurpose: z.enum(['mixed', 'company']).nullable().optional().describe('New usage purpose'),
-        vatLeasingBelowLimit: z
-          .boolean()
-          .nullable().optional()
-          .describe('Update value below 150k PLN'),
-        vatLeasingDate: z
-          .string()
-          .nullable().optional()
-          .describe('New lease date (YYYY-MM-DD)'),
-        vatLeasingValue: z.number().nullable().optional().describe('New vehicle value'),
-      }),
-    }
-  );
+  });
+
 }
 
 /**
@@ -434,9 +426,18 @@ export function createDeleteVehicleTool(
   locale: Locale,
   subscriptionService?: SubscriptionService
 ): StructuredToolInterface {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return (tool as any)(
-    async ({ vehicleId, register }: { vehicleId?: string; register?: string }) => {
+  return new DynamicStructuredTool({
+    name: 'delete_vehicle',
+    description:
+      'Delete a vehicle from wFirma. WARNING: This action cannot be undone. Identify vehicle by vehicleId or register.',
+    schema: z.object({
+      vehicleId: z.string().nullable().optional().describe('Vehicle ID (if known)'),
+      register: z
+        .string()
+        .nullable().optional()
+        .describe('Registration number (to find vehicle)'),
+    }),
+    func: async ({ vehicleId, register }: { vehicleId?: string; register?: string }) => {
       try {
         const limitError = await checkWFirmaLimit(subscriptionService, userId, locale);
         if (limitError) return limitError;
@@ -496,17 +497,6 @@ export function createDeleteVehicleTool(
         return `Error: ${t.errorDelete}`;
       }
     },
-    {
-      name: 'delete_vehicle',
-      description:
-        'Delete a vehicle from wFirma. WARNING: This action cannot be undone. Identify vehicle by vehicleId or register.',
-      schema: z.object({
-        vehicleId: z.string().nullable().optional().describe('Vehicle ID (if known)'),
-        register: z
-          .string()
-          .nullable().optional()
-          .describe('Registration number (to find vehicle)'),
-      }),
-    }
-  );
+  });
+
 }

@@ -3,7 +3,7 @@
  * LangChain tools for KSeF (Krajowy System e-Faktur) operations
  */
 
-import { tool, StructuredToolInterface } from '@langchain/core/tools';
+import { DynamicStructuredTool, StructuredToolInterface } from '@langchain/core/tools';
 import { z } from 'zod';
 import { logger } from '../../../utils/logger';
 import { getKSeFTranslations, Locale } from '../../../i18n';
@@ -30,9 +30,13 @@ export function createSendToKSeFTool(
   userId: string,
   subscriptionService?: SubscriptionService
 ): StructuredToolInterface {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return (tool as any)(
-    async ({ invoiceId }: { invoiceId: string }) => {
+  return new DynamicStructuredTool({
+    name: 'send_invoice_to_ksef',
+    description: 'Send invoice to KSeF (Polish National e-Invoice System). Use when user wants to submit invoice to KSeF.',
+    schema: z.object({
+      invoiceId: z.string().describe('Invoice ID to send to KSeF'),
+    }),
+    func: async ({ invoiceId }: { invoiceId: string }) => {
       try {
         const limitError = await checkWFirmaLimit(subscriptionService, userId, locale);
         if (limitError) return limitError;
@@ -52,14 +56,8 @@ export function createSendToKSeFTool(
         return `Error: ${t.errorSend}`;
       }
     },
-    {
-      name: 'send_invoice_to_ksef',
-      description: 'Send invoice to KSeF (Polish National e-Invoice System). Use when user wants to submit invoice to KSeF.',
-      schema: z.object({
-        invoiceId: z.string().describe('Invoice ID to send to KSeF'),
-      }),
-    }
-  );
+  });
+
 }
 
 export function createCheckKSeFStatusTool(
@@ -68,9 +66,13 @@ export function createCheckKSeFStatusTool(
   userId: string,
   subscriptionService?: SubscriptionService
 ): StructuredToolInterface {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return (tool as any)(
-    async ({ referenceNumber }: { referenceNumber: string }) => {
+  return new DynamicStructuredTool({
+    name: 'check_ksef_status',
+    description: 'Check status of invoice in KSeF by reference number.',
+    schema: z.object({
+      referenceNumber: z.string().describe('KSeF reference number to check status for'),
+    }),
+    func: async ({ referenceNumber }: { referenceNumber: string }) => {
       try {
         const limitError = await checkWFirmaLimit(subscriptionService, userId, locale);
         if (limitError) return limitError;
@@ -90,14 +92,8 @@ export function createCheckKSeFStatusTool(
         return `Error: ${t.errorStatus}`;
       }
     },
-    {
-      name: 'check_ksef_status',
-      description: 'Check status of invoice in KSeF by reference number.',
-      schema: z.object({
-        referenceNumber: z.string().describe('KSeF reference number to check status for'),
-      }),
-    }
-  );
+  });
+
 }
 
 export function createDownloadKSeFUPOTool(
@@ -106,9 +102,13 @@ export function createDownloadKSeFUPOTool(
   userId: string,
   subscriptionService?: SubscriptionService
 ): StructuredToolInterface {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return (tool as any)(
-    async ({ referenceNumber }: { referenceNumber: string }) => {
+  return new DynamicStructuredTool({
+    name: 'download_ksef_upo',
+    description: 'Download UPO (official confirmation) from KSeF for accepted invoice.',
+    schema: z.object({
+      referenceNumber: z.string().describe('KSeF reference number to download UPO for'),
+    }),
+    func: async ({ referenceNumber }: { referenceNumber: string }) => {
       try {
         const limitError = await checkWFirmaLimit(subscriptionService, userId, locale);
         if (limitError) return limitError;
@@ -128,14 +128,8 @@ export function createDownloadKSeFUPOTool(
         return `Error: ${t.errorUPO}`;
       }
     },
-    {
-      name: 'download_ksef_upo',
-      description: 'Download UPO (official confirmation) from KSeF for accepted invoice.',
-      schema: z.object({
-        referenceNumber: z.string().describe('KSeF reference number to download UPO for'),
-      }),
-    }
-  );
+  });
+
 }
 
 export function createQueryKSeFInvoicesTool(
@@ -144,9 +138,16 @@ export function createQueryKSeFInvoicesTool(
   userId: string,
   subscriptionService?: SubscriptionService
 ): StructuredToolInterface {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return (tool as any)(
-    async ({
+  return new DynamicStructuredTool({
+    name: 'query_ksef_invoices',
+    description: 'Query KSeF invoices. Can filter by date range, status, direction (sent/received).',
+    schema: z.object({
+      dateFrom: z.string().nullable().optional().describe('Start date filter (ISO format, e.g. 2024-01-01)'),
+      dateTo: z.string().nullable().optional().describe('End date filter (ISO format, e.g. 2024-12-31)'),
+      status: z.string().nullable().optional().describe('Status filter (pending, sent, accepted, rejected, completed, failed)'),
+      direction: z.enum(['sent', 'received']).nullable().optional().describe('Direction filter: sent or received'),
+    }),
+    func: async ({
       dateFrom,
       dateTo,
       status,
@@ -182,17 +183,8 @@ export function createQueryKSeFInvoicesTool(
         return `Error: ${t.errorQuery}`;
       }
     },
-    {
-      name: 'query_ksef_invoices',
-      description: 'Query KSeF invoices. Can filter by date range, status, direction (sent/received).',
-      schema: z.object({
-        dateFrom: z.string().nullable().optional().describe('Start date filter (ISO format, e.g. 2024-01-01)'),
-        dateTo: z.string().nullable().optional().describe('End date filter (ISO format, e.g. 2024-12-31)'),
-        status: z.string().nullable().optional().describe('Status filter (pending, sent, accepted, rejected, completed, failed)'),
-        direction: z.enum(['sent', 'received']).nullable().optional().describe('Direction filter: sent or received'),
-      }),
-    }
-  );
+  });
+
 }
 
 export function createGetKSeFStatisticsTool(
@@ -201,9 +193,11 @@ export function createGetKSeFStatisticsTool(
   userId: string,
   subscriptionService?: SubscriptionService
 ): StructuredToolInterface {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return (tool as any)(
-    async () => {
+  return new DynamicStructuredTool({
+    name: 'get_ksef_statistics',
+    description: 'Get KSeF statistics and summary. Shows total sent, received, accepted, rejected invoices.',
+    schema: z.object({}),
+    func: async () => {
       try {
         const limitError = await checkWFirmaLimit(subscriptionService, userId, locale);
         if (limitError) return limitError;
@@ -226,12 +220,8 @@ export function createGetKSeFStatisticsTool(
         return `Error: ${t.errorStatistics}`;
       }
     },
-    {
-      name: 'get_ksef_statistics',
-      description: 'Get KSeF statistics and summary. Shows total sent, received, accepted, rejected invoices.',
-      schema: z.object({}),
-    }
-  );
+  });
+
 }
 
 export function createBulkSendToKSeFTool(
@@ -240,9 +230,14 @@ export function createBulkSendToKSeFTool(
   userId: string,
   subscriptionService?: SubscriptionService
 ): StructuredToolInterface {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return (tool as any)(
-    async ({
+  return new DynamicStructuredTool({
+    name: 'bulk_send_to_ksef',
+    description: 'Send multiple invoices to KSeF at once. Use for batch submissions.',
+    schema: z.object({
+      invoiceIds: z.array(z.string()).describe('Array of invoice IDs to send to KSeF'),
+      continueOnError: z.boolean().nullable().optional().describe('Continue sending remaining invoices if one fails (default: true)'),
+    }),
+    func: async ({
       invoiceIds,
       continueOnError,
     }: {
@@ -275,15 +270,8 @@ export function createBulkSendToKSeFTool(
         return `Error: ${t.errorBulkSend}`;
       }
     },
-    {
-      name: 'bulk_send_to_ksef',
-      description: 'Send multiple invoices to KSeF at once. Use for batch submissions.',
-      schema: z.object({
-        invoiceIds: z.array(z.string()).describe('Array of invoice IDs to send to KSeF'),
-        continueOnError: z.boolean().nullable().optional().describe('Continue sending remaining invoices if one fails (default: true)'),
-      }),
-    }
-  );
+  });
+
 }
 
 export function createGetIncomingKSeFInvoicesTool(
@@ -292,9 +280,15 @@ export function createGetIncomingKSeFInvoicesTool(
   userId: string,
   subscriptionService?: SubscriptionService
 ): StructuredToolInterface {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return (tool as any)(
-    async ({
+  return new DynamicStructuredTool({
+    name: 'get_incoming_ksef_invoices',
+    description: 'Get incoming (received) invoices from KSeF. Shows invoices received from other companies. Can filter by date range and status.',
+    schema: z.object({
+      dateFrom: z.string().nullable().optional().describe('Start date filter (ISO format, e.g. 2024-01-01)'),
+      dateTo: z.string().nullable().optional().describe('End date filter (ISO format, e.g. 2024-12-31)'),
+      status: z.string().nullable().optional().describe('Status filter (pending, accepted, rejected, completed)'),
+    }),
+    func: async ({
       dateFrom,
       dateTo,
       status,
@@ -327,16 +321,8 @@ export function createGetIncomingKSeFInvoicesTool(
         return `Error: ${t.errorQueryIncoming}`;
       }
     },
-    {
-      name: 'get_incoming_ksef_invoices',
-      description: 'Get incoming (received) invoices from KSeF. Shows invoices received from other companies. Can filter by date range and status.',
-      schema: z.object({
-        dateFrom: z.string().nullable().optional().describe('Start date filter (ISO format, e.g. 2024-01-01)'),
-        dateTo: z.string().nullable().optional().describe('End date filter (ISO format, e.g. 2024-12-31)'),
-        status: z.string().nullable().optional().describe('Status filter (pending, accepted, rejected, completed)'),
-      }),
-    }
-  );
+  });
+
 }
 
 export function createMatchIncomingInvoiceTool(
@@ -345,9 +331,13 @@ export function createMatchIncomingInvoiceTool(
   userId: string,
   subscriptionService?: SubscriptionService
 ): StructuredToolInterface {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return (tool as any)(
-    async ({ referenceNumber }: { referenceNumber: string }) => {
+  return new DynamicStructuredTool({
+    name: 'match_incoming_ksef_invoice',
+    description: 'Match an incoming KSeF invoice with existing records in wFirma. Helps verify if a received invoice has a corresponding record.',
+    schema: z.object({
+      referenceNumber: z.string().describe('KSeF reference number of the incoming invoice to match'),
+    }),
+    func: async ({ referenceNumber }: { referenceNumber: string }) => {
       try {
         const limitError = await checkWFirmaLimit(subscriptionService, userId, locale);
         if (limitError) return limitError;
@@ -371,14 +361,8 @@ export function createMatchIncomingInvoiceTool(
         return `Error: ${t.errorMatchIncoming}`;
       }
     },
-    {
-      name: 'match_incoming_ksef_invoice',
-      description: 'Match an incoming KSeF invoice with existing records in wFirma. Helps verify if a received invoice has a corresponding record.',
-      schema: z.object({
-        referenceNumber: z.string().describe('KSeF reference number of the incoming invoice to match'),
-      }),
-    }
-  );
+  });
+
 }
 
 const FA3ItemSchema = z.object({
@@ -399,9 +383,39 @@ export function createDirectSendToKSeFTool(
   subscriptionService?: SubscriptionService,
   contractorService?: KSeFContractorService
 ): StructuredToolInterface {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return (tool as any)(
-    async ({
+  return new DynamicStructuredTool({
+    name: 'create_and_send_to_ksef',
+    description:
+      'Create a new invoice from scratch and send it directly to KSeF (Polish National e-Invoice System). ' +
+      'Use this when the user wants to submit an invoice to KSeF. ' +
+      'If seller or buyer NIP / address details are missing, they will be looked up automatically from the contractor database by company name. ' +
+      'Always provide at least the seller and buyer names. Provide NIP and address only if explicitly given by the user.',
+    schema: z.object({
+      invoiceNumber: z.string().describe('Invoice number (e.g. FV/2024/001)'),
+      issueDate: z.string().describe('Issue date in ISO format (e.g. 2024-01-15)'),
+      sellDate: z.string().describe('Sale/service date in ISO format'),
+      dueDate: z.string().describe('Payment due date in ISO format'),
+      sellerName: z.string().describe('Seller company name'),
+      sellerNip: z.string().nullable().optional().describe('Seller NIP (10 digits, no dashes or spaces). Will be looked up from contractor DB if not provided.'),
+      sellerStreet: z.string().nullable().optional().describe('Seller street address (e.g. ul. Marszałkowska 1). Will be looked up from contractor DB if not provided.'),
+      sellerCity: z.string().nullable().optional().describe('Seller city. Will be looked up from contractor DB if not provided.'),
+      sellerZip: z.string().nullable().optional().describe('Seller postal code (e.g. 00-001). Will be looked up from contractor DB if not provided.'),
+      sellerCountry: z.string().nullable().optional().describe('Seller country code (default: PL)'),
+      buyerName: z.string().describe('Buyer company or person name'),
+      buyerNip: z.string().nullable().optional().describe('Buyer NIP number. Will be looked up from contractor DB if not provided.'),
+      buyerStreet: z.string().nullable().optional().describe('Buyer street address. Will be looked up from contractor DB if not provided.'),
+      buyerCity: z.string().nullable().optional().describe('Buyer city. Will be looked up from contractor DB if not provided.'),
+      buyerZip: z.string().nullable().optional().describe('Buyer postal code. Will be looked up from contractor DB if not provided.'),
+      buyerCountry: z.string().nullable().optional().describe('Buyer country code (default: PL)'),
+      items: z.array(FA3ItemSchema).min(1).describe('Invoice line items (at least one required)'),
+      totalNet: z.number().describe('Invoice total net amount'),
+      totalVat: z.number().describe('Invoice total VAT amount'),
+      totalGross: z.number().describe('Invoice total gross amount'),
+      currency: z.string().nullable().optional().describe('Currency code (default: PLN)'),
+      paymentMethod: z.string().nullable().optional().describe('Payment method (default: transfer)'),
+      paymentAccount: z.string().nullable().optional().describe('Bank account number (IBAN, optional)'),
+    }),
+    func: async ({
       invoiceNumber,
       issueDate,
       sellDate,
@@ -560,38 +574,6 @@ export function createDirectSendToKSeFTool(
         return `Error: ${t.errorDirectSend}`;
       }
     },
-    {
-      name: 'create_and_send_to_ksef',
-      description:
-        'Create a new invoice from scratch and send it directly to KSeF (Polish National e-Invoice System). ' +
-        'Use this when the user wants to submit an invoice to KSeF. ' +
-        'If seller or buyer NIP / address details are missing, they will be looked up automatically from the contractor database by company name. ' +
-        'Always provide at least the seller and buyer names. Provide NIP and address only if explicitly given by the user.',
-      schema: z.object({
-        invoiceNumber: z.string().describe('Invoice number (e.g. FV/2024/001)'),
-        issueDate: z.string().describe('Issue date in ISO format (e.g. 2024-01-15)'),
-        sellDate: z.string().describe('Sale/service date in ISO format'),
-        dueDate: z.string().describe('Payment due date in ISO format'),
-        sellerName: z.string().describe('Seller company name'),
-        sellerNip: z.string().nullable().optional().describe('Seller NIP (10 digits, no dashes or spaces). Will be looked up from contractor DB if not provided.'),
-        sellerStreet: z.string().nullable().optional().describe('Seller street address (e.g. ul. Marszałkowska 1). Will be looked up from contractor DB if not provided.'),
-        sellerCity: z.string().nullable().optional().describe('Seller city. Will be looked up from contractor DB if not provided.'),
-        sellerZip: z.string().nullable().optional().describe('Seller postal code (e.g. 00-001). Will be looked up from contractor DB if not provided.'),
-        sellerCountry: z.string().nullable().optional().describe('Seller country code (default: PL)'),
-        buyerName: z.string().describe('Buyer company or person name'),
-        buyerNip: z.string().nullable().optional().describe('Buyer NIP number. Will be looked up from contractor DB if not provided.'),
-        buyerStreet: z.string().nullable().optional().describe('Buyer street address. Will be looked up from contractor DB if not provided.'),
-        buyerCity: z.string().nullable().optional().describe('Buyer city. Will be looked up from contractor DB if not provided.'),
-        buyerZip: z.string().nullable().optional().describe('Buyer postal code. Will be looked up from contractor DB if not provided.'),
-        buyerCountry: z.string().nullable().optional().describe('Buyer country code (default: PL)'),
-        items: z.array(FA3ItemSchema).min(1).describe('Invoice line items (at least one required)'),
-        totalNet: z.number().describe('Invoice total net amount'),
-        totalVat: z.number().describe('Invoice total VAT amount'),
-        totalGross: z.number().describe('Invoice total gross amount'),
-        currency: z.string().nullable().optional().describe('Currency code (default: PLN)'),
-        paymentMethod: z.string().nullable().optional().describe('Payment method (default: transfer)'),
-        paymentAccount: z.string().nullable().optional().describe('Bank account number (IBAN, optional)'),
-      }),
-    }
-  );
+  });
+
 }

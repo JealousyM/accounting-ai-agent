@@ -3,7 +3,7 @@
  * LangChain tools for expense operations (read + receipt-driven create)
  */
 
-import { tool, StructuredToolInterface } from '@langchain/core/tools';
+import { DynamicStructuredTool, StructuredToolInterface } from '@langchain/core/tools';
 import { z } from 'zod';
 import { logger } from '../../../utils/logger';
 import { getExpenseTranslations, Locale } from '../../../i18n';
@@ -141,8 +141,30 @@ export function createGetExpensesTool(
   locale: Locale,
   subscriptionService?: SubscriptionService
 ): StructuredToolInterface {
-  return (tool as any)(
-    async ({
+  return new DynamicStructuredTool({
+    name: 'get_expenses',
+    description:
+      'Get list of INCOMING expenses/bills (wydatki — purchases and bills received from vendors) from wFirma. For OUTGOING invoices issued to clients, use get_invoices instead. CRITICAL: whenever the user mentions any period (month, year, quarter, "last month", "April 2026", etc.) you MUST pass dateFrom and dateTo. Never call this tool without date filters if a period was mentioned — returning unfiltered results is a bug.',
+    schema: z.object({
+      contractorName: z
+        .string()
+        .nullable().optional()
+        .describe('Contractor/vendor name to filter expenses by'),
+      dateFrom: z
+        .string()
+        .nullable().optional()
+        .describe('Start date YYYY-MM-DD inclusive. REQUIRED when user specifies any period. For "April 2026" pass "2026-04-01".'),
+      dateTo: z.string().nullable().optional().describe('End date YYYY-MM-DD inclusive. REQUIRED when user specifies any period. For "April 2026" pass "2026-04-30".'),
+      paid: z
+        .boolean()
+        .nullable().optional()
+        .describe('Filter by payment status (true = paid, false = unpaid)'),
+      expenseType: z
+        .enum(['invoice', 'bill', 'vat_exempt'])
+        .nullable().optional()
+        .describe('Filter by expense type'),
+    }),
+    func: async ({
       contractorName,
       dateFrom,
       dateTo,
@@ -199,31 +221,8 @@ export function createGetExpensesTool(
         return `Error: ${getExpenseTranslations(locale).errorFetch}`;
       }
     },
-    {
-      name: 'get_expenses',
-      description:
-        'Get list of INCOMING expenses/bills (wydatki — purchases and bills received from vendors) from wFirma. For OUTGOING invoices issued to clients, use get_invoices instead. CRITICAL: whenever the user mentions any period (month, year, quarter, "last month", "April 2026", etc.) you MUST pass dateFrom and dateTo. Never call this tool without date filters if a period was mentioned — returning unfiltered results is a bug.',
-      schema: z.object({
-        contractorName: z
-          .string()
-          .nullable().optional()
-          .describe('Contractor/vendor name to filter expenses by'),
-        dateFrom: z
-          .string()
-          .nullable().optional()
-          .describe('Start date YYYY-MM-DD inclusive. REQUIRED when user specifies any period. For "April 2026" pass "2026-04-01".'),
-        dateTo: z.string().nullable().optional().describe('End date YYYY-MM-DD inclusive. REQUIRED when user specifies any period. For "April 2026" pass "2026-04-30".'),
-        paid: z
-          .boolean()
-          .nullable().optional()
-          .describe('Filter by payment status (true = paid, false = unpaid)'),
-        expenseType: z
-          .enum(['invoice', 'bill', 'vat_exempt'])
-          .nullable().optional()
-          .describe('Filter by expense type'),
-      }),
-    }
-  );
+  });
+
 }
 
 /**
@@ -235,8 +234,14 @@ export function createGetExpenseDetailsTool(
   locale: Locale,
   subscriptionService?: SubscriptionService
 ): StructuredToolInterface {
-  return (tool as any)(
-    async ({ expenseId }: { expenseId: string }) => {
+  return new DynamicStructuredTool({
+    name: 'get_expense_details',
+    description:
+      'Get detailed information about a specific expense by ID, including all expense items/parts, contractor information, and payment details.',
+    schema: z.object({
+      expenseId: z.string().describe('Expense ID'),
+    }),
+    func: async ({ expenseId }: { expenseId: string }) => {
       try {
         const limitError = await checkWFirmaLimit(subscriptionService, userId, locale);
         if (limitError) return limitError;
@@ -259,15 +264,8 @@ export function createGetExpenseDetailsTool(
         return `Error: ${getExpenseTranslations(locale).errorFetchDetails}`;
       }
     },
-    {
-      name: 'get_expense_details',
-      description:
-        'Get detailed information about a specific expense by ID, including all expense items/parts, contractor information, and payment details.',
-      schema: z.object({
-        expenseId: z.string().describe('Expense ID'),
-      }),
-    }
-  );
+  });
+
 }
 
 /**
@@ -287,9 +285,24 @@ export function createCreateExpenseFromReceiptTool(
   subscriptionService?: SubscriptionService,
   enrichmentService?: CompanyEnrichmentService,
 ): StructuredToolInterface {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return (tool as any)(
-    async ({
+  return new DynamicStructuredTool({
+    name: 'create_expense_from_receipt',
+    description:
+      'Create a new EXPENSE in wFirma from a parsed receipt or invoice (faktura/paragon). Resolves the seller by NIP — uses an existing wFirma contractor when found, otherwise creates one (auto-filling name/address from the Polish public registry). Pass at minimum `totalGross`; pass `sellerNip` whenever the document has one.',
+    schema: z.object({
+      sellerName: z.string().nullable().optional().describe('Seller / merchant name as printed on the document'),
+      sellerNip: z.string().nullable().optional().describe('Polish NIP (10 digits, dashes are stripped). Strongly recommended — without it the contractor cannot be matched in the public registry.'),
+      sellerAddress: z.string().nullable().optional().describe('Seller address as a single line (used as a fallback when GUS lookup is empty)'),
+      issueDate: z.string().nullable().optional().describe('Issue date YYYY-MM-DD; defaults to today on the wFirma side if omitted'),
+      documentNumber: z.string().nullable().optional().describe('Faktura / paragon number — used as the expense description'),
+      totalNet: z.number().nullable().optional().describe('NET amount; computed from gross+vatRate if missing'),
+      totalVat: z.number().nullable().optional().describe('VAT amount; computed from gross-net if missing'),
+      totalGross: z.number().describe('Gross amount paid (REQUIRED)'),
+      currency: z.string().nullable().optional().describe('ISO currency code, default "PLN"'),
+      vatRate: z.number().nullable().optional().describe('Effective VAT rate as a percent (e.g. 23, 8, 5, 0); defaults to 23'),
+      itemName: z.string().nullable().optional().describe('Optional line-item name; defaults to documentNumber or "Paragon"'),
+    }),
+    func: async ({
       sellerName,
       sellerNip,
       sellerAddress,
@@ -360,23 +373,5 @@ export function createCreateExpenseFromReceiptTool(
 **${t.errorReason}:** ${sanitizeForPrompt(msg)}`;
       }
     },
-    {
-      name: 'create_expense_from_receipt',
-      description:
-        'Create a new EXPENSE in wFirma from a parsed receipt or invoice (faktura/paragon). Resolves the seller by NIP — uses an existing wFirma contractor when found, otherwise creates one (auto-filling name/address from the Polish public registry). Pass at minimum `totalGross`; pass `sellerNip` whenever the document has one.',
-      schema: z.object({
-        sellerName: z.string().nullable().optional().describe('Seller / merchant name as printed on the document'),
-        sellerNip: z.string().nullable().optional().describe('Polish NIP (10 digits, dashes are stripped). Strongly recommended — without it the contractor cannot be matched in the public registry.'),
-        sellerAddress: z.string().nullable().optional().describe('Seller address as a single line (used as a fallback when GUS lookup is empty)'),
-        issueDate: z.string().nullable().optional().describe('Issue date YYYY-MM-DD; defaults to today on the wFirma side if omitted'),
-        documentNumber: z.string().nullable().optional().describe('Faktura / paragon number — used as the expense description'),
-        totalNet: z.number().nullable().optional().describe('NET amount; computed from gross+vatRate if missing'),
-        totalVat: z.number().nullable().optional().describe('VAT amount; computed from gross-net if missing'),
-        totalGross: z.number().describe('Gross amount paid (REQUIRED)'),
-        currency: z.string().nullable().optional().describe('ISO currency code, default "PLN"'),
-        vatRate: z.number().nullable().optional().describe('Effective VAT rate as a percent (e.g. 23, 8, 5, 0); defaults to 23'),
-        itemName: z.string().nullable().optional().describe('Optional line-item name; defaults to documentNumber or "Paragon"'),
-      }),
-    },
-  );
+  });
 }
