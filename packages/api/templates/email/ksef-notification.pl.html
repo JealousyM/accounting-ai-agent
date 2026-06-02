@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Powiadomienie KSeF</title>
+  <style>
+    body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; }
+    .container { background: #f9f9f9; border-radius: 8px; padding: 30px; }
+    .header { text-align: center; margin-bottom: 30px; }
+    .header h1 { margin: 0; }
+    .content { background: #fff; border-radius: 8px; padding: 20px; margin-bottom: 20px; }
+    .button { display: inline-block; background: #2563eb; color: #fff !important; text-decoration: none; padding: 12px 30px; border-radius: 6px; margin: 20px 0; }
+    .button:hover { background: #1d4ed8; }
+    .footer { text-align: center; font-size: 12px; color: #666; margin-top: 30px; }
+    .success { color: #16a34a; }
+    .error { color: #dc2626; }
+    .details { background: #f3f4f6; border-radius: 6px; padding: 15px; margin-top: 15px; }
+    .details p { margin: 5px 0; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1 class="{{statusClass}}">{{statusTitle}}</h1>
+    </div>
+    <div class="content">
+      <p>{{statusDescription}}</p>
+      {{detailsHtml}}
+      <p style="text-align: center;">
+        <a href="{{dashboardLink}}" class="button">Zobacz w panelu KSeF</a>
+      </p>
+    </div>
+    <div class="footer">
+      <p>To jest automatyczne powiadomienie z Accounting AI Agent.</p>
+    </div>
+  </div>
+</body>
+</html>
