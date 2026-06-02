@@ -4,7 +4,7 @@ This document describes the LangGraph-based single-agent architecture powering t
 
 ## Overview
 
-The system uses a **single LangGraph agent** with 55+ tools (up to 79 when all optional services are available). There is no multi-agent routing -- a single `StateGraph` with `agent` and `tools` nodes handles all user requests. The LLM decides which tools to call based on the user's message and the conversation history.
+The system uses a **single LangGraph agent** with 58 tools (up to 82 when all optional services are available). There is no multi-agent routing -- a single `StateGraph` with `agent` and `tools` nodes handles all user requests. The LLM decides which tools to call based on the user's message and the conversation history.
 
 **Recent additions (April 2026):**
 
@@ -29,7 +29,7 @@ The system uses a **single LangGraph agent** with 55+ tools (up to 79 when all o
 | File | Purpose |
 |------|---------|
 | `packages/api/src/services/ai-chat/ai-chat.service.ts` | Main service: conversation CRUD, `sendMessage`, `runAgent` |
-| `packages/api/src/services/ai-chat/tools/index.ts` | `createAllTools()` factory -- registers up to 79 tools |
+| `packages/api/src/services/ai-chat/tools/index.ts` | `createAllTools()` factory -- registers up to 82 tools |
 | `packages/api/src/services/ai-chat/tools/biala-lista.tools.ts` | Biała Lista MF White List bank-account verification tool |
 | `packages/api/src/services/ocr/receipt-ocr.service.ts` | Receipt OCR (OpenAI GPT-4o vision) — invoked from the Telegram photo handler |
 | `packages/api/src/services/ai-chat/constants.ts` | `getSystemPrompt()` builder |
@@ -108,7 +108,7 @@ flowchart TD
         G --> H[detectLocale from message text]
         H --> I[Load AI Context Memory<br/>buildMemoryPromptFragment]
         I --> J[Build system prompt<br/>base + language + tools + formatting<br/>+ professional + data accuracy<br/>+ error handling + tax data + memory]
-        J --> K[createAllTools<br/>55 base + 15 HR + 9 KSeF]
+        J --> K[createAllTools<br/>58 base + 15 HR + 9 KSeF]
         K --> L[Bind tools to LLM]
         L --> M[Build LangChain messages<br/>SystemMessage + history + HumanMessage]
         M --> N[graph.invoke<br/>recursionLimit: 25]
@@ -258,12 +258,13 @@ All tools are created by `createAllTools()` in `packages/api/src/services/ai-cha
 | `update_payment` | Update payment | `payment.tools.ts` |
 | `delete_payment` | Delete payment | `payment.tools.ts` |
 
-### Expenses (2 tools)
+### Expenses (3 tools)
 
 | Tool | Description | File |
 |------|-------------|------|
 | `get_expenses` | List expenses | `expense.tools.ts` |
 | `get_expense_details` | Get expense details | `expense.tools.ts` |
+| `create_expense_from_receipt` | Create an expense in wFirma from parsed receipt/OCR data (autofills contractor by NIP) | `expense.tools.ts` |
 
 ### Vehicles (5 tools)
 
@@ -315,6 +316,14 @@ No wFirma dependency — always available to all users.
 | Tool | Description | File |
 |------|-------------|------|
 | `get_tax_deadlines` | Get Polish statutory tax payment deadlines (VAT-7, CIT, PIT-4R, ZUS, VAT-UE, PCC, dividends) for a given period. Shifts to next business day on weekends/holidays. | `tax-calendar.tools.ts` |
+
+### Biała Lista / White List (1 tool)
+
+No wFirma dependency — always available to all users.
+
+| Tool | Description | File |
+|------|-------------|------|
+| `verify_bank_account_white_list` | Verify a contractor's bank account against the Polish Ministry of Finance White List (Biała Lista). Mandatory before any payment ≥ 15 000 PLN per Art. 117ba Ordynacji podatkowej. | `biala-lista.tools.ts` |
 
 ### Documents (4 tools)
 
@@ -382,18 +391,19 @@ Loaded when `ksefService` is available.
 | Invoices | 10 | No |
 | Users | 3 | No |
 | Payments | 5 | No |
-| Expenses | 2 | No |
+| Expenses | 3 | No |
 | Vehicles | 5 | No |
 | Terms | 5 | No |
 | Term Groups | 5 | No |
 | Declarations | 2 | No |
 | Tax Register / KPiR | 1 | No |
 | Tax Calendar | 1 | No |
+| Biała Lista (White List) | 1 | No |
 | Documents | 4 | No |
 | Ledger | 4 | No |
 | HR | 15 | Yes (hrService) |
 | KSeF | 9 | Yes (ksefService) |
-| **Total** | **80** | |
+| **Total** | **82** | |
 
 ---
 
@@ -551,7 +561,7 @@ buildMemoryPromptFragment(userId, 'en') -> memory context (or undefined)
 getSystemPrompt('en', memoryContext) -> full system prompt
         |
         v
-createAllTools(...) -> up to 79 tools bound to LLM (55 base + 15 HR + 9 KSeF)
+createAllTools(...) -> up to 82 tools bound to LLM (58 base + 15 HR + 9 KSeF)
         |
         v
 graph.invoke({ messages: [SystemMessage, HumanMessage] })

@@ -53,8 +53,8 @@ packages/web/src/
 │   ├── chat/                   # AI Chat components
 │   │   ├── ChatContainer.tsx
 │   │   ├── MessageList.tsx
-│   │   ├── MessageInput.tsx
-│   │   └── ChatMessage.tsx
+│   │   ├── ChatInput.tsx
+│   │   └── MessageBubble.tsx
 │   ├── dashboard/              # KPI dashboard components
 │   │   ├── SummaryCards.tsx
 │   │   ├── RevenueExpenseChart.tsx
@@ -500,7 +500,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
 
 import { useChat } from '@/hooks/useChat';
 import { MessageList } from './MessageList';
-import { MessageInput } from './MessageInput';
+import { ChatInput } from './ChatInput';
 
 export function ChatContainer() {
   const { messages, sendMessage, isLoading } = useChat();
@@ -508,7 +508,7 @@ export function ChatContainer() {
   return (
     <div className="flex flex-col h-full">
       <MessageList messages={messages} />
-      <MessageInput onSend={sendMessage} disabled={isLoading} />
+      <ChatInput onSend={sendMessage} disabled={isLoading} />
     </div>
   );
 }
@@ -517,15 +517,15 @@ export function ChatContainer() {
 ### Message Component
 
 ```tsx
-// components/chat/ChatMessage.tsx
+// components/chat/MessageBubble.tsx
 import ReactMarkdown from 'react-markdown';
 
-interface ChatMessageProps {
+interface MessageBubbleProps {
   role: 'user' | 'assistant';
   content: string;
 }
 
-export function ChatMessage({ role, content }: ChatMessageProps) {
+export function MessageBubble({ role, content }: MessageBubbleProps) {
   return (
     <div className={cn(
       'flex',
