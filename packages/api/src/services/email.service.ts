@@ -1,341 +1,44 @@
+import * as fs from 'fs';
+import * as path from 'path';
 import nodemailer, { Transporter } from 'nodemailer';
 import { logger } from '../utils/logger';
 
 // ============================================
-// EMAIL TEMPLATES
+// TEMPLATE LOADER
 // ============================================
 
-interface EmailTemplates {
-  subject: string;
-  html: string;
+const TEMPLATES_DIR = path.resolve(__dirname, '../../templates/email');
+const templateCache = new Map<string, string>();
+
+function loadTemplate(name: string, locale: string, vars: Record<string, string>): string {
+  const key = `${name}.${locale}`;
+  let tpl = templateCache.get(key);
+  if (!tpl) {
+    const filepath = path.join(TEMPLATES_DIR, `${key}.html`);
+    tpl = fs.readFileSync(filepath, 'utf-8');
+    templateCache.set(key, tpl);
+  }
+  return tpl.replace(/\{\{(\w+)\}\}/g, (_, k: string) => vars[k] ?? '');
 }
 
-const getWelcomeEmailTemplate = (
-  firstName: string,
-  loginLink: string,
-  locale: string = 'en'
-): EmailTemplates => {
-  const templates: Record<string, EmailTemplates> = {
-    en: {
-      subject: 'Welcome to Accounting AI Agent!',
-      html: `
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Welcome</title>
-  <style>
-    body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; }
-    .container { background: #f9f9f9; border-radius: 8px; padding: 30px; }
-    .header { text-align: center; margin-bottom: 30px; }
-    .header h1 { color: #2563eb; margin: 0; }
-    .content { background: #fff; border-radius: 8px; padding: 20px; margin-bottom: 20px; }
-    .button { display: inline-block; background: #2563eb; color: #fff !important; text-decoration: none; padding: 12px 30px; border-radius: 6px; margin: 20px 0; }
-    .button:hover { background: #1d4ed8; }
-    .footer { text-align: center; font-size: 12px; color: #666; margin-top: 30px; }
-    .features { background: #eff6ff; border-radius: 6px; padding: 15px; margin-top: 20px; }
-    .features ul { margin: 10px 0; padding-left: 20px; }
-    .features li { margin: 8px 0; }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <div class="header">
-      <h1>Welcome to Accounting AI Agent!</h1>
-    </div>
-    <div class="content">
-      <p>Hello ${firstName},</p>
-      <p>Thank you for registering! Your account has been successfully created.</p>
-      <p>You are now logged in and can start using all the features of the platform.</p>
-      <div class="features">
-        <strong>What you can do:</strong>
-        <ul>
-          <li>Chat with AI assistant about accounting and finance</li>
-          <li>Manage invoices and contractors via wFirma integration</li>
-          <li>Generate financial reports and documents</li>
-          <li>Get AI-powered recommendations for your business</li>
-        </ul>
-      </div>
-      <p style="text-align: center;">
-        <a href="${loginLink}" class="button">Go to Dashboard</a>
-      </p>
-    </div>
-    <div class="footer">
-      <p>If you have any questions, feel free to use the chat feature in the application.</p>
-      <p>This is an automated message from Accounting AI Agent.</p>
-    </div>
-  </div>
-</body>
-</html>
-      `,
-    },
-    pl: {
-      subject: 'Witamy w Accounting AI Agent!',
-      html: `
-<!DOCTYPE html>
-<html lang="pl">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Witamy</title>
-  <style>
-    body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; }
-    .container { background: #f9f9f9; border-radius: 8px; padding: 30px; }
-    .header { text-align: center; margin-bottom: 30px; }
-    .header h1 { color: #2563eb; margin: 0; }
-    .content { background: #fff; border-radius: 8px; padding: 20px; margin-bottom: 20px; }
-    .button { display: inline-block; background: #2563eb; color: #fff !important; text-decoration: none; padding: 12px 30px; border-radius: 6px; margin: 20px 0; }
-    .button:hover { background: #1d4ed8; }
-    .footer { text-align: center; font-size: 12px; color: #666; margin-top: 30px; }
-    .features { background: #eff6ff; border-radius: 6px; padding: 15px; margin-top: 20px; }
-    .features ul { margin: 10px 0; padding-left: 20px; }
-    .features li { margin: 8px 0; }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <div class="header">
-      <h1>Witamy w Accounting AI Agent!</h1>
-    </div>
-    <div class="content">
-      <p>Czesc ${firstName},</p>
-      <p>Dziekujemy za rejestracje! Twoje konto zostalo pomyslnie utworzone.</p>
-      <p>Jestes teraz zalogowany i mozesz korzystac ze wszystkich funkcji platformy.</p>
-      <div class="features">
-        <strong>Co mozesz robic:</strong>
-        <ul>
-          <li>Rozmawiac z asystentem AI o ksiegowosci i finansach</li>
-          <li>Zarzadzac fakturami i kontrahentami przez integracje z wFirma</li>
-          <li>Generowac raporty finansowe i dokumenty</li>
-          <li>Otrzymywac rekomendacje AI dla Twojej firmy</li>
-        </ul>
-      </div>
-      <p style="text-align: center;">
-        <a href="${loginLink}" class="button">Przejdz do panelu</a>
-      </p>
-    </div>
-    <div class="footer">
-      <p>Jesli masz pytania, skorzystaj z funkcji czatu w aplikacji.</p>
-      <p>To jest automatyczna wiadomosc z Accounting AI Agent.</p>
-    </div>
-  </div>
-</body>
-</html>
-      `,
-    },
-    ru: {
-      subject: 'Добро пожаловать в Accounting AI Agent!',
-      html: `
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Добро пожаловать</title>
-  <style>
-    body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; }
-    .container { background: #f9f9f9; border-radius: 8px; padding: 30px; }
-    .header { text-align: center; margin-bottom: 30px; }
-    .header h1 { color: #2563eb; margin: 0; }
-    .content { background: #fff; border-radius: 8px; padding: 20px; margin-bottom: 20px; }
-    .button { display: inline-block; background: #2563eb; color: #fff !important; text-decoration: none; padding: 12px 30px; border-radius: 6px; margin: 20px 0; }
-    .button:hover { background: #1d4ed8; }
-    .footer { text-align: center; font-size: 12px; color: #666; margin-top: 30px; }
-    .features { background: #eff6ff; border-radius: 6px; padding: 15px; margin-top: 20px; }
-    .features ul { margin: 10px 0; padding-left: 20px; }
-    .features li { margin: 8px 0; }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <div class="header">
-      <h1>Добро пожаловать в Accounting AI Agent!</h1>
-    </div>
-    <div class="content">
-      <p>Здравствуйте, ${firstName}!</p>
-      <p>Спасибо за регистрацию! Ваш аккаунт успешно создан.</p>
-      <p>Вы уже вошли в систему и можете использовать все функции платформы.</p>
-      <div class="features">
-        <strong>Что вы можете делать:</strong>
-        <ul>
-          <li>Общаться с AI-ассистентом по вопросам бухгалтерии и финансов</li>
-          <li>Управлять счетами и контрагентами через интеграцию с wFirma</li>
-          <li>Генерировать финансовые отчёты и документы</li>
-          <li>Получать AI-рекомендации для вашего бизнеса</li>
-        </ul>
-      </div>
-      <p style="text-align: center;">
-        <a href="${loginLink}" class="button">Перейти в панель</a>
-      </p>
-    </div>
-    <div class="footer">
-      <p>Если у вас есть вопросы, используйте функцию чата в приложении.</p>
-      <p>Это автоматическое сообщение от Accounting AI Agent.</p>
-    </div>
-  </div>
-</body>
-</html>
-      `,
-    },
-  };
+// ============================================
+// TEMPLATE SUBJECTS
+// ============================================
 
-  return templates[locale] || templates['en'];
+const welcomeSubjects: Record<string, string> = {
+  en: 'Welcome to Accounting AI Agent!',
+  pl: 'Witamy w Accounting AI Agent!',
+  ru: 'Добро пожаловать в Accounting AI Agent!',
 };
 
-const getPasswordResetEmailTemplate = (
-  resetLink: string,
-  locale: string = 'en'
-): EmailTemplates => {
-  const templates: Record<string, EmailTemplates> = {
-    en: {
-      subject: 'Password Reset Request',
-      html: `
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Password Reset</title>
-  <style>
-    body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; }
-    .container { background: #f9f9f9; border-radius: 8px; padding: 30px; }
-    .header { text-align: center; margin-bottom: 30px; }
-    .header h1 { color: #2563eb; margin: 0; }
-    .content { background: #fff; border-radius: 8px; padding: 20px; margin-bottom: 20px; }
-    .button { display: inline-block; background: #2563eb; color: #fff !important; text-decoration: none; padding: 12px 30px; border-radius: 6px; margin: 20px 0; }
-    .button:hover { background: #1d4ed8; }
-    .footer { text-align: center; font-size: 12px; color: #666; margin-top: 30px; }
-    .warning { background: #fef3c7; border: 1px solid #f59e0b; border-radius: 6px; padding: 15px; margin-top: 20px; }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <div class="header">
-      <h1>Password Reset</h1>
-    </div>
-    <div class="content">
-      <p>Hello,</p>
-      <p>We received a request to reset your password for your Accounting AI Agent account.</p>
-      <p>Click the button below to reset your password:</p>
-      <p style="text-align: center;">
-        <a href="${resetLink}" class="button">Reset Password</a>
-      </p>
-      <p>Or copy and paste this link into your browser:</p>
-      <p style="word-break: break-all; color: #2563eb;">${resetLink}</p>
-      <div class="warning">
-        <strong>Important:</strong> This link will expire in 1 hour. If you did not request a password reset, please ignore this email or contact support if you have concerns.
-      </div>
-    </div>
-    <div class="footer">
-      <p>This is an automated message from Accounting AI Agent. Please do not reply to this email.</p>
-    </div>
-  </div>
-</body>
-</html>
-      `,
-    },
-    pl: {
-      subject: 'Prosby o zresetowanie hasla',
-      html: `
-<!DOCTYPE html>
-<html lang="pl">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Resetowanie hasla</title>
-  <style>
-    body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; }
-    .container { background: #f9f9f9; border-radius: 8px; padding: 30px; }
-    .header { text-align: center; margin-bottom: 30px; }
-    .header h1 { color: #2563eb; margin: 0; }
-    .content { background: #fff; border-radius: 8px; padding: 20px; margin-bottom: 20px; }
-    .button { display: inline-block; background: #2563eb; color: #fff !important; text-decoration: none; padding: 12px 30px; border-radius: 6px; margin: 20px 0; }
-    .button:hover { background: #1d4ed8; }
-    .footer { text-align: center; font-size: 12px; color: #666; margin-top: 30px; }
-    .warning { background: #fef3c7; border: 1px solid #f59e0b; border-radius: 6px; padding: 15px; margin-top: 20px; }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <div class="header">
-      <h1>Resetowanie hasla</h1>
-    </div>
-    <div class="content">
-      <p>Czesc,</p>
-      <p>Otrzymalismy prosbe o zresetowanie hasla do Twojego konta Accounting AI Agent.</p>
-      <p>Kliknij przycisk ponizej, aby zresetowac haslo:</p>
-      <p style="text-align: center;">
-        <a href="${resetLink}" class="button">Zresetuj haslo</a>
-      </p>
-      <p>Lub skopiuj i wklej ten link do przegladarki:</p>
-      <p style="word-break: break-all; color: #2563eb;">${resetLink}</p>
-      <div class="warning">
-        <strong>Wazne:</strong> Ten link wygasnie za 1 godzine. Jesli nie prosiles o zresetowanie hasla, zignoruj ten e-mail lub skontaktuj sie z obsluga, jesli masz jakies watpliwosci.
-      </div>
-    </div>
-    <div class="footer">
-      <p>To jest automatyczna wiadomosc z Accounting AI Agent. Prosimy nie odpowiadac na tego e-maila.</p>
-    </div>
-  </div>
-</body>
-</html>
-      `,
-    },
-    ru: {
-      subject: 'Запрос на сброс пароля',
-      html: `
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Сброс пароля</title>
-  <style>
-    body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; }
-    .container { background: #f9f9f9; border-radius: 8px; padding: 30px; }
-    .header { text-align: center; margin-bottom: 30px; }
-    .header h1 { color: #2563eb; margin: 0; }
-    .content { background: #fff; border-radius: 8px; padding: 20px; margin-bottom: 20px; }
-    .button { display: inline-block; background: #2563eb; color: #fff !important; text-decoration: none; padding: 12px 30px; border-radius: 6px; margin: 20px 0; }
-    .button:hover { background: #1d4ed8; }
-    .footer { text-align: center; font-size: 12px; color: #666; margin-top: 30px; }
-    .warning { background: #fef3c7; border: 1px solid #f59e0b; border-radius: 6px; padding: 15px; margin-top: 20px; }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <div class="header">
-      <h1>Сброс пароля</h1>
-    </div>
-    <div class="content">
-      <p>Здравствуйте,</p>
-      <p>Мы получили запрос на сброс пароля для вашей учётной записи Accounting AI Agent.</p>
-      <p>Нажмите кнопку ниже, чтобы сбросить пароль:</p>
-      <p style="text-align: center;">
-        <a href="${resetLink}" class="button">Сбросить пароль</a>
-      </p>
-      <p>Или скопируйте и вставьте эту ссылку в браузер:</p>
-      <p style="word-break: break-all; color: #2563eb;">${resetLink}</p>
-      <div class="warning">
-        <strong>Важно:</strong> Эта ссылка истечёт через 1 час. Если вы не запрашивали сброс пароля, проигнорируйте это письмо или свяжитесь с поддержкой, если у вас есть вопросы.
-      </div>
-    </div>
-    <div class="footer">
-      <p>Это автоматическое сообщение от Accounting AI Agent. Пожалуйста, не отвечайте на это письмо.</p>
-    </div>
-  </div>
-</body>
-</html>
-      `,
-    },
-  };
-
-  return templates[locale] || templates['en'];
+const passwordResetSubjects: Record<string, string> = {
+  en: 'Password Reset Request',
+  pl: 'Prosby o zresetowanie hasla',
+  ru: 'Запрос на сброс пароля',
 };
 
 // ============================================
-// KSeF NOTIFICATION TEMPLATE
+// KSeF NOTIFICATION INTERFACE + HELPERS
 // ============================================
 
 export interface KSeFNotificationParams {
@@ -347,107 +50,54 @@ export interface KSeFNotificationParams {
   dashboardLink: string;
 }
 
-const emailStyles = `
-  body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; }
-  .container { background: #f9f9f9; border-radius: 8px; padding: 30px; }
-  .header { text-align: center; margin-bottom: 30px; }
-  .header h1 { margin: 0; }
-  .content { background: #fff; border-radius: 8px; padding: 20px; margin-bottom: 20px; }
-  .button { display: inline-block; background: #2563eb; color: #fff !important; text-decoration: none; padding: 12px 30px; border-radius: 6px; margin: 20px 0; }
-  .button:hover { background: #1d4ed8; }
-  .footer { text-align: center; font-size: 12px; color: #666; margin-top: 30px; }
-  .success { color: #16a34a; }
-  .error { color: #dc2626; }
-  .details { background: #f3f4f6; border-radius: 6px; padding: 15px; margin-top: 15px; }
-  .details p { margin: 5px 0; }
-`;
-
-const getKSeFNotificationTemplate = (
-  params: KSeFNotificationParams,
-  locale: string = 'en'
-): EmailTemplates => {
-  const { invoiceNumber, status, referenceNumber, errorCode, errorMessage, dashboardLink } = params;
+function buildKSeFLocale(locale: string, params: KSeFNotificationParams) {
+  const { invoiceNumber, status, referenceNumber, errorCode, errorMessage } = params;
   const isAccepted = status === 'accepted';
+
+  const labels = {
+    invoiceNumber: locale === 'pl' ? 'Numer faktury' : locale === 'ru' ? 'Номер счёта' : 'Invoice number',
+    ksefRef: locale === 'pl' ? 'Numer referencyjny KSeF' : locale === 'ru' ? 'Референс KSeF' : 'KSeF reference',
+    errorCode: locale === 'pl' ? 'Kod bledu' : locale === 'ru' ? 'Код ошибки' : 'Error code',
+    reason: locale === 'pl' ? 'Przyczyna' : locale === 'ru' ? 'Причина' : 'Reason',
+  };
 
   const detailsHtml = `
     <div class="details">
-      <p><strong>${isAccepted ? (locale === 'pl' ? 'Numer faktury' : locale === 'ru' ? 'Номер счёта' : 'Invoice number') : (locale === 'pl' ? 'Numer faktury' : locale === 'ru' ? 'Номер счёта' : 'Invoice number')}:</strong> ${invoiceNumber}</p>
-      ${referenceNumber ? `<p><strong>${locale === 'pl' ? 'Numer referencyjny KSeF' : locale === 'ru' ? 'Референс KSeF' : 'KSeF reference'}:</strong> ${referenceNumber}</p>` : ''}
-      ${!isAccepted && errorCode ? `<p><strong>${locale === 'pl' ? 'Kod bledu' : locale === 'ru' ? 'Код ошибки' : 'Error code'}:</strong> ${errorCode}</p>` : ''}
-      ${!isAccepted && errorMessage ? `<p><strong>${locale === 'pl' ? 'Przyczyna' : locale === 'ru' ? 'Причина' : 'Reason'}:</strong> ${errorMessage}</p>` : ''}
+      <p><strong>${labels.invoiceNumber}:</strong> ${invoiceNumber}</p>
+      ${referenceNumber ? `<p><strong>${labels.ksefRef}:</strong> ${referenceNumber}</p>` : ''}
+      ${!isAccepted && errorCode ? `<p><strong>${labels.errorCode}:</strong> ${errorCode}</p>` : ''}
+      ${!isAccepted && errorMessage ? `<p><strong>${labels.reason}:</strong> ${errorMessage}</p>` : ''}
     </div>`;
 
-  const templates: Record<string, EmailTemplates> = {
-    en: {
-      subject: isAccepted
-        ? `KSeF: Invoice ${invoiceNumber} accepted`
-        : `KSeF: Invoice ${invoiceNumber} rejected`,
-      html: `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>KSeF Notification</title><style>${emailStyles}</style></head><body>
-  <div class="container">
-    <div class="header">
-      <h1 class="${isAccepted ? 'success' : 'error'}">${isAccepted ? 'Invoice Accepted' : 'Invoice Rejected'}</h1>
-    </div>
-    <div class="content">
-      <p>Your invoice <strong>${invoiceNumber}</strong> has been <strong>${isAccepted ? 'accepted' : 'rejected'}</strong> by KSeF.</p>
-      ${detailsHtml}
-      <p style="text-align: center;">
-        <a href="${dashboardLink}" class="button">View in KSeF Dashboard</a>
-      </p>
-    </div>
-    <div class="footer">
-      <p>This is an automated notification from Accounting AI Agent.</p>
-    </div>
-  </div>
-</body></html>`,
-    },
-    pl: {
-      subject: isAccepted
-        ? `KSeF: Faktura ${invoiceNumber} zaakceptowana`
-        : `KSeF: Faktura ${invoiceNumber} odrzucona`,
-      html: `<!DOCTYPE html><html lang="pl"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Powiadomienie KSeF</title><style>${emailStyles}</style></head><body>
-  <div class="container">
-    <div class="header">
-      <h1 class="${isAccepted ? 'success' : 'error'}">${isAccepted ? 'Faktura zaakceptowana' : 'Faktura odrzucona'}</h1>
-    </div>
-    <div class="content">
-      <p>Twoja faktura <strong>${invoiceNumber}</strong> zostala <strong>${isAccepted ? 'zaakceptowana' : 'odrzucona'}</strong> przez KSeF.</p>
-      ${detailsHtml}
-      <p style="text-align: center;">
-        <a href="${dashboardLink}" class="button">Zobacz w panelu KSeF</a>
-      </p>
-    </div>
-    <div class="footer">
-      <p>To jest automatyczne powiadomienie z Accounting AI Agent.</p>
-    </div>
-  </div>
-</body></html>`,
-    },
-    ru: {
-      subject: isAccepted
-        ? `KSeF: Счёт ${invoiceNumber} принят`
-        : `KSeF: Счёт ${invoiceNumber} отклонён`,
-      html: `<!DOCTYPE html><html lang="ru"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Уведомление KSeF</title><style>${emailStyles}</style></head><body>
-  <div class="container">
-    <div class="header">
-      <h1 class="${isAccepted ? 'success' : 'error'}">${isAccepted ? 'Счёт принят' : 'Счёт отклонён'}</h1>
-    </div>
-    <div class="content">
-      <p>Ваш счёт <strong>${invoiceNumber}</strong> был <strong>${isAccepted ? 'принят' : 'отклонён'}</strong> системой KSeF.</p>
-      ${detailsHtml}
-      <p style="text-align: center;">
-        <a href="${dashboardLink}" class="button">Открыть панель KSeF</a>
-      </p>
-    </div>
-    <div class="footer">
-      <p>Это автоматическое уведомление от Accounting AI Agent.</p>
-    </div>
-  </div>
-</body></html>`,
-    },
+  const subjects: Record<string, { accepted: string; rejected: string }> = {
+    en: { accepted: `KSeF: Invoice ${invoiceNumber} accepted`, rejected: `KSeF: Invoice ${invoiceNumber} rejected` },
+    pl: { accepted: `KSeF: Faktura ${invoiceNumber} zaakceptowana`, rejected: `KSeF: Faktura ${invoiceNumber} odrzucona` },
+    ru: { accepted: `KSeF: Счёт ${invoiceNumber} принят`, rejected: `KSeF: Счёт ${invoiceNumber} отклонён` },
   };
 
-  return templates[locale] || templates['en'];
-};
+  const titles: Record<string, { accepted: string; rejected: string }> = {
+    en: { accepted: 'Invoice Accepted', rejected: 'Invoice Rejected' },
+    pl: { accepted: 'Faktura zaakceptowana', rejected: 'Faktura odrzucona' },
+    ru: { accepted: 'Счёт принят', rejected: 'Счёт отклонён' },
+  };
+
+  const descriptions: Record<string, { accepted: string; rejected: string }> = {
+    en: { accepted: `Your invoice <strong>${invoiceNumber}</strong> has been <strong>accepted</strong> by KSeF.`, rejected: `Your invoice <strong>${invoiceNumber}</strong> has been <strong>rejected</strong> by KSeF.` },
+    pl: { accepted: `Twoja faktura <strong>${invoiceNumber}</strong> zostala <strong>zaakceptowana</strong> przez KSeF.`, rejected: `Twoja faktura <strong>${invoiceNumber}</strong> zostala <strong>odrzucona</strong> przez KSeF.` },
+    ru: { accepted: `Ваш счёт <strong>${invoiceNumber}</strong> был <strong>принят</strong> системой KSeF.`, rejected: `Ваш счёт <strong>${invoiceNumber}</strong> был <strong>отклонён</strong> системой KSeF.` },
+  };
+
+  const lang = subjects[locale] ? locale : 'en';
+  const key = isAccepted ? 'accepted' : 'rejected';
+
+  return {
+    subject: subjects[lang][key],
+    statusClass: isAccepted ? 'success' : 'error',
+    statusTitle: titles[lang][key],
+    statusDescription: descriptions[lang][key],
+    detailsHtml,
+  };
+}
 
 // ============================================
 // EMAIL SERVICE
@@ -475,9 +125,6 @@ export class EmailService {
     this.initializeTransporter();
   }
 
-  /**
-   * Initialize Nodemailer transporter
-   */
   private initializeTransporter(): void {
     if (!this.smtpHost || !this.smtpUser || !this.smtpPass) {
       logger.warn('SMTP configuration is incomplete. Email sending will be disabled.');
@@ -495,7 +142,6 @@ export class EmailService {
         },
       });
 
-      // Verify connection
       this.transporter.verify((error: Error | null) => {
         if (error) {
           logger.error('SMTP connection verification failed', { error: error.message });
@@ -508,17 +154,10 @@ export class EmailService {
     }
   }
 
-  /**
-   * Check if email service is configured and ready
-   */
   isConfigured(): boolean {
     return this.transporter !== null;
   }
 
-  /**
-   * Send password reset email
-   * Returns { sent, reason? } — reason is only set on failure
-   */
   async sendPasswordResetEmail(
     email: string,
     resetToken: string,
@@ -536,22 +175,17 @@ export class EmailService {
 
     try {
       const resetLink = `${this.frontendUrl}/reset-password?token=${resetToken}`;
-      const template = getPasswordResetEmailTemplate(resetLink, locale);
+      const lang = passwordResetSubjects[locale] ? locale : 'en';
+      const html = loadTemplate('password-reset', lang, { resetLink });
 
-      const mailOptions = {
+      const result = await this.transporter.sendMail({
         from: `"${this.fromName}" <${this.fromEmail}>`,
         to: email,
-        subject: template.subject,
-        html: template.html,
-      };
-
-      const result = await this.transporter.sendMail(mailOptions);
-
-      logger.info('Password reset email sent successfully', {
-        email,
-        messageId: result.messageId,
+        subject: passwordResetSubjects[lang],
+        html,
       });
 
+      logger.info('Password reset email sent successfully', { email, messageId: result.messageId });
       return { sent: true };
     } catch (error) {
       const reason = error instanceof Error ? error.message : 'Unknown SMTP error';
@@ -560,9 +194,6 @@ export class EmailService {
     }
   }
 
-  /**
-   * Send welcome email after successful registration
-   */
   async sendWelcomeEmail(
     email: string,
     firstName: string,
@@ -575,22 +206,17 @@ export class EmailService {
 
     try {
       const loginLink = `${this.frontendUrl}/chat`;
-      const template = getWelcomeEmailTemplate(firstName, loginLink, locale);
+      const lang = welcomeSubjects[locale] ? locale : 'en';
+      const html = loadTemplate('welcome', lang, { firstName, loginLink });
 
-      const mailOptions = {
+      const result = await this.transporter.sendMail({
         from: `"${this.fromName}" <${this.fromEmail}>`,
         to: email,
-        subject: template.subject,
-        html: template.html,
-      };
-
-      const result = await this.transporter.sendMail(mailOptions);
-
-      logger.info('Welcome email sent successfully', {
-        email,
-        messageId: result.messageId,
+        subject: welcomeSubjects[lang],
+        html,
       });
 
+      logger.info('Welcome email sent successfully', { email, messageId: result.messageId });
       return true;
     } catch (error) {
       logger.error('Failed to send welcome email', {
@@ -601,9 +227,6 @@ export class EmailService {
     }
   }
 
-  /**
-   * Send KSeF invoice status notification email
-   */
   async sendKSeFNotification(
     email: string,
     params: KSeFNotificationParams,
@@ -615,16 +238,23 @@ export class EmailService {
     }
 
     try {
-      const template = getKSeFNotificationTemplate(params, locale);
+      const lang = ['en', 'pl', 'ru'].includes(locale) ? locale : 'en';
+      const { subject, statusClass, statusTitle, statusDescription, detailsHtml } =
+        buildKSeFLocale(lang, params);
+      const html = loadTemplate('ksef-notification', lang, {
+        statusClass,
+        statusTitle,
+        statusDescription,
+        detailsHtml,
+        dashboardLink: params.dashboardLink,
+      });
 
-      const mailOptions = {
+      const result = await this.transporter.sendMail({
         from: `"${this.fromName}" <${this.fromEmail}>`,
         to: email,
-        subject: template.subject,
-        html: template.html,
-      };
-
-      const result = await this.transporter.sendMail(mailOptions);
+        subject,
+        html,
+      });
 
       logger.info('KSeF notification email sent', {
         email,
@@ -632,7 +262,6 @@ export class EmailService {
         status: params.status,
         messageId: result.messageId,
       });
-
       return true;
     } catch (error) {
       logger.error('Failed to send KSeF notification email', {
@@ -645,5 +274,4 @@ export class EmailService {
   }
 }
 
-// Export singleton instance
 export const emailService = new EmailService();

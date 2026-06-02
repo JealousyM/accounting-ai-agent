@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Witamy</title>
+  <style>
+    body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; }
+    .container { background: #f9f9f9; border-radius: 8px; padding: 30px; }
+    .header { text-align: center; margin-bottom: 30px; }
+    .header h1 { color: #2563eb; margin: 0; }
+    .content { background: #fff; border-radius: 8px; padding: 20px; margin-bottom: 20px; }
+    .button { display: inline-block; background: #2563eb; color: #fff !important; text-decoration: none; padding: 12px 30px; border-radius: 6px; margin: 20px 0; }
+    .button:hover { background: #1d4ed8; }
+    .footer { text-align: center; font-size: 12px; color: #666; margin-top: 30px; }
+    .features { background: #eff6ff; border-radius: 6px; padding: 15px; margin-top: 20px; }
+    .features ul { margin: 10px 0; padding-left: 20px; }
+    .features li { margin: 8px 0; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Witamy w Accounting AI Agent!</h1>
+    </div>
+    <div class="content">
+      <p>Czesc {{firstName}},</p>
+      <p>Dziekujemy za rejestracje! Twoje konto zostalo pomyslnie utworzone.</p>
+      <p>Jestes teraz zalogowany i mozesz korzystac ze wszystkich funkcji platformy.</p>
+      <div class="features">
+        <strong>Co mozesz robic:</strong>
+        <ul>
+          <li>Rozmawiac z asystentem AI o ksiegowosci i finansach</li>
+          <li>Zarzadzac fakturami i kontrahentami przez integracje z wFirma</li>
+          <li>Generowac raporty finansowe i dokumenty</li>
+          <li>Otrzymywac rekomendacje AI dla Twojej firmy</li>
+        </ul>
+      </div>
+      <p style="text-align: center;">
+        <a href="{{loginLink}}" class="button">Przejdz do panelu</a>
+      </p>
+    </div>
+    <div class="footer">
+      <p>Jesli masz pytania, skorzystaj z funkcji czatu w aplikacji.</p>
+      <p>To jest automatyczna wiadomosc z Accounting AI Agent.</p>
+    </div>
+  </div>
+</body>
+</html>
