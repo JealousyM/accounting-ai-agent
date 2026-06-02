@@ -3,7 +3,7 @@
  * LangChain tools for document operations with file download support
  */
 
-import { DynamicStructuredTool, StructuredToolInterface } from '@langchain/core/tools';
+import { tool, StructuredToolInterface } from '@langchain/core/tools';
 import { z } from 'zod';
 import { logger } from '../../../utils/logger';
 import { getDocumentTranslations, Locale } from '../../../i18n';
@@ -29,33 +29,8 @@ export function createGetDocumentsTool(
   locale: Locale,
   subscriptionService?: SubscriptionService
 ): StructuredToolInterface {
-  return new DynamicStructuredTool({
-    name: 'get_documents',
-    description:
-      'Get list of documents from wFirma. Can filter by type (file/document_template/url), set (book/crm/declaration/staff/warehouse), related object (objectName + objectId), or search by name. Returns a table with document names, types, and download icons for files.',
-    schema: z.object({
-      objectName: z
-        .string()
-        .nullable().optional()
-        .describe(
-          'Filter by related object type (e.g., invoice, expense, contractor)'
-        ),
-      objectId: z.string().nullable().optional().describe('Filter by related object ID'),
-      type: z
-        .enum(['file', 'document_template', 'url'])
-        .nullable().optional()
-        .describe('Filter by document type'),
-      set: z
-        .enum(['book', 'crm', 'declaration', 'staff', 'warehouse'])
-        .nullable().optional()
-        .describe('Filter by document set/category'),
-      search: z.string().nullable().optional().describe('Search in document name'),
-      limit: z
-        .number()
-        .nullable().optional()
-        .describe('Maximum number of results (default 50)'),
-    }),
-    func: async ({
+  return (tool as any)(
+    async ({
       objectName,
       objectId,
       type,
@@ -93,8 +68,34 @@ export function createGetDocumentsTool(
         return `Error: ${t.errorFetch}`;
       }
     },
-  });
-
+    {
+      name: 'get_documents',
+      description:
+        'Get list of documents from wFirma. Can filter by type (file/document_template/url), set (book/crm/declaration/staff/warehouse), related object (objectName + objectId), or search by name. Returns a table with document names, types, and download icons for files.',
+      schema: z.object({
+        objectName: z
+          .string()
+          .nullable().optional()
+          .describe(
+            'Filter by related object type (e.g., invoice, expense, contractor)'
+          ),
+        objectId: z.string().nullable().optional().describe('Filter by related object ID'),
+        type: z
+          .enum(['file', 'document_template', 'url'])
+          .nullable().optional()
+          .describe('Filter by document type'),
+        set: z
+          .enum(['book', 'crm', 'declaration', 'staff', 'warehouse'])
+          .nullable().optional()
+          .describe('Filter by document set/category'),
+        search: z.string().nullable().optional().describe('Search in document name'),
+        limit: z
+          .number()
+          .nullable().optional()
+          .describe('Maximum number of results (default 50)'),
+      }),
+    }
+  );
 }
 
 /**
@@ -106,20 +107,8 @@ export function createGetDocumentDetailsTool(
   locale: Locale,
   subscriptionService?: SubscriptionService
 ): StructuredToolInterface {
-  return new DynamicStructuredTool({
-    name: 'get_document_details',
-    description:
-      'Get detailed information about a specific document by ID. If prepareDownload is true and document is a file, returns a download link. Use this when user wants to see document details or download a specific document.',
-    schema: z.object({
-      documentId: z.string().describe('Document ID from wFirma'),
-      prepareDownload: z
-        .boolean()
-        .nullable().optional()
-        .describe(
-          'Set to true to prepare file for download (only works for type=file)'
-        ),
-    }),
-    func: async ({
+  return (tool as any)(
+    async ({
       documentId,
       prepareDownload,
     }: {
@@ -182,8 +171,21 @@ export function createGetDocumentDetailsTool(
         return `Error: ${t.errorFetchDetails}`;
       }
     },
-  });
-
+    {
+      name: 'get_document_details',
+      description:
+        'Get detailed information about a specific document by ID. If prepareDownload is true and document is a file, returns a download link. Use this when user wants to see document details or download a specific document.',
+      schema: z.object({
+        documentId: z.string().describe('Document ID from wFirma'),
+        prepareDownload: z
+          .boolean()
+          .nullable().optional()
+          .describe(
+            'Set to true to prepare file for download (only works for type=file)'
+          ),
+      }),
+    }
+  );
 }
 
 /**
@@ -195,14 +197,8 @@ export function createDownloadDocumentTool(
   locale: Locale,
   subscriptionService?: SubscriptionService
 ): StructuredToolInterface {
-  return new DynamicStructuredTool({
-    name: 'download_document',
-    description:
-      'Download a document file from wFirma and get a temporary download link. Only works for documents with type=file. Use this when user wants to download a document file.',
-    schema: z.object({
-      documentId: z.string().describe('Document ID to download'),
-    }),
-    func: async ({ documentId }: { documentId: string }) => {
+  return (tool as any)(
+    async ({ documentId }: { documentId: string }) => {
       try {
         const limitError = await checkWFirmaLimit(subscriptionService, userId, locale);
         if (limitError) return limitError;
@@ -252,8 +248,15 @@ export function createDownloadDocumentTool(
         return `Error: ${t.errorDownload}`;
       }
     },
-  });
-
+    {
+      name: 'download_document',
+      description:
+        'Download a document file from wFirma and get a temporary download link. Only works for documents with type=file. Use this when user wants to download a document file.',
+      schema: z.object({
+        documentId: z.string().describe('Document ID to download'),
+      }),
+    }
+  );
 }
 
 /**
@@ -266,14 +269,8 @@ export function createDeleteDocumentTool(
   locale: Locale,
   subscriptionService?: SubscriptionService
 ): StructuredToolInterface {
-  return new DynamicStructuredTool({
-    name: 'delete_document',
-    description:
-      'Delete a document from wFirma. WARNING: This action cannot be undone. Use this when user explicitly wants to delete a document.',
-    schema: z.object({
-      documentId: z.string().describe('Document ID to delete'),
-    }),
-    func: async ({ documentId }: { documentId: string }) => {
+  return (tool as any)(
+    async ({ documentId }: { documentId: string }) => {
       try {
         const limitError = await checkWFirmaLimit(subscriptionService, userId, locale);
         if (limitError) return limitError;
@@ -305,6 +302,13 @@ export function createDeleteDocumentTool(
         return `Error: ${t.errorDelete}`;
       }
     },
-  });
-
+    {
+      name: 'delete_document',
+      description:
+        'Delete a document from wFirma. WARNING: This action cannot be undone. Use this when user explicitly wants to delete a document.',
+      schema: z.object({
+        documentId: z.string().describe('Document ID to delete'),
+      }),
+    }
+  );
 }

@@ -3,7 +3,7 @@
  * LangChain tools for fetching user and user-company information from wFirma
  */
 
-import { DynamicStructuredTool, StructuredToolInterface } from '@langchain/core/tools';
+import { tool, StructuredToolInterface } from '@langchain/core/tools';
 import { z } from 'zod';
 import { logger } from '../../../utils/logger';
 import { WFirmaUser, WFirmaUserCompany } from '../../../types/wfirma.types';
@@ -30,11 +30,9 @@ export function createGetUsersTool(
 ): StructuredToolInterface {
   const t = getUserTranslations(locale);
 
-  return new DynamicStructuredTool({
-    name: 'get_users',
-    description: 'Get list of users with access to the wFirma company. Shows names, emails, logins, roles, active status. Use when user asks about company users or who has access.',
-    schema: z.object({}),
-    func: async () => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (tool as any)(
+    async () => {
       try {
         const limitError = await checkWFirmaLimit(subscriptionService, userId, locale);
         if (limitError) return limitError;
@@ -59,8 +57,12 @@ export function createGetUsersTool(
         return `Error: ${t.errorFetchUsers}`;
       }
     },
-  });
-
+    {
+      name: 'get_users',
+      description: 'Get list of users with access to the wFirma company. Shows names, emails, logins, roles, active status. Use when user asks about company users or who has access.',
+      schema: z.object({}),
+    }
+  );
 }
 
 /**
@@ -75,14 +77,9 @@ export function createGetUserCompaniesTool(
 ): StructuredToolInterface {
   const t = getUserTranslations(locale);
 
-  return new DynamicStructuredTool({
-    name: 'get_user_companies',
-    description: 'Get user-company relationships showing which users have access to which companies with their roles and permissions. Use when user asks about user access or permissions.',
-    schema: z.object({
-      limit: z.number().nullable().optional().describe('Max results to return (default: 100)'),
-      page: z.number().nullable().optional().describe('Page number for pagination (default: 1)'),
-    }),
-    func: async ({ limit, page }: { limit?: number; page?: number }) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (tool as any)(
+    async ({ limit, page }: { limit?: number; page?: number }) => {
       try {
         const limitError = await checkWFirmaLimit(subscriptionService, userId, locale);
         if (limitError) return limitError;
@@ -107,8 +104,15 @@ export function createGetUserCompaniesTool(
         return `Error: ${t.errorFetchUserCompanies}`;
       }
     },
-  });
-
+    {
+      name: 'get_user_companies',
+      description: 'Get user-company relationships showing which users have access to which companies with their roles and permissions. Use when user asks about user access or permissions.',
+      schema: z.object({
+        limit: z.number().nullable().optional().describe('Max results to return (default: 100)'),
+        page: z.number().nullable().optional().describe('Page number for pagination (default: 1)'),
+      }),
+    }
+  );
 }
 
 /**
@@ -123,13 +127,9 @@ export function createGetUserCompanyByIdTool(
 ): StructuredToolInterface {
   const t = getUserTranslations(locale);
 
-  return new DynamicStructuredTool({
-    name: 'get_user_company_by_id',
-    description: 'Get specific user-company relationship by ID with full details (role, permissions). Use when user asks about specific user-company relationship details.',
-    schema: z.object({
-      id: z.string().describe('User-company relationship ID'),
-    }),
-    func: async ({ id }: { id: string }) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (tool as any)(
+    async ({ id }: { id: string }) => {
       try {
         const limitError = await checkWFirmaLimit(subscriptionService, userId, locale);
         if (limitError) return limitError;
@@ -158,6 +158,12 @@ export function createGetUserCompanyByIdTool(
         return `Error: ${t.errorFetchUserCompany}`;
       }
     },
-  });
-
+    {
+      name: 'get_user_company_by_id',
+      description: 'Get specific user-company relationship by ID with full details (role, permissions). Use when user asks about specific user-company relationship details.',
+      schema: z.object({
+        id: z.string().describe('User-company relationship ID'),
+      }),
+    }
+  );
 }

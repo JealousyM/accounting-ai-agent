@@ -3,7 +3,7 @@
  * LangChain tools for fetching company information from wFirma
  */
 
-import { DynamicStructuredTool, StructuredToolInterface } from '@langchain/core/tools';
+import { tool, StructuredToolInterface } from '@langchain/core/tools';
 import { z } from 'zod';
 import { logger } from '../../../utils/logger';
 import {
@@ -36,11 +36,9 @@ export function createGetCompanyInfoTool(
 ): StructuredToolInterface {
   const t = getCompanyTranslations(locale);
 
-  return new DynamicStructuredTool({
-    name: 'get_company_info',
-    description: 'Get complete company information from wFirma and public registries (name, NIP, REGON, KRS, VAT status, addresses, bank accounts, subscription). Use when user asks about their company data.',
-    schema: z.object({}),
-    func: async () => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (tool as any)(
+    async () => {
       try {
         const limitError = await checkWFirmaLimit(subscriptionService, userId, locale);
         if (limitError) return limitError;
@@ -68,8 +66,12 @@ export function createGetCompanyInfoTool(
         return `Error: ${t.errorFetch}`;
       }
     },
-  });
-
+    {
+      name: 'get_company_info',
+      description: 'Get complete company information from wFirma and public registries (name, NIP, REGON, KRS, VAT status, addresses, bank accounts, subscription). Use when user asks about their company data.',
+      schema: z.object({}),
+    }
+  );
 }
 
 /**
@@ -84,11 +86,9 @@ export function createGetCompanyAccountsTool(
 ): StructuredToolInterface {
   const t = getCompanyTranslations(locale);
 
-  return new DynamicStructuredTool({
-    name: 'get_company_accounts',
-    description: 'Get company bank accounts from wFirma (account numbers, bank names, SWIFT codes). Use when user asks about their bank accounts.',
-    schema: z.object({}),
-    func: async () => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (tool as any)(
+    async () => {
       try {
         const limitError = await checkWFirmaLimit(subscriptionService, userId, locale);
         if (limitError) return limitError;
@@ -113,8 +113,12 @@ export function createGetCompanyAccountsTool(
         return `Error: ${t.errorFetchAccounts}`;
       }
     },
-  });
-
+    {
+      name: 'get_company_accounts',
+      description: 'Get company bank accounts from wFirma (account numbers, bank names, SWIFT codes). Use when user asks about their bank accounts.',
+      schema: z.object({}),
+    }
+  );
 }
 
 /**
@@ -129,11 +133,9 @@ export function createGetCompanyAddressesTool(
 ): StructuredToolInterface {
   const t = getCompanyTranslations(locale);
 
-  return new DynamicStructuredTool({
-    name: 'get_company_addresses',
-    description: 'Get company addresses from wFirma (main registration address, correspondence address). Use when user asks about company addresses.',
-    schema: z.object({}),
-    func: async () => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (tool as any)(
+    async () => {
       try {
         const limitError = await checkWFirmaLimit(subscriptionService, userId, locale);
         if (limitError) return limitError;
@@ -158,8 +160,12 @@ export function createGetCompanyAddressesTool(
         return `Error: ${t.errorFetchAddresses}`;
       }
     },
-  });
-
+    {
+      name: 'get_company_addresses',
+      description: 'Get company addresses from wFirma (main registration address, correspondence address). Use when user asks about company addresses.',
+      schema: z.object({}),
+    }
+  );
 }
 
 /**
@@ -172,13 +178,9 @@ export function createLookupCompanyByNipTool(
 ): StructuredToolInterface {
   const t = getCompanyTranslations(locale);
 
-  return new DynamicStructuredTool({
-    name: 'lookup_company_by_nip',
-    description: 'Look up any Polish company by NIP in public registries (REGON, KRS, VAT status, verified bank accounts, board members). Use when user asks to check or verify a company by NIP.',
-    schema: z.object({
-      nip: z.string().regex(/^\d{10}$/).describe('Polish NIP number (10 digits)'),
-    }),
-    func: async (input: { nip: string }) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (tool as any)(
+    async (input: { nip: string }) => {
       try {
         if (!validateNip(input.nip)) {
           return t.invalidNip;
@@ -196,7 +198,13 @@ export function createLookupCompanyByNipTool(
         return `Error: ${t.errorFetchPublicRegistry}`;
       }
     },
-  });
-
+    {
+      name: 'lookup_company_by_nip',
+      description: 'Look up any Polish company by NIP in public registries (REGON, KRS, VAT status, verified bank accounts, board members). Use when user asks to check or verify a company by NIP.',
+      schema: z.object({
+        nip: z.string().regex(/^\d{10}$/).describe('Polish NIP number (10 digits)'),
+      }),
+    }
+  );
 }
 
