@@ -3,7 +3,7 @@
  * LangChain tools for fiscal years and accounting schemas (read-only)
  */
 
-import { DynamicStructuredTool, StructuredToolInterface } from '@langchain/core/tools';
+import { tool, StructuredToolInterface } from '@langchain/core/tools';
 import { z } from 'zod';
 import { logger } from '../../../utils/logger';
 import { getLedgerTranslations, Locale } from '../../../i18n';
@@ -31,15 +31,9 @@ export function createGetFiscalYearsTool(
   userId: string,
   subscriptionService?: SubscriptionService
 ): StructuredToolInterface {
-  return new DynamicStructuredTool({
-    name: 'get_fiscal_years',
-    description:
-      'Get list of fiscal years (accounting periods) from wFirma. Fiscal years define the accounting periods for the company.',
-    schema: z.object({
-      limit: z.number().nullable().optional().describe('Maximum number of results (default 100)'),
-      page: z.number().nullable().optional().describe('Page number for pagination (default 1)'),
-    }),
-    func: async ({
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (tool as any)(
+    async ({
       limit,
       page,
     }: {
@@ -66,8 +60,16 @@ export function createGetFiscalYearsTool(
         return `Error: ${t.errorFetchFiscalYears}${wfirmaMessage ? ` - ${sanitizeForPrompt(wfirmaMessage)}` : ''}`;
       }
     },
-  });
-
+    {
+      name: 'get_fiscal_years',
+      description:
+        'Get list of fiscal years (accounting periods) from wFirma. Fiscal years define the accounting periods for the company.',
+      schema: z.object({
+        limit: z.number().nullable().optional().describe('Maximum number of results (default 100)'),
+        page: z.number().nullable().optional().describe('Page number for pagination (default 1)'),
+      }),
+    }
+  );
 }
 
 /**
@@ -79,14 +81,9 @@ export function createGetFiscalYearDetailsTool(
   userId: string,
   subscriptionService?: SubscriptionService
 ): StructuredToolInterface {
-  return new DynamicStructuredTool({
-    name: 'get_fiscal_year_details',
-    description:
-      'Get detailed information about a specific fiscal year by ID or symbol (e.g. "2025"). Shows symbol, start date, and end date.',
-    schema: z.object({
-      fiscalYearId: z.string().describe('Fiscal year ID or symbol (e.g. "2025") from wFirma'),
-    }),
-    func: async ({ fiscalYearId }: { fiscalYearId: string }) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (tool as any)(
+    async ({ fiscalYearId }: { fiscalYearId: string }) => {
       try {
         const limitError = await checkWFirmaLimit(subscriptionService, userId, locale);
         if (limitError) return limitError;
@@ -114,8 +111,15 @@ export function createGetFiscalYearDetailsTool(
         return `Error: ${t.errorFetchFiscalYearDetails}${wfirmaMessage ? ` - ${sanitizeForPrompt(wfirmaMessage)}` : ''}`;
       }
     },
-  });
-
+    {
+      name: 'get_fiscal_year_details',
+      description:
+        'Get detailed information about a specific fiscal year by ID or symbol (e.g. "2025"). Shows symbol, start date, and end date.',
+      schema: z.object({
+        fiscalYearId: z.string().describe('Fiscal year ID or symbol (e.g. "2025") from wFirma'),
+      }),
+    }
+  );
 }
 
 // ============================================
@@ -131,17 +135,9 @@ export function createGetAccountingSchemasTool(
   userId: string,
   subscriptionService?: SubscriptionService
 ): StructuredToolInterface {
-  return new DynamicStructuredTool({
-    name: 'get_accounting_schemas',
-    description:
-      'Get list of accounting schemas (operation schemas) from wFirma. Can filter by fiscal year or category. Schemas define how transactions are recorded in the accounting system.',
-    schema: z.object({
-      fiscalYearId: z.string().nullable().optional().describe('Filter by fiscal year ID'),
-      category: z.string().nullable().optional().describe('Filter by schema category'),
-      limit: z.number().nullable().optional().describe('Maximum number of results (default 100)'),
-      page: z.number().nullable().optional().describe('Page number for pagination (default 1)'),
-    }),
-    func: async ({
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (tool as any)(
+    async ({
       fiscalYearId,
       category,
       limit,
@@ -174,8 +170,18 @@ export function createGetAccountingSchemasTool(
         return `Error: ${t.errorFetchSchemas}${wfirmaMessage ? ` - ${sanitizeForPrompt(wfirmaMessage)}` : ''}`;
       }
     },
-  });
-
+    {
+      name: 'get_accounting_schemas',
+      description:
+        'Get list of accounting schemas (operation schemas) from wFirma. Can filter by fiscal year or category. Schemas define how transactions are recorded in the accounting system.',
+      schema: z.object({
+        fiscalYearId: z.string().nullable().optional().describe('Filter by fiscal year ID'),
+        category: z.string().nullable().optional().describe('Filter by schema category'),
+        limit: z.number().nullable().optional().describe('Maximum number of results (default 100)'),
+        page: z.number().nullable().optional().describe('Page number for pagination (default 1)'),
+      }),
+    }
+  );
 }
 
 /**
@@ -187,14 +193,9 @@ export function createGetAccountingSchemaDetailsTool(
   userId: string,
   subscriptionService?: SubscriptionService
 ): StructuredToolInterface {
-  return new DynamicStructuredTool({
-    name: 'get_accounting_schema_details',
-    description:
-      'Get detailed information about a specific accounting schema by ID. Shows name, category, visibility, and related fiscal year.',
-    schema: z.object({
-      schemaId: z.string().describe('Accounting schema ID from wFirma'),
-    }),
-    func: async ({ schemaId }: { schemaId: string }) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (tool as any)(
+    async ({ schemaId }: { schemaId: string }) => {
       try {
         const limitError = await checkWFirmaLimit(subscriptionService, userId, locale);
         if (limitError) return limitError;
@@ -222,6 +223,13 @@ export function createGetAccountingSchemaDetailsTool(
         return `Error: ${t.errorFetchSchemaDetails}${wfirmaMessage ? ` - ${sanitizeForPrompt(wfirmaMessage)}` : ''}`;
       }
     },
-  });
-
+    {
+      name: 'get_accounting_schema_details',
+      description:
+        'Get detailed information about a specific accounting schema by ID. Shows name, category, visibility, and related fiscal year.',
+      schema: z.object({
+        schemaId: z.string().describe('Accounting schema ID from wFirma'),
+      }),
+    }
+  );
 }

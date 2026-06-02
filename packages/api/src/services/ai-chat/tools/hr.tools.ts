@@ -3,7 +3,7 @@
  * LangChain tools for employee management, contracts, payroll, and absences
  */
 
-import { DynamicStructuredTool, StructuredToolInterface } from '@langchain/core/tools';
+import { tool, StructuredToolInterface } from '@langchain/core/tools';
 import { z } from 'zod';
 import { logger } from '../../../utils/logger';
 import { getHRTranslations, Locale } from '../../../i18n';
@@ -33,15 +33,9 @@ export function createGetEmployeesTool(
   userId: string,
   locale: Locale,
 ): StructuredToolInterface {
-  return new DynamicStructuredTool({
-    name: 'get_employees',
-    description: 'Get list of employees. Can filter by name/email search, active status. Use when user asks about their employees or staff.',
-    schema: z.object({
-      search: z.string().nullable().optional().describe('Search by employee name, email, PESEL, or NIP'),
-      isActive: z.boolean().nullable().optional().describe('Filter by active status (true = active, false = inactive)'),
-      limit: z.number().nullable().optional().describe('Maximum number of results (default 20)'),
-    }),
-    func: async ({ search, isActive, limit }: { search?: string; isActive?: boolean; limit?: number }) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (tool as any)(
+    async ({ search, isActive, limit }: { search?: string; isActive?: boolean; limit?: number }) => {
       try {
         const result = await hrService.getEmployees(userId, {
           search: search || undefined,
@@ -58,8 +52,16 @@ export function createGetEmployeesTool(
         return `Error: ${t.errorFetch}`;
       }
     },
-  });
-
+    {
+      name: 'get_employees',
+      description: 'Get list of employees. Can filter by name/email search, active status. Use when user asks about their employees or staff.',
+      schema: z.object({
+        search: z.string().nullable().optional().describe('Search by employee name, email, PESEL, or NIP'),
+        isActive: z.boolean().nullable().optional().describe('Filter by active status (true = active, false = inactive)'),
+        limit: z.number().nullable().optional().describe('Maximum number of results (default 20)'),
+      }),
+    }
+  );
 }
 
 // ============================================
@@ -71,13 +73,9 @@ export function createGetEmployeeDetailsTool(
   userId: string,
   locale: Locale,
 ): StructuredToolInterface {
-  return new DynamicStructuredTool({
-    name: 'get_employee_details',
-    description: 'Get detailed information about a specific employee by their ID. Returns personal data, contact info, and employment details.',
-    schema: z.object({
-      id: z.string().describe('Employee ID (UUID)'),
-    }),
-    func: async ({ id }: { id: string }) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (tool as any)(
+    async ({ id }: { id: string }) => {
       try {
         const employee = await hrService.getEmployeeById(userId, id);
 
@@ -95,8 +93,14 @@ export function createGetEmployeeDetailsTool(
         return `Error: ${t.errorFetch}`;
       }
     },
-  });
-
+    {
+      name: 'get_employee_details',
+      description: 'Get detailed information about a specific employee by their ID. Returns personal data, contact info, and employment details.',
+      schema: z.object({
+        id: z.string().describe('Employee ID (UUID)'),
+      }),
+    }
+  );
 }
 
 // ============================================
@@ -108,25 +112,9 @@ export function createAddEmployeeTool(
   userId: string,
   locale: Locale,
 ): StructuredToolInterface {
-  return new DynamicStructuredTool({
-    name: 'add_employee',
-    description: 'Add a new employee to the system. Required: firstName, lastName. Optional: pesel, nip, email, phone, address fields, bankAccount, taxOffice, position, hiredAt.',
-    schema: z.object({
-      firstName: z.string().describe('Employee first name (required)'),
-      lastName: z.string().describe('Employee last name (required)'),
-      pesel: z.string().nullable().optional().describe('PESEL number (Polish national ID)'),
-      nip: z.string().nullable().optional().describe('NIP (tax identification number)'),
-      email: z.string().nullable().optional().describe('Email address'),
-      phone: z.string().nullable().optional().describe('Phone number'),
-      street: z.string().nullable().optional().describe('Street address'),
-      city: z.string().nullable().optional().describe('City'),
-      zip: z.string().nullable().optional().describe('Postal code (e.g., 00-001)'),
-      bankAccount: z.string().nullable().optional().describe('Bank account number'),
-      taxOffice: z.string().nullable().optional().describe('Tax office name'),
-      position: z.string().nullable().optional().describe('Job position/title'),
-      hiredAt: z.string().nullable().optional().describe('Hire date (YYYY-MM-DD format)'),
-    }),
-    func: async ({
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (tool as any)(
+    async ({
       firstName,
       lastName,
       pesel,
@@ -196,8 +184,26 @@ ${t.tryAgain}`;
         return `Error: ${t.errorCreate}`;
       }
     },
-  });
-
+    {
+      name: 'add_employee',
+      description: 'Add a new employee to the system. Required: firstName, lastName. Optional: pesel, nip, email, phone, address fields, bankAccount, taxOffice, position, hiredAt.',
+      schema: z.object({
+        firstName: z.string().describe('Employee first name (required)'),
+        lastName: z.string().describe('Employee last name (required)'),
+        pesel: z.string().nullable().optional().describe('PESEL number (Polish national ID)'),
+        nip: z.string().nullable().optional().describe('NIP (tax identification number)'),
+        email: z.string().nullable().optional().describe('Email address'),
+        phone: z.string().nullable().optional().describe('Phone number'),
+        street: z.string().nullable().optional().describe('Street address'),
+        city: z.string().nullable().optional().describe('City'),
+        zip: z.string().nullable().optional().describe('Postal code (e.g., 00-001)'),
+        bankAccount: z.string().nullable().optional().describe('Bank account number'),
+        taxOffice: z.string().nullable().optional().describe('Tax office name'),
+        position: z.string().nullable().optional().describe('Job position/title'),
+        hiredAt: z.string().nullable().optional().describe('Hire date (YYYY-MM-DD format)'),
+      }),
+    }
+  );
 }
 
 // ============================================
@@ -209,27 +215,9 @@ export function createUpdateEmployeeTool(
   userId: string,
   locale: Locale,
 ): StructuredToolInterface {
-  return new DynamicStructuredTool({
-    name: 'update_employee',
-    description: 'Update an existing employee by ID. Specify only the fields that need to be changed.',
-    schema: z.object({
-      id: z.string().describe('Employee ID (UUID) to update'),
-      firstName: z.string().nullable().optional().describe('New first name'),
-      lastName: z.string().nullable().optional().describe('New last name'),
-      pesel: z.string().nullable().optional().describe('New PESEL number'),
-      nip: z.string().nullable().optional().describe('New NIP number'),
-      email: z.string().nullable().optional().describe('New email address'),
-      phone: z.string().nullable().optional().describe('New phone number'),
-      street: z.string().nullable().optional().describe('New street address'),
-      city: z.string().nullable().optional().describe('New city'),
-      zip: z.string().nullable().optional().describe('New postal code'),
-      bankAccount: z.string().nullable().optional().describe('New bank account number'),
-      taxOffice: z.string().nullable().optional().describe('New tax office name'),
-      position: z.string().nullable().optional().describe('New job position/title'),
-      hiredAt: z.string().nullable().optional().describe('New hire date (YYYY-MM-DD format)'),
-      isActive: z.boolean().nullable().optional().describe('Set active/inactive status'),
-    }),
-    func: async ({
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (tool as any)(
+    async ({
       id,
       firstName,
       lastName,
@@ -305,8 +293,28 @@ export function createUpdateEmployeeTool(
         return `Error: ${t.errorUpdate}`;
       }
     },
-  });
-
+    {
+      name: 'update_employee',
+      description: 'Update an existing employee by ID. Specify only the fields that need to be changed.',
+      schema: z.object({
+        id: z.string().describe('Employee ID (UUID) to update'),
+        firstName: z.string().nullable().optional().describe('New first name'),
+        lastName: z.string().nullable().optional().describe('New last name'),
+        pesel: z.string().nullable().optional().describe('New PESEL number'),
+        nip: z.string().nullable().optional().describe('New NIP number'),
+        email: z.string().nullable().optional().describe('New email address'),
+        phone: z.string().nullable().optional().describe('New phone number'),
+        street: z.string().nullable().optional().describe('New street address'),
+        city: z.string().nullable().optional().describe('New city'),
+        zip: z.string().nullable().optional().describe('New postal code'),
+        bankAccount: z.string().nullable().optional().describe('New bank account number'),
+        taxOffice: z.string().nullable().optional().describe('New tax office name'),
+        position: z.string().nullable().optional().describe('New job position/title'),
+        hiredAt: z.string().nullable().optional().describe('New hire date (YYYY-MM-DD format)'),
+        isActive: z.boolean().nullable().optional().describe('Set active/inactive status'),
+      }),
+    }
+  );
 }
 
 // ============================================
@@ -318,13 +326,9 @@ export function createDeleteEmployeeTool(
   userId: string,
   locale: Locale,
 ): StructuredToolInterface {
-  return new DynamicStructuredTool({
-    name: 'delete_employee',
-    description: 'Delete (soft-delete) an employee by ID. WARNING: This will deactivate the employee and mark them as deleted.',
-    schema: z.object({
-      id: z.string().describe('Employee ID (UUID) to delete'),
-    }),
-    func: async ({ id }: { id: string }) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (tool as any)(
+    async ({ id }: { id: string }) => {
       try {
         const employee = await hrService.deleteEmployee(userId, id);
 
@@ -344,8 +348,14 @@ export function createDeleteEmployeeTool(
         return `Error: ${t.errorDelete}`;
       }
     },
-  });
-
+    {
+      name: 'delete_employee',
+      description: 'Delete (soft-delete) an employee by ID. WARNING: This will deactivate the employee and mark them as deleted.',
+      schema: z.object({
+        id: z.string().describe('Employee ID (UUID) to delete'),
+      }),
+    }
+  );
 }
 
 // ============================================
@@ -357,16 +367,9 @@ export function createGetHRContractsTool(
   userId: string,
   locale: Locale,
 ): StructuredToolInterface {
-  return new DynamicStructuredTool({
-    name: 'get_hr_contracts',
-    description: 'Get list of employment contracts. Can filter by employee, status (draft/active/terminated/expired), and type (employment/mandate_contract/work_contract/board_resolution/dividend).',
-    schema: z.object({
-      employeeId: z.string().nullable().optional().describe('Filter by employee ID (UUID)'),
-      status: z.enum(['draft', 'active', 'terminated', 'expired']).nullable().optional().describe('Filter by contract status'),
-      type: z.enum(['employment', 'mandate_contract', 'work_contract', 'board_resolution', 'dividend']).nullable().optional().describe('Filter by contract type'),
-      limit: z.number().nullable().optional().describe('Maximum number of results (default 20)'),
-    }),
-    func: async ({
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (tool as any)(
+    async ({
       employeeId,
       status,
       type,
@@ -396,8 +399,17 @@ export function createGetHRContractsTool(
         return `Error: ${t.errorFetch}`;
       }
     },
-  });
-
+    {
+      name: 'get_hr_contracts',
+      description: 'Get list of employment contracts. Can filter by employee, status (draft/active/terminated/expired), and type (employment/mandate_contract/work_contract/board_resolution/dividend).',
+      schema: z.object({
+        employeeId: z.string().nullable().optional().describe('Filter by employee ID (UUID)'),
+        status: z.enum(['draft', 'active', 'terminated', 'expired']).nullable().optional().describe('Filter by contract status'),
+        type: z.enum(['employment', 'mandate_contract', 'work_contract', 'board_resolution', 'dividend']).nullable().optional().describe('Filter by contract type'),
+        limit: z.number().nullable().optional().describe('Maximum number of results (default 20)'),
+      }),
+    }
+  );
 }
 
 // ============================================
@@ -409,20 +421,9 @@ export function createAddHRContractTool(
   userId: string,
   locale: Locale,
 ): StructuredToolInterface {
-  return new DynamicStructuredTool({
-    name: 'add_hr_contract',
-    description: 'Create a new employment contract for an employee. Required: employeeId, type, startDate, baseSalaryGross. The contract is created with status "active".',
-    schema: z.object({
-      employeeId: z.string().describe('Employee ID (UUID) to assign the contract to'),
-      type: z.enum(['employment', 'mandate_contract', 'work_contract', 'board_resolution', 'dividend']).describe('Contract type: employment (umowa o prace), mandate_contract (umowa zlecenie), work_contract (umowa o dzielo), board_resolution (uchwala zarzadu), dividend (dywidenda)'),
-      position: z.string().nullable().optional().describe('Job position/title for this contract'),
-      startDate: z.string().describe('Contract start date (YYYY-MM-DD format)'),
-      baseSalaryGross: z.number().describe('Base gross salary in PLN'),
-      workHoursPerWeek: z.number().nullable().optional().describe('Work hours per week (e.g., 40)'),
-      costDeductionRate: z.number().nullable().optional().describe('Cost deduction rate as percentage (e.g., 20 or 50 for copyright)'),
-      endDate: z.string().nullable().optional().describe('Contract end date (YYYY-MM-DD format), if fixed-term'),
-    }),
-    func: async ({
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (tool as any)(
+    async ({
       employeeId,
       type,
       position,
@@ -485,8 +486,21 @@ ${t.tryAgain}`;
         return `Error: ${t.errorCreate}`;
       }
     },
-  });
-
+    {
+      name: 'add_hr_contract',
+      description: 'Create a new employment contract for an employee. Required: employeeId, type, startDate, baseSalaryGross. The contract is created with status "active".',
+      schema: z.object({
+        employeeId: z.string().describe('Employee ID (UUID) to assign the contract to'),
+        type: z.enum(['employment', 'mandate_contract', 'work_contract', 'board_resolution', 'dividend']).describe('Contract type: employment (umowa o prace), mandate_contract (umowa zlecenie), work_contract (umowa o dzielo), board_resolution (uchwala zarzadu), dividend (dywidenda)'),
+        position: z.string().nullable().optional().describe('Job position/title for this contract'),
+        startDate: z.string().describe('Contract start date (YYYY-MM-DD format)'),
+        baseSalaryGross: z.number().describe('Base gross salary in PLN'),
+        workHoursPerWeek: z.number().nullable().optional().describe('Work hours per week (e.g., 40)'),
+        costDeductionRate: z.number().nullable().optional().describe('Cost deduction rate as percentage (e.g., 20 or 50 for copyright)'),
+        endDate: z.string().nullable().optional().describe('Contract end date (YYYY-MM-DD format), if fixed-term'),
+      }),
+    }
+  );
 }
 
 // ============================================
@@ -498,14 +512,9 @@ export function createTerminateHRContractTool(
   userId: string,
   locale: Locale,
 ): StructuredToolInterface {
-  return new DynamicStructuredTool({
-    name: 'terminate_hr_contract',
-    description: 'Terminate an employment contract by setting its status to "terminated" and recording the end date. Use when an employee is leaving or a contract is ending.',
-    schema: z.object({
-      id: z.string().describe('Contract ID (UUID) to terminate'),
-      endDate: z.string().describe('Contract termination/end date (YYYY-MM-DD format)'),
-    }),
-    func: async ({ id, endDate }: { id: string; endDate: string }) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (tool as any)(
+    async ({ id, endDate }: { id: string; endDate: string }) => {
       try {
         const contract = await hrService.terminateContract(userId, id, new Date(endDate));
 
@@ -532,8 +541,15 @@ ${contractsList}
         return `Error: ${t.errorUpdate}`;
       }
     },
-  });
-
+    {
+      name: 'terminate_hr_contract',
+      description: 'Terminate an employment contract by setting its status to "terminated" and recording the end date. Use when an employee is leaving or a contract is ending.',
+      schema: z.object({
+        id: z.string().describe('Contract ID (UUID) to terminate'),
+        endDate: z.string().describe('Contract termination/end date (YYYY-MM-DD format)'),
+      }),
+    }
+  );
 }
 
 // ============================================
@@ -545,16 +561,9 @@ export function createCalculatePayrollTool(
   userId: string,
   locale: Locale,
 ): StructuredToolInterface {
-  return new DynamicStructuredTool({
-    name: 'calculate_payroll',
-    description: 'Calculate payroll for a specific contract and period. Shows full breakdown: gross salary, ZUS contributions (employee and employer), income tax, net salary, and total employer cost. Does NOT save the record - use this for preview/estimation.',
-    schema: z.object({
-      contractId: z.string().describe('Contract ID (UUID) to calculate payroll for'),
-      period: z.string().describe('Payroll period in YYYY-MM format (e.g., 2026-02)'),
-      bonuses: z.number().nullable().optional().describe('Additional bonuses in PLN (default 0)'),
-      deductions: z.number().nullable().optional().describe('Deductions in PLN (default 0)'),
-    }),
-    func: async ({
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (tool as any)(
+    async ({
       contractId,
       period,
       bonuses,
@@ -629,8 +638,17 @@ export function createCalculatePayrollTool(
         return `Error: ${t.errorFetch}`;
       }
     },
-  });
-
+    {
+      name: 'calculate_payroll',
+      description: 'Calculate payroll for a specific contract and period. Shows full breakdown: gross salary, ZUS contributions (employee and employer), income tax, net salary, and total employer cost. Does NOT save the record - use this for preview/estimation.',
+      schema: z.object({
+        contractId: z.string().describe('Contract ID (UUID) to calculate payroll for'),
+        period: z.string().describe('Payroll period in YYYY-MM format (e.g., 2026-02)'),
+        bonuses: z.number().nullable().optional().describe('Additional bonuses in PLN (default 0)'),
+        deductions: z.number().nullable().optional().describe('Deductions in PLN (default 0)'),
+      }),
+    }
+  );
 }
 
 // ============================================
@@ -642,16 +660,9 @@ export function createSavePayrollRecordTool(
   userId: string,
   locale: Locale,
 ): StructuredToolInterface {
-  return new DynamicStructuredTool({
-    name: 'save_payroll_record',
-    description: 'Calculate payroll AND save the record to the system. Use this when the user wants to create/register/save a payroll entry. This performs the calculation and permanently stores the result in the database.',
-    schema: z.object({
-      contractId: z.string().describe('Contract ID (UUID) to calculate and save payroll for'),
-      period: z.string().describe('Payroll period in YYYY-MM format (e.g., 2026-02)'),
-      bonuses: z.number().nullable().optional().describe('Additional bonuses in PLN (default 0)'),
-      deductions: z.number().nullable().optional().describe('Deductions in PLN (default 0)'),
-    }),
-    func: async ({
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (tool as any)(
+    async ({
       contractId,
       period,
       bonuses,
@@ -724,8 +735,17 @@ export function createSavePayrollRecordTool(
         return `Error: ${t.errorCreate}`;
       }
     },
-  });
-
+    {
+      name: 'save_payroll_record',
+      description: 'Calculate payroll AND save the record to the system. Use this when the user wants to create/register/save a payroll entry. This performs the calculation and permanently stores the result in the database.',
+      schema: z.object({
+        contractId: z.string().describe('Contract ID (UUID) to calculate and save payroll for'),
+        period: z.string().describe('Payroll period in YYYY-MM format (e.g., 2026-02)'),
+        bonuses: z.number().nullable().optional().describe('Additional bonuses in PLN (default 0)'),
+        deductions: z.number().nullable().optional().describe('Deductions in PLN (default 0)'),
+      }),
+    }
+  );
 }
 
 // ============================================
@@ -737,13 +757,9 @@ export function createDeletePayrollRecordTool(
   userId: string,
   locale: Locale,
 ): StructuredToolInterface {
-  return new DynamicStructuredTool({
-    name: 'delete_payroll_record',
-    description: 'Delete a saved payroll record by its ID. WARNING: This permanently removes the record from the database and cannot be undone.',
-    schema: z.object({
-      id: z.string().describe('Payroll record ID (UUID) to delete'),
-    }),
-    func: async ({ id }: { id: string }) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (tool as any)(
+    async ({ id }: { id: string }) => {
       try {
         const result = await hrService.deletePayrollRecord(userId, id);
 
@@ -768,8 +784,14 @@ export function createDeletePayrollRecordTool(
         return `Error: ${t.errorDelete}`;
       }
     },
-  });
-
+    {
+      name: 'delete_payroll_record',
+      description: 'Delete a saved payroll record by its ID. WARNING: This permanently removes the record from the database and cannot be undone.',
+      schema: z.object({
+        id: z.string().describe('Payroll record ID (UUID) to delete'),
+      }),
+    }
+  );
 }
 
 // ============================================
@@ -781,17 +803,9 @@ export function createGetPayrollRecordsTool(
   userId: string,
   locale: Locale,
 ): StructuredToolInterface {
-  return new DynamicStructuredTool({
-    name: 'get_payroll_records',
-    description: 'Get list of saved payroll records. Can filter by employee, specific period, or period range. Shows gross, net amounts and payment status.',
-    schema: z.object({
-      employeeId: z.string().nullable().optional().describe('Filter by employee ID (UUID)'),
-      period: z.string().nullable().optional().describe('Filter by exact period (YYYY-MM format)'),
-      periodFrom: z.string().nullable().optional().describe('Period range start (YYYY-MM format, inclusive)'),
-      periodTo: z.string().nullable().optional().describe('Period range end (YYYY-MM format, inclusive)'),
-      limit: z.number().nullable().optional().describe('Maximum number of results (default 20)'),
-    }),
-    func: async ({
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (tool as any)(
+    async ({
       employeeId,
       period,
       periodFrom,
@@ -824,8 +838,18 @@ export function createGetPayrollRecordsTool(
         return `Error: ${t.errorFetch}`;
       }
     },
-  });
-
+    {
+      name: 'get_payroll_records',
+      description: 'Get list of saved payroll records. Can filter by employee, specific period, or period range. Shows gross, net amounts and payment status.',
+      schema: z.object({
+        employeeId: z.string().nullable().optional().describe('Filter by employee ID (UUID)'),
+        period: z.string().nullable().optional().describe('Filter by exact period (YYYY-MM format)'),
+        periodFrom: z.string().nullable().optional().describe('Period range start (YYYY-MM format, inclusive)'),
+        periodTo: z.string().nullable().optional().describe('Period range end (YYYY-MM format, inclusive)'),
+        limit: z.number().nullable().optional().describe('Maximum number of results (default 20)'),
+      }),
+    }
+  );
 }
 
 // ============================================
@@ -837,18 +861,9 @@ export function createAddAbsenceTool(
   userId: string,
   locale: Locale,
 ): StructuredToolInterface {
-  return new DynamicStructuredTool({
-    name: 'add_absence',
-    description: 'Record an absence (vacation, sick leave, maternity, unpaid, other) for an employee. Required: employeeId, type, startDate, endDate, businessDays.',
-    schema: z.object({
-      employeeId: z.string().describe('Employee ID (UUID) to record absence for'),
-      type: z.enum(['vacation', 'sick_leave', 'maternity', 'unpaid', 'other']).describe('Absence type: vacation, sick_leave, maternity, unpaid, other'),
-      startDate: z.string().describe('Absence start date (YYYY-MM-DD format)'),
-      endDate: z.string().describe('Absence end date (YYYY-MM-DD format)'),
-      businessDays: z.number().describe('Number of business days of absence'),
-      notes: z.string().nullable().optional().describe('Additional notes about the absence'),
-    }),
-    func: async ({
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (tool as any)(
+    async ({
       employeeId,
       type,
       startDate,
@@ -905,8 +920,19 @@ ${t.tryAgain}`;
         return `Error: ${t.errorCreate}`;
       }
     },
-  });
-
+    {
+      name: 'add_absence',
+      description: 'Record an absence (vacation, sick leave, maternity, unpaid, other) for an employee. Required: employeeId, type, startDate, endDate, businessDays.',
+      schema: z.object({
+        employeeId: z.string().describe('Employee ID (UUID) to record absence for'),
+        type: z.enum(['vacation', 'sick_leave', 'maternity', 'unpaid', 'other']).describe('Absence type: vacation, sick_leave, maternity, unpaid, other'),
+        startDate: z.string().describe('Absence start date (YYYY-MM-DD format)'),
+        endDate: z.string().describe('Absence end date (YYYY-MM-DD format)'),
+        businessDays: z.number().describe('Number of business days of absence'),
+        notes: z.string().nullable().optional().describe('Additional notes about the absence'),
+      }),
+    }
+  );
 }
 
 // ============================================
@@ -918,16 +944,9 @@ export function createGetAbsencesTool(
   userId: string,
   locale: Locale,
 ): StructuredToolInterface {
-  return new DynamicStructuredTool({
-    name: 'get_absences',
-    description: 'Get list of employee absences. Can filter by employee, type (vacation/sick_leave/maternity/unpaid/other), and year.',
-    schema: z.object({
-      employeeId: z.string().nullable().optional().describe('Filter by employee ID (UUID)'),
-      type: z.enum(['vacation', 'sick_leave', 'maternity', 'unpaid', 'other']).nullable().optional().describe('Filter by absence type'),
-      year: z.number().nullable().optional().describe('Filter by year (e.g., 2026)'),
-      limit: z.number().nullable().optional().describe('Maximum number of results (default 20)'),
-    }),
-    func: async ({
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (tool as any)(
+    async ({
       employeeId,
       type,
       year,
@@ -957,8 +976,17 @@ export function createGetAbsencesTool(
         return `Error: ${t.errorFetch}`;
       }
     },
-  });
-
+    {
+      name: 'get_absences',
+      description: 'Get list of employee absences. Can filter by employee, type (vacation/sick_leave/maternity/unpaid/other), and year.',
+      schema: z.object({
+        employeeId: z.string().nullable().optional().describe('Filter by employee ID (UUID)'),
+        type: z.enum(['vacation', 'sick_leave', 'maternity', 'unpaid', 'other']).nullable().optional().describe('Filter by absence type'),
+        year: z.number().nullable().optional().describe('Filter by year (e.g., 2026)'),
+        limit: z.number().nullable().optional().describe('Maximum number of results (default 20)'),
+      }),
+    }
+  );
 }
 
 // ============================================
@@ -970,11 +998,9 @@ export function createGetHRSummaryTool(
   userId: string,
   locale: Locale,
 ): StructuredToolInterface {
-  return new DynamicStructuredTool({
-    name: 'get_hr_summary',
-    description: 'Get an HR overview/summary: total employees, active contracts by type, and total monthly payroll cost. Use when user asks for a general HR overview or dashboard.',
-    schema: z.object({}),
-    func: async () => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (tool as any)(
+    async () => {
       try {
         const summary = await hrService.getHRSummary(userId);
 
@@ -991,6 +1017,10 @@ export function createGetHRSummaryTool(
         return `Error: ${t.errorFetch}`;
       }
     },
-  });
-
+    {
+      name: 'get_hr_summary',
+      description: 'Get an HR overview/summary: total employees, active contracts by type, and total monthly payroll cost. Use when user asks for a general HR overview or dashboard.',
+      schema: z.object({}),
+    }
+  );
 }

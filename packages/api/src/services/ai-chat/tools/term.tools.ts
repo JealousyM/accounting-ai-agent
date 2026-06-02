@@ -3,7 +3,7 @@
  * LangChain tools for term and term group CRUD operations
  */
 
-import { DynamicStructuredTool, StructuredToolInterface } from '@langchain/core/tools';
+import { tool, StructuredToolInterface } from '@langchain/core/tools';
 import { z } from 'zod';
 import { logger } from '../../../utils/logger';
 import { getTermTranslations, Locale } from '../../../i18n';
@@ -37,22 +37,9 @@ export function createGetTermsTool(
   locale: Locale,
   subscriptionService?: SubscriptionService
 ): StructuredToolInterface {
-  return new DynamicStructuredTool({
-    name: 'get_terms',
-    description:
-      'Get list of user-created terms (appointments/deadlines/reminders) from wFirma. These are custom entries the user added manually. Can filter by date range, type (normal/cycle_day_of_week/cycle_day_of_month), group ID, or search by description. NOTE: When user asks about "сроки" or "deadlines" in general, also call get_tax_deadlines to include statutory tax payment deadlines (VAT, CIT, ZUS, PIT).',
-    schema: z.object({
-      dateFrom: z.string().nullable().optional().describe('Start date for filtering (YYYY-MM-DD)'),
-      dateTo: z.string().nullable().optional().describe('End date for filtering (YYYY-MM-DD)'),
-      type: z
-        .enum(['normal', 'cycle_day_of_week', 'cycle_day_of_month'])
-        .nullable().optional()
-        .describe('Filter by term type'),
-      groupId: z.string().nullable().optional().describe('Filter by term group ID'),
-      search: z.string().nullable().optional().describe('Search by description'),
-      limit: z.number().nullable().optional().describe('Maximum number of results (default 100)'),
-    }),
-    func: async ({
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (tool as any)(
+    async ({
       dateFrom,
       dateTo,
       type,
@@ -90,8 +77,23 @@ export function createGetTermsTool(
         return `Error: ${t.errorFetch}`;
       }
     },
-  });
-
+    {
+      name: 'get_terms',
+      description:
+        'Get list of user-created terms (appointments/deadlines/reminders) from wFirma. These are custom entries the user added manually. Can filter by date range, type (normal/cycle_day_of_week/cycle_day_of_month), group ID, or search by description. NOTE: When user asks about "сроки" or "deadlines" in general, also call get_tax_deadlines to include statutory tax payment deadlines (VAT, CIT, ZUS, PIT).',
+      schema: z.object({
+        dateFrom: z.string().nullable().optional().describe('Start date for filtering (YYYY-MM-DD)'),
+        dateTo: z.string().nullable().optional().describe('End date for filtering (YYYY-MM-DD)'),
+        type: z
+          .enum(['normal', 'cycle_day_of_week', 'cycle_day_of_month'])
+          .nullable().optional()
+          .describe('Filter by term type'),
+        groupId: z.string().nullable().optional().describe('Filter by term group ID'),
+        search: z.string().nullable().optional().describe('Search by description'),
+        limit: z.number().nullable().optional().describe('Maximum number of results (default 100)'),
+      }),
+    }
+  );
 }
 
 /**
@@ -103,14 +105,9 @@ export function createGetTermDetailsTool(
   locale: Locale,
   subscriptionService?: SubscriptionService
 ): StructuredToolInterface {
-  return new DynamicStructuredTool({
-    name: 'get_term_details',
-    description:
-      'Get detailed information about a specific term (appointment/deadline) by ID.',
-    schema: z.object({
-      termId: z.string().describe('Term ID from wFirma'),
-    }),
-    func: async ({ termId }: { termId: string }) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (tool as any)(
+    async ({ termId }: { termId: string }) => {
       try {
         const limitError = await checkWFirmaLimit(subscriptionService, userId, locale);
         if (limitError) return limitError;
@@ -136,8 +133,15 @@ export function createGetTermDetailsTool(
         return `Error: ${t.errorFetchDetails}`;
       }
     },
-  });
-
+    {
+      name: 'get_term_details',
+      description:
+        'Get detailed information about a specific term (appointment/deadline) by ID.',
+      schema: z.object({
+        termId: z.string().describe('Term ID from wFirma'),
+      }),
+    }
+  );
 }
 
 /**
@@ -150,23 +154,9 @@ export function createAddTermTool(
   locale: Locale,
   subscriptionService?: SubscriptionService
 ): StructuredToolInterface {
-  return new DynamicStructuredTool({
-    name: 'add_term',
-    description:
-      'Create a new term (appointment/deadline) in wFirma. Required: date. Optional: hour, description, termGroupId, type, contractorId, contactId.',
-    schema: z.object({
-      date: z.string().describe('Term date in YYYY-MM-DD format (required)'),
-      hour: z.string().nullable().optional().describe('Term hour in HH:MM:SS format'),
-      description: z.string().nullable().optional().describe('Term description/note'),
-      termGroupId: z.string().nullable().optional().describe('Term group ID'),
-      type: z
-        .enum(['normal', 'cycle_day_of_week', 'cycle_day_of_month'])
-        .nullable().optional()
-        .describe('Term type (default: normal)'),
-      contractorId: z.string().nullable().optional().describe('Associated contractor ID'),
-      contactId: z.string().nullable().optional().describe('Associated contact ID'),
-    }),
-    func: async ({
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (tool as any)(
+    async ({
       date,
       hour,
       description,
@@ -220,8 +210,24 @@ ${t.tryAgain}`;
         return `Error: ${t.errorCreate}`;
       }
     },
-  });
-
+    {
+      name: 'add_term',
+      description:
+        'Create a new term (appointment/deadline) in wFirma. Required: date. Optional: hour, description, termGroupId, type, contractorId, contactId.',
+      schema: z.object({
+        date: z.string().describe('Term date in YYYY-MM-DD format (required)'),
+        hour: z.string().nullable().optional().describe('Term hour in HH:MM:SS format'),
+        description: z.string().nullable().optional().describe('Term description/note'),
+        termGroupId: z.string().nullable().optional().describe('Term group ID'),
+        type: z
+          .enum(['normal', 'cycle_day_of_week', 'cycle_day_of_month'])
+          .nullable().optional()
+          .describe('Term type (default: normal)'),
+        contractorId: z.string().nullable().optional().describe('Associated contractor ID'),
+        contactId: z.string().nullable().optional().describe('Associated contact ID'),
+      }),
+    }
+  );
 }
 
 /**
@@ -234,24 +240,9 @@ export function createUpdateTermTool(
   locale: Locale,
   subscriptionService?: SubscriptionService
 ): StructuredToolInterface {
-  return new DynamicStructuredTool({
-    name: 'update_term',
-    description:
-      'Update an existing term (appointment/deadline) in wFirma. Required: termId. All other fields are optional - only provided fields will be updated.',
-    schema: z.object({
-      termId: z.string().describe('Term ID to update (required)'),
-      date: z.string().nullable().optional().describe('New term date (YYYY-MM-DD)'),
-      hour: z.string().nullable().optional().describe('New term hour (HH:MM:SS)'),
-      description: z.string().nullable().optional().describe('New description'),
-      termGroupId: z.string().nullable().optional().describe('New term group ID'),
-      type: z
-        .enum(['normal', 'cycle_day_of_week', 'cycle_day_of_month'])
-        .nullable().optional()
-        .describe('New term type'),
-      contractorId: z.string().nullable().optional().describe('New contractor ID'),
-      contactId: z.string().nullable().optional().describe('New contact ID'),
-    }),
-    func: async ({
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (tool as any)(
+    async ({
       termId,
       date,
       hour,
@@ -310,8 +301,25 @@ ${t.tryAgain}`;
         return `Error: ${t.errorUpdate}`;
       }
     },
-  });
-
+    {
+      name: 'update_term',
+      description:
+        'Update an existing term (appointment/deadline) in wFirma. Required: termId. All other fields are optional - only provided fields will be updated.',
+      schema: z.object({
+        termId: z.string().describe('Term ID to update (required)'),
+        date: z.string().nullable().optional().describe('New term date (YYYY-MM-DD)'),
+        hour: z.string().nullable().optional().describe('New term hour (HH:MM:SS)'),
+        description: z.string().nullable().optional().describe('New description'),
+        termGroupId: z.string().nullable().optional().describe('New term group ID'),
+        type: z
+          .enum(['normal', 'cycle_day_of_week', 'cycle_day_of_month'])
+          .nullable().optional()
+          .describe('New term type'),
+        contractorId: z.string().nullable().optional().describe('New contractor ID'),
+        contactId: z.string().nullable().optional().describe('New contact ID'),
+      }),
+    }
+  );
 }
 
 /**
@@ -324,14 +332,9 @@ export function createDeleteTermTool(
   locale: Locale,
   subscriptionService?: SubscriptionService
 ): StructuredToolInterface {
-  return new DynamicStructuredTool({
-    name: 'delete_term',
-    description:
-      'Delete a term (appointment/deadline) from wFirma. WARNING: This action cannot be undone.',
-    schema: z.object({
-      termId: z.string().describe('Term ID to delete'),
-    }),
-    func: async ({ termId }: { termId: string }) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (tool as any)(
+    async ({ termId }: { termId: string }) => {
       try {
         const limitError = await checkWFirmaLimit(subscriptionService, userId, locale);
         if (limitError) return limitError;
@@ -367,8 +370,15 @@ export function createDeleteTermTool(
         return `Error: ${t.errorDelete}`;
       }
     },
-  });
-
+    {
+      name: 'delete_term',
+      description:
+        'Delete a term (appointment/deadline) from wFirma. WARNING: This action cannot be undone.',
+      schema: z.object({
+        termId: z.string().describe('Term ID to delete'),
+      }),
+    }
+  );
 }
 
 // ============================================
@@ -384,15 +394,9 @@ export function createGetTermGroupsTool(
   locale: Locale,
   subscriptionService?: SubscriptionService
 ): StructuredToolInterface {
-  return new DynamicStructuredTool({
-    name: 'get_term_groups',
-    description:
-      'Get list of term groups from wFirma. Can search by name.',
-    schema: z.object({
-      search: z.string().nullable().optional().describe('Search by group name'),
-      limit: z.number().nullable().optional().describe('Maximum number of results (default 100)'),
-    }),
-    func: async ({
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (tool as any)(
+    async ({
       search,
       limit,
     }: {
@@ -418,8 +422,16 @@ export function createGetTermGroupsTool(
         return `Error: ${t.errorFetchGroups}`;
       }
     },
-  });
-
+    {
+      name: 'get_term_groups',
+      description:
+        'Get list of term groups from wFirma. Can search by name.',
+      schema: z.object({
+        search: z.string().nullable().optional().describe('Search by group name'),
+        limit: z.number().nullable().optional().describe('Maximum number of results (default 100)'),
+      }),
+    }
+  );
 }
 
 /**
@@ -431,14 +443,9 @@ export function createGetTermGroupDetailsTool(
   locale: Locale,
   subscriptionService?: SubscriptionService
 ): StructuredToolInterface {
-  return new DynamicStructuredTool({
-    name: 'get_term_group_details',
-    description:
-      'Get detailed information about a specific term group by ID.',
-    schema: z.object({
-      termGroupId: z.string().describe('Term group ID from wFirma'),
-    }),
-    func: async ({ termGroupId }: { termGroupId: string }) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (tool as any)(
+    async ({ termGroupId }: { termGroupId: string }) => {
       try {
         const limitError = await checkWFirmaLimit(subscriptionService, userId, locale);
         if (limitError) return limitError;
@@ -464,8 +471,15 @@ export function createGetTermGroupDetailsTool(
         return `Error: ${t.errorFetchGroupDetails}`;
       }
     },
-  });
-
+    {
+      name: 'get_term_group_details',
+      description:
+        'Get detailed information about a specific term group by ID.',
+      schema: z.object({
+        termGroupId: z.string().describe('Term group ID from wFirma'),
+      }),
+    }
+  );
 }
 
 /**
@@ -478,18 +492,9 @@ export function createAddTermGroupTool(
   locale: Locale,
   subscriptionService?: SubscriptionService
 ): StructuredToolInterface {
-  return new DynamicStructuredTool({
-    name: 'add_term_group',
-    description:
-      'Create a new term group in wFirma. Required: name. Optional: isReadonly (determines if group and its terms can be modified via wFirma.pl website).',
-    schema: z.object({
-      name: z.string().describe('Group name (required)'),
-      isReadonly: z
-        .boolean()
-        .nullable().optional()
-        .describe('If true, group and its terms cannot be modified via wFirma.pl website'),
-    }),
-    func: async ({
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (tool as any)(
+    async ({
       name,
       isReadonly,
     }: {
@@ -528,8 +533,19 @@ ${t.tryAgain}`;
         return `Error: ${t.errorCreateGroup}`;
       }
     },
-  });
-
+    {
+      name: 'add_term_group',
+      description:
+        'Create a new term group in wFirma. Required: name. Optional: isReadonly (determines if group and its terms can be modified via wFirma.pl website).',
+      schema: z.object({
+        name: z.string().describe('Group name (required)'),
+        isReadonly: z
+          .boolean()
+          .nullable().optional()
+          .describe('If true, group and its terms cannot be modified via wFirma.pl website'),
+      }),
+    }
+  );
 }
 
 /**
@@ -542,16 +558,9 @@ export function createUpdateTermGroupTool(
   locale: Locale,
   subscriptionService?: SubscriptionService
 ): StructuredToolInterface {
-  return new DynamicStructuredTool({
-    name: 'update_term_group',
-    description:
-      'Update an existing term group in wFirma. Required: termGroupId. Optional: name, isReadonly.',
-    schema: z.object({
-      termGroupId: z.string().describe('Term group ID to update (required)'),
-      name: z.string().nullable().optional().describe('New group name'),
-      isReadonly: z.boolean().nullable().optional().describe('New read-only setting'),
-    }),
-    func: async ({
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (tool as any)(
+    async ({
       termGroupId,
       name,
       isReadonly,
@@ -595,8 +604,17 @@ ${t.tryAgain}`;
         return `Error: ${t.errorUpdateGroup}`;
       }
     },
-  });
-
+    {
+      name: 'update_term_group',
+      description:
+        'Update an existing term group in wFirma. Required: termGroupId. Optional: name, isReadonly.',
+      schema: z.object({
+        termGroupId: z.string().describe('Term group ID to update (required)'),
+        name: z.string().nullable().optional().describe('New group name'),
+        isReadonly: z.boolean().nullable().optional().describe('New read-only setting'),
+      }),
+    }
+  );
 }
 
 /**
@@ -609,14 +627,9 @@ export function createDeleteTermGroupTool(
   locale: Locale,
   subscriptionService?: SubscriptionService
 ): StructuredToolInterface {
-  return new DynamicStructuredTool({
-    name: 'delete_term_group',
-    description:
-      'Delete a term group from wFirma. WARNING: This action cannot be undone. Make sure to reassign any terms in this group first.',
-    schema: z.object({
-      termGroupId: z.string().describe('Term group ID to delete'),
-    }),
-    func: async ({ termGroupId }: { termGroupId: string }) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (tool as any)(
+    async ({ termGroupId }: { termGroupId: string }) => {
       try {
         const limitError = await checkWFirmaLimit(subscriptionService, userId, locale);
         if (limitError) return limitError;
@@ -652,6 +665,13 @@ export function createDeleteTermGroupTool(
         return `Error: ${t.errorDeleteGroup}`;
       }
     },
-  });
-
+    {
+      name: 'delete_term_group',
+      description:
+        'Delete a term group from wFirma. WARNING: This action cannot be undone. Make sure to reassign any terms in this group first.',
+      schema: z.object({
+        termGroupId: z.string().describe('Term group ID to delete'),
+      }),
+    }
+  );
 }

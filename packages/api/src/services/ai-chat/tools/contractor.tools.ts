@@ -3,7 +3,7 @@
  * LangChain tools for contractor CRUD operations
  */
 
-import { DynamicStructuredTool, StructuredToolInterface } from '@langchain/core/tools';
+import { tool, StructuredToolInterface } from '@langchain/core/tools';
 import { z } from 'zod';
 import { logger } from '../../../utils/logger';
 import { getContractorTranslations, Locale } from '../../../i18n';
@@ -30,15 +30,9 @@ export function createGetContractorsTool(
   userId: string,
   subscriptionService?: SubscriptionService
 ): StructuredToolInterface {
-  return new DynamicStructuredTool({
-    name: 'get_contractors',
-    description: 'Get list of contractors/customers from wFirma. Can filter by name or NIP. Use when user asks about their clients or contractors.',
-    schema: z.object({
-      search: z.string().nullable().optional().describe('Search by contractor name'),
-      nip: z.string().nullable().optional().describe('Filter by NIP number'),
-      limit: z.number().nullable().optional().describe('Maximum number of results (default 100)'),
-    }),
-    func: async ({ search, nip, limit }: { search?: string; nip?: string; limit?: number }) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (tool as any)(
+    async ({ search, nip, limit }: { search?: string; nip?: string; limit?: number }) => {
       try {
         const limitError = await checkWFirmaLimit(subscriptionService, userId, locale);
         if (limitError) return limitError;
@@ -59,8 +53,16 @@ export function createGetContractorsTool(
         return `Error: ${t.errorFetch}`;
       }
     },
-  });
-
+    {
+      name: 'get_contractors',
+      description: 'Get list of contractors/customers from wFirma. Can filter by name or NIP. Use when user asks about their clients or contractors.',
+      schema: z.object({
+        search: z.string().nullable().optional().describe('Search by contractor name'),
+        nip: z.string().nullable().optional().describe('Filter by NIP number'),
+        limit: z.number().nullable().optional().describe('Maximum number of results (default 100)'),
+      }),
+    }
+  );
 }
 
 export function createCreateContractorTool(
@@ -71,34 +73,9 @@ export function createCreateContractorTool(
   subscriptionService?: SubscriptionService,
   enrichmentService?: CompanyEnrichmentService,
 ): StructuredToolInterface {
-  return new DynamicStructuredTool({
-    name: 'create_contractor',
-    description:
-      'Create a new contractor/customer in wFirma. Provide either `name` OR `nip` (when only NIP is given, name/REGON/address are auto-filled from the Polish public registry — Biała Lista MF). Optional: email, phone, street, city, zip, country (2-letter code like PL, LT), bankAccount, notes. The reply lists which fields were auto-filled.',
-    schema: z.object({
-      name: z
-        .string()
-        .nullable()
-        .optional()
-        .describe(
-          'Full name or company name of the contractor. Optional only if NIP is provided — in that case it is auto-filled from the Polish public registry.',
-        ),
-      nip: z
-        .string()
-        .nullable()
-        .optional()
-        .describe('NIP (Polish tax ID) — 10 digits. When provided, missing fields (name, REGON, address) are auto-filled from Biała Lista MF.'),
-      regon: z.string().nullable().optional().describe('REGON number'),
-      email: z.string().nullable().optional().describe('Email address'),
-      phone: z.string().nullable().optional().describe('Phone number'),
-      street: z.string().nullable().optional().describe('Street address'),
-      city: z.string().nullable().optional().describe('City'),
-      zip: z.string().nullable().optional().describe('Postal code (e.g., 00-001)'),
-      country: z.string().nullable().optional().describe('Country code (default: PL)'),
-      bankAccount: z.string().nullable().optional().describe('Bank account number'),
-      notes: z.string().nullable().optional().describe('Additional notes'),
-    }),
-    func: async ({
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (tool as any)(
+    async ({
       name,
       nip,
       regon,
@@ -258,8 +235,35 @@ ${t.tryAgain}`;
         return `Error: ${t.errorCreate}`;
       }
     },
-  });
-
+    {
+      name: 'create_contractor',
+      description:
+        'Create a new contractor/customer in wFirma. Provide either `name` OR `nip` (when only NIP is given, name/REGON/address are auto-filled from the Polish public registry — Biała Lista MF). Optional: email, phone, street, city, zip, country (2-letter code like PL, LT), bankAccount, notes. The reply lists which fields were auto-filled.',
+      schema: z.object({
+        name: z
+          .string()
+          .nullable()
+          .optional()
+          .describe(
+            'Full name or company name of the contractor. Optional only if NIP is provided — in that case it is auto-filled from the Polish public registry.',
+          ),
+        nip: z
+          .string()
+          .nullable()
+          .optional()
+          .describe('NIP (Polish tax ID) — 10 digits. When provided, missing fields (name, REGON, address) are auto-filled from Biała Lista MF.'),
+        regon: z.string().nullable().optional().describe('REGON number'),
+        email: z.string().nullable().optional().describe('Email address'),
+        phone: z.string().nullable().optional().describe('Phone number'),
+        street: z.string().nullable().optional().describe('Street address'),
+        city: z.string().nullable().optional().describe('City'),
+        zip: z.string().nullable().optional().describe('Postal code (e.g., 00-001)'),
+        country: z.string().nullable().optional().describe('Country code (default: PL)'),
+        bankAccount: z.string().nullable().optional().describe('Bank account number'),
+        notes: z.string().nullable().optional().describe('Additional notes'),
+      }),
+    }
+  );
 }
 
 export function createUpdateContractorTool(
@@ -269,24 +273,9 @@ export function createUpdateContractorTool(
   locale: Locale,
   subscriptionService?: SubscriptionService
 ): StructuredToolInterface {
-  return new DynamicStructuredTool({
-    name: 'update_contractor',
-    description: 'Update an existing contractor/customer in wFirma by name. Searches for contractor by exact name match, then updates specified fields.',
-    schema: z.object({
-      contractorName: z.string().describe('Current name of contractor to update (exact match)'),
-      newName: z.string().nullable().optional().describe('New company/contractor name'),
-      nip: z.string().nullable().optional().describe('New NIP (Polish tax ID)'),
-      regon: z.string().nullable().optional().describe('New REGON number'),
-      email: z.string().nullable().optional().describe('New email address'),
-      phone: z.string().nullable().optional().describe('New phone number'),
-      street: z.string().nullable().optional().describe('New street address'),
-      city: z.string().nullable().optional().describe('New city'),
-      zip: z.string().nullable().optional().describe('New postal code'),
-      country: z.string().nullable().optional().describe('New country code'),
-      bankAccount: z.string().nullable().optional().describe('New bank account number'),
-      notes: z.string().nullable().optional().describe('New notes'),
-    }),
-    func: async ({
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (tool as any)(
+    async ({
       contractorName,
       newName,
       nip,
@@ -367,8 +356,25 @@ export function createUpdateContractorTool(
         return `Error: ${t.errorUpdate}`;
       }
     },
-  });
-
+    {
+      name: 'update_contractor',
+      description: 'Update an existing contractor/customer in wFirma by name. Searches for contractor by exact name match, then updates specified fields.',
+      schema: z.object({
+        contractorName: z.string().describe('Current name of contractor to update (exact match)'),
+        newName: z.string().nullable().optional().describe('New company/contractor name'),
+        nip: z.string().nullable().optional().describe('New NIP (Polish tax ID)'),
+        regon: z.string().nullable().optional().describe('New REGON number'),
+        email: z.string().nullable().optional().describe('New email address'),
+        phone: z.string().nullable().optional().describe('New phone number'),
+        street: z.string().nullable().optional().describe('New street address'),
+        city: z.string().nullable().optional().describe('New city'),
+        zip: z.string().nullable().optional().describe('New postal code'),
+        country: z.string().nullable().optional().describe('New country code'),
+        bankAccount: z.string().nullable().optional().describe('New bank account number'),
+        notes: z.string().nullable().optional().describe('New notes'),
+      }),
+    }
+  );
 }
 
 export function createDeleteContractorTool(
@@ -378,13 +384,9 @@ export function createDeleteContractorTool(
   locale: Locale,
   subscriptionService?: SubscriptionService
 ): StructuredToolInterface {
-  return new DynamicStructuredTool({
-    name: 'delete_contractor',
-    description: 'Delete a contractor/customer from wFirma by name. Use when user wants to remove a contractor. Searches by exact name match. WARNING: This action cannot be undone.',
-    schema: z.object({
-      name: z.string().describe('Contractor name to delete (exact match required)'),
-    }),
-    func: async ({ name }: { name: string }) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (tool as any)(
+    async ({ name }: { name: string }) => {
       try {
         const limitError = await checkWFirmaLimit(subscriptionService, userId, locale);
         if (limitError) return limitError;
@@ -420,6 +422,12 @@ export function createDeleteContractorTool(
         return `Error: ${t.errorDelete}`;
       }
     },
-  });
-
+    {
+      name: 'delete_contractor',
+      description: 'Delete a contractor/customer from wFirma by name. Use when user wants to remove a contractor. Searches by exact name match. WARNING: This action cannot be undone.',
+      schema: z.object({
+        name: z.string().describe('Contractor name to delete (exact match required)'),
+      }),
+    }
+  );
 }

@@ -3,7 +3,7 @@
  * LangChain tools for invoice operations
  */
 
-import { DynamicStructuredTool, StructuredToolInterface } from '@langchain/core/tools';
+import { tool, StructuredToolInterface } from '@langchain/core/tools';
 import { z } from 'zod';
 import { logger } from '../../../utils/logger';
 import { getInvoiceTranslations, Locale } from '../../../i18n';
@@ -37,15 +37,9 @@ export function createGetInvoicesTool(
   locale: Locale,
   subscriptionService?: SubscriptionService
 ): StructuredToolInterface {
-  return new DynamicStructuredTool({
-    name: 'get_invoices',
-    description: 'Get list of OUTGOING invoices (faktury sprzedaży — issued by the user to their clients) from wFirma. For INCOMING bills/purchases (wydatki), use get_expenses instead. CRITICAL: whenever the user mentions any period (month, year, quarter, "last month", "April 2026", etc.) you MUST pass dateFrom and dateTo. Never call this tool without date filters if a period was mentioned — returning unfiltered results is a bug.',
-    schema: z.object({
-      dateFrom: z.string().nullable().optional().describe('Start date YYYY-MM-DD inclusive. REQUIRED when user specifies any period. For "April 2026" pass "2026-04-01".'),
-      dateTo: z.string().nullable().optional().describe('End date YYYY-MM-DD inclusive. REQUIRED when user specifies any period. For "April 2026" pass "2026-04-30".'),
-      status: z.enum(['all', 'paid', 'unpaid', 'overdue', 'draft', 'issued', 'sent']).nullable().optional().describe('Filter by payment status'),
-    }),
-    func: async ({ dateFrom, dateTo, status }: { dateFrom?: string; dateTo?: string; status?: string }) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (tool as any)(
+    async ({ dateFrom, dateTo, status }: { dateFrom?: string; dateTo?: string; status?: string }) => {
       try {
         // Check wFirma usage limit
         const limitError = await checkWFirmaLimit(subscriptionService, userId, locale);
@@ -71,8 +65,16 @@ export function createGetInvoicesTool(
         return `Error: ${getInvoiceTranslations(locale).errorFetch}`;
       }
     },
-  });
-
+    {
+      name: 'get_invoices',
+      description: 'Get list of OUTGOING invoices (faktury sprzedaży — issued by the user to their clients) from wFirma. For INCOMING bills/purchases (wydatki), use get_expenses instead. CRITICAL: whenever the user mentions any period (month, year, quarter, "last month", "April 2026", etc.) you MUST pass dateFrom and dateTo. Never call this tool without date filters if a period was mentioned — returning unfiltered results is a bug.',
+      schema: z.object({
+        dateFrom: z.string().nullable().optional().describe('Start date YYYY-MM-DD inclusive. REQUIRED when user specifies any period. For "April 2026" pass "2026-04-01".'),
+        dateTo: z.string().nullable().optional().describe('End date YYYY-MM-DD inclusive. REQUIRED when user specifies any period. For "April 2026" pass "2026-04-30".'),
+        status: z.enum(['all', 'paid', 'unpaid', 'overdue', 'draft', 'issued', 'sent']).nullable().optional().describe('Filter by payment status'),
+      }),
+    }
+  );
 }
 
 export function createGetInvoiceDetailsTool(
@@ -81,13 +83,9 @@ export function createGetInvoiceDetailsTool(
   locale: Locale,
   subscriptionService?: SubscriptionService
 ): StructuredToolInterface {
-  return new DynamicStructuredTool({
-    name: 'get_invoice_details',
-    description: 'Get full details of a specific invoice by invoice number, including all line items.',
-    schema: z.object({
-      invoiceNumber: z.string().describe('Invoice number (e.g., FV 1/2024, FV/01/2024)'),
-    }),
-    func: async ({ invoiceNumber }: { invoiceNumber: string }) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (tool as any)(
+    async ({ invoiceNumber }: { invoiceNumber: string }) => {
       try {
         // Check wFirma usage limit
         const limitError = await checkWFirmaLimit(subscriptionService, userId, locale);
@@ -116,8 +114,14 @@ export function createGetInvoiceDetailsTool(
         return `Error: ${getInvoiceTranslations(locale).errorFetchDetails}`;
       }
     },
-  });
-
+    {
+      name: 'get_invoice_details',
+      description: 'Get full details of a specific invoice by invoice number, including all line items.',
+      schema: z.object({
+        invoiceNumber: z.string().describe('Invoice number (e.g., FV 1/2024, FV/01/2024)'),
+      }),
+    }
+  );
 }
 
 export function createSendInvoiceTool(
@@ -127,16 +131,9 @@ export function createSendInvoiceTool(
   locale: Locale,
   subscriptionService?: SubscriptionService
 ): StructuredToolInterface {
-  return new DynamicStructuredTool({
-    name: 'send_invoice',
-    description: 'Send an invoice via email to the contractor. Uses contractor email if not provided.',
-    schema: z.object({
-      invoiceNumber: z.string().describe('Invoice number to send'),
-      email: z.string().nullable().optional().describe('Email address (uses contractor email if not provided)'),
-      subject: z.string().nullable().optional().describe('Email subject'),
-      body: z.string().nullable().optional().describe('Email body message'),
-    }),
-    func: async ({ invoiceNumber, email, subject, body }: {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (tool as any)(
+    async ({ invoiceNumber, email, subject, body }: {
       invoiceNumber: string;
       email?: string;
       subject?: string;
@@ -176,8 +173,17 @@ export function createSendInvoiceTool(
         return `Error: ${getInvoiceTranslations(locale).errorSend}\n\n${reason}`;
       }
     },
-  });
-
+    {
+      name: 'send_invoice',
+      description: 'Send an invoice via email to the contractor. Uses contractor email if not provided.',
+      schema: z.object({
+        invoiceNumber: z.string().describe('Invoice number to send'),
+        email: z.string().nullable().optional().describe('Email address (uses contractor email if not provided)'),
+        subject: z.string().nullable().optional().describe('Email subject'),
+        body: z.string().nullable().optional().describe('Email body message'),
+      }),
+    }
+  );
 }
 
 export function createAddInvoiceNoteTool(
@@ -187,14 +193,9 @@ export function createAddInvoiceNoteTool(
   locale: Locale,
   subscriptionService?: SubscriptionService
 ): StructuredToolInterface {
-  return new DynamicStructuredTool({
-    name: 'add_invoice_note',
-    description: 'Add a note/comment to an invoice.',
-    schema: z.object({
-      invoiceNumber: z.string().describe('Invoice number'),
-      text: z.string().describe('Note text'),
-    }),
-    func: async ({ invoiceNumber, text }: { invoiceNumber: string; text: string }) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (tool as any)(
+    async ({ invoiceNumber, text }: { invoiceNumber: string; text: string }) => {
       try {
         // Check wFirma usage limit
         const limitError = await checkWFirmaLimit(subscriptionService, userId, locale);
@@ -224,8 +225,15 @@ export function createAddInvoiceNoteTool(
         return `Error: ${getInvoiceTranslations(locale).errorAddNote}`;
       }
     },
-  });
-
+    {
+      name: 'add_invoice_note',
+      description: 'Add a note/comment to an invoice.',
+      schema: z.object({
+        invoiceNumber: z.string().describe('Invoice number'),
+        text: z.string().describe('Note text'),
+      }),
+    }
+  );
 }
 
 export function createGetInvoiceNotesTool(
@@ -234,13 +242,9 @@ export function createGetInvoiceNotesTool(
   locale: Locale,
   subscriptionService?: SubscriptionService
 ): StructuredToolInterface {
-  return new DynamicStructuredTool({
-    name: 'get_invoice_notes',
-    description: 'Get all notes attached to an invoice.',
-    schema: z.object({
-      invoiceNumber: z.string().describe('Invoice number'),
-    }),
-    func: async ({ invoiceNumber }: { invoiceNumber: string }) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (tool as any)(
+    async ({ invoiceNumber }: { invoiceNumber: string }) => {
       try {
         // Check wFirma usage limit
         const limitError = await checkWFirmaLimit(subscriptionService, userId, locale);
@@ -271,8 +275,14 @@ export function createGetInvoiceNotesTool(
         return `Error: ${getInvoiceTranslations(locale).errorFetchNotes}`;
       }
     },
-  });
-
+    {
+      name: 'get_invoice_notes',
+      description: 'Get all notes attached to an invoice.',
+      schema: z.object({
+        invoiceNumber: z.string().describe('Invoice number'),
+      }),
+    }
+  );
 }
 
 export function createDeleteInvoiceNoteTool(
@@ -282,13 +292,9 @@ export function createDeleteInvoiceNoteTool(
   locale: Locale,
   subscriptionService?: SubscriptionService
 ): StructuredToolInterface {
-  return new DynamicStructuredTool({
-    name: 'delete_invoice_note',
-    description: 'Delete a note from an invoice by note ID.',
-    schema: z.object({
-      noteId: z.string().describe('Note ID to delete'),
-    }),
-    func: async ({ noteId }: { noteId: string }) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (tool as any)(
+    async ({ noteId }: { noteId: string }) => {
       try {
         // Check wFirma usage limit
         const limitError = await checkWFirmaLimit(subscriptionService, userId, locale);
@@ -308,8 +314,14 @@ export function createDeleteInvoiceNoteTool(
         return `Error: ${getInvoiceTranslations(locale).errorDeleteNote}`;
       }
     },
-  });
-
+    {
+      name: 'delete_invoice_note',
+      description: 'Delete a note from an invoice by note ID.',
+      schema: z.object({
+        noteId: z.string().describe('Note ID to delete'),
+      }),
+    }
+  );
 }
 
 export function createDownloadInvoiceTool(
@@ -319,15 +331,9 @@ export function createDownloadInvoiceTool(
   locale: Locale,
   subscriptionService?: SubscriptionService
 ): StructuredToolInterface {
-  return new DynamicStructuredTool({
-    name: 'download_invoice',
-    description: 'Download invoice as PDF file. Returns a download link valid for 15 minutes.',
-    schema: z.object({
-      invoiceNumber: z.string().describe('Invoice number to download (e.g., FV 1/2024)'),
-      page: z.enum(['all', 'invoice', 'invoicecopy']).nullable().optional()
-        .describe('PDF content: all (original+copy), invoice (original only), invoicecopy (copy only). Default: invoice'),
-    }),
-    func: async ({ invoiceNumber, page }: { invoiceNumber: string; page?: string }) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (tool as any)(
+    async ({ invoiceNumber, page }: { invoiceNumber: string; page?: string }) => {
       try {
         // Check wFirma usage limit
         const limitError = await checkWFirmaLimit(subscriptionService, userId, locale);
@@ -378,8 +384,16 @@ export function createDownloadInvoiceTool(
         return `Error: ${t.errorDownload}`;
       }
     },
-  });
-
+    {
+      name: 'download_invoice',
+      description: 'Download invoice as PDF file. Returns a download link valid for 15 minutes.',
+      schema: z.object({
+        invoiceNumber: z.string().describe('Invoice number to download (e.g., FV 1/2024)'),
+        page: z.enum(['all', 'invoice', 'invoicecopy']).nullable().optional()
+          .describe('PDF content: all (original+copy), invoice (original only), invoicecopy (copy only). Default: invoice'),
+      }),
+    }
+  );
 }
 
 export function createCreateInvoiceTool(
@@ -389,30 +403,9 @@ export function createCreateInvoiceTool(
   locale: Locale,
   subscriptionService?: SubscriptionService
 ): StructuredToolInterface {
-  return new DynamicStructuredTool({
-    name: 'create_invoice',
-    description: 'Create a new invoice in wFirma. Requires contractor and at least one item. IMPORTANT: Use type="bill" for invoices without VAT (bez VAT, без НДС). Use type="normal" only if company is VAT payer.',
-    schema: z.object({
-      contractorName: z.string().nullable().optional().describe('Contractor name (use if no ID)'),
-      contractorId: z.string().nullable().optional().describe('Contractor ID from wFirma'),
-      contractorNip: z.string().nullable().optional().describe('Contractor NIP (tax ID)'),
-      type: z.enum(['normal', 'proforma', 'bill', 'receipt_normal', 'margin']).nullable().optional()
-        .describe('Invoice type: "bill" for non-VAT invoices (bez VAT/без НДС), "normal" for VAT invoices (requires VAT payer status), "proforma" for pro-forma. Default: bill'),
-      items: z.array(z.object({
-        name: z.string().describe('Item/service name'),
-        quantity: z.number().describe('Quantity'),
-        unit: z.string().describe('Unit (e.g., szt., godz., usługa)'),
-        priceNet: z.number().describe('Net price per unit'),
-        vatRate: z.string().nullable().optional().describe('VAT rate: 23, 8, 5, 0, zw (default: 23)'),
-      })).describe('Invoice line items'),
-      paymentMethod: z.enum(['transfer', 'cash', 'card', 'compensation']).nullable().optional()
-        .describe('Payment method'),
-      issueDate: z.string().nullable().optional().describe('Invoice issue date (YYYY-MM-DD)'),
-      dueDate: z.string().nullable().optional().describe('Payment due date (YYYY-MM-DD)'),
-      currency: z.string().nullable().optional().describe('Currency code (default: PLN)'),
-      description: z.string().nullable().optional().describe('Invoice notes/description'),
-    }),
-    func: async ({
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (tool as any)(
+    async ({
       contractorName,
       contractorId,
       contractorNip,
@@ -547,8 +540,31 @@ export function createCreateInvoiceTool(
         return `Error: ${t.errorCreate}`;
       }
     },
-  });
-
+    {
+      name: 'create_invoice',
+      description: 'Create a new invoice in wFirma. Requires contractor and at least one item. IMPORTANT: Use type="bill" for invoices without VAT (bez VAT, без НДС). Use type="normal" only if company is VAT payer.',
+      schema: z.object({
+        contractorName: z.string().nullable().optional().describe('Contractor name (use if no ID)'),
+        contractorId: z.string().nullable().optional().describe('Contractor ID from wFirma'),
+        contractorNip: z.string().nullable().optional().describe('Contractor NIP (tax ID)'),
+        type: z.enum(['normal', 'proforma', 'bill', 'receipt_normal', 'margin']).nullable().optional()
+          .describe('Invoice type: "bill" for non-VAT invoices (bez VAT/без НДС), "normal" for VAT invoices (requires VAT payer status), "proforma" for pro-forma. Default: bill'),
+        items: z.array(z.object({
+          name: z.string().describe('Item/service name'),
+          quantity: z.number().describe('Quantity'),
+          unit: z.string().describe('Unit (e.g., szt., godz., usługa)'),
+          priceNet: z.number().describe('Net price per unit'),
+          vatRate: z.string().nullable().optional().describe('VAT rate: 23, 8, 5, 0, zw (default: 23)'),
+        })).describe('Invoice line items'),
+        paymentMethod: z.enum(['transfer', 'cash', 'card', 'compensation']).nullable().optional()
+          .describe('Payment method'),
+        issueDate: z.string().nullable().optional().describe('Invoice issue date (YYYY-MM-DD)'),
+        dueDate: z.string().nullable().optional().describe('Payment due date (YYYY-MM-DD)'),
+        currency: z.string().nullable().optional().describe('Currency code (default: PLN)'),
+        description: z.string().nullable().optional().describe('Invoice notes/description'),
+      }),
+    }
+  );
 }
 
 export function createUpdateInvoiceTool(
@@ -558,18 +574,9 @@ export function createUpdateInvoiceTool(
   locale: Locale,
   subscriptionService?: SubscriptionService
 ): StructuredToolInterface {
-  return new DynamicStructuredTool({
-    name: 'update_invoice',
-    description: 'Update an existing invoice. Can modify due date, payment method, description, or mark payments.',
-    schema: z.object({
-      invoiceNumber: z.string().describe('Invoice number to update (e.g., FV 1/2024)'),
-      dueDate: z.string().nullable().optional().describe('New due date (YYYY-MM-DD)'),
-      paymentMethod: z.enum(['transfer', 'cash', 'card', 'compensation']).nullable().optional()
-        .describe('Payment method'),
-      description: z.string().nullable().optional().describe('Invoice notes/description'),
-      alreadypaid: z.number().nullable().optional().describe('Amount already paid'),
-    }),
-    func: async ({
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (tool as any)(
+    async ({
       invoiceNumber,
       dueDate,
       paymentMethod,
@@ -629,8 +636,19 @@ export function createUpdateInvoiceTool(
         return `Error: ${t.errorUpdate}`;
       }
     },
-  });
-
+    {
+      name: 'update_invoice',
+      description: 'Update an existing invoice. Can modify due date, payment method, description, or mark payments.',
+      schema: z.object({
+        invoiceNumber: z.string().describe('Invoice number to update (e.g., FV 1/2024)'),
+        dueDate: z.string().nullable().optional().describe('New due date (YYYY-MM-DD)'),
+        paymentMethod: z.enum(['transfer', 'cash', 'card', 'compensation']).nullable().optional()
+          .describe('Payment method'),
+        description: z.string().nullable().optional().describe('Invoice notes/description'),
+        alreadypaid: z.number().nullable().optional().describe('Amount already paid'),
+      }),
+    }
+  );
 }
 
 export function createDeleteInvoiceTool(
@@ -640,13 +658,9 @@ export function createDeleteInvoiceTool(
   locale: Locale,
   subscriptionService?: SubscriptionService
 ): StructuredToolInterface {
-  return new DynamicStructuredTool({
-    name: 'delete_invoice',
-    description: 'Delete an invoice from wFirma. WARNING: This action cannot be undone.',
-    schema: z.object({
-      invoiceNumber: z.string().describe('Invoice number to delete (e.g., FV 1/2024)'),
-    }),
-    func: async ({ invoiceNumber }: { invoiceNumber: string }) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (tool as any)(
+    async ({ invoiceNumber }: { invoiceNumber: string }) => {
       try {
         // Check wFirma usage limit
         const limitError = await checkWFirmaLimit(subscriptionService, userId, locale);
@@ -688,6 +702,12 @@ export function createDeleteInvoiceTool(
         return `Error: ${t.errorDelete}`;
       }
     },
-  });
-
+    {
+      name: 'delete_invoice',
+      description: 'Delete an invoice from wFirma. WARNING: This action cannot be undone.',
+      schema: z.object({
+        invoiceNumber: z.string().describe('Invoice number to delete (e.g., FV 1/2024)'),
+      }),
+    }
+  );
 }
