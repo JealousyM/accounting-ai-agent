@@ -1,5 +1,8 @@
 import { Router } from 'express';
-import { authController } from '../controllers/auth.controller';
+import { authCoreController } from '../controllers/auth-core.controller';
+import { oauthController } from '../controllers/oauth.controller';
+import { tokenController } from '../controllers/token.controller';
+import { profileController } from '../controllers/profile.controller';
 import { authenticate } from '../middleware/auth.middleware';
 import { rateLimiter } from '../middleware/rate-limiter.middleware';
 import { validateRequest } from '../middleware/validation.middleware';
@@ -20,146 +23,82 @@ const router = Router();
 // PUBLIC ROUTES
 // ============================================
 
-/**
- * GET /api/auth/config
- * Get public auth configuration (OAuth visibility settings)
- */
-router.get('/config', authController.getConfig.bind(authController));
+router.get('/config', profileController.getConfig.bind(profileController));
 
-/**
- * POST /api/auth/register
- * Register a new user
- */
 router.post(
   '/register',
-  rateLimiter({ windowMs: 15 * 60 * 1000, max: 5 }), // 5 requests per 15 minutes
+  rateLimiter({ windowMs: 15 * 60 * 1000, max: 5 }),
   validateRequest(registerSchema),
-  authController.register.bind(authController)
+  authCoreController.register.bind(authCoreController)
 );
 
-/**
- * POST /api/auth/login
- * Login existing user
- */
 router.post(
   '/login',
-  rateLimiter({ windowMs: 15 * 60 * 1000, max: 10 }), // 10 requests per 15 minutes
+  rateLimiter({ windowMs: 15 * 60 * 1000, max: 10 }),
   validateRequest(loginSchema),
-  authController.login.bind(authController)
+  authCoreController.login.bind(authCoreController)
 );
 
-/**
- * POST /api/auth/refresh
- * Refresh access token
- */
 router.post(
   '/refresh',
-  rateLimiter({ windowMs: 15 * 60 * 1000, max: 20 }), // 20 requests per 15 minutes
+  rateLimiter({ windowMs: 15 * 60 * 1000, max: 20 }),
   validateRequest(refreshTokenSchema),
-  authController.refresh.bind(authController)
+  tokenController.refresh.bind(tokenController)
 );
 
-/**
- * POST /api/auth/forgot-password
- * Request password reset email
- */
 router.post(
   '/forgot-password',
-  rateLimiter({ windowMs: 15 * 60 * 1000, max: 3 }), // 3 requests per 15 minutes (strict limit)
+  rateLimiter({ windowMs: 15 * 60 * 1000, max: 3 }),
   validateRequest(forgotPasswordSchema),
-  authController.forgotPassword.bind(authController)
+  authCoreController.forgotPassword.bind(authCoreController)
 );
 
-/**
- * POST /api/auth/reset-password
- * Reset password using token
- */
 router.post(
   '/reset-password',
-  rateLimiter({ windowMs: 15 * 60 * 1000, max: 5 }), // 5 requests per 15 minutes
+  rateLimiter({ windowMs: 15 * 60 * 1000, max: 5 }),
   validateRequest(resetPasswordSchema),
-  authController.resetPassword.bind(authController)
+  authCoreController.resetPassword.bind(authCoreController)
 );
 
-/**
- * GET /api/auth/llm-models
- * Fetch available LLM models for registration (public endpoint)
- */
 router.get(
   '/llm-models',
-  rateLimiter({ windowMs: 60 * 1000, max: 10 }), // 10 requests per minute
-  authController.getPublicLLMModels.bind(authController)
+  rateLimiter({ windowMs: 60 * 1000, max: 10 }),
+  profileController.getPublicLLMModels.bind(profileController)
 );
 
 // ============================================
 // OAUTH ROUTES
 // ============================================
 
-/**
- * POST /api/auth/oauth/google
- * Google OAuth authentication - accepts access_token for secure server-side verification
- */
 router.post(
   '/oauth/google',
   rateLimiter({ windowMs: 15 * 60 * 1000, max: 10 }),
   validateRequest(googleOAuthSchema),
-  authController.googleOAuth.bind(authController)
+  oauthController.googleOAuth.bind(oauthController)
 );
 
 // ============================================
 // PROTECTED ROUTES
 // ============================================
 
-/**
- * POST /api/auth/logout
- * Logout user (invalidate refresh token)
- */
-router.post(
-  '/logout',
-  authenticate,
-  authController.logout.bind(authController)
-);
+router.post('/logout', authenticate, tokenController.logout.bind(tokenController));
 
-/**
- * GET /api/auth/me
- * Get current user profile
- */
-router.get(
-  '/me',
-  authenticate,
-  authController.me.bind(authController)
-);
+router.get('/me', authenticate, profileController.me.bind(profileController));
 
-/**
- * PATCH /api/auth/profile
- * Update user profile
- */
 router.patch(
   '/profile',
   authenticate,
   validateRequest(updateProfileSchema),
-  authController.updateProfile.bind(authController)
+  profileController.updateProfile.bind(profileController)
 );
 
-/**
- * POST /api/auth/first-login-complete
- * Mark first login as complete (hide welcome modal)
- */
-router.post(
-  '/first-login-complete',
-  authenticate,
-  authController.markFirstLoginComplete.bind(authController)
-);
+router.post('/first-login-complete', authenticate, profileController.markFirstLoginComplete.bind(profileController));
 
-/**
- * POST /api/auth/complete-profile
- * Complete OAuth user profile with LLM and optional wFirma credentials
- */
 router.post(
   '/complete-profile',
   authenticate,
   validateRequest(completeProfileSchema),
-  authController.completeProfile.bind(authController)
+  oauthController.completeProfile.bind(oauthController)
 );
 
 export default router;
