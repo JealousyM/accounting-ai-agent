@@ -203,6 +203,7 @@ model User {
   telegramLink      TelegramLink?
   referralsMade     Referral[] @relation("referrals_made")
   referredBy        Referral?  @relation("referred_by")
+  promptShortcuts   UserPromptShortcut[]
 
   @@index([email])
   @@index([googleId])
@@ -730,6 +731,25 @@ model AIMemory {
   @@index([userId, category])
   @@index([userId, isHidden])
   @@map("ai_memories")
+}
+
+// ============================================
+// PROMPT SHORTCUTS
+// ============================================
+
+model UserPromptShortcut {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @db.Uuid
+  label     String   @db.VarChar(100)
+  prompt    String   @db.Text
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, sortOrder])
+  @@map("user_prompt_shortcuts")
 }
 
 model AIToolUsage {
