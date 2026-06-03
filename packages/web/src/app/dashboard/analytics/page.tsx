@@ -32,7 +32,7 @@ export default function AnalyticsDashboardPage() {
 
 function AnalyticsDashboardContent() {
   const { locale } = useLocale();
-  const t = (translations[locale] as any).analytics;
+  const t = (translations[locale] as typeof enTranslations).analytics;
 
   const { data, range, setRange, isLoading, refetch } = useUserAnalytics();
 
