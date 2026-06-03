@@ -25,6 +25,7 @@ export const API_ENDPOINTS = {
     LOCALE: '/api/users/locale',
     PROFILE: '/api/users/profile',
     UPDATE: '/api/users/update',
+    ANALYTICS: '/api/users/me/analytics',
   },
 
   // Invoices
