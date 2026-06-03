@@ -8,6 +8,7 @@ initSentry();
 import express, { Application, Request, Response } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
+import { APP_VERSION } from './lib/version';
 import authRoutes from './routes/auth.routes';
 import userRoutes from './routes/user.routes';
 import credentialsRoutes from './routes/credentials.routes';
@@ -84,7 +85,7 @@ app.get('/health/live', (_req: Request, res: Response) => {
 
 // API routes
 app.get('/api', (_req: Request, res: Response) => {
-  res.json({ message: 'Accounting AI Agent API', version: '1.0.0' });
+  res.json({ message: 'Accounting AI Agent API', version: APP_VERSION });
 });
 
 // Auth routes
