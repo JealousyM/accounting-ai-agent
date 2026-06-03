@@ -410,6 +410,7 @@ function ChatContainerInner() {
             toolsTranslations={t.tools}
             suggestionsTranslations={t.suggestions}
             ttsTranslations={t.tts}
+            onSuggestionClick={handleSendMessage}
           />
         </div>
 

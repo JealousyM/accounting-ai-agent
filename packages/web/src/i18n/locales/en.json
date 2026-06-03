@@ -226,7 +226,9 @@
       "vatRates": "What are VAT rates?",
       "companyData": "Show my company data",
       "ipBox": "What is IP Box?",
-      "zusPayment": "When to pay ZUS?"
+      "zusPayment": "When to pay ZUS?",
+      "unpaidInvoices": "List my unpaid invoices",
+      "taxDeadlines": "Show upcoming tax deadlines"
     },
     "tts": {
       "play": "Read aloud",

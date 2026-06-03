@@ -226,7 +226,9 @@
       "vatRates": "Jakie są stawki VAT?",
       "companyData": "Pokaż dane mojej firmy",
       "ipBox": "Co to jest IP Box?",
-      "zusPayment": "Kiedy płacić ZUS?"
+      "zusPayment": "Kiedy płacić ZUS?",
+      "unpaidInvoices": "Pokaż nieopłacone faktury",
+      "taxDeadlines": "Pokaż nadchodzące terminy podatkowe"
     },
     "tts": {
       "play": "Przeczytaj na głos",

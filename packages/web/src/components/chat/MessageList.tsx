@@ -27,6 +27,8 @@ interface SuggestionsTranslations {
   companyData: string;
   ipBox: string;
   zusPayment: string;
+  unpaidInvoices: string;
+  taxDeadlines: string;
 }
 
 interface TTSTranslations {
@@ -43,6 +45,7 @@ interface MessageListProps {
   toolsTranslations: ToolsTranslations;
   suggestionsTranslations: SuggestionsTranslations;
   ttsTranslations: TTSTranslations;
+  onSuggestionClick?: (text: string) => void;
 }
 
 export function MessageList({
@@ -53,6 +56,7 @@ export function MessageList({
   toolsTranslations,
   suggestionsTranslations,
   ttsTranslations,
+  onSuggestionClick,
 }: MessageListProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -74,6 +78,8 @@ export function MessageList({
     suggestionsTranslations.companyData,
     suggestionsTranslations.ipBox,
     suggestionsTranslations.zusPayment,
+    suggestionsTranslations.unpaidInvoices,
+    suggestionsTranslations.taxDeadlines,
   ];
 
   if (messages.length === 0) {
@@ -88,14 +94,16 @@ export function MessageList({
         <p className="text-gray-500 dark:text-gray-400 max-w-md mb-6">
           {translations.emptyDescription}
         </p>
-        <div className="flex flex-wrap justify-center gap-2">
+        <div className="flex flex-wrap justify-center gap-2 max-w-lg">
           {suggestions.map((suggestion, index) => (
-            <span
+            <button
               key={index}
-              className="px-3 py-1.5 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-sm rounded-full"
+              type="button"
+              onClick={() => onSuggestionClick?.(suggestion)}
+              className="px-3 py-1.5 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-sm rounded-full hover:bg-blue-50 hover:text-blue-700 dark:hover:bg-blue-900/40 dark:hover:text-blue-300 hover:border-blue-200 dark:hover:border-blue-700 border border-transparent transition-colors duration-150 cursor-pointer"
             >
               {suggestion}
-            </span>
+            </button>
           ))}
         </div>
       </div>
