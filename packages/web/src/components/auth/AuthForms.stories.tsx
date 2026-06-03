@@ -157,7 +157,7 @@ export const LoginFormPreview: Story = {
 
       {/* App Version */}
       <div className="mt-8 text-center">
-        <span className="text-xs text-gray-400 dark:text-gray-500">v1.0.0</span>
+        <span className="text-xs text-gray-400 dark:text-gray-500">v1.1.0</span>
       </div>
     </div>
   ),
@@ -493,7 +493,7 @@ export const RegistrationFormPreview: Story = {
 
       {/* App Version */}
       <div className="mt-8 text-center">
-        <span className="text-xs text-gray-400 dark:text-gray-500">v1.0.0</span>
+        <span className="text-xs text-gray-400 dark:text-gray-500">v1.1.0</span>
       </div>
     </div>
   ),
