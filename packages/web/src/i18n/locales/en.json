@@ -841,6 +841,39 @@
       }
     }
   },
+  "analytics": {
+    "title": "AI Usage Analytics",
+    "backToChat": "Back to Chat",
+    "refresh": "Refresh",
+    "timeRange": {
+      "week": "7 Days",
+      "month": "30 Days",
+      "year": "1 Year"
+    },
+    "summary": {
+      "conversations": "Conversations",
+      "toolCalls": "Tool Calls",
+      "topTool": "Top Tool",
+      "noData": "—"
+    },
+    "quota": {
+      "title": "Usage This Period",
+      "used": "used",
+      "of": "of",
+      "unlimited": "Unlimited"
+    },
+    "activity": {
+      "title": "Daily Activity",
+      "conversations": "Conversations",
+      "toolCalls": "Tool Calls",
+      "noData": "No activity in the selected period"
+    },
+    "topTools": {
+      "title": "Top 5 Tools",
+      "noData": "No tool usage data",
+      "calls": "calls"
+    }
+  },
   "common": {
     "loading": "Loading...",
     "redirecting": "Redirecting...",
