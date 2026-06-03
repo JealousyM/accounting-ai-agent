@@ -64,7 +64,7 @@ export function usePromptShortcuts(): UsePromptShortcutsReturn {
 
   const isLimitError =
     createMutation.isError &&
-    (createMutation.error as any)?.message?.includes('SHORTCUT_LIMIT_REACHED');
+    (createMutation.error as Error)?.message?.includes('SHORTCUT_LIMIT_REACHED');
 
   return {
     shortcuts,
