@@ -1527,5 +1527,22 @@
         "wfirma": "wFirma integration is temporarily unavailable. Other features still work."
       }
     }
+  },
+  "promptShortcuts": {
+    "title": "Prompt Shortcuts",
+    "description": "Your saved prompts for frequent accounting tasks",
+    "sidebarLink": "Shortcuts",
+    "empty": "No shortcuts yet",
+    "emptyHint": "Save your frequent prompts here to reuse them in one click",
+    "addButton": "Add shortcut",
+    "labelPlaceholder": "Shortcut name (e.g. Unpaid invoices)",
+    "promptPlaceholder": "Prompt text (e.g. Show all unpaid invoices)",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "limitReached": "Shortcut limit reached (20/20)",
+    "limitHint": "Upgrade to Pro for unlimited shortcuts",
+    "clickToUse": "Click to pre-fill"
   }
 }

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { MessageSquarePlus, X, DollarSign, Crown, AlertTriangle, FileCheck, LayoutDashboard, Brain, Building2, Gift } from 'lucide-react';
+import { MessageSquarePlus, X, DollarSign, Crown, AlertTriangle, FileCheck, LayoutDashboard, Brain, Building2, Gift, BookmarkCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { AppVersion } from '@/components/ui/app-version';
 import Link from 'next/link';
@@ -18,6 +18,7 @@ import { CurrentPlanBadge, UsageWidget } from '@/components/subscription';
 import { useSubscription } from '@/hooks/useSubscription';
 import { TTSProvider, useAutoSpeak, useTTS } from '@/contexts/TTSContext';
 import { AIMemoryPanel } from './AIMemoryPanel';
+import { PromptShortcutsPanel } from './PromptShortcutsPanel';
 import { TaxDeadlineNudges } from './TaxDeadlineNudges';
 import { OrganizationPanel } from '@/components/organization/OrganizationPanel';
 import { useTaxDeadlines } from '@/hooks/useTaxDeadlines';
@@ -61,6 +62,8 @@ function ChatContainerInner() {
   const [showSubscriptionWelcome, setShowSubscriptionWelcome] = useState(false);
   const [showMemoryPanel, setShowMemoryPanel] = useState(false);
   const [showOrgPanel, setShowOrgPanel] = useState(false);
+  const [showShortcutsPanel, setShowShortcutsPanel] = useState(false);
+  const [shortcutPrefill, setShortcutPrefill] = useState<string | undefined>(undefined);
   const { locale, setLocale } = useLocale();
   const t = translations[locale].chat;
   const onboardingTranslations = translations[locale].onboarding;
@@ -291,6 +294,16 @@ function ChatContainerInner() {
                 <span>KSeF</span>
               </Link>
             </div>
+            {/* Prompt Shortcuts link */}
+            <div className="py-2 border-b border-gray-200 dark:border-gray-700">
+              <button
+                onClick={() => setShowShortcutsPanel(true)}
+                className="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors w-full text-left"
+              >
+                <BookmarkCheck className="w-4 h-4" />
+                <span>{translations[locale].promptShortcuts.sidebarLink}</span>
+              </button>
+            </div>
             {/* AI Memory link */}
             <div className="py-2 border-b border-gray-200 dark:border-gray-700">
               <button
@@ -451,6 +464,9 @@ function ChatContainerInner() {
           }
           translations={t.input}
           locale={locale}
+          prefillValue={shortcutPrefill}
+          onPrefillConsumed={() => setShortcutPrefill(undefined)}
+          onShortcutsClick={() => setShowShortcutsPanel(true)}
         />
       </div>
 
@@ -459,6 +475,14 @@ function ChatContainerInner() {
         open={showWfirmaWelcome}
         onClose={handleWfirmaWelcomeClose}
         translations={onboardingTranslations.wfirmaWelcome}
+      />
+
+      {/* Prompt Shortcuts Panel */}
+      <PromptShortcutsPanel
+        open={showShortcutsPanel}
+        onClose={() => setShowShortcutsPanel(false)}
+        onSelect={(prompt) => setShortcutPrefill(prompt)}
+        translations={translations[locale].promptShortcuts}
       />
 
       {/* AI Memory Panel */}

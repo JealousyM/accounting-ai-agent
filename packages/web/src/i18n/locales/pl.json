@@ -1527,5 +1527,22 @@
         "wfirma": "Integracja z wFirmą jest tymczasowo niedostępna. Pozostałe funkcje działają."
       }
     }
+  },
+  "promptShortcuts": {
+    "title": "Skróty promptów",
+    "description": "Twoje zapisane zapytania do częstych zadań księgowych",
+    "sidebarLink": "Skróty",
+    "empty": "Brak skrótów",
+    "emptyHint": "Zapisz tutaj swoje najczęstsze zapytania, aby używać ich jednym kliknięciem",
+    "addButton": "Dodaj skrót",
+    "labelPlaceholder": "Nazwa skrótu (np. Niezapłacone faktury)",
+    "promptPlaceholder": "Treść zapytania (np. Pokaż wszystkie niezapłacone faktury)",
+    "save": "Zapisz",
+    "cancel": "Anuluj",
+    "delete": "Usuń",
+    "edit": "Edytuj",
+    "limitReached": "Osiągnięto limit skrótów (20/20)",
+    "limitHint": "Przejdź na plan Pro, aby mieć nieograniczoną liczbę skrótów",
+    "clickToUse": "Kliknij, aby wstawić"
   }
 }
