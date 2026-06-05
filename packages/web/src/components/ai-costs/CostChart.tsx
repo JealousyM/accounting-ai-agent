@@ -80,9 +80,10 @@ export function CostChart({ data, isLoading, translations = DEFAULT_TRANSLATIONS
               tickLine={{ stroke: '#e5e7eb' }}
             />
             <Tooltip
-              formatter={(value: number, name: string) => {
-                if (name === 'cost') return [`$${value.toFixed(4)}`, 'Cost'];
-                return [value.toLocaleString(), name];
+              formatter={(value: number | undefined, name: string | undefined) => {
+                const v = value ?? 0;
+                if (name === 'cost') return [`$${v.toFixed(4)}`, 'Cost'];
+                return [v.toLocaleString(), name];
               }}
               contentStyle={{
                 backgroundColor: 'white',
