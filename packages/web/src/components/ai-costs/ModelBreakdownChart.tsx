@@ -79,7 +79,7 @@ export function ModelBreakdownChart({ data, isLoading, translations = DEFAULT_TR
               ))}
             </Pie>
             <Tooltip
-              formatter={(value: number | undefined) => formatCost(value ?? 0)}
+              formatter={(value: number) => formatCost(value)}
               contentStyle={{
                 backgroundColor: 'white',
                 border: '1px solid #e5e7eb',
