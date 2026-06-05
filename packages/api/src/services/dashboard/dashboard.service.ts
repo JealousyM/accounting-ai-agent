@@ -7,6 +7,7 @@ import { logger } from '../../utils/logger';
 import { WFirmaServiceFactory } from '../wfirma-integration.factory';
 import { KSeFService } from '../ksef/ksef.service';
 import { taxCalendarService } from '../tax-calendar.instance';
+import { WFirmaInvoice } from '../../types/wfirma.types';
 import {
   DashboardSummaryResponse,
   DashboardFinancialSummary,
@@ -118,16 +119,18 @@ export class DashboardService {
 
       const wfirmaService = await this.wfirmaServiceFactory.getServiceForUser(userId);
 
-      // One query, filter locally. Status is derived in mapInvoiceData from
-      // paymentdate + alreadypaid, so the wFirma endpoint has no native
-      // "unpaid" filter. Overdue is a strict subset of unpaid — previously
-      // the two were fetched separately (with a spurious status='unpaid'
-      // filter that matched nothing) and summed, double-counting overdue.
+      // One query, filter locally. wFirma's /invoices/find has no native
+      // "unpaid" filter and also returns non-invoice documents (PK ledger
+      // commands, type 'ledger_accounting_command') that carry no payment
+      // state. Count as unpaid only real invoices whose wFirma paymentState is
+      // 'unpaid' or 'remaining' — this excludes paid invoices AND the
+      // bookkeeping entries that previously inflated the count. Overdue is a
+      // strict subset of unpaid (mapInvoiceData marks it from a past due date).
       const invoices = await wfirmaService.findInvoices({ limit: 500 });
 
-      const isUnpaid = (s?: string) => s === 'issued' || s === 'sent' || s === 'overdue';
-      const plnGross = (inv: { totalNet?: number; totalVat?: number }) =>
-        (inv.totalNet ?? 0) + (inv.totalVat ?? 0);
+      const isUnpaid = (inv: WFirmaInvoice) =>
+        inv.paymentState === 'unpaid' || inv.paymentState === 'remaining';
+      const plnGross = (inv: WFirmaInvoice) => (inv.totalNet ?? 0) + (inv.totalVat ?? 0);
 
       let unpaidCount = 0;
       let unpaidTotal = 0;
@@ -135,7 +138,7 @@ export class DashboardService {
       let overdueTotal = 0;
 
       for (const inv of invoices) {
-        if (!isUnpaid(inv.status)) continue;
+        if (!isUnpaid(inv)) continue;
         const amount = plnGross(inv);
         unpaidCount += 1;
         unpaidTotal += amount;

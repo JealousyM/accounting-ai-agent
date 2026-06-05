@@ -254,22 +254,33 @@ describe('DashboardService', () => {
   // =============================================================
 
   describe('invoice section', () => {
-    it('counts unpaid invoices (issued + sent + overdue)', async () => {
+    it('counts unpaid invoices by wFirma paymentState (unpaid/remaining)', async () => {
       mockWfirmaService.findInvoices.mockResolvedValue([
-        makeInvoice({ id: 'a', status: 'issued', totalNet: 100, totalVat: 23 }),
-        makeInvoice({ id: 'b', status: 'sent', totalNet: 200, totalVat: 46 }),
-        makeInvoice({ id: 'c', status: 'overdue', totalNet: 300, totalVat: 69 }),
-        makeInvoice({ id: 'd', status: 'paid', totalNet: 500, totalVat: 115 }),
+        makeInvoice({ id: 'a', status: 'issued', paymentState: 'unpaid', totalNet: 100, totalVat: 23 }),
+        makeInvoice({ id: 'b', status: 'sent', paymentState: 'remaining', totalNet: 200, totalVat: 46 }),
+        makeInvoice({ id: 'c', status: 'overdue', paymentState: 'unpaid', totalNet: 300, totalVat: 69 }),
+        makeInvoice({ id: 'd', status: 'paid', paymentState: 'paid', totalNet: 500, totalVat: 115 }),
       ]);
       const result = await service.getSummary(USER_ID);
       expect(result.invoices?.unpaidCount).toBe(3);
       expect(result.invoices?.unpaidTotal).toBe(123 + 246 + 369);
     });
 
+    it('excludes non-invoice PK ledger documents (no paymentState) from unpaid count', async () => {
+      mockWfirmaService.findInvoices.mockResolvedValue([
+        // PK bookkeeping entry: status defaults to 'issued', but no paymentState
+        makeInvoice({ id: 'pk', status: 'issued', documentType: 'ledger_accounting_command', totalNet: 100, totalVat: 0 }),
+        makeInvoice({ id: 'a', status: 'issued', paymentState: 'unpaid', totalNet: 200, totalVat: 0 }),
+      ]);
+      const result = await service.getSummary(USER_ID);
+      expect(result.invoices?.unpaidCount).toBe(1);
+      expect(result.invoices?.unpaidTotal).toBe(200);
+    });
+
     it('overdue is a strict subset of unpaid — no double-counting (bug #94.3)', async () => {
       mockWfirmaService.findInvoices.mockResolvedValue([
-        makeInvoice({ id: 'a', status: 'overdue', totalNet: 500, totalVat: 115 }),
-        makeInvoice({ id: 'b', status: 'issued', totalNet: 200, totalVat: 46 }),
+        makeInvoice({ id: 'a', status: 'overdue', paymentState: 'unpaid', totalNet: 500, totalVat: 115 }),
+        makeInvoice({ id: 'b', status: 'issued', paymentState: 'unpaid', totalNet: 200, totalVat: 46 }),
       ]);
       const result = await service.getSummary(USER_ID);
       expect(result.invoices?.unpaidCount).toBe(2);
