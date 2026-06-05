@@ -88,21 +88,40 @@ describe('TaxCalendarService', () => {
   const service = new TaxCalendarService();
 
   describe('getDeadlines', () => {
-    it('returns 7 monthly deadlines for a regular month', () => {
+    it('returns 6 monthly deadlines for a regular month', () => {
       const deadlines = service.getDeadlines({ year: 2026, month: 6 }, 'en');
-      expect(deadlines.length).toBe(7);
+      expect(deadlines.length).toBe(6);
     });
 
-    it('returns 8 deadlines for March (CIT-8 annual)', () => {
-      const deadlines = service.getDeadlines({ year: 2026, month: 3 }, 'en');
+    it('does not include event-driven PCC-3 in the recurring calendar', () => {
+      const deadlines = service.getDeadlines({ year: 2026, month: 6 }, 'en');
+      expect(deadlines.find(d => d.name === 'PCC-3')).toBeUndefined();
+    });
+
+    it('returns 8 deadlines for January (PIT-4R + PIT-8AR annual declarations)', () => {
+      const deadlines = service.getDeadlines({ year: 2026, month: 1 }, 'en');
       expect(deadlines.length).toBe(8);
+      const annual = deadlines.filter(d => d.frequency === 'annual').map(d => d.name).sort();
+      expect(annual).toEqual(['PIT-4R', 'PIT-8AR']);
+    });
+
+    it('returns 7 deadlines for March (CIT-8 annual)', () => {
+      const deadlines = service.getDeadlines({ year: 2026, month: 3 }, 'en');
+      expect(deadlines.length).toBe(7);
       expect(deadlines.find(d => d.name === 'CIT-8')).toBeDefined();
     });
 
-    it('returns 8 deadlines for February (PIT-11 annual)', () => {
+    it('returns 7 deadlines for February (PIT-11 annual)', () => {
       const deadlines = service.getDeadlines({ year: 2026, month: 2 }, 'en');
-      expect(deadlines.length).toBe(8);
+      expect(deadlines.length).toBe(7);
       expect(deadlines.find(d => d.name === 'PIT-11')).toBeDefined();
+    });
+
+    it('schedules the monthly payroll advance (PIT-4) on the 20th', () => {
+      const deadlines = service.getDeadlines({ year: 2026, month: 6 }, 'en');
+      const pit4 = deadlines.find(d => d.name === 'PIT-4');
+      expect(pit4).toBeDefined();
+      expect(pit4!.originalDay).toBe(20);
     });
 
     it('filters by category', () => {
@@ -113,7 +132,8 @@ describe('TaxCalendarService', () => {
 
     it('generates full year when month is omitted', () => {
       const deadlines = service.getDeadlines({ year: 2026 }, 'en');
-      expect(deadlines.length).toBe(86);
+      // 6 monthly × 12 + 4 annual (PIT-4R, PIT-8AR, PIT-11, CIT-8)
+      expect(deadlines.length).toBe(76);
     });
 
     it('shifts VAT-7 when 25th is Saturday', () => {
@@ -134,7 +154,7 @@ describe('TaxCalendarService', () => {
     it('generates correct IDs', () => {
       const deadlines = service.getDeadlines({ year: 2026, month: 4 }, 'en');
       const vat7 = deadlines.find(d => d.name === 'VAT-7');
-      expect(vat7!.id).toBe('vat-7-2026-04');
+      expect(vat7!.id).toBe('vat-7-2026-04-25');
     });
   });
 
@@ -145,27 +165,29 @@ describe('TaxCalendarService', () => {
     it('returns correct deadlines for April 1, 2026', () => {
       jest.setSystemTime(new Date(2026, 3, 1));
       const deadlines = service.getUpcomingDeadlines(30, 'en');
-      // 7 April deadlines + some late-March overdue (pastDays=7 default)
-      expect(deadlines.length).toBeGreaterThanOrEqual(7);
-      // First upcoming deadline in April should be PIT-4R on the 7th
+      // 6 April deadlines + some late-March overdue (pastDays=7 default)
+      expect(deadlines.length).toBeGreaterThanOrEqual(6);
+      // First upcoming deadline in April should be ZUS on the 15th
       const aprilDeadlines = deadlines.filter(d => d.date.getMonth() === 3);
-      expect(aprilDeadlines[0].name).toBe('PIT-4R');
+      expect(aprilDeadlines[0].name).toBe('ZUS');
     });
 
     it('includes overdue deadlines from past 7 days', () => {
-      jest.setSystemTime(new Date(2026, 3, 10));
+      jest.setSystemTime(new Date(2026, 3, 22));
       const deadlines = service.getUpcomingDeadlines(30, 'en', 7);
       const overdueNames = deadlines
-        .filter(d => d.date < new Date(2026, 3, 10))
+        .filter(d => d.date < new Date(2026, 3, 22))
         .map(d => d.name);
-      expect(overdueNames).toContain('PIT-4R');
+      // PIT-4 (the 20th) is within the past 7 days → reported as overdue
+      expect(overdueNames).toContain('PIT-4');
     });
 
     it('excludes deadlines older than pastDays', () => {
-      jest.setSystemTime(new Date(2026, 3, 20));
+      jest.setSystemTime(new Date(2026, 3, 25));
       const deadlines = service.getUpcomingDeadlines(30, 'en', 3);
-      const april7 = deadlines.filter(d => d.date.getDate() === 7 && d.date.getMonth() === 3);
-      expect(april7.length).toBe(0);
+      // The 20th is more than 3 days before the 25th → excluded
+      const april20 = deadlines.filter(d => d.date.getDate() === 20 && d.date.getMonth() === 3);
+      expect(april20.length).toBe(0);
     });
   });
 });
