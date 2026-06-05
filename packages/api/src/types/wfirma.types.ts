@@ -322,6 +322,11 @@ export interface WFirmaInvoice {
   totalVat: number;
   currency: string;
   status: WFirmaInvoiceStatus;
+  /** Raw wFirma `paymentstate` ('paid' | 'unpaid' | 'remaining'); absent on
+   *  non-invoice documents such as PK ledger commands (`ledger_accounting_command`). */
+  paymentState?: string;
+  /** Raw wFirma document `type` (e.g. 'normal', 'proforma', 'ledger_accounting_command'). */
+  documentType?: string;
   paymentMethod?: string;
   notes?: string;
   createdAt: Date;

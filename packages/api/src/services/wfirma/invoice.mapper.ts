@@ -97,6 +97,8 @@ export function mapInvoiceData(inv: WFirmaRawInvoice): WFirmaInvoice {
     totalVat: parseFloat(inv.tax || '0'),
     currency,
     status,
+    paymentState: inv.paymentstate,
+    documentType: inv.type,
     paymentMethod: inv.paymentmethod,
     notes: inv.notes,
     createdAt: new Date(inv.created || Date.now()),
