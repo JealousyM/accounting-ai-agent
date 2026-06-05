@@ -14,20 +14,27 @@ import { getTaxCalendarTranslations, Locale } from '../i18n';
 // POLISH TAX DEADLINE RULES
 // ============================================
 
+// Deadlines are stated as the statutory day; shiftToBusinessDay() moves them to
+// the next working day when they fall on a weekend/holiday.
+//
+// PCC-3 is intentionally NOT listed: it is event-driven (filed and paid within
+// 14 days of the transaction), so it has no fixed recurring date.
 const TAX_DEADLINE_RULES: TaxDeadlineRule[] = [
-  // Monthly — 7th
-  { name: 'PIT-4R', day: 7, category: 'pit', frequency: 'monthly', obligatory: true, descriptionKey: 'pit4r' },
-  { name: 'PCC-3', day: 7, category: 'pcc', frequency: 'monthly', obligatory: false, descriptionKey: 'pcc' },
-  { name: 'PIT-8AR', day: 7, category: 'dividend', frequency: 'monthly', obligatory: false, descriptionKey: 'dividend' },
-  // Monthly — 15th
+  // Monthly — 15th (ZUS for legal entities / płatnicy będący osobami prawnymi)
   { name: 'ZUS', day: 15, category: 'zus', frequency: 'monthly', obligatory: true, descriptionKey: 'zus' },
-  // Monthly — 20th
+  // Monthly — 20th: płatnik advances are due by the 20th of the following month
+  { name: 'PIT-4', day: 20, category: 'pit', frequency: 'monthly', obligatory: true, descriptionKey: 'pit4' },
+  { name: 'PIT-8AR', day: 20, category: 'dividend', frequency: 'monthly', obligatory: false, descriptionKey: 'dividend' },
   { name: 'CIT', day: 20, category: 'cit', frequency: 'monthly', obligatory: true, descriptionKey: 'cit' },
   // Monthly — 25th
   { name: 'VAT-7', day: 25, category: 'vat', frequency: 'monthly', obligatory: true, descriptionKey: 'vat7' },
   { name: 'VAT-UE', day: 25, category: 'vat', frequency: 'monthly', obligatory: false, descriptionKey: 'vatue' },
-  // Annual
+  // Annual — 31 January: płatnik annual declarations
+  { name: 'PIT-4R', day: 31, category: 'pit', frequency: 'annual', obligatory: true, month: 1, descriptionKey: 'pit4r' },
+  { name: 'PIT-8AR', day: 31, category: 'dividend', frequency: 'annual', obligatory: false, month: 1, descriptionKey: 'pit8ar' },
+  // Annual — PIT-11 (employee copy by end of February)
   { name: 'PIT-11', day: 28, category: 'pit', frequency: 'annual', obligatory: true, month: 2, descriptionKey: 'pit11' },
+  // Annual — CIT-8 (31 March)
   { name: 'CIT-8', day: 31, category: 'cit', frequency: 'annual', obligatory: true, month: 3, descriptionKey: 'cit8' },
 ];
 
@@ -125,7 +132,7 @@ export class TaxCalendarService {
   private buildDescriptions(locale: Locale): Record<string, string> {
     const t = getTaxCalendarTranslations(locale);
     return {
-      pit4r: t.pit4r, pcc: t.pcc, dividend: t.dividend,
+      pit4: t.pit4, pit4r: t.pit4r, dividend: t.dividend, pit8ar: t.pit8ar,
       zus: t.zus, cit: t.cit, vat7: t.vat7,
       vatue: t.vatue, pit11: t.pit11, cit8: t.cit8,
     };
@@ -151,7 +158,10 @@ export class TaxCalendarService {
         const date = shiftToBusinessDay(rawDate, holidays);
 
         deadlines.push({
-          id: `${rule.name.toLowerCase().replace(/[^a-z0-9]/g, '-')}-${year}-${String(m).padStart(2, '0')}`,
+          // Day is part of the id so distinct obligations that share a name and
+          // month (e.g. monthly PIT-8AR on the 20th vs annual PIT-8AR on the
+          // 31st of January) get unique ids.
+          id: `${rule.name.toLowerCase().replace(/[^a-z0-9]/g, '-')}-${year}-${String(m).padStart(2, '0')}-${String(rule.day).padStart(2, '0')}`,
           name: rule.name,
           description: descriptions[rule.descriptionKey] || rule.name,
           date,
