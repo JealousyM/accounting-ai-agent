@@ -14,6 +14,7 @@ interface KSeFStatusTranslations {
   pending: string;
   acceptanceRate: string;
   noData: string;
+  noActivity: string;
 }
 
 interface KSeFStatusCardProps {
@@ -46,6 +47,11 @@ export function KSeFStatusCard({ data, isLoading, translations }: KSeFStatusCard
       ]
     : [];
 
+  // Donut + acceptance rate are only meaningful once at least one sent invoice
+  // has a decision. Without it the chart renders as an empty ring at 0%, which
+  // reads as broken — show a neutral note instead.
+  const hasDecisionData = donutData.some((d) => d.value > 0);
+
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700 p-3 hover:shadow-md transition-shadow">
       <div className="flex items-center gap-2 mb-2">
@@ -61,39 +67,47 @@ export function KSeFStatusCard({ data, isLoading, translations }: KSeFStatusCard
         <p className="text-sm text-gray-500 dark:text-gray-400">{translations.noData}</p>
       ) : (
         <div className="space-y-2">
-          {/* Donut chart with acceptance rate centered */}
-          <div className="flex items-center justify-center">
-            <div className="relative" style={{ width: 120, height: 120 }}>
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={donutData}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={35}
-                    outerRadius={55}
-                    dataKey="value"
-                    strokeWidth={0}
-                  >
-                    {donutData.map((entry, index) => (
-                      <Cell key={index} fill={entry.color} />
-                    ))}
-                  </Pie>
-                </PieChart>
-              </ResponsiveContainer>
-              {/* Centered acceptance rate */}
-              <div className="absolute inset-0 flex items-center justify-center">
-                <span className="text-lg font-bold text-gray-900 dark:text-gray-100">
-                  {Math.round(data.acceptanceRate)}%
-                </span>
+          {hasDecisionData ? (
+            <>
+              {/* Donut chart with acceptance rate centered */}
+              <div className="flex items-center justify-center">
+                <div className="relative" style={{ width: 120, height: 120 }}>
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={donutData}
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={35}
+                        outerRadius={55}
+                        dataKey="value"
+                        strokeWidth={0}
+                      >
+                        {donutData.map((entry, index) => (
+                          <Cell key={index} fill={entry.color} />
+                        ))}
+                      </Pie>
+                    </PieChart>
+                  </ResponsiveContainer>
+                  {/* Centered acceptance rate */}
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <span className="text-lg font-bold text-gray-900 dark:text-gray-100">
+                      {Math.round(data.acceptanceRate)}%
+                    </span>
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
 
-          {/* Acceptance rate label */}
-          <p className="text-center text-xs text-gray-500 dark:text-gray-400">
-            {translations.acceptanceRate}
-          </p>
+              {/* Acceptance rate label */}
+              <p className="text-center text-xs text-gray-500 dark:text-gray-400">
+                {translations.acceptanceRate}
+              </p>
+            </>
+          ) : (
+            <p className="py-4 text-center text-sm text-gray-500 dark:text-gray-400">
+              {translations.noActivity}
+            </p>
+          )}
 
           {/* Stat grid */}
           <div className="grid grid-cols-2 gap-2">

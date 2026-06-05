@@ -285,6 +285,8 @@ export interface WFirmaRawInvoice {
   netto?: string;
   tax?: string;
   alreadypaid?: string;
+  paymentstate?: string;
+  paid?: string;
   sended?: string;
   contractor?: string;
   contractor_name?: string;

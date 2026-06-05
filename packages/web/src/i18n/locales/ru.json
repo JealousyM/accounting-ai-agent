@@ -1343,10 +1343,10 @@
       "title": "Предстоящие сроки",
       "noDeadlines": "Нет предстоящих сроков",
       "notConnected": "wFirma не подключена",
-      "daysLeft": "дней осталось",
+      "daysLeft": "{days} дн. осталось",
       "today": "Сегодня",
       "overdue": "Просрочено",
-      "daysOverdue": "дней просрочки"
+      "daysOverdue": "{days} дн. просрочки"
     },
     "hr": {
       "title": "Сотрудники",
@@ -1370,7 +1370,8 @@
       "rejected": "Отклонено",
       "pending": "В ожидании",
       "acceptanceRate": "Уровень принятия",
-      "noData": "Нет данных KSeF"
+      "noData": "Нет данных KSeF",
+      "noActivity": "Нет активности KSeF"
     }
   },
   "landing": {

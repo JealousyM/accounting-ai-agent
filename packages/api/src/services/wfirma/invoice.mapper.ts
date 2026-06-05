@@ -46,11 +46,20 @@ export function mapInvoiceData(inv: WFirmaRawInvoice): WFirmaInvoice {
   const paymentDate = inv.paymentdate ? new Date(inv.paymentdate) : null;
   const now = new Date();
 
+  // wFirma's authoritative paid flag is `paymentstate` ('paid'); the list
+  // endpoint does not always populate `alreadypaid`, so deriving "paid" from
+  // `alreadypaid >= total` alone left fully-paid invoices stuck in the default
+  // 'issued' bucket and inflated the dashboard's "unpaid" count.
+  const isPaid =
+    inv.paymentstate === 'paid' ||
+    inv.paid === '1' ||
+    (alreadyPaid >= total && total > 0);
+
   if (inv.disposaldate_empty === '1' || inv.type === 'proforma') {
     status = 'draft';
-  } else if (alreadyPaid >= total && total > 0) {
+  } else if (isPaid) {
     status = 'paid';
-  } else if (paymentDate && paymentDate < now && alreadyPaid < total) {
+  } else if (paymentDate && paymentDate < now) {
     status = 'overdue';
   } else if (inv.sended === '1') {
     status = 'sent';

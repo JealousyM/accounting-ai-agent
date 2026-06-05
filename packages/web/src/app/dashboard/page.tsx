@@ -10,6 +10,7 @@ import {
   TaxDeadlines,
   KSeFStatusCard,
 } from '@/components/dashboard';
+import { AppHeader } from '@/components/layout/AppHeader';
 import { RefreshCw, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import enTranslations from '@/i18n/locales/en.json';
@@ -45,35 +46,31 @@ function DashboardContent() {
 
   return (
     <div className="h-dvh flex flex-col bg-gray-50 dark:bg-gray-900">
-      {/* Compact Header */}
-      <header className="flex-shrink-0 bg-white dark:bg-gray-800 shadow-sm">
-        <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-2">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <Link
-                href="/chat"
-                className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-                title={t.backToChat}
-              >
-                <ArrowLeft className="h-4 w-4 text-gray-600 dark:text-gray-400" />
-              </Link>
-              <h1 className="text-lg font-bold text-gray-900 dark:text-gray-100">
-                {t.title}
-              </h1>
-            </div>
-            <button
-              onClick={() => refetch()}
-              disabled={isLoading}
-              className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors disabled:opacity-50"
-              title={t.refresh}
-            >
-              <RefreshCw
-                className={`h-4 w-4 text-gray-600 dark:text-gray-400 ${isLoading ? 'animate-spin' : ''}`}
-              />
-            </button>
-          </div>
-        </div>
-      </header>
+      {/* Shared application header */}
+      <AppHeader
+        title={t.title}
+        leading={
+          <Link
+            href="/chat"
+            className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+            title={t.backToChat}
+          >
+            <ArrowLeft className="h-4 w-4 text-gray-600 dark:text-gray-400" />
+          </Link>
+        }
+        actions={
+          <button
+            onClick={() => refetch()}
+            disabled={isLoading}
+            className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors disabled:opacity-50"
+            title={t.refresh}
+          >
+            <RefreshCw
+              className={`h-4 w-4 text-gray-600 dark:text-gray-400 ${isLoading ? 'animate-spin' : ''}`}
+            />
+          </button>
+        }
+      />
 
       {/* Scrollable Content */}
       <main className="flex-1 min-h-0 overflow-auto">
