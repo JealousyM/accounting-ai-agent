@@ -5,7 +5,9 @@
 
 import { Request, Response } from 'express';
 import { z } from 'zod';
+import type { Prisma } from '@prisma/client';
 import { prisma } from '../lib/prisma';
+import { logger } from '../utils/logger';
 import type { Locale } from '../i18n';
 
 const getTopicsSchema = z.object({
@@ -23,7 +25,7 @@ export class HelpController {
     try {
       const { locale = 'en', category, search } = getTopicsSchema.parse(req.query);
 
-      const where: any = { isPublished: true };
+      const where: Prisma.HelpTopicWhereInput = { isPublished: true };
       if (category) where.category = category;
 
       let topics = await prisma.helpTopic.findMany({
@@ -109,7 +111,7 @@ export class HelpController {
 
       res.json(localized);
     } catch (error) {
-      console.error('Error fetching help topics:', error);
+      logger.error('Error fetching help topics', { error });
       res.status(500).json({ error: 'Failed to fetch help topics' });
     }
   }
@@ -146,7 +148,7 @@ export class HelpController {
 
       return res.json(localized);
     } catch (error) {
-      console.error('Error fetching help topic:', error);
+      logger.error('Error fetching help topic', { error });
       return res.status(500).json({ error: 'Failed to fetch help topic' });
     }
   }
@@ -169,7 +171,7 @@ export class HelpController {
 
       res.json(categoryCounts);
     } catch (error) {
-      console.error('Error fetching categories:', error);
+      logger.error('Error fetching categories', { error });
       res.status(500).json({ error: 'Failed to fetch categories' });
     }
   }
