@@ -346,6 +346,39 @@
     "notLinked": "Niepołączony",
     "instructions": "Wyślij /link do @eKsiegowyAIBot w Telegram, aby otrzymać kod"
   },
+  "telegramSetup": {
+    "title": "Konfiguracja bota Telegram",
+    "subtitle": "Korzystaj z AI na telefonie, fotografuj paragony i otrzymuj przypomnienia o terminach podatkowych — wszystko przez Telegram.",
+    "step1": {
+      "label": "Krok 1 z 3",
+      "title": "Znajdź bota",
+      "description": "Wyszukaj @eKsiegowyAIBot w Telegram lub kliknij przycisk poniżej, aby otworzyć go bezpośrednio.",
+      "openButton": "Otwórz @eKsiegowyAIBot w Telegram",
+      "nextButton": "Znalazłem bota — kontynuuj"
+    },
+    "step2": {
+      "label": "Krok 2 z 3",
+      "title": "Połącz konto",
+      "description": "W czacie z botem wyślij komendę /link. Bot odpowie 6-cyfrowym kodem. Wpisz ten kod poniżej.",
+      "codePlaceholder": "Wpisz 6-cyfrowy kod",
+      "linkButton": "Połącz konto",
+      "waitingHint": "Albo poczekaj — wykryjemy połączenie automatycznie."
+    },
+    "step3": {
+      "label": "Krok 3 z 3",
+      "title": "Gotowe!",
+      "description": "Twoje konto Telegram jest połączone. Oto co możesz teraz robić:",
+      "feature1": "Czat AI na telefonie — zadawaj pytania wszędzie i o każdej porze",
+      "feature2": "Wysyłaj zdjęcia paragonów — bot automatycznie je odczyta i zarejestruje",
+      "feature3": "Przypomnienia o terminach podatkowych — powiadomienie 3 dni przed każdym terminem",
+      "goToChat": "Przejdź do czatu AI"
+    },
+    "settingsTitle": "Konto Telegram",
+    "linkedAs": "Połączono jako",
+    "linkButton": "Połącz konto Telegram",
+    "unlinkButton": "Odłącz konto",
+    "notLinked": "Brak połączonego konta Telegram"
+  },
   "onboarding": {
     "wfirmaWelcome": {
       "title": "Witaj w integracji wFirma!",
@@ -682,6 +715,43 @@
               "testPortal": { "label": "Aplikacja Podatnika KSeF — test", "href": "https://ap-test.ksef.mf.gov.pl/web/" },
               "officialDocs": { "label": "Oficjalna dokumentacja KSeF (Ministerstwo Finansów)", "href": "https://www.podatki.gov.pl/ksef/" },
               "appSettings": { "label": "Otwórz ustawienia KSeF w eKsięgowy AI", "href": "/ksef/settings" }
+            }
+          }
+        }
+      },
+      "telegram": {
+        "title": "Bot Telegram",
+        "description": "Skonfiguruj bota Telegram do czatu AI na telefonie i skanowania paragonów.",
+        "articles": {
+          "setup": {
+            "title": "Jak skonfigurować bota Telegram",
+            "summary": "Połącz konto Telegram i zacznij korzystać z czatu AI na telefonie.",
+            "intro": "Bot Telegram eKsięgowy AI umożliwia czat z AI na telefonie, skanowanie paragonów przez zdjęcie i automatyczne przypomnienia o terminach podatkowych — bez otwierania aplikacji webowej.",
+            "steps": [
+              {
+                "title": "Znajdź bota w Telegram",
+                "body": "Otwórz Telegram na telefonie lub komputerze. W wyszukiwarce wpisz @eKsiegowyAIBot i otwórz czat. Możesz też skorzystać z przycisku w kreatorze konfiguracji."
+              },
+              {
+                "title": "Pobierz 6-cyfrowy kod",
+                "body": "W czacie z botem wyślij komendę /link. Bot odpowie natychmiast 6-cyfrowym kodem ważnym przez 5 minut. Zachowaj ten kod — zaraz wkleisz go w aplikacji webowej."
+              },
+              {
+                "title": "Wpisz kod w eKsięgowy AI",
+                "body": "W aplikacji webowej otwórz stronę konfiguracji Telegrama, wpisz swój 6-cyfrowy kod i kliknij Połącz. Konta zostaną połączone i zobaczysz potwierdzenie."
+              }
+            ],
+            "callouts": {
+              "codeExpiry": {
+                "variant": "warning",
+                "title": "Kod wygasa po 5 minutach",
+                "body": "Jeśli kod wygaśnie przed wpisaniem, wyślij /link ponownie w Telegram, aby otrzymać nowy."
+              }
+            },
+            "links": {
+              "title": "Przydatne linki",
+              "setupWizard": { "label": "Otwórz kreator konfiguracji Telegram", "href": "/settings/telegram" },
+              "telegram": { "label": "Pobierz Telegram — iOS, Android, Desktop", "href": "https://telegram.org" }
             }
           }
         }
