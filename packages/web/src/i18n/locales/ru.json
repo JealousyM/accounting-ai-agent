@@ -178,7 +178,10 @@
       "deleteCancel": "Отмена",
       "deleteButton": "Удалить",
       "yesterday": "Вчера",
-      "messages": "сообщений"
+      "messages": "сообщений",
+      "searchPlaceholder": "Поиск разговоров… (Ctrl+K)",
+      "noSearchResults": "Нет разговоров по запросу",
+      "noSearchResultsSuggestion": "Попробуйте другое ключевое слово или начните новый чат"
     },
     "header": {
       "defaultTitle": "ИИ Бухгалтерский ассистент",

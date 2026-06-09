@@ -129,8 +129,8 @@ export class AIChatService {
     return processMessage();
   }
 
-  async getConversations(userId: string, limit: number = 50): Promise<ConversationListItem[]> {
-    return this.repo.list(userId, limit);
+  async getConversations(userId: string, limit: number = 50, query?: string): Promise<ConversationListItem[]> {
+    return this.repo.list(userId, limit, query);
   }
 
   async getConversation(conversationId: string, userId: string): Promise<AIConversationData | null> {
