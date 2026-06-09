@@ -176,7 +176,7 @@ export function ConversationList({
           <Search className="w-10 h-10 text-gray-300 dark:text-gray-600 mb-3" />
           <p className="text-sm text-gray-500 dark:text-gray-400">
             {translations.noSearchResults ?? 'No conversations matching'}{' '}
-            <span className="font-medium text-gray-700 dark:text-gray-300">"{searchQuery}"</span>
+            <span className="font-medium text-gray-700 dark:text-gray-300">&quot;{searchQuery}&quot;</span>
           </p>
           <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
             {translations.noSearchResultsSuggestion ?? 'Try a different keyword or start a new chat'}
