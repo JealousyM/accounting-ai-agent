@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "scripts": {
     "dev": "tsx watch src/index.ts",
-    "build": "prisma generate && cross-env NODE_OPTIONS=\"--max-old-space-size=8192\" tsc",
+    "build": "prisma generate && cross-env NODE_OPTIONS=\"--max-old-space-size=8192\" tsc && node scripts/copy-data-assets.js",
     "start": "node dist/index.js",
     "test": "jest",
     "test:watch": "jest --watch",
