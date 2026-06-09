@@ -178,7 +178,10 @@
       "deleteCancel": "Anuluj",
       "deleteButton": "Usuń",
       "yesterday": "Wczoraj",
-      "messages": "wiadomości"
+      "messages": "wiadomości",
+      "searchPlaceholder": "Szukaj rozmów… (Ctrl+K)",
+      "noSearchResults": "Brak rozmów pasujących do",
+      "noSearchResultsSuggestion": "Spróbuj innego słowa kluczowego lub rozpocznij nowy czat"
     },
     "header": {
       "defaultTitle": "Asystent Księgowy AI",

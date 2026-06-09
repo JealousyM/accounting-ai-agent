@@ -51,9 +51,13 @@ export class ConversationRepository {
     return conversation;
   }
 
-  async list(userId: string, limit: number = 50): Promise<ConversationListItem[]> {
+  async list(userId: string, limit: number = 50, query?: string): Promise<ConversationListItem[]> {
     const rows = await this.prisma.aIConversation.findMany({
-      where: { userId, deletedAt: null },
+      where: {
+        userId,
+        deletedAt: null,
+        ...(query ? { title: { contains: query, mode: 'insensitive' } } : {}),
+      },
       orderBy: { updatedAt: 'desc' },
       take: limit,
     });

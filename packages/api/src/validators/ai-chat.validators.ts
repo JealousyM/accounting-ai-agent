@@ -48,6 +48,7 @@ export const getConversationsSchema = z.object({
       .transform(val => parseInt(val, 10))
       .pipe(z.number().min(1).max(100))
       .optional(),
+    q: z.string().max(200).optional(),
   }).optional(),
 });
 

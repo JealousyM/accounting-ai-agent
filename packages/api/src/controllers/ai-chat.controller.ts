@@ -73,8 +73,9 @@ export class AIChatController {
       }
 
       const limit = req.query.limit ? parseInt(req.query.limit as string, 10) : 50;
+      const q = req.query.q as string | undefined;
 
-      const conversations = await aiChatService.getConversations(userId, limit);
+      const conversations = await aiChatService.getConversations(userId, limit, q);
 
       res.status(200).json({
         success: true,

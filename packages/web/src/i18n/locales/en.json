@@ -178,7 +178,10 @@
       "deleteCancel": "Cancel",
       "deleteButton": "Delete",
       "yesterday": "Yesterday",
-      "messages": "messages"
+      "messages": "messages",
+      "searchPlaceholder": "Search conversations… (Ctrl+K)",
+      "noSearchResults": "No conversations matching",
+      "noSearchResultsSuggestion": "Try a different keyword or start a new chat"
     },
     "header": {
       "defaultTitle": "AI Accounting Assistant",

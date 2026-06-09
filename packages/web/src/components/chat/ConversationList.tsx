@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { MessageSquare, Trash2, Loader2, AlertTriangle, Users } from 'lucide-react';
+import { MessageSquare, Trash2, Loader2, AlertTriangle, Users, Search, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -24,6 +24,9 @@ interface SidebarTranslations {
   deleteButton: string;
   yesterday: string;
   messages: string;
+  searchPlaceholder?: string;
+  noSearchResults?: string;
+  noSearchResultsSuggestion?: string;
 }
 
 interface SharedTranslations {
@@ -42,6 +45,28 @@ interface ConversationListProps {
   sharedTranslations?: SharedTranslations;
 }
 
+// Wraps the matched substring of `text` with <mark> for highlighting.
+function HighlightedText({ text, query }: { text: string; query: string }) {
+  if (!query) return <>{text}</>;
+  const idx = text.toLowerCase().indexOf(query.toLowerCase());
+  if (idx === -1) return <>{text}</>;
+  return (
+    <>
+      {text.slice(0, idx)}
+      <mark className="bg-yellow-200 dark:bg-yellow-700 text-inherit rounded-sm px-0.5">
+        {text.slice(idx, idx + query.length)}
+      </mark>
+      {text.slice(idx + query.length)}
+    </>
+  );
+}
+
+function filterByQuery(conversations: Conversation[], query: string): Conversation[] {
+  if (!query) return conversations;
+  const q = query.toLowerCase();
+  return conversations.filter(c => c.title.toLowerCase().includes(q));
+}
+
 export function ConversationList({
   conversations,
   sharedConversations = [],
@@ -54,6 +79,20 @@ export function ConversationList({
 }: ConversationListProps) {
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
   const [pendingDeleteId, setPendingDeleteId] = React.useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = React.useState('');
+  const searchInputRef = React.useRef<HTMLInputElement>(null);
+
+  // Ctrl+K / Cmd+K focuses the search input
+  React.useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+        e.preventDefault();
+        searchInputRef.current?.focus();
+      }
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   const handleDeleteRequest = (id: string) => {
     setPendingDeleteId(id);
@@ -81,35 +120,89 @@ export function ConversationList({
     );
   }
 
-  if (conversations.length === 0 && sharedConversations.length === 0) {
-    return (
-      <div className="flex flex-col items-center justify-center py-8 px-4 text-center">
-        <MessageSquare className="w-10 h-10 text-gray-300 dark:text-gray-600 mb-3" />
-        <p className="text-sm text-gray-500 dark:text-gray-400">{translations.noConversations}</p>
-        <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
-          {translations.startNewChat}
-        </p>
-      </div>
-    );
-  }
+  const filteredConversations = filterByQuery(conversations, searchQuery);
+  const filteredShared = filterByQuery(sharedConversations, searchQuery);
+  const isSearching = searchQuery.length > 0;
+  const noResults = isSearching && filteredConversations.length === 0 && filteredShared.length === 0;
+  const isEmpty = !isSearching && conversations.length === 0 && sharedConversations.length === 0;
 
   return (
     <>
-      <div className="py-2">
-        {conversations.map((conversation) => (
-          <ConversationItem
-            key={conversation.id}
-            conversation={conversation}
-            isActive={conversation.id === currentId}
-            onSelect={() => onSelect(conversation.id)}
-            onDelete={() => handleDeleteRequest(conversation.id)}
-            translations={translations}
+      {/* Search input */}
+      <div className="px-3 pt-2 pb-1">
+        <div className="relative">
+          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 dark:text-gray-500 pointer-events-none" />
+          <input
+            ref={searchInputRef}
+            type="text"
+            value={searchQuery}
+            onChange={e => setSearchQuery(e.target.value)}
+            placeholder={translations.searchPlaceholder ?? 'Search conversations…'}
+            className="
+              w-full pl-8 pr-7 py-1.5 text-sm rounded-md
+              bg-gray-100 dark:bg-gray-700
+              border border-transparent focus:border-blue-400 dark:focus:border-blue-500
+              text-gray-900 dark:text-gray-100
+              placeholder:text-gray-400 dark:placeholder:text-gray-500
+              focus:outline-none transition-colors
+            "
           />
-        ))}
+          {isSearching && (
+            <button
+              onClick={() => setSearchQuery('')}
+              className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300"
+              aria-label="Clear search"
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
+          )}
+        </div>
       </div>
 
+      {/* Empty (no conversations at all) */}
+      {isEmpty && (
+        <div className="flex flex-col items-center justify-center py-8 px-4 text-center">
+          <MessageSquare className="w-10 h-10 text-gray-300 dark:text-gray-600 mb-3" />
+          <p className="text-sm text-gray-500 dark:text-gray-400">{translations.noConversations}</p>
+          <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
+            {translations.startNewChat}
+          </p>
+        </div>
+      )}
+
+      {/* No search results */}
+      {noResults && (
+        <div className="flex flex-col items-center justify-center py-8 px-4 text-center">
+          <Search className="w-10 h-10 text-gray-300 dark:text-gray-600 mb-3" />
+          <p className="text-sm text-gray-500 dark:text-gray-400">
+            {translations.noSearchResults ?? 'No conversations matching'}{' '}
+            <span className="font-medium text-gray-700 dark:text-gray-300">"{searchQuery}"</span>
+          </p>
+          <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
+            {translations.noSearchResultsSuggestion ?? 'Try a different keyword or start a new chat'}
+          </p>
+        </div>
+      )}
+
+      {/* Personal conversations */}
+      {filteredConversations.length > 0 && (
+        <div className="py-2">
+          {filteredConversations.map((conversation) => (
+            <ConversationItem
+              key={conversation.id}
+              conversation={conversation}
+              isActive={conversation.id === currentId}
+              onSelect={() => onSelect(conversation.id)}
+              onDelete={() => handleDeleteRequest(conversation.id)}
+              translations={translations}
+              searchQuery={searchQuery}
+            />
+          ))}
+        </div>
+      )}
+
       {/* Shared conversations section */}
-      {sharedConversations.length > 0 && sharedTranslations && (
+      {filteredShared.length > 0 && sharedTranslations && (
         <div className="py-2">
           <div className="mx-4 my-2 border-t border-gray-200 dark:border-gray-700" />
           <div className="flex items-center gap-2 px-4 py-1.5">
@@ -118,7 +211,7 @@ export function ConversationList({
               {sharedTranslations.section}
             </span>
           </div>
-          {sharedConversations.map((conversation) => (
+          {filteredShared.map((conversation) => (
             <SharedConversationItem
               key={conversation.id}
               conversation={conversation}
@@ -126,6 +219,7 @@ export function ConversationList({
               onSelect={() => onSelect(conversation.id)}
               translations={translations}
               sharedByLabel={sharedTranslations.sharedBy}
+              searchQuery={searchQuery}
             />
           ))}
         </div>
@@ -174,6 +268,7 @@ interface ConversationItemProps {
   onSelect: () => void;
   onDelete: () => void;
   translations: SidebarTranslations;
+  searchQuery: string;
 }
 
 function ConversationItem({
@@ -182,6 +277,7 @@ function ConversationItem({
   onSelect,
   onDelete,
   translations,
+  searchQuery,
 }: ConversationItemProps) {
   const [isHovered, setIsHovered] = React.useState(false);
 
@@ -228,7 +324,7 @@ function ConversationItem({
               ${isActive ? 'text-blue-900 dark:text-blue-300' : 'text-gray-900 dark:text-gray-100'}
             `}
           >
-            {conversation.title}
+            <HighlightedText text={conversation.title} query={searchQuery} />
           </h3>
           {conversation.lastMessage && (
             <p className="text-xs text-gray-500 dark:text-gray-400 truncate mt-0.5">
@@ -271,6 +367,7 @@ interface SharedConversationItemProps {
   onSelect: () => void;
   translations: SidebarTranslations;
   sharedByLabel: string;
+  searchQuery: string;
 }
 
 function SharedConversationItem({
@@ -279,6 +376,7 @@ function SharedConversationItem({
   onSelect,
   translations,
   sharedByLabel,
+  searchQuery,
 }: SharedConversationItemProps) {
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -316,7 +414,7 @@ function SharedConversationItem({
               ${isActive ? 'text-blue-900 dark:text-blue-300' : 'text-gray-900 dark:text-gray-100'}
             `}
           >
-            {conversation.title}
+            <HighlightedText text={conversation.title} query={searchQuery} />
           </h3>
           {conversation.ownerName && (
             <p className="text-xs text-purple-500 dark:text-purple-400 mt-0.5">
