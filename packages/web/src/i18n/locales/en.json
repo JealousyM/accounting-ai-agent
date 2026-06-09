@@ -346,6 +346,39 @@
     "notLinked": "Not linked",
     "instructions": "Send /link to @eKsiegowyAIBot in Telegram to get a code"
   },
+  "telegramSetup": {
+    "title": "Telegram Bot Setup",
+    "subtitle": "Use AI on mobile, photograph receipts, and get tax deadline reminders — all via Telegram.",
+    "step1": {
+      "label": "Step 1 of 3",
+      "title": "Find the bot",
+      "description": "Search for @eKsiegowyAIBot in Telegram or tap the button below to open it directly.",
+      "openButton": "Open @eKsiegowyAIBot in Telegram",
+      "nextButton": "I've found the bot — continue"
+    },
+    "step2": {
+      "label": "Step 2 of 3",
+      "title": "Link your account",
+      "description": "In the bot chat, send the /link command. The bot replies with a 6-digit code. Enter that code below.",
+      "codePlaceholder": "Enter 6-digit code",
+      "linkButton": "Link account",
+      "waitingHint": "Or just wait — we'll detect the link automatically."
+    },
+    "step3": {
+      "label": "Step 3 of 3",
+      "title": "You're all set!",
+      "description": "Your Telegram account is linked. Here's what you can do now:",
+      "feature1": "AI chat on mobile — ask questions anywhere, any time",
+      "feature2": "Send photos of receipts — the bot reads and records them automatically",
+      "feature3": "Tax deadline reminders — get notified 3 days before each Polish deadline",
+      "goToChat": "Go to AI Chat"
+    },
+    "settingsTitle": "Telegram Account",
+    "linkedAs": "Linked as",
+    "linkButton": "Link Telegram account",
+    "unlinkButton": "Unlink account",
+    "notLinked": "No Telegram account linked"
+  },
   "onboarding": {
     "wfirmaWelcome": {
       "title": "Welcome to wFirma Integration!",
@@ -682,6 +715,43 @@
               "testPortal": { "label": "KSeF Taxpayer Application — test", "href": "https://ap-test.ksef.mf.gov.pl/web/" },
               "officialDocs": { "label": "Official KSeF documentation (Ministry of Finance)", "href": "https://www.podatki.gov.pl/ksef/" },
               "appSettings": { "label": "Open KSeF settings in eKsięgowy AI", "href": "/ksef/settings" }
+            }
+          }
+        }
+      },
+      "telegram": {
+        "title": "Telegram Bot",
+        "description": "Set up the Telegram bot for mobile AI chat and receipt scanning.",
+        "articles": {
+          "setup": {
+            "title": "How to set up the Telegram bot",
+            "summary": "Link your Telegram account and start using AI chat on mobile.",
+            "intro": "The eKsięgowy AI Telegram bot gives you AI chat on mobile, receipt scanning via photo, and automatic tax deadline reminders — all without opening the web app.",
+            "steps": [
+              {
+                "title": "Find the bot in Telegram",
+                "body": "Open Telegram on your phone or desktop. In the search bar, type @eKsiegowyAIBot and open the chat. You can also use the quick-start button in the setup wizard."
+              },
+              {
+                "title": "Get your 6-digit link code",
+                "body": "In the bot chat, send the /link command. The bot replies immediately with a 6-digit code valid for 5 minutes. Keep this code ready — you will paste it into the eKsięgowy AI web app."
+              },
+              {
+                "title": "Enter the code in eKsięgowy AI",
+                "body": "In the web app, open the Telegram setup page and enter your 6-digit code, then click Link. Your accounts will be connected and you'll see a confirmation."
+              }
+            ],
+            "callouts": {
+              "codeExpiry": {
+                "variant": "warning",
+                "title": "Code expires in 5 minutes",
+                "body": "If the code expires before you enter it, send /link again in Telegram to receive a new one."
+              }
+            },
+            "links": {
+              "title": "Useful links",
+              "setupWizard": { "label": "Open the Telegram setup wizard", "href": "/settings/telegram" },
+              "telegram": { "label": "Download Telegram — iOS, Android, Desktop", "href": "https://telegram.org" }
             }
           }
         }
