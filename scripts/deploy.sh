@@ -29,7 +29,11 @@ echo "=== Reloading nginx (external) ==="
 docker exec accounting-nginx nginx -s reload 2>/dev/null || true
 
 echo "=== Running database migrations ==="
-$DC -f "$COMPOSE_FILE" --env-file "$ENV_FILE" exec -T api npx prisma migrate deploy
+# Run migrations in a lightweight one-off container instead of exec-ing into the
+# live api server. exec spawns a second Node process inside the api container's
+# 1G cgroup (docker-compose.prod.yml), and combined with the loaded server RSS it
+# gets OOM-killed (exit 137). `run --rm` overrides CMD so only Prisma runs (~200M).
+$DC -f "$COMPOSE_FILE" --env-file "$ENV_FILE" run --rm --no-deps api npx prisma migrate deploy
 
 echo "=== Health checks ==="
 API_STATUS=$($DC -f "$COMPOSE_FILE" --env-file "$ENV_FILE" exec -T api node -e "
