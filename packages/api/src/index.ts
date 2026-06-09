@@ -29,6 +29,7 @@ import referralRoutes from './routes/referral.routes';
 import telegramBotRoutes from './routes/telegram-bot.routes';
 import taxCalendarRoutes from './routes/tax-calendar.routes';
 import promptShortcutRoutes from './routes/prompt-shortcut.routes';
+import orgPromptShortcutRoutes from './routes/org-prompt-shortcut.routes';
 import { telegramBotService, taxDeadlineReminderService } from './services/telegram-bot';
 import { globalRateLimiter } from './middleware/rate-limiter.middleware';
 import { auditLogMiddleware } from './middleware/audit-log.middleware';
@@ -144,6 +145,9 @@ app.use('/api/tax-calendar', taxCalendarRoutes);
 
 // Prompt shortcut routes (saved AI prompt shortcuts)
 app.use('/api/ai/shortcuts', promptShortcutRoutes);
+
+// Org shared prompt shortcuts (org admin manages, all members read)
+app.use('/api/organization/shortcuts', orgPromptShortcutRoutes);
 
 // 404 handler
 app.use(notFoundHandler);

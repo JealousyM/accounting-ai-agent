@@ -1590,7 +1590,17 @@
     "companyNamePlaceholder": "Enter company name",
     "joinButton": "Continue",
     "createInfo": "If no organization with this name exists, a new one will be created and you'll become its admin.",
-    "joinInfo": "If the organization already exists, a join request will be sent to its admin for approval."
+    "joinInfo": "If the organization already exists, a join request will be sent to its admin for approval.",
+    "tabMembers": "Members",
+    "tabSharedPrompts": "Shared Prompts",
+    "sharedPromptsEmpty": "No shared prompts yet",
+    "sharedPromptsEmptyHint": "Add prompts to share them with all organisation members",
+    "sharedPromptsAdd": "Add shared prompt",
+    "sharedPromptsLabelPlaceholder": "Shortcut name (e.g. Unpaid invoices)",
+    "sharedPromptsPromptPlaceholder": "Prompt text (e.g. Show all unpaid invoices this month)",
+    "sharedPromptsLimit": "Organisation limit reached (20/20)",
+    "edit": "Edit",
+    "delete": "Delete"
   },
   "referral": {
     "sidebarLink": "Referral Program",
@@ -1650,6 +1660,9 @@
     "edit": "Edit",
     "limitReached": "Shortcut limit reached (20/20)",
     "limitHint": "Upgrade to Pro for unlimited shortcuts",
-    "clickToUse": "Click to pre-fill"
+    "clickToUse": "Click to pre-fill",
+    "orgSection": "Organisation",
+    "personalSection": "Personal",
+    "orgReadOnly": "Read-only"
   }
 }

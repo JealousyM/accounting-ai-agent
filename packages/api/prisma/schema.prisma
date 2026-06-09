@@ -117,8 +117,9 @@ model Organization {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  members       User[]
-  conversations AIConversation[]
+  members            User[]
+  conversations      AIConversation[]
+  orgPromptShortcuts OrgPromptShortcut[]
 
   @@index([nameNorm])
   @@map("organizations")
@@ -203,7 +204,8 @@ model User {
   telegramLink      TelegramLink?
   referralsMade     Referral[] @relation("referrals_made")
   referredBy        Referral?  @relation("referred_by")
-  promptShortcuts   UserPromptShortcut[]
+  promptShortcuts      UserPromptShortcut[]
+  createdOrgShortcuts  OrgPromptShortcut[] @relation("OrgShortcutCreator")
 
   @@index([email])
   @@index([googleId])
@@ -750,6 +752,23 @@ model UserPromptShortcut {
 
   @@index([userId, sortOrder])
   @@map("user_prompt_shortcuts")
+}
+
+model OrgPromptShortcut {
+  id             String       @id @default(uuid()) @db.Uuid
+  organizationId String       @db.Uuid
+  label          String       @db.VarChar(100)
+  prompt         String       @db.Text
+  sortOrder      Int          @default(0)
+  createdBy      String       @db.Uuid
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  creator        User         @relation("OrgShortcutCreator", fields: [createdBy], references: [id])
+
+  @@index([organizationId, sortOrder])
+  @@map("org_prompt_shortcuts")
 }
 
 model AIToolUsage {
