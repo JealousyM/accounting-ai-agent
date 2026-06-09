@@ -21,6 +21,9 @@ export interface User {
   role: UserRole;
   hasGoogleAuth: boolean;
   company: any;
+  organizationId: string | null;
+  orgRole: 'admin' | 'member';
+  orgMembershipStatus: 'active' | 'pending' | 'rejected';
   createdAt: string;
   updatedAt: string;
 }

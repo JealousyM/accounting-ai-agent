@@ -1590,7 +1590,17 @@
     "companyNamePlaceholder": "Wprowadź nazwę firmy",
     "joinButton": "Kontynuuj",
     "createInfo": "Jeśli organizacja o tej nazwie nie istnieje, zostanie utworzona nowa, a Ty zostaniesz jej administratorem.",
-    "joinInfo": "Jeśli organizacja już istnieje, zostanie wysłana prośba o dołączenie do zatwierdzenia przez administratora."
+    "joinInfo": "Jeśli organizacja już istnieje, zostanie wysłana prośba o dołączenie do zatwierdzenia przez administratora.",
+    "tabMembers": "Członkowie",
+    "tabSharedPrompts": "Wspólne skróty",
+    "sharedPromptsEmpty": "Brak wspólnych skrótów",
+    "sharedPromptsEmptyHint": "Dodaj skróty, aby udostępnić je wszystkim członkom organizacji",
+    "sharedPromptsAdd": "Dodaj wspólny skrót",
+    "sharedPromptsLabelPlaceholder": "Nazwa skrótu (np. Niezapłacone faktury)",
+    "sharedPromptsPromptPlaceholder": "Treść zapytania (np. Pokaż niezapłacone faktury z tego miesiąca)",
+    "sharedPromptsLimit": "Osiągnięto limit organizacji (20/20)",
+    "edit": "Edytuj",
+    "delete": "Usuń"
   },
   "referral": {
     "sidebarLink": "Program poleceń",
@@ -1650,6 +1660,9 @@
     "edit": "Edytuj",
     "limitReached": "Osiągnięto limit skrótów (20/20)",
     "limitHint": "Przejdź na plan Pro, aby mieć nieograniczoną liczbę skrótów",
-    "clickToUse": "Kliknij, aby wstawić"
+    "clickToUse": "Kliknij, aby wstawić",
+    "orgSection": "Organizacja",
+    "personalSection": "Osobiste",
+    "orgReadOnly": "Tylko do odczytu"
   }
 }

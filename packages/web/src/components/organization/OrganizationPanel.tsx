@@ -16,6 +16,9 @@ import {
   LogOut,
   AlertTriangle,
   Send,
+  BookmarkCheck,
+  Plus,
+  Trash2,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -33,6 +36,13 @@ import {
   joinOrganization,
   OrgMember,
 } from '@/lib/api/organization';
+import {
+  getOrgShortcuts,
+  createOrgShortcut,
+  updateOrgShortcut,
+  deleteOrgShortcut,
+  OrgPromptShortcut,
+} from '@/lib/api/org-prompt-shortcuts';
 
 export interface OrganizationTranslations {
   title: string;
@@ -60,12 +70,30 @@ export interface OrganizationTranslations {
   joinButton: string;
   createInfo: string;
   joinInfo: string;
+  tabMembers: string;
+  tabSharedPrompts: string;
+  sharedPromptsEmpty: string;
+  sharedPromptsEmptyHint: string;
+  sharedPromptsAdd: string;
+  sharedPromptsLabelPlaceholder: string;
+  sharedPromptsPromptPlaceholder: string;
+  sharedPromptsLimit: string;
+  edit: string;
+  delete: string;
 }
 
 interface OrganizationPanelProps {
   open: boolean;
   onClose: () => void;
   translations: OrganizationTranslations;
+}
+
+type OrgTab = 'members' | 'shared-prompts';
+
+interface ShortcutEditState {
+  id: string;
+  label: string;
+  prompt: string;
 }
 
 export function OrganizationPanel({ open, onClose, translations: t }: OrganizationPanelProps) {
@@ -77,6 +105,11 @@ export function OrganizationPanel({ open, onClose, translations: t }: Organizati
   const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
   const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
   const [joinName, setJoinName] = useState('');
+  const [activeTab, setActiveTab] = useState<OrgTab>('members');
+  const [showAddShortcut, setShowAddShortcut] = useState(false);
+  const [newShortcutLabel, setNewShortcutLabel] = useState('');
+  const [newShortcutPrompt, setNewShortcutPrompt] = useState('');
+  const [shortcutEdit, setShortcutEdit] = useState<ShortcutEditState | null>(null);
 
   const { data: org, isLoading, refetch } = useQuery({
     queryKey: ['organization'],
@@ -132,6 +165,44 @@ export function OrganizationPanel({ open, onClose, translations: t }: Organizati
   const removeMutation = useMutation({ mutationFn: removeMember, onSuccess: invalidate });
   const promoteMutation = useMutation({ mutationFn: promoteMember, onSuccess: invalidate });
   const demoteMutation = useMutation({ mutationFn: demoteMember, onSuccess: invalidate });
+
+  // Org shared shortcuts
+  const ORG_SHORTCUT_LIMIT = 20;
+  const isActiveOrgMember = user?.organizationId && user?.orgMembershipStatus === 'active';
+
+  const { data: orgShortcuts = [], isLoading: isShortcutsLoading } = useQuery({
+    queryKey: ['org-prompt-shortcuts'],
+    queryFn: getOrgShortcuts,
+    enabled: open && !!isActiveOrgMember,
+    staleTime: 30 * 1000,
+  });
+
+  const invalidateShortcuts = () =>
+    queryClient.invalidateQueries({ queryKey: ['org-prompt-shortcuts'] });
+
+  const createShortcutMutation = useMutation({
+    mutationFn: createOrgShortcut,
+    onSuccess: () => {
+      invalidateShortcuts();
+      setShowAddShortcut(false);
+      setNewShortcutLabel('');
+      setNewShortcutPrompt('');
+    },
+  });
+
+  const updateShortcutMutation = useMutation({
+    mutationFn: ({ id, ...data }: { id: string; label?: string; prompt?: string }) =>
+      updateOrgShortcut(id, data),
+    onSuccess: () => {
+      invalidateShortcuts();
+      setShortcutEdit(null);
+    },
+  });
+
+  const deleteShortcutMutation = useMutation({
+    mutationFn: deleteOrgShortcut,
+    onSuccess: invalidateShortcuts,
+  });
 
   if (!open) return null;
 
@@ -240,7 +311,7 @@ export function OrganizationPanel({ open, onClose, translations: t }: Organizati
             </div>
           ) : (
             /* Active member / admin */
-            <div className="space-y-6">
+            <div className="space-y-4">
               {/* Organization name */}
               <div>
                 {isEditingName ? (
@@ -284,6 +355,164 @@ export function OrganizationPanel({ open, onClose, translations: t }: Organizati
                 )}
               </div>
 
+              {/* Tab navigation */}
+              <div className="flex border-b border-gray-200 dark:border-gray-700">
+                <button
+                  onClick={() => setActiveTab('members')}
+                  className={`flex items-center gap-1.5 px-3 py-2 text-sm font-medium border-b-2 transition-colors ${
+                    activeTab === 'members'
+                      ? 'border-blue-500 text-blue-600 dark:text-blue-400'
+                      : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
+                  }`}
+                >
+                  {t.tabMembers}
+                </button>
+                <button
+                  onClick={() => setActiveTab('shared-prompts')}
+                  className={`flex items-center gap-1.5 px-3 py-2 text-sm font-medium border-b-2 transition-colors ${
+                    activeTab === 'shared-prompts'
+                      ? 'border-blue-500 text-blue-600 dark:text-blue-400'
+                      : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
+                  }`}
+                >
+                  <BookmarkCheck className="w-3.5 h-3.5" />
+                  {t.tabSharedPrompts}
+                </button>
+              </div>
+
+              {activeTab === 'shared-prompts' ? (
+                /* Shared Prompts tab */
+                <div className="space-y-3">
+                  {isShortcutsLoading ? (
+                    <div className="flex items-center justify-center py-8">
+                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-500" />
+                    </div>
+                  ) : orgShortcuts.length === 0 && !showAddShortcut ? (
+                    <div className="text-center py-8">
+                      <BookmarkCheck className="w-10 h-10 text-gray-300 dark:text-gray-600 mx-auto mb-2" />
+                      <p className="text-gray-500 dark:text-gray-400 font-medium text-sm">{t.sharedPromptsEmpty}</p>
+                      <p className="text-gray-400 dark:text-gray-500 text-xs mt-1">{t.sharedPromptsEmptyHint}</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-2">
+                      {orgShortcuts.map((s: OrgPromptShortcut) =>
+                        shortcutEdit?.id === s.id ? (
+                          <div key={s.id} className="p-3 rounded-lg border border-blue-300 dark:border-blue-600 bg-blue-50/50 dark:bg-blue-900/20">
+                            <input
+                              className="w-full text-sm font-medium bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded px-2 py-1 mb-2 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                              value={shortcutEdit.label}
+                              onChange={(e) => setShortcutEdit({ ...shortcutEdit, label: e.target.value })}
+                              maxLength={100}
+                            />
+                            <textarea
+                              className="w-full text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded px-2 py-1 mb-2 text-gray-900 dark:text-gray-100 resize-none focus:outline-none focus:ring-1 focus:ring-blue-500"
+                              value={shortcutEdit.prompt}
+                              onChange={(e) => setShortcutEdit({ ...shortcutEdit, prompt: e.target.value })}
+                              rows={3}
+                              maxLength={2000}
+                            />
+                            <div className="flex gap-2 justify-end">
+                              <Button variant="ghost" size="sm" onClick={() => setShortcutEdit(null)}>{t.cancel}</Button>
+                              <Button
+                                size="sm"
+                                disabled={!shortcutEdit.label.trim() || !shortcutEdit.prompt.trim() || updateShortcutMutation.isPending}
+                                onClick={() =>
+                                  updateShortcutMutation.mutate({
+                                    id: shortcutEdit.id,
+                                    label: shortcutEdit.label.trim(),
+                                    prompt: shortcutEdit.prompt.trim(),
+                                  })
+                                }
+                              >
+                                <Check className="w-3.5 h-3.5 mr-1" />
+                                {t.save}
+                              </Button>
+                            </div>
+                          </div>
+                        ) : (
+                          <div key={s.id} className="group flex items-start justify-between p-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-750/50">
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">{s.label}</p>
+                              <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 line-clamp-2">{s.prompt}</p>
+                            </div>
+                            {isAdmin && (
+                              <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0 ml-2">
+                                <button
+                                  onClick={() => setShortcutEdit({ id: s.id, label: s.label, prompt: s.prompt })}
+                                  className="p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-500"
+                                  title={t.edit}
+                                >
+                                  <Pencil className="w-3.5 h-3.5" />
+                                </button>
+                                <button
+                                  onClick={() => deleteShortcutMutation.mutate(s.id)}
+                                  className="p-1 rounded hover:bg-red-100 dark:hover:bg-red-900/30 text-gray-500 hover:text-red-600"
+                                  title={t.delete}
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                </button>
+                              </div>
+                            )}
+                          </div>
+                        )
+                      )}
+                    </div>
+                  )}
+
+                  {/* Add form */}
+                  {isAdmin && showAddShortcut && (
+                    <div className="p-3 rounded-lg border border-blue-300 dark:border-blue-600 bg-blue-50/50 dark:bg-blue-900/20">
+                      <input
+                        className="w-full text-sm font-medium bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded px-2 py-1 mb-2 text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                        placeholder={t.sharedPromptsLabelPlaceholder}
+                        value={newShortcutLabel}
+                        onChange={(e) => setNewShortcutLabel(e.target.value)}
+                        maxLength={100}
+                        autoFocus
+                      />
+                      <textarea
+                        className="w-full text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded px-2 py-1 mb-2 text-gray-900 dark:text-gray-100 placeholder-gray-400 resize-none focus:outline-none focus:ring-1 focus:ring-blue-500"
+                        placeholder={t.sharedPromptsPromptPlaceholder}
+                        value={newShortcutPrompt}
+                        onChange={(e) => setNewShortcutPrompt(e.target.value)}
+                        rows={3}
+                        maxLength={2000}
+                      />
+                      <div className="flex gap-2 justify-end">
+                        <Button variant="ghost" size="sm" onClick={() => { setShowAddShortcut(false); setNewShortcutLabel(''); setNewShortcutPrompt(''); }}>
+                          {t.cancel}
+                        </Button>
+                        <Button
+                          size="sm"
+                          disabled={!newShortcutLabel.trim() || !newShortcutPrompt.trim() || createShortcutMutation.isPending}
+                          onClick={() => createShortcutMutation.mutate({ label: newShortcutLabel.trim(), prompt: newShortcutPrompt.trim() })}
+                        >
+                          <Check className="w-3.5 h-3.5 mr-1" />
+                          {t.save}
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Add button */}
+                  {isAdmin && !showAddShortcut && (
+                    orgShortcuts.length >= ORG_SHORTCUT_LIMIT ? (
+                      <p className="text-xs text-center text-amber-600 dark:text-amber-400 py-1">{t.sharedPromptsLimit}</p>
+                    ) : (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setShowAddShortcut(true)}
+                        className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-900/20 w-full"
+                      >
+                        <Plus className="w-4 h-4 mr-1" />
+                        {t.sharedPromptsAdd}
+                      </Button>
+                    )
+                  )}
+                </div>
+              ) : (
+                <>
               {/* Pending Members (admin only) */}
               {isAdmin && org.pendingMembers && org.pendingMembers.length > 0 && (
                 <div>
@@ -420,6 +649,8 @@ export function OrganizationPanel({ open, onClose, translations: t }: Organizati
                   })}
                 </div>
               </div>
+              </>
+              )}
             </div>
           )}
         </div>
