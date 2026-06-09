@@ -1,0 +1,19 @@
+[
+  { "slug": "getting-started-welcome",        "category": "gettingStarted", "order": 1, "isFeatured": true  },
+  { "slug": "ai-chat-how-to-use",              "category": "aiChat",         "order": 1, "isFeatured": true  },
+  { "slug": "ai-chat-context-memory",          "category": "aiChat",         "order": 2, "isFeatured": true  },
+  { "slug": "faq-wfirma-connection",           "category": "faq",            "order": 1, "isFeatured": true  },
+  { "slug": "wfirma-query-examples",           "category": "wfirma",         "order": 1, "isFeatured": true  },
+  { "slug": "invoices-overview",               "category": "invoices",       "order": 1, "isFeatured": true  },
+  { "slug": "contractors-overview",            "category": "contractors",    "order": 1, "isFeatured": true  },
+  { "slug": "taxes-overview",                  "category": "taxes",          "order": 1, "isFeatured": true  },
+  { "slug": "settings-overview",               "category": "settings",       "order": 1, "isFeatured": true  },
+  { "slug": "ai-chat-text-to-speech",          "category": "aiChat",         "order": 2, "isFeatured": false },
+  { "slug": "dashboard-overview",              "category": "dashboard",      "order": 1, "isFeatured": true  },
+  { "slug": "settings-organization",           "category": "organization",   "order": 2, "isFeatured": false },
+  { "slug": "ai-chat-shared-conversations",    "category": "aiChat",         "order": 3, "isFeatured": false },
+  { "slug": "settings-telegram",              "category": "telegram",       "order": 3, "isFeatured": false },
+  { "slug": "ai-chat-receipt-ocr-telegram",   "category": "telegram",       "order": 4, "isFeatured": true  },
+  { "slug": "wfirma-biala-lista-vat",         "category": "wfirma",         "order": 5, "isFeatured": true  },
+  { "slug": "contractors-nip-autofill",       "category": "contractors",    "order": 4, "isFeatured": true  }
+]
