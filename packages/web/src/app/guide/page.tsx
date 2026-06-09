@@ -12,6 +12,7 @@ const translations = { en, pl, ru };
 const TOPICS = [
   { slug: 'ksef', i18nKey: 'ksef' as const },
   { slug: 'wfirma', i18nKey: 'wfirma' as const },
+  { slug: 'telegram', i18nKey: 'telegram' as const },
 ];
 
 export default function GuideIndexPage() {

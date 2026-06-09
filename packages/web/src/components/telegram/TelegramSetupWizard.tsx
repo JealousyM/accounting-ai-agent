@@ -103,12 +103,12 @@ export function TelegramSetupWizard({ translations: t }: TelegramSetupWizardProp
     );
   }
 
-  if (status?.linked && step !== 3) {
-    return <LinkedSettings status={status} translations={t} unlinkMutation={unlinkMutation} />;
+  if (step === 3) {
+    return <StepDone translations={t.step3} status={status} />;
   }
 
-  if (step === 3 || (status?.linked && step === 3)) {
-    return <StepDone translations={t} status={status} />;
+  if (status?.linked) {
+    return <LinkedSettings status={status} translations={t} unlinkMutation={unlinkMutation} />;
   }
 
   return (
@@ -286,7 +286,7 @@ function StepDone({
   status,
 }: {
   translations: TelegramSetupTranslations['step3'];
-  status?: { linked: boolean; username?: string; firstName?: string };
+  status?: { linked?: boolean; username?: string; firstName?: string };
 }) {
   const displayName = status?.username
     ? `@${status.username}`
