@@ -29,7 +29,7 @@ export function LandingFooter() {
                 height={128}
               />
               <h3 className="text-lg font-bold text-gray-900 dark:text-white">
-                eKsiegowy AI
+                eKsięgowy AI
               </h3>
             </div>
             <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
@@ -123,7 +123,7 @@ export function LandingFooter() {
             className="rounded-full"
           />
           <p className="text-sm text-gray-500 dark:text-gray-500 text-center">
-            &copy; 2026 eKsiegowy AI &mdash; MICODE sp. z o.o. {t.allRightsReserved}
+            &copy; 2026 eKsięgowy AI &mdash; MICODE sp. z o.o. {t.allRightsReserved}
           </p>
         </div>
       </div>

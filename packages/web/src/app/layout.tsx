@@ -1,5 +1,7 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import './globals.css';
+import { SITE_URL, SITE_NAME, ORGANIZATION_JSONLD, WEBSITE_JSONLD } from '@/lib/seo';
+import { JsonLd } from '@/components/seo/JsonLd';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { LocaleProvider } from '@/contexts/LocaleContext';
 import { ThemeProvider } from '@/contexts/ThemeContext';
@@ -31,22 +33,31 @@ export const metadata: Metadata = {
     'księgowość',
   ],
   authors: [{ name: 'MICODE sp. z o.o.' }],
-  metadataBase: new URL('https://eksiegowyai.pl'),
+  metadataBase: new URL(SITE_URL),
+  alternates: {
+    canonical: '/',
+    languages: {
+      'pl-PL': '/',
+      'x-default': '/',
+    },
+  },
   openGraph: {
     type: 'website',
     locale: 'pl_PL',
     alternateLocale: ['en_US', 'ru_RU'],
-    url: 'https://eksiegowyai.pl',
-    siteName: 'eKsięgowy AI',
+    url: SITE_URL,
+    siteName: SITE_NAME,
     title: 'eKsięgowy AI — AI Accounting for Polish Businesses',
     description:
       'Your intelligent accounting assistant that integrates with wFirma. Ask about VAT, PIT, CIT, ZUS, invoices, and more.',
+    images: [{ url: '/opengraph-image', width: 1200, height: 630, alt: SITE_NAME }],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'eKsięgowy AI — AI Accounting for Polish Businesses',
     description:
       'Your intelligent accounting assistant that integrates with wFirma. Ask about VAT, PIT, CIT, ZUS, invoices, and more.',
+    images: ['/opengraph-image'],
   },
   robots: {
     index: true,
@@ -61,6 +72,10 @@ export const metadata: Metadata = {
     ],
     shortcut: '/logo.svg',
   },
+};
+
+export const viewport: Viewport = {
+  themeColor: '#2563eb',
 };
 
 const themeScript = `
@@ -88,9 +103,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="pl" suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+        <JsonLd data={ORGANIZATION_JSONLD} />
+        <JsonLd data={WEBSITE_JSONLD} />
       </head>
       <body>
         <QueryProvider>

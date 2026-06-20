@@ -39,7 +39,7 @@ export function LandingHeader() {
             height={64}
           />
           <span className="text-xl font-bold text-gray-900 dark:text-white">
-            eKsiegowy AI
+            eKsięgowy AI
           </span>
         </Link>
 

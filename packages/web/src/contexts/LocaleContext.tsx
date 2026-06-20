@@ -113,6 +113,17 @@ export function LocaleProvider({ children }: LocaleProviderProps) {
   }, [user?.locale]);
 
   /**
+   * Keep <html lang> in sync with the active locale (SEO + a11y).
+   * The server renders lang="pl" (canonical); update it once the client
+   * resolves the user's actual locale.
+   */
+  useEffect(() => {
+    if (typeof document !== 'undefined') {
+      document.documentElement.lang = locale;
+    }
+  }, [locale]);
+
+  /**
    * Set locale and persist to localStorage
    */
   const setLocale = useCallback((newLocale: Locale) => {
