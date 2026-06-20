@@ -1,13 +1,15 @@
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Pricing',
+  title: 'Cennik',
   description:
-    'Choose your eKsięgowy AI plan. Start free with your own API key or upgrade to Pro for included AI credits and unlimited wFirma access.',
+    'Wybierz plan eKsięgowy AI. Zacznij za darmo z własnym kluczem API lub przejdź na Pro, aby uzyskać kredyty AI w cenie i nielimitowany dostęp do wFirma.',
+  alternates: { canonical: '/pricing' },
   openGraph: {
-    title: 'Pricing | eKsięgowy AI',
+    title: 'Cennik | eKsięgowy AI',
     description:
-      'Simple, transparent pricing. Start free or upgrade to Pro for included AI credits.',
+      'Prosty, przejrzysty cennik. Zacznij za darmo lub przejdź na Pro z kredytami AI w cenie.',
+    url: '/pricing',
   },
 };
 

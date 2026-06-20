@@ -1,6 +1,8 @@
 'use client';
 
 import { useAuth } from '@/contexts/AuthContext';
+import { JsonLd } from '@/components/seo/JsonLd';
+import { SOFTWARE_APPLICATION_JSONLD } from '@/lib/seo';
 import { ChatContainer } from '@/components/chat';
 import {
   LandingHeader,
@@ -47,6 +49,7 @@ function LoadingScreen() {
 function LandingPage() {
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900">
+      <JsonLd data={SOFTWARE_APPLICATION_JSONLD} />
       <LandingHeader />
       <main>
         <HeroSection />

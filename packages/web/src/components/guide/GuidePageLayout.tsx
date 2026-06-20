@@ -3,6 +3,8 @@ import React from 'react';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 import { useLocale, type Locale } from '@/contexts/LocaleContext';
+import { JsonLd } from '@/components/seo/JsonLd';
+import { absoluteUrl } from '@/lib/seo';
 import { Breadcrumbs, type BreadcrumbItem } from './Breadcrumbs';
 
 interface Props {
@@ -21,8 +23,24 @@ const LOCALE_OPTIONS: { value: Locale; label: string }[] = [
 export function GuidePageLayout({ title, summary, breadcrumbs, children }: Props) {
   const { locale, setLocale } = useLocale();
 
+  // BreadcrumbList structured data (only meaningful for multi-level trails)
+  const breadcrumbJsonLd =
+    breadcrumbs.length > 1
+      ? {
+          '@context': 'https://schema.org',
+          '@type': 'BreadcrumbList',
+          itemListElement: breadcrumbs.map((item, index) => ({
+            '@type': 'ListItem',
+            position: index + 1,
+            name: item.label,
+            ...(item.href ? { item: absoluteUrl(item.href) } : {}),
+          })),
+        }
+      : null;
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col">
+      {breadcrumbJsonLd && <JsonLd data={breadcrumbJsonLd} />}
       <header className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 sticky top-0 z-10">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
