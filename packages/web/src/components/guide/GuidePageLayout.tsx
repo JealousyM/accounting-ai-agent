@@ -1,8 +1,9 @@
 'use client';
 import React from 'react';
-import Link from 'next/link';
+import { LocaleLink as Link } from '@/components/LocaleLink';
 import { ArrowLeft } from 'lucide-react';
 import { useLocale, type Locale } from '@/contexts/LocaleContext';
+import { useLocaleSwitcher } from '@/hooks/useLocalizedHref';
 import { JsonLd } from '@/components/seo/JsonLd';
 import { absoluteUrl } from '@/lib/seo';
 import { Breadcrumbs, type BreadcrumbItem } from './Breadcrumbs';
@@ -21,7 +22,8 @@ const LOCALE_OPTIONS: { value: Locale; label: string }[] = [
 ];
 
 export function GuidePageLayout({ title, summary, breadcrumbs, children }: Props) {
-  const { locale, setLocale } = useLocale();
+  const { locale } = useLocale();
+  const switchLocale = useLocaleSwitcher();
 
   // BreadcrumbList structured data (only meaningful for multi-level trails)
   const breadcrumbJsonLd =
@@ -55,7 +57,7 @@ export function GuidePageLayout({ title, summary, breadcrumbs, children }: Props
           </div>
           <select
             value={locale}
-            onChange={(e) => setLocale(e.target.value as Locale)}
+            onChange={(e) => switchLocale(e.target.value as Locale)}
             className="px-2 py-1 text-xs font-medium rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent cursor-pointer"
             aria-label="Language"
           >
