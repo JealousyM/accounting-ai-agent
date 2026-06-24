@@ -1,8 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import Link from 'next/link';
+import { LocaleLink as Link } from '@/components/LocaleLink';
 import { useLocale, Locale } from '@/contexts/LocaleContext';
+import { useLocaleSwitcher } from '@/hooks/useLocalizedHref';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { Button } from '@/components/ui/button';
 import { Menu, X } from 'lucide-react';
@@ -19,7 +20,8 @@ const localeOptions: { value: Locale; label: string }[] = [
 ];
 
 export function LandingHeader() {
-  const { locale, setLocale } = useLocale();
+  const { locale } = useLocale();
+  const switchLocale = useLocaleSwitcher();
   const t = translations[locale].landing.nav;
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -64,7 +66,7 @@ export function LandingHeader() {
           {/* Locale switcher */}
           <select
             value={locale}
-            onChange={(e) => setLocale(e.target.value as Locale)}
+            onChange={(e) => switchLocale(e.target.value as Locale)}
             className="px-2 py-1 text-xs font-medium rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent cursor-pointer mr-1"
           >
             {localeOptions.map((l) => (
@@ -138,7 +140,7 @@ export function LandingHeader() {
             <div className="flex items-center justify-between pt-2 border-t border-gray-200 dark:border-gray-700">
               <select
                 value={locale}
-                onChange={(e) => setLocale(e.target.value as Locale)}
+                onChange={(e) => switchLocale(e.target.value as Locale)}
                 className="px-2 py-1 text-xs font-medium rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent cursor-pointer"
               >
                 {localeOptions.map((l) => (

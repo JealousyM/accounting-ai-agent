@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import { LocaleLink as Link } from '@/components/LocaleLink';
 import { ChevronRight } from 'lucide-react';
 
 export interface BreadcrumbItem {

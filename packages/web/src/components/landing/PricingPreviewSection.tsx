@@ -1,7 +1,7 @@
 'use client';
 
 import { Suspense } from 'react';
-import Link from 'next/link';
+import { LocaleLink as Link } from '@/components/LocaleLink';
 import { Loader2 } from 'lucide-react';
 import { useLocale } from '@/contexts/LocaleContext';
 import { PricingPlans } from '@/components/subscription/PricingPlans';
