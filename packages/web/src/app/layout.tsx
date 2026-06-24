@@ -13,11 +13,11 @@ import { GoogleAnalytics, MarketingAITracking } from '@/components/analytics';
 
 export const metadata: Metadata = {
   title: {
-    default: 'eKsięgowy AI — AI Accounting for Polish Businesses',
+    default: 'eKsięgowy AI — Księgowość AI dla polskich firm',
     template: '%s | eKsięgowy AI',
   },
   description:
-    'AI-powered accounting assistant for Polish businesses. Integrates with wFirma, supports KSeF e-invoices, and answers your tax questions about VAT, PIT, CIT, and ZUS.',
+    'Asystent księgowy oparty na AI dla polskich firm. Integruje się z wFirma, obsługuje e-faktury KSeF i odpowiada na pytania o VAT, PIT, CIT i ZUS.',
   keywords: [
     'accounting',
     'AI',
@@ -47,16 +47,16 @@ export const metadata: Metadata = {
     alternateLocale: ['en_US', 'ru_RU'],
     url: SITE_URL,
     siteName: SITE_NAME,
-    title: 'eKsięgowy AI — AI Accounting for Polish Businesses',
+    title: 'eKsięgowy AI — Księgowość AI dla polskich firm',
     description:
-      'Your intelligent accounting assistant that integrates with wFirma. Ask about VAT, PIT, CIT, ZUS, invoices, and more.',
+      'Twój inteligentny asystent księgowy zintegrowany z wFirma. Zapytaj o VAT, PIT, CIT, ZUS, faktury i więcej.',
     images: [{ url: '/opengraph-image', width: 1200, height: 630, alt: SITE_NAME }],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'eKsięgowy AI — AI Accounting for Polish Businesses',
+    title: 'eKsięgowy AI — Księgowość AI dla polskich firm',
     description:
-      'Your intelligent accounting assistant that integrates with wFirma. Ask about VAT, PIT, CIT, ZUS, invoices, and more.',
+      'Twój inteligentny asystent księgowy zintegrowany z wFirma. Zapytaj o VAT, PIT, CIT, ZUS, faktury i więcej.',
     images: ['/opengraph-image'],
   },
   robots: {
