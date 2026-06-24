@@ -1,9 +1,10 @@
 'use client';
 
 import React from 'react';
-import Link from 'next/link';
+import { LocaleLink as Link } from '@/components/LocaleLink';
 import { ArrowLeft } from 'lucide-react';
 import { useLocale, Locale } from '@/contexts/LocaleContext';
+import { useLocaleSwitcher } from '@/hooks/useLocalizedHref';
 import { LegalFooter } from './LegalFooter';
 
 interface LegalPageLayoutProps {
@@ -12,7 +13,8 @@ interface LegalPageLayoutProps {
 }
 
 export function LegalPageLayout({ title, children }: LegalPageLayoutProps) {
-  const { locale, setLocale } = useLocale();
+  const { locale } = useLocale();
+  const switchLocale = useLocaleSwitcher();
   const locales: Locale[] = ['en', 'pl', 'ru'];
 
   return (
@@ -35,7 +37,7 @@ export function LegalPageLayout({ title, children }: LegalPageLayoutProps) {
             {locales.map((l) => (
               <button
                 key={l}
-                onClick={() => setLocale(l)}
+                onClick={() => switchLocale(l)}
                 className={`px-2 py-1 text-xs rounded uppercase font-medium transition-colors ${
                   locale === l
                     ? 'bg-blue-600 text-white'

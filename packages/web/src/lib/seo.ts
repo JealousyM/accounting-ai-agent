@@ -125,6 +125,53 @@ export function absoluteUrl(path: string): string {
 }
 
 // ============================================
+// Per-page localized metadata builder
+// ============================================
+
+/** Localized copy for a single public page, keyed by locale. */
+export interface PageMeta {
+  title: string;
+  description: string;
+  /** Optional OG title override; falls back to `${title} | ${SITE_NAME}`. */
+  ogTitle?: string;
+  /** Optional OG description override; falls back to `description`. */
+  ogDescription?: string;
+}
+
+/**
+ * Build a locale-correct Metadata fragment for a public subpage.
+ *
+ * Given the page's per-locale copy and the canonical (unprefixed) path, this
+ * sets the right title/description for the active locale, a self-referencing
+ * canonical plus the full hreflang trio (+ x-default), and a localized
+ * openGraph block whose `url` points at the locale-prefixed page.
+ *
+ *   export async function generateMetadata(): Promise<Metadata> {
+ *     const locale = await getRequestLocale();
+ *     return buildPageMetadata(PRICING_META, '/pricing', locale);
+ *   }
+ */
+export function buildPageMetadata(
+  meta: Record<Locale, PageMeta>,
+  path: string,
+  locale: Locale,
+) {
+  const m = meta[locale];
+  const ogTitle = m.ogTitle ?? `${m.title} | ${SITE_NAME}`;
+  const ogDescription = m.ogDescription ?? m.description;
+  return {
+    title: m.title,
+    description: m.description,
+    alternates: alternatesFor(path, locale),
+    openGraph: {
+      title: ogTitle,
+      description: ogDescription,
+      url: localizedPath(path, locale),
+    },
+  };
+}
+
+// ============================================
 // Organization (legal entity behind the service)
 // ============================================
 
