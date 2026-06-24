@@ -73,33 +73,47 @@ const LocaleContext = createContext<LocaleContextType | undefined>(undefined);
 
 interface LocaleProviderProps {
   children: React.ReactNode;
+  /**
+   * Locale resolved server-side from the URL (via middleware's `x-locale`
+   * header). When the URL carries an explicit `/en` or `/ru` prefix this is
+   * authoritative and overrides any stored preference, so a shared link always
+   * renders in its own language. Defaults to `pl` for unprefixed URLs.
+   */
+  initialLocale?: Locale;
 }
 
-export function LocaleProvider({ children }: LocaleProviderProps) {
+export function LocaleProvider({ children, initialLocale = DEFAULT_LOCALE }: LocaleProviderProps) {
   const { user } = useAuth();
-  const [locale, setLocaleState] = useState<Locale>(DEFAULT_LOCALE);
+  const [locale, setLocaleState] = useState<Locale>(initialLocale);
   const [isInitialized, setIsInitialized] = useState(false);
 
   /**
-   * Initialize locale on mount
-   * Priority: 1. localStorage, 2. browser preference, 3. default
+   * Initialize locale on mount.
+   * If the URL explicitly selected a non-default locale (e.g. /en/pricing),
+   * that wins and is persisted. Otherwise fall back to the stored preference,
+   * then the browser language, then the default.
    */
   useEffect(() => {
     if (isInitialized) return;
 
-    const storedLocale = getStoredLocale();
-    if (storedLocale) {
-      setLocaleState(storedLocale);
+    if (initialLocale !== DEFAULT_LOCALE) {
+      // Explicit /en or /ru URL — authoritative.
+      saveLocale(initialLocale);
     } else {
-      const browserLocale = getBrowserLocale();
-      if (browserLocale) {
-        setLocaleState(browserLocale);
-        saveLocale(browserLocale);
+      const storedLocale = getStoredLocale();
+      if (storedLocale) {
+        setLocaleState(storedLocale);
+      } else {
+        const browserLocale = getBrowserLocale();
+        if (browserLocale) {
+          setLocaleState(browserLocale);
+          saveLocale(browserLocale);
+        }
       }
     }
 
     setIsInitialized(true);
-  }, [isInitialized]);
+  }, [isInitialized, initialLocale]);
 
   /**
    * Sync locale when user changes (e.g., login)

@@ -1,5 +1,5 @@
 'use client';
-import Link from 'next/link';
+import { LocaleLink as Link } from '@/components/LocaleLink';
 import { ChevronRight, FileText } from 'lucide-react';
 import { useLocale } from '@/contexts/LocaleContext';
 import { GuidePageLayout } from '@/components/guide';
