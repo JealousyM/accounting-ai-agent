@@ -1,7 +1,13 @@
 import fs from 'fs';
 import os from 'os';
 import path from 'path';
-import { getAllPublished, getPostBySlug, getTranslations } from './content';
+import {
+  getAllPublished,
+  getPostBySlug,
+  getTranslations,
+  getAllPosts,
+  getAnyPostBySlug,
+} from './content';
 
 let base: string;
 
@@ -94,6 +100,21 @@ describe('getPostBySlug', () => {
 
   it('returns null for a missing file', () => {
     expect(getPostBySlug('pl', 'nope', base)).toBeNull();
+  });
+});
+
+describe('getAllPosts (preview)', () => {
+  it('includes drafts alongside published, newest first', () => {
+    const slugs = getAllPosts('pl', base).map((p) => p.slug);
+    expect(slugs).toContain('secret'); // draft
+    expect(slugs).toContain('sample'); // published
+  });
+});
+
+describe('getAnyPostBySlug (preview)', () => {
+  it('returns a draft post (which getPostBySlug hides)', () => {
+    expect(getAnyPostBySlug('pl', 'secret', base)?.status).toBe('draft');
+    expect(getPostBySlug('pl', 'secret', base)).toBeNull();
   });
 });
 

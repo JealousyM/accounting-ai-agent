@@ -121,6 +121,22 @@ export function getPostBySlug(locale: BlogLocale, slug: string, baseDir?: string
   return post.status === 'published' ? post : null;
 }
 
+/** All posts for a locale INCLUDING drafts, newest first. Local-preview only —
+ *  never call from code paths that feed the public site or the sitemap. */
+export function getAllPosts(locale: BlogLocale, baseDir?: string): PostMeta[] {
+  return readLocale(locale, baseDir).map(stripBody).sort(byPublishedDesc);
+}
+
+/** A single post by slug regardless of status (incl. drafts). Local-preview only. */
+export function getAnyPostBySlug(locale: BlogLocale, slug: string, baseDir?: string): Post | null {
+  const dir = path.join(contentRoot(baseDir), locale);
+  try {
+    return parseFile(dir, locale, `${slug}.md`);
+  } catch {
+    return null;
+  }
+}
+
 /** Published variants of one article across locales — for hreflang alternates. */
 export function getTranslations(
   translationKey: string,
