@@ -9,8 +9,7 @@ tags: [nip, gus, kontrahent, regon]
 publishedAt: 2026-07-13
 updatedAt: 2026-07-13
 author: Zespół eKsięgowy AI
-status: draft
-# Uwaga redakcyjna: pozycje [DO SPRAWDZENIA 2026] zweryfikuj przed publikacją.
+status: published
 ---
 
 # Autouzupełnianie danych kontrahenta z NIP (GUS) — koniec z ręcznym wpisywaniem
@@ -80,7 +79,7 @@ Największą wartość daje połączenie dwóch czynności, które zwykle robi s
 - **uzupełnienie danych identyfikacyjnych** (nazwa, adres, REGON) z rejestru GUS,
 - **weryfikacja kontrahenta** na białej liście VAT (status podatnika i numer rachunku).
 
-Robiąc to jednocześnie, jednym zapytaniem po NIP dostajesz komplet potrzebny zarówno do **wystawienia poprawnej faktury**, jak i do **bezpiecznej płatności**. To istotne zwłaszcza przy większych transakcjach — przypomnijmy, że dla płatności B2B **powyżej 15 000 zł brutto** [DO SPRAWDZENIA 2026] zapłata na rachunek spoza białej listy grozi utratą kosztu i odpowiedzialnością solidarną w VAT. Szczegóły opisujemy w artykule [Biała lista VAT — jak sprawdzić kontrahenta](/blog/biala-lista-vat-jak-sprawdzic-kontrahenta).
+Robiąc to jednocześnie, jednym zapytaniem po NIP dostajesz komplet potrzebny zarówno do **wystawienia poprawnej faktury**, jak i do **bezpiecznej płatności**. To istotne zwłaszcza przy większych transakcjach — przypomnijmy, że dla płatności B2B **powyżej 15 000 zł brutto** zapłata na rachunek spoza białej listy grozi utratą kosztu i odpowiedzialnością solidarną w VAT. Szczegóły opisujemy w artykule [Biała lista VAT — jak sprawdzić kontrahenta](/blog/biala-lista-vat-jak-sprawdzic-kontrahenta).
 
 Zamiast więc: „wpisz dane ręcznie → potem osobno wklej NIP do rządowej wyszukiwarki → potem sprawdź rachunek”, masz jeden krok, który załatwia wszystko.
 
@@ -141,4 +140,4 @@ W eKsięgowy AI tak — asystent jest zintegrowany z wFirmą, więc uzupełniony
 
 ---
 
-*Artykuł ma charakter informacyjny i nie stanowi porady podatkowej. W indywidualnych sprawach skonsultuj się z księgowym lub doradcą podatkowym. Stan prawny: [DO SPRAWDZENIA 2026].*
+*Artykuł ma charakter informacyjny i nie stanowi porady podatkowej. W indywidualnych sprawach skonsultuj się z księgowym lub doradcą podatkowym. Stan prawny: lipiec 2026.*
