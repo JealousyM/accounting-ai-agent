@@ -94,6 +94,8 @@ All these tasks are handled by one tool. [eKsięgowy AI](/) is an AI assistant *
 
 Want to see where to start? Check out the [guide](/guide).
 
+> **And your personal finances?** Beyond company bookkeeping, it pays to keep your household budget in check too. Our sister app [AI Budget](https://ai-budget.pl) helps with exactly that — expenses, budgets, savings and shared family finances in one place, powered by AI. Try the [web app](https://app.ai-budget.pl) or get it on [Google Play](https://play.google.com/store/apps/details?id=com.budget.assistant).
+
 ## What AI Won't Replace
 
 Let's be honest: an AI assistant is a **tool for executional, repetitive work**, not a replacement for an accountant or tax advisor. Some things stay on the human side:
