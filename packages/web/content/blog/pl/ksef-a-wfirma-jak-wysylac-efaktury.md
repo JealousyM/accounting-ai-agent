@@ -1,6 +1,7 @@
 ---
 slug: ksef-a-wfirma-jak-wysylac-efaktury
 locale: pl
+translationKey: ksef-a-wfirma-jak-wysylac-efaktury
 title: "KSeF a wFirma — jak wysyłać e-faktury przez integrację"
 description: "Jak wysyłać e-faktury do KSeF przez wFirma: token i certyfikat, autoryzacja, uprawnienia, statusy i numer KSeF, odbiór faktur kosztowych oraz asystent AI."
 category: KSeF

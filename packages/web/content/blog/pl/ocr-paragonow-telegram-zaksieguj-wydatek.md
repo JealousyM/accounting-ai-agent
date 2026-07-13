@@ -1,6 +1,7 @@
 ---
 slug: ocr-paragonow-telegram-zaksieguj-wydatek
 locale: pl
+translationKey: ocr-paragonow-telegram-zaksieguj-wydatek
 title: "OCR paragonów w Telegramie — zaksięguj wydatek ze zdjęcia w kilka sekund"
 description: "Zrób zdjęcie paragonu w Telegramie, a asystent AI rozpozna sprzedawcę, NIP, datę, kwoty i VAT oraz utworzy wydatek w wFirma. Przewodnik krok po kroku."
 category: AI

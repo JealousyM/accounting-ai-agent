@@ -1,6 +1,7 @@
 ---
 slug: ksef-od-kiedy-obowiazkowy-2026
 locale: pl
+translationKey: ksef-od-kiedy-obowiazkowy-2026
 title: "KSeF 2026 — od kiedy obowiązkowy, kto musi wystawiać e-faktury i jak się przygotować"
 description: "KSeF od kiedy jest obowiązkowy? Harmonogram 2026–2027, kto musi wystawiać e-faktury, tryb offline, uprawnienia, kary i praktyczne kroki wdrożenia bez chaosu."
 category: KSeF

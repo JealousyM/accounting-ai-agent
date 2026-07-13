@@ -1,6 +1,7 @@
 ---
 slug: zaliczki-pit-jdg-terminy-wyliczenie
 locale: pl
+translationKey: zaliczki-pit-jdg-terminy-wyliczenie
 title: "Zaliczki na PIT w jednoosobowej działalności — terminy i wyliczenie"
 description: "Zaliczki na PIT w JDG w 2026: terminy (do 20. dnia), miesięczne vs kwartalne, wyliczenie na skali, liniówce i ryczałcie, przykład krok po kroku i rozliczenie roczne."
 category: PIT

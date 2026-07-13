@@ -1,6 +1,7 @@
 ---
 slug: jak-wystawic-fakture-ksef-krok-po-kroku
 locale: pl
+translationKey: jak-wystawic-fakture-ksef-krok-po-kroku
 title: "Jak wystawić fakturę w KSeF — krok po kroku"
 description: "Jak wystawić fakturę w KSeF krok po kroku: uprawnienia, token i certyfikat, logowanie, schemat FA(3), numer KSeF i UPO, korekty oraz tryb offline i awaryjny."
 category: KSeF

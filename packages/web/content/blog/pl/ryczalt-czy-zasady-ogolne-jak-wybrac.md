@@ -1,6 +1,7 @@
 ---
 slug: ryczalt-czy-zasady-ogolne-jak-wybrac
 locale: pl
+translationKey: ryczalt-czy-zasady-ogolne-jak-wybrac
 title: "Ryczałt czy zasady ogólne — jak wybrać formę opodatkowania w 2026"
 description: "Skala, podatek liniowy czy ryczałt w 2026? Porównanie stawek, wpływ na składkę zdrowotną, dla kogo się opłaca, jak i do kiedy zmienić formę opodatkowania. Przykłady."
 category: PIT

@@ -1,6 +1,7 @@
 ---
 slug: skladki-zus-2026-przedsiebiorca
 locale: pl
+translationKey: skladki-zus-2026-przedsiebiorca
 title: "Składki ZUS 2026 dla przedsiębiorcy — ile wynoszą, ulgi i do kiedy zapłacić"
 description: "Ile wynoszą składki ZUS w 2026: duży ZUS, mały ZUS, Mały ZUS Plus, ulga na start i składka zdrowotna. Aktualne kwoty, przykłady wyliczeń, wakacje składkowe i terminy."
 category: ZUS

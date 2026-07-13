@@ -1,6 +1,7 @@
 ---
 slug: autouzupelnianie-danych-kontrahenta-nip-gus
 locale: pl
+translationKey: autouzupelnianie-danych-kontrahenta-nip-gus
 title: "Autouzupełnianie danych kontrahenta z NIP (GUS) — koniec z ręcznym wpisywaniem"
 description: "Autouzupełnianie danych kontrahenta po NIP z rejestru GUS: nazwa, adres, REGON i status wypełniają się same. Mniej literówek, poprawne faktury i JPK."
 category: AI

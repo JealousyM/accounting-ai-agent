@@ -1,6 +1,7 @@
 ---
 slug: jak-ai-pomaga-w-ksiegowosci-malej-firmy
 locale: pl
+translationKey: jak-ai-pomaga-w-ksiegowosci-malej-firmy
 title: "Jak AI pomaga w księgowości małej firmy — 7 zadań, które przejmuje asystent"
 description: "Jak asystent AI odciąża właściciela małej firmy: pytania o VAT/PIT/CIT/ZUS, faktury do KSeF, biała lista, dane po NIP, OCR paragonów i terminy."
 category: AI

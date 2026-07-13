@@ -1,6 +1,7 @@
 ---
 slug: biala-lista-vat-jak-sprawdzic-kontrahenta
 locale: pl
+translationKey: biala-lista-vat-jak-sprawdzic-kontrahenta
 title: "Biała lista VAT — jak sprawdzić kontrahenta, uniknąć sankcji i nie stracić kosztu"
 description: "Biała lista podatników VAT: jak sprawdzić kontrahenta i jego rachunek, limit 15 000 zł, sankcje, split payment, rachunki wirtualne i ratunek w 7 dni (ZAW-NR)."
 category: VAT
