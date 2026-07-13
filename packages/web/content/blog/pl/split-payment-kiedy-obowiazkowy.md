@@ -1,6 +1,7 @@
 ---
 slug: split-payment-kiedy-obowiazkowy
 locale: pl
+translationKey: split-payment-kiedy-obowiazkowy
 title: "Split payment — kiedy mechanizm podzielonej płatności jest obowiązkowy"
 description: "Split payment (MPP): kiedy obowiązkowy — faktura powyżej 15 000 zł i towary z załącznika nr 15, oznaczenie na fakturze, rachunek VAT, sankcje 30% i korzyści."
 category: VAT

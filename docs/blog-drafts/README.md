@@ -1,8 +1,12 @@
 # Blog drafts — eKsięgowy AI
 
-Robocze artykuły blogowe pod SEO (rynek polski). To **wersje robocze** do wklejenia
-w edytor bloga (planowana architektura: model `BlogPost` w Prisma + panel `/admin/blog`),
-gdy powstanie sama funkcja. Nie są jeszcze publikowane.
+Artykuły blogowe pod SEO (rynek polski). **Źródło treści bloga to pliki Markdown w**
+**`packages/web/content/blog/<locale>/`** — renderowane jako statyczne strony `/blog`.
+Publikacja = ustaw `status: published` we frontmatterze + commit + deploy. Do czasu
+weryfikacji wszystkie pozostają `status: draft` (publiczny blog ich nie pokazuje).
+
+Ten katalog (`docs/blog-drafts/`) pełni rolę **logu redakcyjnego / checklisty weryfikacji**;
+same artykuły przeniesiono do `packages/web/content/blog/pl/`.
 
 ## Zasady
 
@@ -13,10 +17,12 @@ gdy powstanie sama funkcja. Nie są jeszcze publikowane.
 - **CTA:** każdy artykuł prowadzi naturalnie do produktu (integracja wFirma/KSeF,
   weryfikacja białej listy, kalendarz terminów).
 
-## Schemat frontmattera (→ pola przyszłego modelu `BlogPost`)
+## Schemat frontmattera
 
-`slug`, `locale`, `title`, `description` (meta ≤160 zn.), `category`, `tags[]`,
-`publishedAt`, `updatedAt`, `author`, `status` (`draft` | `published`).
+`slug`, `locale`, `translationKey` (grupuje tłumaczenia pl/en/ru dla hreflang),
+`title`, `description` (meta ≤160 zn.), `category`, `tags[]`, `publishedAt`,
+`updatedAt`, `author`, `status` (`draft` | `published`), opcjonalnie `coverImage`,
+`ogImage`, `faq` (`[{q,a}]` → FAQPage JSON-LD).
 
 ## Plan treści — 12/12 napisane (wersje robocze)
 

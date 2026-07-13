@@ -1,6 +1,7 @@
 ---
 slug: terminy-vat-jpk-v7-2026
 locale: pl
+translationKey: terminy-vat-jpk-v7-2026
 title: "Terminy VAT i JPK_V7 w 2026 — kalendarz płatności"
 description: "Terminy VAT i JPK_V7 w 2026: do kiedy płatność i wysyłka JPK_V7M/K, rozliczenie kwartalne, VAT-UE i przesunięcia świąteczne. Gotowy kalendarz."
 category: VAT
