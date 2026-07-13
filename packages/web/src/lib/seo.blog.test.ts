@@ -1,4 +1,27 @@
-import { blogAlternatesFor, blogPostingJsonLd, faqPageJsonLd } from './seo';
+import {
+  blogAlternatesFor,
+  blogPostingJsonLd,
+  faqPageJsonLd,
+  splitLocale,
+  localizedPath,
+  type Locale,
+} from './seo';
+
+describe('locale switch target (regression: prefixes must not stack)', () => {
+  // Mirrors what useLocaleSwitcher computes: strip any existing locale prefix,
+  // then re-localize. Guards against /ru/blog -> /en/ru/blog.
+  const cases: [string, Locale, string][] = [
+    ['/ru/blog', 'en', '/en/blog'],
+    ['/en/blog', 'ru', '/ru/blog'],
+    ['/blog', 'en', '/en/blog'],
+    ['/en/blog', 'pl', '/blog'],
+    ['/ru/blog/ksef-od-kiedy-obowiazkowy-2026', 'en', '/en/blog/ksef-od-kiedy-obowiazkowy-2026'],
+    ['/en/pricing', 'ru', '/ru/pricing'],
+  ];
+  it.each(cases)('switch %s to %s -> %s', (path, loc, expected) => {
+    expect(localizedPath(splitLocale(path).path, loc)).toBe(expected);
+  });
+});
 
 describe('blogAlternatesFor', () => {
   it('only advertises locales that have a published translation', () => {
