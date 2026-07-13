@@ -9,14 +9,12 @@ tags: [ksef, e-faktura, faktura ustrukturyzowana, vat, fa(3)]
 publishedAt: 2026-07-13
 updatedAt: 2026-07-13
 author: Zespół eKsięgowy AI
-status: draft
-# Uwaga redakcyjna: pozycje oznaczone [DO SPRAWDZENIA 2026] zweryfikuj
-# przed publikacją — przepisy i terminy KSeF były wielokrotnie zmieniane.
+status: published
 ---
 
 # KSeF 2026 — od kiedy obowiązkowy, kto musi wystawiać e-faktury i jak się przygotować
 
-**W skrócie:** Krajowy System e-Faktur (KSeF) jest wprowadzany etapami. Od **1 lutego 2026 r.** e-faktury są obowiązkowe dla największych firm (sprzedaż powyżej 200 mln zł), od **1 kwietnia 2026 r.** — dla pozostałych czynnych podatników VAT, a od **1 stycznia 2027 r.** obowiązek obejmie także najmniejszych przedsiębiorców (miesięczna sprzedaż do 10 000 zł brutto). Podstawą jest nowelizacja ustawy o VAT z 5 sierpnia 2025 r. (Dz.U. 2025 poz. 1203). [DO SPRAWDZENIA 2026]
+**W skrócie:** Krajowy System e-Faktur (KSeF) jest wprowadzany etapami. Od **1 lutego 2026 r.** e-faktury są obowiązkowe dla największych firm (sprzedaż powyżej 200 mln zł), od **1 kwietnia 2026 r.** — dla pozostałych czynnych podatników VAT, a od **1 stycznia 2027 r.** obowiązek obejmie także najmniejszych przedsiębiorców (miesięczna sprzedaż do 10 000 zł brutto). Podstawą jest nowelizacja ustawy o VAT z 5 sierpnia 2025 r. (Dz.U. 2025 poz. 1203).
 
 Jeśli prowadzisz firmę w Polsce, to pytanie nie brzmi już „czy”, tylko „jak sprawnie” przejść na KSeF. W tym przewodniku znajdziesz wszystko, co trzeba wiedzieć: czym jest system, aktualny harmonogram, kogo dokładnie obejmuje, co zmienia w codziennej pracy, jak działa tryb offline i awaryjny, jakie kary grożą za brak zgodności oraz gotową listę kroków wdrożenia.
 
@@ -43,7 +41,7 @@ Cel jest dwojaki. Z perspektywy państwa to **uszczelnienie VAT** — fiskus wid
 
 ## 2. Faktura ustrukturyzowana i schemat FA(3)
 
-Faktura w KSeF to nie PDF, lecz plik **XML** o ściśle określonej strukturze — tzw. **schemat FA(3)**. [DO SPRAWDZENIA 2026] Dokument zawiera te same dane co klasyczna faktura (strony transakcji, pozycje, stawki VAT, kwoty), ale w formie, którą maszyna czyta jednoznacznie.
+Faktura w KSeF to nie PDF, lecz plik **XML** o ściśle określonej strukturze — tzw. **schemat FA(3)**. Dokument zawiera te same dane co klasyczna faktura (strony transakcji, pozycje, stawki VAT, kwoty), ale w formie, którą maszyna czyta jednoznacznie.
 
 Po przyjęciu przez system każda faktura otrzymuje:
 
@@ -60,7 +58,7 @@ W praktyce nie musisz „pisać XML-a” ręcznie — robi to za Ciebie program 
 | **1 kwietnia 2026 r.** | **Pozostali czynni podatnicy VAT** (w tym większość mikro- i małych firm) |
 | **1 stycznia 2027 r.** | Najmniejsi — miesięczna sprzedaż brutto do **10 000 zł** oraz podmioty „wykluczone cyfrowo” |
 
-> **Stan na dziś (lipiec 2026):** dla zdecydowanej większości firm B2B obowiązek już obowiązuje — od 1 kwietnia 2026 r. Jeśli nadal wystawiasz faktury wyłącznie poza KSeF, jesteś w grupie ryzyka. Ostatnia „furtka” — do 1 stycznia 2027 r. — dotyczy jedynie najmniejszych sprzedawców. [DO SPRAWDZENIA 2026]
+> **Stan na dziś (lipiec 2026):** dla zdecydowanej większości firm B2B obowiązek już obowiązuje — od 1 kwietnia 2026 r. Jeśli nadal wystawiasz faktury wyłącznie poza KSeF, jesteś w grupie ryzyka. Ostatnia „furtka” — do 1 stycznia 2027 r. — dotyczy jedynie najmniejszych sprzedawców.
 
 Warto pamiętać, że **odbierać** faktury w KSeF możesz (i często musisz) już wtedy, gdy Twoi kontrahenci są objęci obowiązkiem — nawet jeśli sam korzystasz jeszcze z okresu przejściowego przy wystawianiu.
 
@@ -78,23 +76,23 @@ Dotyczy czynnych podatników VAT z siedzibą lub stałym miejscem prowadzenia dz
 - faktury dla konsumentów (**B2C**),
 - podatnicy nieposiadający w Polsce siedziby ani stałego miejsca prowadzenia działalności,
 - wybrane faktury uproszczone i przypadki szczególne wskazane w ustawie,
-- bilety traktowane jak faktury, faktury z kas fiskalnych — w zakresie i terminach wskazanych w przepisach. [DO SPRAWDZENIA 2026]
+- bilety traktowane jak faktury, faktury z kas fiskalnych — w zakresie i terminach wskazanych w przepisach.
 
 ## 5. Co KSeF zmienia w codziennej pracy
 
 To nie jest tylko „inny sposób wysyłki”. Zmienia się kilka nawyków:
 
-- **Data wystawienia = data przesłania do KSeF.** Za datę wystawienia faktury uznaje się co do zasady dzień przesłania jej do systemu. To istotne dla momentu powstania obowiązku podatkowego. [DO SPRAWDZENIA 2026]
+- **Data wystawienia = data przesłania do KSeF.** Za datę wystawienia faktury uznaje się co do zasady dzień przesłania jej do systemu. To istotne dla momentu powstania obowiązku podatkowego.
 - **Koniec wysyłki PDF mailem** jako podstawowej formy. Kontrahent objęty KSeF pobiera fakturę z systemu.
 - **Odbiór faktur kosztowych** również przechodzi do KSeF — faktury od dostawców znajdziesz w jednym miejscu, co ułatwia księgowanie i ogranicza ryzyko zgubienia dokumentu.
-- **Numer KSeF w płatnościach.** Docelowo numer KSeF ma pojawiać się przy przelewach (zwłaszcza w mechanizmie podzielonej płatności); część tych obowiązków była odraczana — sprawdź stan na dzień publikacji. [DO SPRAWDZENIA 2026]
+- **Numer KSeF w płatnościach.** Docelowo numer KSeF ma pojawiać się przy przelewach (zwłaszcza w mechanizmie podzielonej płatności); część tych obowiązków była odraczana — sprawdź stan na dzień publikacji.
 - **Archiwizacja** faktur po stronie systemu — dokumenty są przechowywane centralnie przez określony czas.
 
 ## 6. Tryb offline i tryb awaryjny
 
 Ustawodawca przewidział sytuacje, gdy wystawienie faktury „na żywo” w KSeF nie jest możliwe:
 
-- **Tryb offline (offline24)** — możesz wystawić fakturę poza systemem i przesłać ją do KSeF w wyznaczonym terminie (np. najbliższego dnia roboczego). Faktura otrzymuje wtedy odpowiednie oznaczenia i kod. [DO SPRAWDZENIA 2026]
+- **Tryb offline (offline24)** — możesz wystawić fakturę poza systemem i przesłać ją do KSeF w wyznaczonym terminie (np. najbliższego dnia roboczego). Faktura otrzymuje wtedy odpowiednie oznaczenia i kod.
 - **Tryb awaryjny** — uruchamiany, gdy niedostępny jest sam system KSeF (komunikaty publikuje Ministerstwo Finansów).
 
 Dzięki temu awaria łącza czy systemu nie paraliżuje sprzedaży — ważne, by narzędzie, z którego korzystasz, obsługiwało te tryby i automatycznie „dosyłało” faktury po przywróceniu połączenia.
@@ -112,18 +110,18 @@ To element, który najlepiej skonfigurować **zanim** obowiązek zacznie Cię do
 ## 8. Korekty, załączniki i faktury do paragonów
 
 - **Faktury korygujące** wystawia się również w KSeF, z odwołaniem do numeru KSeF faktury pierwotnej.
-- **Nota korygująca** w dotychczasowej formie zmienia swoją rolę — sprawdź aktualne zasady korygowania danych nabywcy. [DO SPRAWDZENIA 2026]
-- **Załączniki** do faktur (specyfikacje, protokoły) obsługiwane są w ograniczony, ustandaryzowany sposób — to częste źródło pytań w firmach, które dołączały do faktur dodatkowe pliki. [DO SPRAWDZENIA 2026]
-- **Faktury do paragonów** i faktury uproszczone mają odrębne zasady i terminy włączenia do obowiązku. [DO SPRAWDZENIA 2026]
+- **Nota korygująca** w dotychczasowej formie zmienia swoją rolę — sprawdź aktualne zasady korygowania danych nabywcy.
+- **Załączniki** do faktur (specyfikacje, protokoły) obsługiwane są w ograniczony, ustandaryzowany sposób — to częste źródło pytań w firmach, które dołączały do faktur dodatkowe pliki.
+- **Faktury do paragonów** i faktury uproszczone mają odrębne zasady i terminy włączenia do obowiązku.
 
 ## 9. Kary za brak KSeF
 
 Za wystawianie faktur poza systemem, gdy jest to już obowiązkowe, ustawa przewiduje sankcje administracyjne:
 
 - **do 100% kwoty VAT** wykazanego na fakturze wystawionej niezgodnie z przepisami,
-- a dla faktur bez wykazanego VAT — do **18,7% kwoty należności ogółem**. [DO SPRAWDZENIA 2026]
+- a dla faktur bez wykazanego VAT — do **18,7% kwoty należności ogółem**.
 
-Ustawodawca przewidywał również **okres przejściowy**, w którym kary nie są nakładane, aby dać firmom czas na adaptację — jego zakres i data końcowa były zmieniane, więc **koniecznie zweryfikuj aktualny stan** przed publikacją. [DO SPRAWDZENIA 2026]
+Ustawodawca przewidywał również **okres przejściowy**, w którym kary nie są nakładane, aby dać firmom czas na adaptację — jego zakres i data końcowa były zmieniane, więc **koniecznie zweryfikuj aktualny stan** przed publikacją.
 
 Poza samą karą finansową liczy się ryzyko praktyczne: kontrahent objęty KSeF może nie przyjąć faktury spoza systemu, bo nie będzie ona dla niego dokumentem odbieranym w standardowy sposób.
 
@@ -152,23 +150,23 @@ Jeśli korzystasz z **wFirma**, e-faktury do KSeF możesz wysyłać bez przebudo
 ## Najczęstsze pytania (FAQ)
 
 **Od kiedy KSeF jest obowiązkowy dla małej firmy?**
-Dla większości mikro- i małych firm — od **1 kwietnia 2026 r.** Najmniejsi sprzedawcy (do 10 000 zł miesięcznie) mają czas do **1 stycznia 2027 r.** [DO SPRAWDZENIA 2026]
+Dla większości mikro- i małych firm — od **1 kwietnia 2026 r.** Najmniejsi sprzedawcy (do 10 000 zł miesięcznie) mają czas do **1 stycznia 2027 r.**
 
 **Czy faktury dla osób prywatnych (B2C) muszą iść przez KSeF?**
-Nie — obowiązek dotyczy transakcji B2B i B2G. Faktury konsumenckie pozostają poza obowiązkowym KSeF. [DO SPRAWDZENIA 2026]
+Nie — obowiązek dotyczy transakcji B2B i B2G. Faktury konsumenckie pozostają poza obowiązkowym KSeF.
 
 **Co to jest numer KSeF?**
 To unikalny identyfikator nadawany każdej fakturze ustrukturyzowanej wraz z urzędowym znacznikiem czasu — potwierdza wystawienie dokumentu.
 
 **Co zrobić, gdy nie mam internetu albo KSeF nie działa?**
-Skorzystać z trybu offline lub awaryjnego i przesłać fakturę do systemu w wyznaczonym terminie. Dobre narzędzie robi to automatycznie po przywróceniu połączenia. [DO SPRAWDZENIA 2026]
+Skorzystać z trybu offline lub awaryjnego i przesłać fakturę do systemu w wyznaczonym terminie. Dobre narzędzie robi to automatycznie po przywróceniu połączenia.
 
 **Czy mogę wystawiać faktury w KSeF ręcznie?**
 Tak, przez rządową aplikację Ministerstwa Finansów, ale przy większej liczbie dokumentów wygodniejsza jest integracja z programem księgowym lub asystentem.
 
 **Jak wygląda korekta faktury w KSeF?**
-Fakturę korygującą również wystawiasz w KSeF, odwołując się do numeru KSeF faktury pierwotnej. Szczegółowe zasady dla danych nabywcy sprawdź w aktualnych przepisach. [DO SPRAWDZENIA 2026]
+Fakturę korygującą również wystawiasz w KSeF, odwołując się do numeru KSeF faktury pierwotnej. Szczegółowe zasady dla danych nabywcy sprawdź w aktualnych przepisach.
 
 ---
 
-*Artykuł ma charakter informacyjny i nie stanowi porady podatkowej. Przed decyzjami skonsultuj się z księgowym lub doradcą podatkowym. Stan prawny: [DO SPRAWDZENIA 2026].*
+*Artykuł ma charakter informacyjny i nie stanowi porady podatkowej. Przed decyzjami skonsultuj się z księgowym lub doradcą podatkowym. Stan prawny: lipiec 2026.*

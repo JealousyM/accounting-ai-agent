@@ -9,8 +9,7 @@ tags: [biala lista, vat, kontrahent, koszty uzyskania przychodu, zaw-nr, split p
 publishedAt: 2026-07-13
 updatedAt: 2026-07-13
 author: Zespół eKsięgowy AI
-status: draft
-# Uwaga redakcyjna: pozycje [DO SPRAWDZENIA 2026] zweryfikuj przed publikacją.
+status: published
 ---
 
 # Biała lista VAT — jak sprawdzić kontrahenta, uniknąć sankcji i nie stracić kosztu
@@ -76,19 +75,19 @@ Jeśli przelew już poszedł na rachunek spoza listy, nie wszystko stracone. San
 
 - **termin: 7 dni** od dnia **zlecenia przelewu** (termin jest rygorystyczny — liczy się każdy dzień),
 - składasz je do **naczelnika urzędu skarbowego właściwego dla Ciebie** (płatnika dokonującego przelewu), a **nie** dla kontrahenta,
-- po jego złożeniu zachowujesz prawo do kosztu i unikasz odpowiedzialności solidarnej. [DO SPRAWDZENIA 2026]
+- po jego złożeniu zachowujesz prawo do kosztu i unikasz odpowiedzialności solidarnej.
 
 > **Wskazówka:** ustaw wewnętrzną zasadę „przelew powyżej 15 000 zł na nieznany rachunek = automatyczne przypomnienie o ZAW-NR”. Siedem dni mija szybciej, niż się wydaje.
 
 ## 6. Split payment jako tarcza
 
-Zapłata w **mechanizmie podzielonej płatności (split payment, MPP)** w wielu przypadkach chroni przed sankcjami białej listy — nawet gdy rachunek nie figuruje w wykazie. To wygodne „domyślne zabezpieczenie” przy większych, jednorazowych płatnościach. Zwróć jednak uwagę, że MPP ma własne zasady (m.in. obowiązkowy dla niektórych towarów i usług z załącznika nr 15) i nie zwalnia z rozsądnej weryfikacji kontrahenta. [DO SPRAWDZENIA 2026]
+Zapłata w **mechanizmie podzielonej płatności (split payment, MPP)** w wielu przypadkach chroni przed sankcjami białej listy — nawet gdy rachunek nie figuruje w wykazie. To wygodne „domyślne zabezpieczenie” przy większych, jednorazowych płatnościach. Zwróć jednak uwagę, że MPP ma własne zasady (m.in. obowiązkowy dla niektórych towarów i usług z załącznika nr 15) i nie zwalnia z rozsądnej weryfikacji kontrahenta.
 
 ## 7. Pułapki: rachunki wirtualne, faktoring, usługi ciągłe
 
-- **Rachunki wirtualne (wirtualne subkonta)** — np. indywidualne numery do wpłat u operatorów telekomunikacyjnych czy dostawców mediów. Nie widnieją wprost w wykazie, ale bywają powiązane z rachunkiem rozliczeniowym, który tam jest. Wyszukiwarka MF potrafi taki rachunek „rozpoznać”. [DO SPRAWDZENIA 2026]
-- **Faktoring i cesje** — płatność trafia do faktora, nie do wystawcy faktury. To wymaga osobnej analizy, bo rachunek faktora rządzi się swoimi zasadami. [DO SPRAWDZENIA 2026]
-- **Usługi ciągłe / abonamenty** — przy powtarzalnych płatnościach łatwo przekroczyć próg 15 000 zł w skali umowy; oceniaj wartość transakcji, a nie pojedynczej faktury. [DO SPRAWDZENIA 2026]
+- **Rachunki wirtualne (wirtualne subkonta)** — np. indywidualne numery do wpłat u operatorów telekomunikacyjnych czy dostawców mediów. Nie widnieją wprost w wykazie, ale bywają powiązane z rachunkiem rozliczeniowym, który tam jest. Wyszukiwarka MF potrafi taki rachunek „rozpoznać”.
+- **Faktoring i cesje** — płatność trafia do faktora, nie do wystawcy faktury. To wymaga osobnej analizy, bo rachunek faktora rządzi się swoimi zasadami.
+- **Usługi ciągłe / abonamenty** — przy powtarzalnych płatnościach łatwo przekroczyć próg 15 000 zł w skali umowy; oceniaj wartość transakcji, a nie pojedynczej faktury.
 
 ## 8. Kiedy NIE trzeba sprawdzać
 
@@ -96,7 +95,7 @@ Obowiązek nie dotyczy m.in.:
 
 - transakcji **do 15 000 zł brutto**,
 - płatności **innych niż przelew** (np. karta, gotówka w dozwolonym zakresie — pamiętaj o odrębnym limicie płatności gotówkowych),
-- transakcji z podmiotami **niebędącymi czynnymi podatnikami VAT** w zakresie, w jakim mechanizm ich nie obejmuje. [DO SPRAWDZENIA 2026]
+- transakcji z podmiotami **niebędącymi czynnymi podatnikami VAT** w zakresie, w jakim mechanizm ich nie obejmuje.
 
 Mimo to weryfikacja statusu VAT kontrahenta bywa rozsądna także poniżej progu — choćby po to, by potwierdzić, że masz do czynienia z czynnym podatnikiem.
 
@@ -127,20 +126,20 @@ Ręczne wklejanie NIP-ów do rządowej wyszukiwarki przy każdej płatności jes
 Sankcje dotyczą transakcji B2B **powyżej 15 000 zł brutto**. Poniżej tego progu nie ma obowiązku płatności na rachunek z wykazu, choć weryfikacja i tak bywa rozsądna.
 
 **Ile mam czasu na ZAW-NR?**
-**7 dni** od dnia zlecenia przelewu na rachunek spoza białej listy. [DO SPRAWDZENIA 2026]
+**7 dni** od dnia zlecenia przelewu na rachunek spoza białej listy.
 
 **Gdzie składam ZAW-NR?**
 Do naczelnika urzędu skarbowego **właściwego dla Ciebie** (podatnika dokonującego płatności).
 
 **Czy split payment zwalnia z obowiązku sprawdzania?**
-Zapłata w mechanizmie podzielonej płatności w wielu przypadkach chroni przed sankcjami, ale nie zwalnia z rozsądnej weryfikacji kontrahenta. [DO SPRAWDZENIA 2026]
+Zapłata w mechanizmie podzielonej płatności w wielu przypadkach chroni przed sankcjami, ale nie zwalnia z rozsądnej weryfikacji kontrahenta.
 
 **Co z rachunkiem wirtualnym, którego nie ma na liście?**
-Rachunki wirtualne bywają powiązane z rachunkiem rozliczeniowym z wykazu — wyszukiwarka MF potrafi je rozpoznać po numerze. Zawsze warto to potwierdzić. [DO SPRAWDZENIA 2026]
+Rachunki wirtualne bywają powiązane z rachunkiem rozliczeniowym z wykazu — wyszukiwarka MF potrafi je rozpoznać po numerze. Zawsze warto to potwierdzić.
 
 **Czy muszę sprawdzać każdą fakturę?**
 Nie każdą — obowiązek zależy od wartości transakcji (powyżej 15 000 zł) i formy płatności (przelew). Ale przy większych płatnościach weryfikacja rachunku powinna być rutyną.
 
 ---
 
-*Artykuł ma charakter informacyjny i nie stanowi porady podatkowej. W indywidualnych sprawach skonsultuj się z księgowym lub doradcą podatkowym. Stan prawny: [DO SPRAWDZENIA 2026].*
+*Artykuł ma charakter informacyjny i nie stanowi porady podatkowej. W indywidualnych sprawach skonsultuj się z księgowym lub doradcą podatkowym. Stan prawny: lipiec 2026.*

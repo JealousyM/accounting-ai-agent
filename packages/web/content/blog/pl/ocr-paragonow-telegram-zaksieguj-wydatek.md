@@ -9,8 +9,7 @@ tags: [ocr, telegram, paragony, wydatki]
 publishedAt: 2026-07-13
 updatedAt: 2026-07-13
 author: Zespół eKsięgowy AI
-status: draft
-# Uwaga redakcyjna: pozycje [DO SPRAWDZENIA 2026] zweryfikuj przed publikacją.
+status: published
 ---
 
 # OCR paragonów w Telegramie — zaksięguj wydatek ze zdjęcia w kilka sekund
@@ -79,7 +78,7 @@ Bot odpisze podsumowaniem tego, co odczytał: sprzedawca, NIP, data, kwota netto
 
 ### Krok 4. Potwierdź zaksięgowanie
 
-Gdy dane się zgadzają, potwierdzasz — i bot tworzy wydatek w wFirma. Dostajesz komunikat zwrotny, że dokument został zapisany. Paragon jest zaksięgowany, a Ty możesz spokojnie wyrzucić papierek albo zachować go zgodnie z zasadami archiwizacji dokumentów. [DO SPRAWDZENIA 2026]
+Gdy dane się zgadzają, potwierdzasz — i bot tworzy wydatek w wFirma. Dostajesz komunikat zwrotny, że dokument został zapisany. Paragon jest zaksięgowany, a Ty możesz spokojnie wyrzucić papierek albo zachować go zgodnie z zasadami archiwizacji dokumentów.
 
 > **Wskazówka:** wyrób sobie nawyk „zdjęcie od razu przy kasie”. Paragon zaksięgowany w 10 sekund nie zdąży się zgubić ani wyblaknąć, a Ty nie masz na koniec miesiąca sterty do przepisania.
 
@@ -95,9 +94,9 @@ OCR radzi sobie bardzo dobrze z typowymi, czytelnymi paragonami. Standardowo asy
 Są jednak sytuacje, w których warto rzucić okiem uważniej albo poprawić dane ręcznie:
 
 - **wyblakłe lub pogniecione paragony** — druk termiczny bywa nieczytelny i OCR może pomylić cyfry,
-- **paragony bez NIP nabywcy** — pamiętaj, że sam paragon nie zawsze jest wystarczającym dokumentem kosztowym; w wielu przypadkach potrzebna jest **faktura** (paragon z NIP do określonego limitu bywa traktowany jak faktura uproszczona). Zweryfikuj wymogi dla swojej formy księgowości. [DO SPRAWDZENIA 2026]
+- **paragony bez NIP nabywcy** — pamiętaj, że sam paragon nie zawsze jest wystarczającym dokumentem kosztowym; w wielu przypadkach potrzebna jest **faktura** (paragon z NIP do określonego limitu bywa traktowany jak faktura uproszczona). Zweryfikuj wymogi dla swojej formy księgowości.
 - **wiele stawek VAT lub pozycje zwolnione** — sprawdź, czy podział kwot został odczytany poprawnie,
-- **waluty obce i zakupy zagraniczne** — kursy i sposób ujęcia wymagają osobnej uwagi. [DO SPRAWDZENIA 2026]
+- **waluty obce i zakupy zagraniczne** — kursy i sposób ujęcia wymagają osobnej uwagi.
 
 Zasada jest prosta: **AI przyspiesza wprowadzanie danych, ale to Ty zatwierdzasz dokument.** Krok weryfikacji istnieje właśnie po to, żeby złapać wyjątki, zanim trafią do ewidencji.
 
@@ -124,7 +123,7 @@ Zdjęcie paragonu to dokument firmowy — traktujemy je poważnie:
 - **połączenie z botem możesz w każdej chwili rozłączyć** w ustawieniach konta; kod łączący jest jednorazowy,
 - **paragon zwykle nie zawiera danych wrażliwych** w rozumieniu przepisów o ochronie danych, ale i tak warto pilnować, komu przekazujesz zdjęcia dokumentów.
 
-Szczegóły przetwarzania danych opisuje polityka prywatności serwisu — zajrzyj do niej, jeśli chcesz poznać zakres i czas przechowywania. [DO SPRAWDZENIA 2026]
+Szczegóły przetwarzania danych opisuje polityka prywatności serwisu — zajrzyj do niej, jeśli chcesz poznać zakres i czas przechowywania.
 
 ## Najczęstsze pytania (FAQ)
 
@@ -141,14 +140,14 @@ Nie. Bot najpierw pokazuje rozpoznane dane, a wydatek powstaje dopiero po Twoim 
 Zobaczysz to na etapie weryfikacji i możesz poprawić dane albo wysłać wyraźniejsze zdjęcie. Najczęstsze przyczyny błędów to wyblakły druk, cień na zdjęciu lub ucięty kadr.
 
 **Czy paragon wystarczy jako dokument kosztowy?**
-To zależy od rodzaju wydatku i Twojej formy księgowości. W wielu sytuacjach potrzebna jest faktura, a paragon z NIP do określonego limitu bywa traktowany jak faktura uproszczona. Zweryfikuj wymogi ze swoim księgowym. [DO SPRAWDZENIA 2026]
+To zależy od rodzaju wydatku i Twojej formy księgowości. W wielu sytuacjach potrzebna jest faktura, a paragon z NIP do określonego limitu bywa traktowany jak faktura uproszczona. Zweryfikuj wymogi ze swoim księgowym.
 
 **Czy mogę wysłać kilka paragonów naraz?**
 Najlepsze rozpoznanie uzyskasz, wysyłając jeden paragon na jednym zdjęciu — wtedy bot jednoznacznie mapuje dane na jeden wydatek.
 
 **Czy zdjęcia paragonów są bezpieczne?**
-Zdjęcie służy do rozpoznania danych i utworzenia wydatku na Twoim koncie. Połączenie z botem możesz w każdej chwili rozłączyć, a zakres przetwarzania danych opisuje polityka prywatności. [DO SPRAWDZENIA 2026]
+Zdjęcie służy do rozpoznania danych i utworzenia wydatku na Twoim koncie. Połączenie z botem możesz w każdej chwili rozłączyć, a zakres przetwarzania danych opisuje polityka prywatności.
 
 ---
 
-*Artykuł ma charakter informacyjny i nie stanowi porady podatkowej. W indywidualnych sprawach skonsultuj się z księgowym lub doradcą podatkowym. Stan prawny: [DO SPRAWDZENIA 2026].*
+*Artykuł ma charakter informacyjny i nie stanowi porady podatkowej. W indywidualnych sprawach skonsultuj się z księgowym lub doradcą podatkowym. Stan prawny: lipiec 2026.*

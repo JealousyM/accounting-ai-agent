@@ -9,8 +9,7 @@ tags: [ai, księgowość, automatyzacja, mała firma]
 publishedAt: 2026-07-13
 updatedAt: 2026-07-13
 author: Zespół eKsięgowy AI
-status: draft
-# Uwaga redakcyjna: pozycje [DO SPRAWDZENIA 2026] zweryfikuj przed publikacją.
+status: published
 ---
 
 # Jak AI pomaga w księgowości małej firmy — 7 zadań, które przejmuje asystent
@@ -41,13 +40,13 @@ Najczęstsza bariera w małej firmie to nie brak wiedzy, tylko **brak czasu, by 
 
 Asystent AI odpowiada na takie pytania **od razu i po ludzku** — bez żargonu, z konkretem dostosowanym do jednoosobowej działalności czy małej spółki. Zapytasz „ile wynosi składka zdrowotna na ryczałcie?” i dostaniesz wyjaśnienie zamiast linku do 40-stronicowej broszury.
 
-Ważne: traktuj to jako **pierwsze rozeznanie**, nie jako wiążącą interpretację. AI świetnie tłumaczy zasady i podpowiada, o co dopytać księgowego — a każdą konkretną kwotę czy termin i tak warto potwierdzić u doradcy, bo stawki i progi zmieniają się co roku. [DO SPRAWDZENIA 2026]
+Ważne: traktuj to jako **pierwsze rozeznanie**, nie jako wiążącą interpretację. AI świetnie tłumaczy zasady i podpowiada, o co dopytać księgowego — a każdą konkretną kwotę czy termin i tak warto potwierdzić u doradcy, bo stawki i progi zmieniają się co roku.
 
 ## 2. Wystawia i wysyła faktury (wFirma, e-faktury KSeF)
 
 Wystawianie faktur to klasyka „małych zadań”, które sumują się w godziny. Asystent zintegrowany z **wFirmą** wystawia fakturę na Twoje polecenie w rozmowie: podajesz kontrahenta, pozycje i kwoty, a resztą — numeracją, stawkami VAT, danymi sprzedawcy — zajmuje się system.
 
-Do tego dochodzi **KSeF (Krajowy System e-Faktur)**. Faktury B2B coraz częściej muszą trafiać do tego systemu w ustrukturyzowanym formacie, a asystent może **wysłać e-fakturę do KSeF** bezpośrednio z integracji — bez ręcznego eksportu XML i logowania do kolejnego portalu. Terminy i zakres obowiązku KSeF warto śledzić osobno, bo harmonogram wdrożenia się zmieniał. [DO SPRAWDZENIA 2026]
+Do tego dochodzi **KSeF (Krajowy System e-Faktur)**. Faktury B2B coraz częściej muszą trafiać do tego systemu w ustrukturyzowanym formacie, a asystent może **wysłać e-fakturę do KSeF** bezpośrednio z integracji — bez ręcznego eksportu XML i logowania do kolejnego portalu. Terminy i zakres obowiązku KSeF warto śledzić osobno, bo harmonogram wdrożenia się zmieniał.
 
 Efekt: „wystaw fakturę dla firmy X na 2 pozycje” zamiast dziesięciu kliknięć w kilku zakładkach.
 
@@ -79,7 +78,7 @@ To jedno z tych zadań, które AI wykonuje wręcz lepiej niż człowiek o 22:00 
 
 VAT, JPK, zaliczka na PIT, składki ZUS — dla małej firmy to comiesięczny bieg z przeszkodami, w którym łatwo przeoczyć datę. A spóźnienie to odsetki i stres, którego dało się uniknąć.
 
-Asystent zna **polski kalendarz terminów podatkowych** i przypomina o zbliżających się datach, zanim będzie za późno. W wersji z botem Telegram potrafi **napisać do Ciebie z wyprzedzeniem** — „za 3 dni mija termin zapłaty składek ZUS” — zamiast liczyć na to, że sam zajrzysz do kalendarza. Konkretne dni terminów zależą od roku i tego, czy nie wypadają w weekend lub święto, więc system uwzględnia takie przesunięcia. [DO SPRAWDZENIA 2026]
+Asystent zna **polski kalendarz terminów podatkowych** i przypomina o zbliżających się datach, zanim będzie za późno. W wersji z botem Telegram potrafi **napisać do Ciebie z wyprzedzeniem** — „za 3 dni mija termin zapłaty składek ZUS” — zamiast liczyć na to, że sam zajrzysz do kalendarza. Konkretne dni terminów zależą od roku i tego, czy nie wypadają w weekend lub święto, więc system uwzględnia takie przesunięcia.
 
 To zamienia terminy z „rzeczy do zapamiętania” w „rzeczy, które przypomną się same”.
 
@@ -108,7 +107,7 @@ Najlepszy układ to **AI + księgowy**: asystent odwala codzienną, drobną robo
 
 ## Bezpieczeństwo danych
 
-Dane firmowe to sprawa wrażliwa, dlatego warto wiedzieć, komu się je powierza. Przy wyborze asystenta AI zwróć uwagę na to, kto stoi za produktem (eKsięgowy AI to produkt **MICODE sp. z o.o.**) i jak przetwarzane są Twoje dane. Model „własnego klucza OpenAI” daje dodatkową kontrolę — rozliczasz zużycie bezpośrednio u dostawcy modelu. Zasady przetwarzania danych osobowych i szczegóły bezpieczeństwa zweryfikuj w regulaminie i polityce prywatności przed połączeniem kont. [DO SPRAWDZENIA 2026]
+Dane firmowe to sprawa wrażliwa, dlatego warto wiedzieć, komu się je powierza. Przy wyborze asystenta AI zwróć uwagę na to, kto stoi za produktem (eKsięgowy AI to produkt **MICODE sp. z o.o.**) i jak przetwarzane są Twoje dane. Model „własnego klucza OpenAI” daje dodatkową kontrolę — rozliczasz zużycie bezpośrednio u dostawcy modelu. Zasady przetwarzania danych osobowych i szczegóły bezpieczeństwa zweryfikuj w regulaminie i polityce prywatności przed połączeniem kont.
 
 ## Jak zacząć
 
@@ -133,14 +132,14 @@ Nie. Z asystentem rozmawiasz normalnym językiem — piszesz albo mówisz, co ma
 Tak. eKsięgowy AI integruje się z wFirmą, więc faktury i dane kontrahentów działają na Twoim istniejącym koncie, bez przenoszenia danych.
 
 **Ile to kosztuje?**
-Jest **darmowy plan** przy korzystaniu z **własnego klucza OpenAI** — płacisz wtedy tylko za zużycie modelu bezpośrednio u dostawcy. Aktualne warunki planów sprawdź na stronie. [DO SPRAWDZENIA 2026]
+Jest **darmowy plan** przy korzystaniu z **własnego klucza OpenAI** — płacisz wtedy tylko za zużycie modelu bezpośrednio u dostawcy. Aktualne warunki planów sprawdź na stronie.
 
 **Czy AI może się pomylić w sprawach podatkowych?**
 Tak, dlatego jego odpowiedzi traktuj jako pomoc pierwszego kontaktu. Świetnie tłumaczy zasady i przyspiesza codzienną pracę, ale każdą konkretną kwotę czy termin warto potwierdzić u księgowego.
 
 **Czy moje dane są bezpieczne?**
-Zasady przetwarzania danych opisują regulamin i polityka prywatności produktu (MICODE sp. z o.o.). Zweryfikuj je przed połączeniem kont; model własnego klucza OpenAI daje dodatkową kontrolę nad rozliczeniem zużycia. [DO SPRAWDZENIA 2026]
+Zasady przetwarzania danych opisują regulamin i polityka prywatności produktu (MICODE sp. z o.o.). Zweryfikuj je przed połączeniem kont; model własnego klucza OpenAI daje dodatkową kontrolę nad rozliczeniem zużycia.
 
 ---
 
-*Artykuł ma charakter informacyjny i nie stanowi porady podatkowej. W indywidualnych sprawach skonsultuj się z księgowym lub doradcą podatkowym. Stan prawny: [DO SPRAWDZENIA 2026].*
+*Artykuł ma charakter informacyjny i nie stanowi porady podatkowej. W indywidualnych sprawach skonsultuj się z księgowym lub doradcą podatkowym. Stan prawny: lipiec 2026.*

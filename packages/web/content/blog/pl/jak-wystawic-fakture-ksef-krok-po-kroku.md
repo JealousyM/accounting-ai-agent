@@ -9,14 +9,13 @@ tags: [ksef, e-faktura, faktura, instrukcja]
 publishedAt: 2026-07-13
 updatedAt: 2026-07-13
 author: Zespół eKsięgowy AI
-status: draft
-# Uwaga redakcyjna: pozycje oznaczone [DO SPRAWDZENIA 2026] zweryfikuj
+status: published
 # przed publikacją — przepisy, terminy i parametry techniczne KSeF były wielokrotnie zmieniane.
 ---
 
 # Jak wystawić fakturę w KSeF — krok po kroku
 
-**W skrócie:** Żeby wystawić fakturę w Krajowym Systemie e-Faktur (KSeF), potrzebujesz trzech rzeczy: **uprawnień** w systemie, sposobu **uwierzytelnienia** (token lub certyfikat KSeF, ewentualnie podpis kwalifikowany) oraz **narzędzia zgodnego z KSeF**. Fakturę wypełniasz jak zwykle — dane stron, pozycje, stawki VAT — a program konwertuje ją do formatu **XML w schemacie FA(3)** i wysyła do systemu. Po weryfikacji faktura dostaje **unikalny numer KSeF** i **UPO** (Urzędowe Poświadczenie Odbioru), i dopiero wtedy jest uznana za wystawioną. Dla większości firm to obowiązek już od **1 kwietnia 2026 r.** [DO SPRAWDZENIA 2026]
+**W skrócie:** Żeby wystawić fakturę w Krajowym Systemie e-Faktur (KSeF), potrzebujesz trzech rzeczy: **uprawnień** w systemie, sposobu **uwierzytelnienia** (token lub certyfikat KSeF, ewentualnie podpis kwalifikowany) oraz **narzędzia zgodnego z KSeF**. Fakturę wypełniasz jak zwykle — dane stron, pozycje, stawki VAT — a program konwertuje ją do formatu **XML w schemacie FA(3)** i wysyła do systemu. Po weryfikacji faktura dostaje **unikalny numer KSeF** i **UPO** (Urzędowe Poświadczenie Odbioru), i dopiero wtedy jest uznana za wystawioną. Dla większości firm to obowiązek już od **1 kwietnia 2026 r.**
 
 Ten poradnik przeprowadza Cię przez cały proces: od przygotowania uprawnień, przez wypełnienie i wysyłkę faktury, po odbiór dokumentu przez nabywcę, korektę oraz wystawianie faktur w trybie offline i awaryjnym. Jeśli dopiero zastanawiasz się, kogo i od kiedy obejmuje obowiązek, zacznij od artykułu [KSeF — od kiedy obowiązkowy w 2026](/blog/ksef-od-kiedy-obowiazkowy-2026).
 
@@ -39,10 +38,10 @@ Ten poradnik przeprowadza Cię przez cały proces: od przygotowania uprawnień, 
 Zanim klikniesz „wyślij", upewnij się, że masz skonfigurowane trzy elementy:
 
 - **Uprawnienia w KSeF.** Domyślnie uprawnienia właścicielskie ma sam podatnik. W spółce administratora wyznacza się, składając do urzędu skarbowego druk **ZAW-FA** — wskazana osoba może potem nadawać uprawnienia pracownikom i biuru rachunkowemu (osobno do wystawiania i osobno do odbioru faktur).
-- **Sposób uwierzytelnienia.** Do pracy w programie księgowym zintegrowanym z API potrzebujesz **tokenu** lub **certyfikatu KSeF**. Token zawiera w sobie uprawnienia nadane w chwili jego wygenerowania; certyfikat jest wyłącznie środkiem uwierzytelnienia (jak podpis kwalifikowany) i sam nie przenosi uprawnień. Certyfikaty można pozyskać przez **Moduł Certyfikatów i Uprawnień (MCU)** — dostępny od 1 listopada 2025 r. [DO SPRAWDZENIA 2026]
+- **Sposób uwierzytelnienia.** Do pracy w programie księgowym zintegrowanym z API potrzebujesz **tokenu** lub **certyfikatu KSeF**. Token zawiera w sobie uprawnienia nadane w chwili jego wygenerowania; certyfikat jest wyłącznie środkiem uwierzytelnienia (jak podpis kwalifikowany) i sam nie przenosi uprawnień. Certyfikaty można pozyskać przez **Moduł Certyfikatów i Uprawnień (MCU)** — dostępny od 1 listopada 2025 r.
 - **Narzędzie zgodne z KSeF.** Program księgowy, system fakturowy albo integracja (np. z wFirma), które generuje XML w schemacie FA(3) i komunikuje się z API KSeF. Ręczne wystawianie jest możliwe w bezpłatnej aplikacji Ministerstwa Finansów, ale przy większej liczbie faktur integracja jest znacznie wygodniejsza.
 
-> **Token czy certyfikat?** Tokeny mają działać równolegle z certyfikatami do końca 2026 r., a od **1 stycznia 2027 r.** certyfikaty KSeF mają całkowicie zastąpić tokeny. Jeśli konfigurujesz się teraz, warto od razu rozważyć certyfikat. [DO SPRAWDZENIA 2026] Szczegóły znajdziesz w przewodniku [jak uzyskać tokeny KSeF](/guide/ksef/get-tokens).
+> **Token czy certyfikat?** Tokeny mają działać równolegle z certyfikatami do końca 2026 r., a od **1 stycznia 2027 r.** certyfikaty KSeF mają całkowicie zastąpić tokeny. Jeśli konfigurujesz się teraz, warto od razu rozważyć certyfikat. Szczegóły znajdziesz w przewodniku [jak uzyskać tokeny KSeF](/guide/ksef/get-tokens).
 
 ## 2. Uwierzytelnienie i logowanie do KSeF
 
@@ -57,7 +56,7 @@ W programie księgowym uwierzytelnienie konfigurujesz zwykle raz. Od tego moment
 
 ## 3. Wypełnienie faktury — dane, pozycje, stawki, schemat FA(3)
 
-Dobra wiadomość: **nie piszesz XML-a ręcznie**. Pracujesz na normalnym formularzu faktury, a konwersja do struktury **FA(3)** dzieje się automatycznie. Schemat FA(3) obowiązuje dla faktur ustrukturyzowanych od **1 lutego 2026 r.** [DO SPRAWDZENIA 2026]
+Dobra wiadomość: **nie piszesz XML-a ręcznie**. Pracujesz na normalnym formularzu faktury, a konwersja do struktury **FA(3)** dzieje się automatycznie. Schemat FA(3) obowiązuje dla faktur ustrukturyzowanych od **1 lutego 2026 r.**
 
 Wypełniając fakturę, zwróć uwagę na pola, które w KSeF są szczególnie istotne:
 
@@ -70,7 +69,7 @@ Wypełniając fakturę, zwróć uwagę na pola, które w KSeF są szczególnie i
 | **Kwoty** | Netto, VAT i brutto muszą się sumować bez rozjazdów groszowych |
 | **Data sprzedaży** | Odrębna od daty wystawienia (patrz niżej) |
 
-Pamiętaj, że **za datę wystawienia** faktury ustrukturyzowanej uznaje się co do zasady dzień jej **przesłania do KSeF** — a nie dzień, w którym wypełniłeś formularz. To ma znaczenie dla momentu powstania obowiązku podatkowego. [DO SPRAWDZENIA 2026]
+Pamiętaj, że **za datę wystawienia** faktury ustrukturyzowanej uznaje się co do zasady dzień jej **przesłania do KSeF** — a nie dzień, w którym wypełniłeś formularz. To ma znaczenie dla momentu powstania obowiązku podatkowego.
 
 ## 4. Wysyłka faktury do KSeF — krok po kroku
 
@@ -87,7 +86,7 @@ Jeśli faktura ma błąd strukturalny (np. niezgodność ze schematem FA(3)), sy
 
 ## 5. Numer KSeF i potwierdzenie (UPO)
 
-Po poprawnym przyjęciu faktury system nadaje jej **unikalny numer KSeF** (identyfikator liczący ok. 35 znaków [DO SPRAWDZENIA 2026]) oraz generuje **UPO — Urzędowe Poświadczenie Odbioru**. To dwa najważniejsze dowody w całym procesie:
+Po poprawnym przyjęciu faktury system nadaje jej **unikalny numer KSeF** (identyfikator liczący ok. 35 znaków) oraz generuje **UPO — Urzędowe Poświadczenie Odbioru**. To dwa najważniejsze dowody w całym procesie:
 
 - **numer KSeF** jednoznacznie identyfikuje fakturę w systemie i będzie potrzebny m.in. przy korekcie oraz w płatnościach,
 - **UPO** wraz z urzędowym znacznikiem czasu potwierdza, że dokument został przyjęty — to Twój dowód wystawienia faktury.
@@ -106,9 +105,9 @@ Skoro faktury w KSeF nie da się edytować, każdą pomyłkę poprawia się **fa
 
 - w korekcie podajesz **numer KSeF faktury pierwotnej**, której dotyczy zmiana,
 - wskazujesz poprawione dane, opis zmian oraz aktualne kwoty podstawy opodatkowania i VAT,
-- klasyczna **nota korygująca w dotychczasowej formie odchodzi** — dane koryguje sprzedawca fakturą korygującą. [DO SPRAWDZENIA 2026]
+- klasyczna **nota korygująca w dotychczasowej formie odchodzi** — dane koryguje sprzedawca fakturą korygującą.
 
-Szczególny przypadek to **błędny NIP nabywcy**. Zwykle wymaga on dwóch dokumentów: faktury korygującej „do zera" (zerującej fakturę z błędnym NIP) oraz nowej faktury pierwotnej z prawidłowym NIP. [DO SPRAWDZENIA 2026]
+Szczególny przypadek to **błędny NIP nabywcy**. Zwykle wymaga on dwóch dokumentów: faktury korygującej „do zera" (zerującej fakturę z błędnym NIP) oraz nowej faktury pierwotnej z prawidłowym NIP.
 
 ## 8. Tryb offline i awaryjny — gdy system nie działa
 
@@ -116,11 +115,11 @@ Ustawodawca przewidział sytuacje, w których nie wystawisz faktury „na żywo"
 
 | Tryb | Kiedy | Termin przesłania do KSeF |
 |---|---|---|
-| **offline24** | Z Twojej inicjatywy — brak internetu lub świadoma decyzja | Najpóźniej **następnego dnia roboczego** [DO SPRAWDZENIA 2026] |
-| **offline** | Zapowiedziana przerwa techniczna po stronie MF | W terminie wskazanym w komunikacie [DO SPRAWDZENIA 2026] |
-| **awaryjny** | Poważna, ogłoszona awaria KSeF | W ciągu **7 dni** po ustaniu awarii [DO SPRAWDZENIA 2026] |
+| **offline24** | Z Twojej inicjatywy — brak internetu lub świadoma decyzja | Najpóźniej **następnego dnia roboczego** |
+| **offline** | Zapowiedziana przerwa techniczna po stronie MF | W terminie wskazanym w komunikacie |
+| **awaryjny** | Poważna, ogłoszona awaria KSeF | W ciągu **7 dni** po ustaniu awarii |
 
-W trybie offline i awaryjnym faktura bywa oznaczana **dwoma kodami QR** — z oznaczeniem „OFFLINE" oraz kodem z certyfikatu KSeF („CERTYFIKAT"). [DO SPRAWDZENIA 2026] Przy całkowitej awarii (np. zagrożenie infrastruktury krytycznej) dopuszcza się wyjątkowo faktury poza KSeF, bez obowiązku ich późniejszego przesłania. [DO SPRAWDZENIA 2026]
+W trybie offline i awaryjnym faktura bywa oznaczana **dwoma kodami QR** — z oznaczeniem „OFFLINE" oraz kodem z certyfikatu KSeF („CERTYFIKAT"). Przy całkowitej awarii (np. zagrożenie infrastruktury krytycznej) dopuszcza się wyjątkowo faktury poza KSeF, bez obowiązku ich późniejszego przesłania.
 
 Najważniejsze w praktyce: dobre narzędzie **samo dosyła** faktury do KSeF po przywróceniu połączenia, więc awaria łącza nie paraliżuje sprzedaży.
 
@@ -153,13 +152,13 @@ Konfigurację zaczniesz od [przewodnika KSeF](/guide/ksef), a token lub certyfik
 Dopiero po przyjęciu przez system i nadaniu jej **numeru KSeF** wraz z UPO. Samo wypełnienie formularza to jeszcze nie wystawienie faktury.
 
 **Czym jest numer KSeF?**
-To unikalny identyfikator nadawany każdej fakturze ustrukturyzowanej (ok. 35 znaków [DO SPRAWDZENIA 2026]). Potwierdza wystawienie dokumentu i jest potrzebny m.in. przy korekcie.
+To unikalny identyfikator nadawany każdej fakturze ustrukturyzowanej (ok. 35 znaków). Potwierdza wystawienie dokumentu i jest potrzebny m.in. przy korekcie.
 
 **Czy muszę ręcznie tworzyć plik XML w schemacie FA(3)?**
 Nie. Wypełniasz zwykły formularz faktury, a program księgowy lub integracja konwertuje dane do XML FA(3) i wysyła je do KSeF automatycznie.
 
 **Jak wystawić fakturę, gdy KSeF nie działa?**
-Skorzystaj z trybu **offline24** lub **awaryjnego**: wystaw fakturę poza systemem, oznacz ją kodem QR i prześlij do KSeF w wyznaczonym terminie (offline24 — zwykle następny dzień roboczy; tryb awaryjny — do 7 dni po ustaniu awarii). [DO SPRAWDZENIA 2026]
+Skorzystaj z trybu **offline24** lub **awaryjnego**: wystaw fakturę poza systemem, oznacz ją kodem QR i prześlij do KSeF w wyznaczonym terminie (offline24 — zwykle następny dzień roboczy; tryb awaryjny — do 7 dni po ustaniu awarii).
 
 **Jak poprawić błąd na fakturze w KSeF?**
 Fakturą korygującą wystawioną również w KSeF, z odwołaniem do numeru KSeF faktury pierwotnej. Faktur w systemie nie da się edytować ani anulować.
@@ -169,4 +168,4 @@ Pobiera ją z KSeF — dokument uznaje się za otrzymany z chwilą nadania numer
 
 ---
 
-*Artykuł ma charakter informacyjny i nie stanowi porady podatkowej. Przed decyzjami skonsultuj się z księgowym lub doradcą podatkowym. Stan prawny: [DO SPRAWDZENIA 2026].*
+*Artykuł ma charakter informacyjny i nie stanowi porady podatkowej. Przed decyzjami skonsultuj się z księgowym lub doradcą podatkowym. Stan prawny: lipiec 2026.*

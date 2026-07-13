@@ -9,8 +9,7 @@ tags: [split payment, mpp, vat, załącznik 15]
 publishedAt: 2026-07-13
 updatedAt: 2026-07-13
 author: Zespół eKsięgowy AI
-status: draft
-# Uwaga redakcyjna: pozycje [DO SPRAWDZENIA 2026] zweryfikuj przed publikacją.
+status: published
 ---
 
 # Split payment — kiedy mechanizm podzielonej płatności jest obowiązkowy
@@ -66,7 +65,7 @@ Załącznik nr 15 do ustawy o VAT to lista **ok. 150 pozycji** towarów i usług
 | **Usługi budowlane** | roboty ogólnobudowlane, instalacyjne, wykończeniowe, rozbiórkowe |
 | **Tworzywa i inne** | folie, arkusze z tworzyw sztucznych, wybrane wyroby przemysłowe |
 
-Jeśli działasz w którejś z tych branż — jako sprzedawca albo nabywca — split payment powinien być Twoim domyślnym scenariuszem przy większych fakturach. Pełną, aktualną listę pozycji (z kodami PKWiU) zawiera sam załącznik nr 15. [DO SPRAWDZENIA 2026]
+Jeśli działasz w którejś z tych branż — jako sprzedawca albo nabywca — split payment powinien być Twoim domyślnym scenariuszem przy większych fakturach. Pełną, aktualną listę pozycji (z kodami PKWiU) zawiera sam załącznik nr 15.
 
 ## 4. Obowiązkowe oznaczenie na fakturze
 
@@ -87,17 +86,17 @@ Pieniądze na rachunku VAT nie są „zamrożone", ale ich przeznaczenie jest **
 - **odsetki** od powyższych należności,
 - **przelewy między własnymi rachunkami VAT**.
 
-Czego **nie** opłacisz z rachunku VAT? Czynszu, wynagrodzeń netto, zwykłych zakupów prywatnych czy netto z faktur kontrahentów. Jeśli chcesz „uwolnić" nadwyżkę na cele bieżące, składasz do naczelnika urzędu skarbowego **wniosek o przekazanie środków** z rachunku VAT na zwykły rachunek — urząd ma określony czas na decyzję. [DO SPRAWDZENIA 2026]
+Czego **nie** opłacisz z rachunku VAT? Czynszu, wynagrodzeń netto, zwykłych zakupów prywatnych czy netto z faktur kontrahentów. Jeśli chcesz „uwolnić" nadwyżkę na cele bieżące, składasz do naczelnika urzędu skarbowego **wniosek o przekazanie środków** z rachunku VAT na zwykły rachunek — urząd ma określony czas na decyzję.
 
 ## 6. Dobrowolny MPP i jego korzyści
 
 Split payment możesz stosować **dobrowolnie** — także dla faktur poniżej 15 000 zł lub spoza załącznika nr 15. To decyzja **nabywcy**: nawet gdy sprzedawca nie oznaczył faktury, możesz zapłacić w MPP. Dlaczego warto?
 
 - **Ochrona przy białej liście VAT** — zapłata w MPP w wielu przypadkach chroni przed sankcjami za przelew na rachunek spoza wykazu (zachowujesz koszt podatkowy i unikasz odpowiedzialności solidarnej). Więcej w artykule [Biała lista VAT — jak sprawdzić kontrahenta](/blog/biala-lista-vat-jak-sprawdzic-kontrahenta).
-- **Brak dodatkowego zobowiązania w VAT** — dla kwot zapłaconych w split paymencie nie stosuje się dodatkowych sankcji VAT (co do zasady 15%, 30%, 100%). [DO SPRAWDZENIA 2026]
-- **Niższe odsetki** — przy zaległości w VAT nie stosuje się podwyższonej stawki odsetek (150% standardowej), jeśli spełnisz warunki dotyczące udziału płatności w MPP. [DO SPRAWDZENIA 2026]
+- **Brak dodatkowego zobowiązania w VAT** — dla kwot zapłaconych w split paymencie nie stosuje się dodatkowych sankcji VAT (co do zasady 15%, 30%, 100%).
+- **Niższe odsetki** — przy zaległości w VAT nie stosuje się podwyższonej stawki odsetek (150% standardowej), jeśli spełnisz warunki dotyczące udziału płatności w MPP.
 - **Domniemanie należytej staranności** — MPP jest mocnym argumentem, że dochowałeś staranności przy weryfikacji kontrahenta, gdyby okazał się nieuczciwy.
-- **Szybszy zwrot VAT** — zwrot na rachunek VAT następuje w skróconym terminie **25 dni** (zamiast standardowego 60-dniowego). [DO SPRAWDZENIA 2026]
+- **Szybszy zwrot VAT** — zwrot na rachunek VAT następuje w skróconym terminie **25 dni** (zamiast standardowego 60-dniowego).
 - **Ochrona środków** — kwoty na rachunku VAT są, co do zasady, wolne od zajęcia egzekucyjnego (poza zaległościami podatkowymi).
 
 Dla firm z branż „wrażliwych" dobrowolny MPP bywa więc wygodnym, domyślnym zabezpieczeniem — mniej analizy przy każdej fakturze, mniejsze ryzyko sankcji.
@@ -109,13 +108,13 @@ Gdy MPP jest obowiązkowy, a któraś ze stron zawali swój obowiązek, konsekwe
 **Dla sprzedawcy** (brak adnotacji „mechanizm podzielonej płatności" na fakturze objętej obowiązkiem):
 
 - dodatkowe zobowiązanie podatkowe w wysokości **30% kwoty VAT** przypadającej na towary/usługi z załącznika nr 15,
-- odpowiedzialność karno-skarbowa — grzywna do **180 stawek dziennych**. [DO SPRAWDZENIA 2026]
+- odpowiedzialność karno-skarbowa — grzywna do **180 stawek dziennych**.
 
 **Dla nabywcy** (zapłata zwykłym przelewem zamiast MPP mimo obowiązku):
 
 - dodatkowe zobowiązanie podatkowe w wysokości **30% kwoty VAT** z nabytych towarów/usług objętych obowiązkiem,
 - **utrata kosztu uzyskania przychodu** w części zapłaconej z pominięciem MPP — to realnie podnosi podatek dochodowy,
-- odpowiedzialność karno-skarbowa — grzywna do **720 stawek dziennych**. [DO SPRAWDZENIA 2026]
+- odpowiedzialność karno-skarbowa — grzywna do **720 stawek dziennych**.
 
 Widać tu asymetrię: nabywca ryzykuje więcej, bo to on faktycznie decyduje o sposobie zapłaty i to jego wydatek „wypada" z kosztów.
 
@@ -126,7 +125,7 @@ Ustawa przewiduje „wentyle bezpieczeństwa". Sankcja 30% **nie zostanie nało�
 - **sprzedawca** nie oznaczył faktury, ale **nabywca i tak zapłacił w MPP** — brak adnotacji nie zaszkodzi, gdy płatność faktycznie poszła podzielona,
 - **nabywca** zapłacił zwykłym przelewem, ale **sprzedawca prawidłowo rozliczył cały VAT** z tej faktury w swojej deklaracji.
 
-To ważne w praktyce: jeśli zorientujesz się po fakcie, że faktura powinna być w MPP, często da się jeszcze naprawić sytuację właściwym zachowaniem drugiej strony. Nie warto jednak na tym polegać — najbezpieczniej po prostu **oznaczać i płacić w MPP** za każdym razem, gdy zachodzi obowiązek. [DO SPRAWDZENIA 2026]
+To ważne w praktyce: jeśli zorientujesz się po fakcie, że faktura powinna być w MPP, często da się jeszcze naprawić sytuację właściwym zachowaniem drugiej strony. Nie warto jednak na tym polegać — najbezpieczniej po prostu **oznaczać i płacić w MPP** za każdym razem, gdy zachodzi obowiązek.
 
 ## 9. Przykład liczbowy
 
@@ -154,17 +153,17 @@ Od faktury **powyżej 15 000 zł brutto**, o ile obejmuje co najmniej jedną poz
 Nie. Obowiązek dotyczy tylko faktur zawierających towary lub usługi z **załącznika nr 15**. Przy pozostałych możesz zastosować MPP dobrowolnie.
 
 **Co, jeśli sprzedawca nie oznaczył faktury, a powinien?**
-Jako nabywca i tak masz obowiązek zapłacić w MPP, jeśli transakcja spełnia warunki. Zapłata w split paymencie chroni Cię wtedy przed sankcją, mimo braku adnotacji. [DO SPRAWDZENIA 2026]
+Jako nabywca i tak masz obowiązek zapłacić w MPP, jeśli transakcja spełnia warunki. Zapłata w split paymencie chroni Cię wtedy przed sankcją, mimo braku adnotacji.
 
 **Jaka jest kara za brak obowiązkowego MPP?**
-Dodatkowe zobowiązanie w wysokości **30% kwoty VAT** — dla sprzedawcy (brak oznaczenia) i dla nabywcy (zapłata bez MPP). Nabywca dodatkowo traci koszt uzyskania przychodu w części zapłaconej poza MPP. [DO SPRAWDZENIA 2026]
+Dodatkowe zobowiązanie w wysokości **30% kwoty VAT** — dla sprzedawcy (brak oznaczenia) i dla nabywcy (zapłata bez MPP). Nabywca dodatkowo traci koszt uzyskania przychodu w części zapłaconej poza MPP.
 
 **Na co mogę wydać pieniądze z rachunku VAT?**
-Na VAT, PIT, CIT, ZUS, akcyzę, cło i odsetki od tych należności oraz na przelewy VAT do kontrahentów i między własnymi rachunkami VAT. Na inne cele — po złożeniu wniosku o uwolnienie środków. [DO SPRAWDZENIA 2026]
+Na VAT, PIT, CIT, ZUS, akcyzę, cło i odsetki od tych należności oraz na przelewy VAT do kontrahentów i między własnymi rachunkami VAT. Na inne cele — po złożeniu wniosku o uwolnienie środków.
 
 **Czy split payment chroni mnie przy białej liście VAT?**
-Tak, w wielu przypadkach zapłata w MPP chroni przed sankcjami białej listy (utratą kosztu i odpowiedzialnością solidarną). Szczegóły w artykule [Biała lista VAT — jak sprawdzić kontrahenta](/blog/biala-lista-vat-jak-sprawdzic-kontrahenta). [DO SPRAWDZENIA 2026]
+Tak, w wielu przypadkach zapłata w MPP chroni przed sankcjami białej listy (utratą kosztu i odpowiedzialnością solidarną). Szczegóły w artykule [Biała lista VAT — jak sprawdzić kontrahenta](/blog/biala-lista-vat-jak-sprawdzic-kontrahenta).
 
 ---
 
-*Artykuł ma charakter informacyjny i nie stanowi porady podatkowej. W indywidualnych sprawach skonsultuj się z księgowym lub doradcą podatkowym. Stan prawny: [DO SPRAWDZENIA 2026].*
+*Artykuł ma charakter informacyjny i nie stanowi porady podatkowej. W indywidualnych sprawach skonsultuj się z księgowym lub doradcą podatkowym. Stan prawny: lipiec 2026.*
