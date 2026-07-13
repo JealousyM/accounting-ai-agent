@@ -1,155 +1,111 @@
-# Blog feature — design spec
+# Blog feature — design spec (revised: files-in-repo)
 
 **Date:** 2026-07-13
 **Branch:** `feature/blog`
-**Status:** approved (design), pending implementation plan
+**Status:** approved (design)
 **Product:** eKsięgowy AI (`eksiegowyai.pl`)
+
+## 0. Revision note
+
+The original design was DB-backed (Prisma `BlogPost` + admin editor + API CRUD),
+chosen under the assumption a **human** publishes via a browser without redeploying.
+The publisher is instead the **AI agent**, which writes content directly, and articles
+reach the live site via **commit → CI deploy**. That removes the entire reason for a
+DB and admin UI. Revised design: **Markdown files in the repo**, rendered as static
+pages. Simpler, fully static (best SEO), versioned in git, and the 12 existing drafts
+become the content near-verbatim.
+
+Dropped vs. the original: Prisma model + migration, API service/controller/routes,
+admin editor, on-demand revalidation. Kept: public `/blog` pages, Markdown rendering,
+and the SEO helpers (hreflang / JSON-LD / sitemap) — now fed by files, not a DB.
 
 ## 1. Overview
 
-Add an SEO content blog to the eKsięgowy AI web app. Articles are authored through
-an admin editor, stored in PostgreSQL (Prisma), and rendered as server-side public
-pages under `/blog`. The goal is to capture long-tail informational search traffic
-around Polish tax/accounting topics (KSeF, VAT, ZUS, PIT) and funnel it to signup.
+Articles are Markdown files with YAML frontmatter under
+`packages/web/content/blog/<locale>/<slug>.md`. A server-only content loader reads and
+parses them; Next.js App Router renders a `/blog` listing and `/blog/[slug]` article
+pages. Publishing = add/edit a file, set `status: published`, commit, deploy.
 
-The blog builds on the SEO/i18n backbone already present on `feature/aia-153-seo-i18n`
-(as-needed locale prefixing, `getRequestLocale()`, `buildPageMetadata()`, hreflang
-helpers, sitemap, JSON-LD builders in `packages/web/src/lib/seo.ts`).
+## 2. Content model (frontmatter)
 
-12 Polish draft articles already exist in `docs/blog-drafts/pl/` and will be the
-initial content, imported through the admin editor after figure verification.
-
-## 2. Goals / non-goals
-
-**Goals (MVP):**
-- Publish/edit articles from a browser admin UI without a redeploy.
-- Server-rendered, indexable public pages with correct canonical + hreflang + JSON-LD.
-- Polish-first; optional en/ru translations per article; hreflang advertises only
-  translations that actually exist.
-- Blog entries included in the sitemap.
-
-**Non-goals (explicitly deferred):**
-- Rich WYSIWYG editor (use Markdown + live preview — `react-markdown` already in deps).
-- File/image uploads (store cover/OG image as URL fields for now).
-- Comments, reactions, scheduled publishing, multi-author management.
-- Free-text categories (use a fixed enum).
-
-## 3. Data model (Prisma — `packages/api/prisma/schema.prisma`)
-
-```prisma
-enum BlogLocale { pl en ru }
-enum BlogCategory { KSeF VAT ZUS PIT AI }
-enum BlogStatus { DRAFT PUBLISHED }
-
-model BlogPost {
-  id             String       @id @default(cuid())
-  translationKey String                        // groups pl/en/ru variants of one article
-  locale         BlogLocale
-  slug           String
-  title          String
-  description    String                        // meta description
-  body           String       @db.Text         // Markdown
-  category       BlogCategory
-  tags           String[]     @default([])
-  faq            Json?                          // [{q,a}] -> FAQPage JSON-LD
-  coverImageUrl  String?
-  ogImageUrl     String?
-  status         BlogStatus   @default(DRAFT)
-  authorName     String       @default("Zespół eKsięgowy AI")
-  publishedAt    DateTime?
-  createdAt      DateTime     @default(now())
-  updatedAt      DateTime     @updatedAt
-
-  @@unique([locale, slug])
-  @@index([status, locale, publishedAt])
-  @@index([translationKey])
-}
+```yaml
+---
+slug: ksef-od-kiedy-obowiazkowy-2026
+locale: pl
+translationKey: ksef-od-kiedy-obowiazkowy   # groups pl/en/ru variants for hreflang
+title: "…"
+description: "…"          # meta description ≤160 chars
+category: KSeF            # KSeF | VAT | ZUS | PIT | AI
+tags: [ksef, e-faktura]
+status: published        # draft | published  (draft = never rendered/listed)
+publishedAt: 2026-07-13
+updatedAt: 2026-07-13
+author: "Zespół eKsięgowy AI"
+coverImage: ""           # optional URL
+ogImage: ""              # optional URL
+faq:                     # optional; when present -> FAQPage JSON-LD
+  - q: "…?"
+    a: "…"
+---
+# Markdown body…
 ```
 
-`translationKey` lets the public page and sitemap resolve sibling-locale variants to
-build honest hreflang alternates (only for translations that exist and are published).
+The 12 existing drafts already carry most of these fields and `status: draft`; they move
+into the content dir unchanged (add `translationKey`), staying `draft` until their
+`[DO SPRAWDZENIA 2026]` figures are verified and someone flips them to `published`.
 
-## 4. Backend (Express — `packages/api/src`, follows the `admin.*` pattern)
+## 3. Content loader (`packages/web/src/lib/blog/content.ts`, server-only)
 
-- `services/blog.service.ts` (+ `blog.instance.ts` singleton):
-  - `listPublished({ locale, page, pageSize, category?, tag? })`
-  - `getPublishedBySlug(locale, slug)` → post + published sibling translations
-  - `adminList({ page, status?, locale? })`
-  - `create(input)`, `update(id, input)`, `remove(id)`, `setStatus(id, status)`
-    (sets/clears `publishedAt`)
-- `controllers/blog.controller.ts` — thin HTTP handlers, `.bind(controller)`.
-- `routes/blog.routes.ts` — mounted in `index.ts`:
-  - Public: `GET /api/blog`, `GET /api/blog/:locale/:slug`
-  - Admin (`requireAdmin`): `GET /api/admin/blog`, `POST /api/admin/blog`,
-    `PUT /api/admin/blog/:id`, `DELETE /api/admin/blog/:id`,
-    `PATCH /api/admin/blog/:id/status`
-- Zod validation on all write inputs (slug format, locale/category enums, required fields).
-- Rate limiters consistent with existing admin routes.
-- On publish/unpublish/update of a published post, trigger Next.js on-demand
-  revalidation (see §7).
+Uses `fs` + `gray-matter`. Functions:
+- `getAllPublished(locale): PostMeta[]` — published posts for a locale, newest first.
+- `getPostBySlug(locale, slug): Post | null` — full post (meta + body); null if missing or `draft`.
+- `getTranslations(translationKey): { locale, slug }[]` — published variants across locales (for hreflang).
+- `getAllPublishedAllLocales(): {...}` — for the sitemap.
 
-## 5. Frontend — public (`packages/web/src/app`)
+`draft` posts are excluded everywhere on the public site.
 
-- `blog/page.tsx` — listing (localized via as-needed prefix: `/blog`, `/en/blog`,
-  `/ru/blog`). Server component; fetches `GET /api/blog?locale=…`. Cards: title,
-  description, category, date. Optional category filter.
-- `blog/[slug]/page.tsx` — article page. Server component; fetches
-  `GET /api/blog/:locale/:slug`. Renders `body` with `react-markdown` + `remark-gfm`
-  (same as `/guide`). 404 via `notFound()` when missing/not published.
-- `generateMetadata()` per page using `buildPageMetadata()`, but hreflang alternates
-  are computed from the post's **existing published translations** (new helper in
-  `seo.ts`, e.g. `blogAlternates(translations, activeLocale)`), not the static trio.
-- JSON-LD injected per article: `BlogPosting`, `BreadcrumbList`, and `FAQPage`
-  (from `faq` field). Reuse/extend builders in `seo.ts`.
-- API client `lib/api/blog.ts`.
+## 4. Rendering (Next.js App Router)
 
-## 6. Frontend — admin (`packages/web/src/app/admin`, reuses `admin/layout.tsx` + auth)
+- `app/blog/page.tsx` (+ `layout.tsx` for metadata) — listing; server component; locale via
+  `getRequestLocale()`; card grid.
+- `app/blog/[slug]/page.tsx` — article; `react-markdown` + `remark-gfm`; `notFound()` when
+  missing/draft; `generateMetadata()` with per-post hreflang (only existing translations) +
+  `BlogPosting` + optional `FAQPage` JSON-LD.
+- Follows the existing header-based i18n (as-needed prefixing; `/blog`, `/en/blog`, `/ru/blog`).
 
-- `admin/blog/page.tsx` — table of posts (status, locale, category, updatedAt), actions.
-- `admin/blog/new/page.tsx` and `admin/blog/[id]/edit/page.tsx` — editor form:
-  title, slug (auto-suggested from title), locale, translationKey, category, tags,
-  description, cover/OG image URL, Markdown `body` with live preview, faq editor,
-  status (draft/published). Client components using `lib/api/blog.ts` with auth token.
+## 5. SEO helpers (`packages/web/src/lib/seo.ts`)
 
-## 7. Rendering / freshness (publish without deploy)
+Add (same as originally planned, unit-tested):
+- `blogAlternatesFor(translations, activeLocale)` — canonical + hreflang from existing translations only.
+- `blogPostingJsonLd(...)`, `faqPageJsonLd(faq)`.
+`sitemap.ts` gains published-post entries with hreflang alternates, read from the loader at build.
 
-- Public blog pages use ISR: `export const revalidate = 60` (short window).
-- On admin publish/unpublish/update-of-published, the API calls a Next.js on-demand
-  revalidation endpoint (`/api/revalidate` route handler in web, shared secret) to
-  `revalidatePath('/blog')` and the affected article path immediately.
-- MVP acceptable fallback: rely on the 60s ISR window if the webhook is deferred.
+## 6. Non-goals
 
-## 8. SEO integration
+No DB, no admin UI, no API, no comments, no image upload, no scheduling. Editing = edit the
+Markdown file. Rich formatting = Markdown (no WYSIWYG). Raw HTML in Markdown is NOT enabled
+(`react-markdown` default escapes it; no `rehype-raw`).
 
-- Extend `sitemap.ts` to append published posts (fetch from API at build/runtime),
-  each with per-post hreflang alternates for existing translations.
-- Add `/blog` to footer/nav. `robots.ts` already permits it (not in PRIVATE_PATHS).
-- Canonical + hreflang honesty: never advertise a locale variant that isn't published.
+## 7. Deployment
 
-## 9. i18n
+Content files live in the repo and are read at build. Confirm `next.config` output mode:
+if `output: 'standalone'`, add the content dir to `outputFileTracingIncludes` (or generate
+statically) so files ship. Otherwise request-time reads resolve against `process.cwd()`
+(= `packages/web`).
 
-- Article content is per-locale rows (not runtime-translated).
-- UI chrome (listing labels, "czytaj więcej", breadcrumbs) via existing i18n (`next-intl`
-  message catalogs in `packages/web/src/i18n`).
+## 8. Implementation task list
 
-## 10. Security
+1. Add `gray-matter`; create content dir; move 12 drafts → `content/blog/pl/` (add
+   `translationKey`, keep `status: draft`).
+2. Content loader + `PostMeta`/`Post` types + unit test (fixture md).
+3. SEO helpers in `seo.ts` + unit test.
+4. `/blog` listing page + layout metadata.
+5. `/blog/[slug]` article page + metadata + JSON-LD.
+6. `sitemap.ts` posts + footer `/blog` link (+ i18n label).
+7. Build + test gate; verify `/blog` renders a published sample.
 
-- All mutating endpoints behind `requireAdmin` (role `admin`).
-- Zod-validate every write; enforce slug charset and `@@unique([locale, slug])`.
-- Markdown rendered without raw HTML injection (react-markdown default escapes HTML;
-  do NOT enable `rehype-raw`). Sanitize/validate image URLs.
-- Revalidation endpoint protected by a shared secret.
+## 9. Verification / rollout
 
-## 11. Testing
-
-- API: unit tests for `blog.service` (CRUD, publish transitions, translation resolution)
-  and `blog.routes` (auth gating, validation) — follow `admin.*.test.ts` patterns.
-- Web: component test for article rendering + a metadata/hreflang unit test for the new
-  `seo.ts` helper.
-
-## 12. Rollout / open items
-
-- Import the 12 existing drafts via the admin editor after verifying `[DO SPRAWDZENIA
-  2026]` figures (priority: ryczałt składka zdrowotna set; KSeF dates; wFirma UI paths).
-- Prisma migration for the new model + enums.
-- Decide runtime for sitemap post fetch (route handler vs. direct DB) — resolve in plan.
+- Build the machinery with all 12 as `draft` → public `/blog` is empty (safe for YMYL).
+- To go live: verify `[DO SPRAWDZENIA 2026]` figures (priority: ryczałt składka zdrowotna),
+  set `status: published`, commit, deploy.
