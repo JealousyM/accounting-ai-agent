@@ -94,6 +94,8 @@ Wszystkie te zadania łączy jedno narzędzie. [eKsięgowy AI](/) to asystent AI
 
 Chcesz zobaczyć, od czego zacząć? Zajrzyj do [przewodnika](/guide).
 
+> **A finanse osobiste?** Poza księgowością firmy warto zapanować też nad domowym budżetem. Pomaga w tym nasza siostrzana aplikacja [AI Budget](https://ai-budget.pl) — wydatki, budżety, oszczędności i wspólne finanse rodziny w jednym miejscu, z pomocą AI. Wypróbuj w [wersji webowej](https://app.ai-budget.pl) lub pobierz z [Google Play](https://play.google.com/store/apps/details?id=com.budget.assistant).
+
 ## Czego AI nie zastąpi
 
 Bądźmy uczciwi: asystent AI to **narzędzie do wykonawczej, powtarzalnej pracy**, a nie zamiennik księgowego ani doradcy podatkowego. Są rzeczy, które zostają po stronie człowieka:
