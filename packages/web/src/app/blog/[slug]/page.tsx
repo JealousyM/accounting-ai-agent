@@ -5,6 +5,7 @@ import remarkGfm from 'remark-gfm';
 import { getRequestLocale } from '@/lib/locale.server';
 import {
   SITE_NAME,
+  LOCALE_BCP47,
   blogAlternatesFor,
   blogPostingJsonLd,
   faqPageJsonLd,
@@ -81,6 +82,17 @@ export default async function BlogArticlePage({ params }: Params) {
       ];
   if (!isDraft && post.faq && post.faq.length > 0) jsonLd.push(faqPageJsonLd(post.faq));
 
+  // The title + byline are rendered from frontmatter, so strip the leading H1
+  // from the Markdown body to avoid showing the title twice.
+  const body = post.body.replace(/^#[^\n]*\r?\n+/, '');
+  const dateLabel = post.publishedAt
+    ? new Date(post.publishedAt).toLocaleDateString(LOCALE_BCP47[locale], {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+      })
+    : null;
+
   return (
     <main className="max-w-3xl mx-auto px-4 py-10">
       {jsonLd.map((obj, i) => (
@@ -93,8 +105,23 @@ export default async function BlogArticlePage({ params }: Params) {
         </p>
       )}
 
+      <header className="mb-8">
+        <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white leading-tight">
+          {post.title}
+        </h1>
+        <p className="mt-3 text-sm text-gray-500 dark:text-gray-400">
+          {post.author}
+          {dateLabel && (
+            <>
+              {' · '}
+              <time dateTime={post.publishedAt ?? undefined}>{dateLabel}</time>
+            </>
+          )}
+        </p>
+      </header>
+
       <article className="prose prose-slate dark:prose-invert max-w-none">
-        <ReactMarkdown remarkPlugins={[remarkGfm]}>{post.body}</ReactMarkdown>
+        <ReactMarkdown remarkPlugins={[remarkGfm]}>{body}</ReactMarkdown>
       </article>
     </main>
   );
