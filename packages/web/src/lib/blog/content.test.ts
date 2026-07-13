@@ -75,7 +75,7 @@ describe('getAllPublished', () => {
     const posts = getAllPublished('pl', base);
     expect(posts.map((p) => p.slug)).toEqual(['sample', 'older']);
     expect(posts.find((p) => p.slug === 'secret')).toBeUndefined();
-    expect((posts[0] as Record<string, unknown>).body).toBeUndefined();
+    expect((posts[0] as unknown as Record<string, unknown>).body).toBeUndefined();
   });
 });
 
