@@ -67,6 +67,14 @@ export function LandingFooter() {
                   {guideT.title}
                 </Link>
               </li>
+              <li>
+                <Link
+                  href="/blog"
+                  className="text-sm text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                >
+                  {t.links.blog}
+                </Link>
+              </li>
             </ul>
           </div>
 

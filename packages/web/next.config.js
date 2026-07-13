@@ -4,6 +4,13 @@ const packageJson = require('../../package.json');
 const nextConfig = {
   reactStrictMode: true,
   output: 'standalone',
+  // Ship the Markdown blog content into the standalone bundle so the /blog
+  // pages and sitemap can read it at runtime (fs reads are not auto-traced).
+  outputFileTracingIncludes: {
+    '/blog': ['./content/blog/**/*'],
+    '/blog/[slug]': ['./content/blog/**/*'],
+    '/sitemap.xml': ['./content/blog/**/*'],
+  },
   env: {
     NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
     NEXT_PUBLIC_APP_VERSION: packageJson.version,
