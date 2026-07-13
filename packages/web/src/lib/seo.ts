@@ -241,3 +241,66 @@ export function breadcrumbJsonLd(items: Array<{ name: string; path: string }>) {
     })),
   };
 }
+
+// ============================================
+// Blog helpers (per-post hreflang + JSON-LD)
+// ============================================
+
+/**
+ * hreflang alternates for a blog article, built ONLY from the locales that
+ * actually have a published translation. `x-default` points at the Polish
+ * variant if present, otherwise the active locale.
+ */
+export function blogAlternatesFor(
+  translations: { locale: Locale; slug: string }[],
+  activeLocale: Locale,
+) {
+  const slugFor = (locale: Locale) => translations.find((t) => t.locale === locale)?.slug;
+  const languages: Record<string, string> = {};
+  for (const t of translations) {
+    languages[LOCALE_BCP47[t.locale]] = localizedPath(`/blog/${t.slug}`, t.locale);
+  }
+  const defaultSlug = slugFor(DEFAULT_LOCALE);
+  if (defaultSlug) languages['x-default'] = localizedPath(`/blog/${defaultSlug}`, DEFAULT_LOCALE);
+  const activeSlug = slugFor(activeLocale) ?? translations[0]?.slug ?? '';
+  return { canonical: localizedPath(`/blog/${activeSlug}`, activeLocale), languages };
+}
+
+/** BlogPosting structured data for an article page. */
+export function blogPostingJsonLd(input: {
+  title: string;
+  description: string;
+  slug: string;
+  locale: Locale;
+  publishedAt: string | null;
+  updatedAt: string | null;
+  author: string;
+  coverImage?: string | null;
+}) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'BlogPosting',
+    headline: input.title,
+    description: input.description,
+    inLanguage: LOCALE_BCP47[input.locale],
+    datePublished: input.publishedAt ?? undefined,
+    dateModified: input.updatedAt ?? input.publishedAt ?? undefined,
+    author: { '@type': 'Organization', name: input.author },
+    publisher: { '@type': 'Organization', name: 'MICODE sp. z o.o.' },
+    mainEntityOfPage: absoluteUrl(localizedPath(`/blog/${input.slug}`, input.locale)),
+    image: input.coverImage || undefined,
+  };
+}
+
+/** FAQPage structured data from an article's FAQ list. */
+export function faqPageJsonLd(faq: { q: string; a: string }[]) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: faq.map((f) => ({
+      '@type': 'Question',
+      name: f.q,
+      acceptedAnswer: { '@type': 'Answer', text: f.a },
+    })),
+  };
+}
