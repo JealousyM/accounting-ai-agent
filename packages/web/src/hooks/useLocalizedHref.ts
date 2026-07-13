@@ -3,7 +3,7 @@
 import { useCallback } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { useLocale } from '@/contexts/LocaleContext';
-import { localizedPath, type Locale } from '@/lib/seo';
+import { localizedPath, splitLocale, type Locale } from '@/lib/seo';
 
 /**
  * Locale-aware link/navigation helpers for the public (pre-login) site.
@@ -41,8 +41,12 @@ export function useLocaleSwitcher() {
 
   return useCallback(
     (newLocale: Locale) => {
-      // pathname is already unprefixed thanks to the middleware rewrite.
-      const target = localizedPath(pathname || '/', newLocale);
+      // `usePathname()` may return either the canonical path (`/blog`) or the
+      // locale-prefixed one (`/ru/blog`) depending on the route. Strip any
+      // existing locale prefix first, otherwise switching from an already
+      // prefixed URL would stack prefixes (`/ru/blog` -> `/en/ru/blog`).
+      const { path } = splitLocale(pathname || '/');
+      const target = localizedPath(path, newLocale);
       setLocale(newLocale);
       router.push(target);
     },
