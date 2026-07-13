@@ -49,7 +49,10 @@ describe('blogPostingJsonLd', () => {
 
 describe('faqPageJsonLd', () => {
   it('builds a FAQPage with mainEntity questions', () => {
-    const jsonld = faqPageJsonLd([{ q: 'Pytanie?', a: 'Odpowiedź.' }]) as Record<string, any>;
+    const jsonld = faqPageJsonLd([{ q: 'Pytanie?', a: 'Odpowiedź.' }]) as {
+      '@type': string;
+      mainEntity: { '@type': string; acceptedAnswer: { text: string } }[];
+    };
     expect(jsonld['@type']).toBe('FAQPage');
     expect(jsonld.mainEntity[0]['@type']).toBe('Question');
     expect(jsonld.mainEntity[0].acceptedAnswer.text).toBe('Odpowiedź.');

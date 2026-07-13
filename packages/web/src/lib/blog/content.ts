@@ -92,8 +92,9 @@ function readLocale(locale: BlogLocale, baseDir?: string): Post[] {
 }
 
 function stripBody(post: Post): PostMeta {
-  const { body: _body, ...meta } = post;
-  return meta;
+  const meta = { ...post } as Partial<Post>;
+  delete meta.body;
+  return meta as PostMeta;
 }
 
 function byPublishedDesc(a: PostMeta, b: PostMeta): number {

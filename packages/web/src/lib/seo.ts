@@ -106,6 +106,7 @@ export const PRIVATE_PATHS = [
 export const PUBLIC_PATHS = [
   '/',
   '/pricing',
+  '/blog',
   '/guide',
   '/guide/ksef',
   '/guide/ksef/get-tokens',
