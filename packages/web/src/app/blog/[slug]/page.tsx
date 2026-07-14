@@ -80,6 +80,7 @@ export default async function BlogArticlePage({ params }: Params) {
           updatedAt: post.updatedAt,
           author: ARTICLE_AUTHOR.name,
           authorUrl: ARTICLE_AUTHOR.url,
+          authorSameAs: ARTICLE_AUTHOR.sameAs,
           authorJobTitle: ARTICLE_AUTHOR.jobTitle,
           coverImage: post.coverImage,
           keywords: post.tags,

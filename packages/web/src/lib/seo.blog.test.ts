@@ -69,7 +69,7 @@ describe('blogPostingJsonLd', () => {
     expect(String(jsonld.mainEntityOfPage)).toContain('/blog/a');
   });
 
-  it('emits a Person author, with url/sameAs/jobTitle when provided', () => {
+  it('emits a Person author with url, a sameAs list and jobTitle when provided', () => {
     const jsonld = blogPostingJsonLd({
       title: 'T',
       description: 'D',
@@ -78,13 +78,14 @@ describe('blogPostingJsonLd', () => {
       publishedAt: '2026-07-10',
       updatedAt: null,
       author: 'Mikhail Peraviortkin',
-      authorUrl: 'https://example.com/mikhail',
+      authorUrl: 'https://example.com',
+      authorSameAs: ['https://example.com', 'https://linkedin.com/in/x'],
       authorJobTitle: 'Founder',
     }) as { author: Record<string, unknown> };
     expect(jsonld.author['@type']).toBe('Person');
     expect(jsonld.author.name).toBe('Mikhail Peraviortkin');
-    expect(jsonld.author.url).toBe('https://example.com/mikhail');
-    expect(jsonld.author.sameAs).toEqual(['https://example.com/mikhail']);
+    expect(jsonld.author.url).toBe('https://example.com');
+    expect(jsonld.author.sameAs).toEqual(['https://example.com', 'https://linkedin.com/in/x']);
     expect(jsonld.author.jobTitle).toBe('Founder');
   });
 
