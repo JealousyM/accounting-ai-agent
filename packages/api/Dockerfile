@@ -24,7 +24,15 @@ RUN npm run build
 # Production stage
 FROM node:20-alpine
 
-RUN apk add --no-cache openssl
+# openssl is required by Prisma at runtime. Retry to ride out transient Alpine
+# mirror/DNS hiccups (e.g. "fetching APKINDEX...: DNS: transient error") that
+# would otherwise fail the whole on-VPS deploy build.
+RUN for i in 1 2 3 4 5; do \
+      apk add --no-cache openssl && break; \
+      echo "apk add openssl failed (attempt $i/5); retrying in 5s..."; \
+      sleep 5; \
+    done; \
+    apk info -e openssl > /dev/null
 
 WORKDIR /app
 

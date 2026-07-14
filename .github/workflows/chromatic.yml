@@ -13,6 +13,9 @@ on:
       - 'packages/web/src/**'
       - 'packages/web/.storybook/**'
       - 'packages/web/package.json'
+  # Allow manual runs (e.g. to re-baseline snapshots or verify a config change
+  # that doesn't touch the trigger paths above).
+  workflow_dispatch:
 
 env:
   NODE_VERSION: '18'
@@ -40,7 +43,10 @@ jobs:
 
       - name: Build Storybook
         working-directory: packages/web
-        run: npm run build-storybook
+        # --stats-json emits preview-stats.json, which Chromatic TurboSnap
+        # (onlyChanged: true) needs to trace changed files. Without it the
+        # action errors: "TurboSnap disabled due to missing stats file".
+        run: npm run build-storybook -- --stats-json
 
       - name: Run Chromatic
         uses: chromaui/action@latest
