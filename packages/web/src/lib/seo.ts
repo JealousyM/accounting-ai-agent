@@ -305,3 +305,64 @@ export function faqPageJsonLd(faq: { q: string; a: string }[]) {
     })),
   };
 }
+
+// ============================================
+// llms.txt (AI / LLM crawler guidance — llmstxt.org)
+// ============================================
+
+/** One article entry for the llms.txt "Articles" section. */
+export interface LlmsArticle {
+  title: string;
+  slug: string;
+  description: string;
+}
+
+/**
+ * Build the `/llms.txt` document: a concise, link-first Markdown overview that
+ * generative engines (ChatGPT, Perplexity, Gemini, Claude, AI Overviews) read
+ * to understand the site and find its most useful pages. Follows the
+ * llmstxt.org convention — H1 name, `>` summary, then `##` sections of links.
+ *
+ * Links point at the canonical (Polish) URLs; the English/Russian variants live
+ * under `/en` and `/ru`. `articles` is expected newest-first.
+ */
+export function buildLlmsTxt(articles: LlmsArticle[]): string {
+  const link = (label: string, path: string, desc?: string) =>
+    `- [${label}](${absoluteUrl(path)})${desc ? `: ${desc}` : ''}`;
+
+  const lines: string[] = [
+    `# ${SITE_NAME}`,
+    '',
+    '> AI-powered accounting assistant for Polish businesses — integrates with wFirma, ' +
+      'handles KSeF e-invoices, and answers VAT, PIT, CIT and ZUS questions in plain language.',
+    '',
+    `${SITE_NAME} (${SITE_URL}) is a product of MICODE sp. z o.o. It is available in Polish ` +
+      '(default, canonical), English (/en) and Russian (/ru). The links below point to the ' +
+      'canonical Polish URLs.',
+    '',
+    '## Product',
+    '',
+    `- [Home](${SITE_URL}): What ${SITE_NAME} is, its features and who it is for.`,
+    link('Pricing', '/pricing', 'Plans, including a free tier when you bring your own OpenAI key.'),
+    link('Blog', '/blog', 'Explainers and how-tos on Polish accounting, taxes and KSeF.'),
+    '',
+    '## Guides',
+    '',
+    link('KSeF setup', '/guide/ksef', "Connect and send e-invoices through Poland's National e-Invoice System (KSeF)."),
+    link('wFirma integration', '/guide/wfirma', 'Link your wFirma account and API credentials.'),
+    link('Telegram bot', '/guide/telegram', 'Book expenses from receipt photos via Telegram OCR.'),
+    '',
+    '## Articles',
+    '',
+    ...articles.map((a) => link(a.title, `/blog/${a.slug}`, a.description)),
+    '',
+    '## Company',
+    '',
+    link('Terms of Service', '/terms'),
+    link('Privacy Policy', '/privacy-policy'),
+    link('RODO / GDPR', '/rodo'),
+    '',
+  ];
+
+  return lines.join('\n');
+}
