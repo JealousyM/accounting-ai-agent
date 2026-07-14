@@ -66,6 +66,7 @@ export default async function BlogArticlePage({ params }: Params) {
 
   const isDraft = post.status === 'draft';
 
+  const wordCount = post.body.split(/\s+/).filter(Boolean).length;
   const jsonLd: Record<string, unknown>[] = isDraft
     ? []
     : [
@@ -78,6 +79,9 @@ export default async function BlogArticlePage({ params }: Params) {
           updatedAt: post.updatedAt,
           author: post.author,
           coverImage: post.coverImage,
+          keywords: post.tags,
+          section: post.category,
+          wordCount,
         }),
       ];
   if (!isDraft && post.faq && post.faq.length > 0) jsonLd.push(faqPageJsonLd(post.faq));
