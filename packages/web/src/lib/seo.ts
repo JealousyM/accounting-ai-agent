@@ -277,8 +277,15 @@ export function breadcrumbJsonLd(items: Array<{ name: string; path: string }>) {
  * strongest authorship signal for AI answer engines and search — and `jobTitle`
  * for the person's role.
  */
-export const ARTICLE_AUTHOR: { name: string; url?: string; jobTitle?: string } = {
+export const ARTICLE_AUTHOR: {
+  name: string;
+  url?: string;
+  sameAs?: string[];
+  jobTitle?: string;
+} = {
   name: 'Mikhail Peraviortkin',
+  url: 'http://mi-code.pl',
+  sameAs: ['http://mi-code.pl', 'https://www.linkedin.com/in/mikhailperaviortkin/'],
 };
 
 /**
@@ -310,8 +317,10 @@ export function blogPostingJsonLd(input: {
   publishedAt: string | null;
   updatedAt: string | null;
   author: string;
-  /** Author profile URL → Person `url` + `sameAs` (strongest E-E-A-T signal). */
+  /** Author homepage → Person `url`. */
   authorUrl?: string;
+  /** Author's authoritative profiles → Person `sameAs` (strongest E-E-A-T signal). */
+  authorSameAs?: string[];
   /** Author role → Person `jobTitle`. */
   authorJobTitle?: string;
   coverImage?: string | null;
@@ -335,7 +344,10 @@ export function blogPostingJsonLd(input: {
     author: {
       '@type': 'Person',
       name: input.author,
-      ...(input.authorUrl ? { url: input.authorUrl, sameAs: [input.authorUrl] } : {}),
+      ...(input.authorUrl ? { url: input.authorUrl } : {}),
+      ...(input.authorSameAs && input.authorSameAs.length > 0
+        ? { sameAs: input.authorSameAs }
+        : {}),
       ...(input.authorJobTitle ? { jobTitle: input.authorJobTitle } : {}),
     },
     publisher: { '@type': 'Organization', name: 'MICODE sp. z o.o.' },
