@@ -68,6 +68,40 @@ describe('blogPostingJsonLd', () => {
     expect(jsonld.datePublished).toBe('2026-07-10');
     expect(String(jsonld.mainEntityOfPage)).toContain('/blog/a');
   });
+
+  it('adds keywords, articleSection and wordCount when provided', () => {
+    const jsonld = blogPostingJsonLd({
+      title: 'T',
+      description: 'D',
+      slug: 'a',
+      locale: 'pl',
+      publishedAt: '2026-07-10',
+      updatedAt: '2026-07-11',
+      author: 'Zespół eKsięgowy AI',
+      keywords: ['vat', 'ksef'],
+      section: 'VAT',
+      wordCount: 1200,
+    }) as Record<string, unknown>;
+    expect(jsonld.keywords).toBe('vat, ksef');
+    expect(jsonld.articleSection).toBe('VAT');
+    expect(jsonld.wordCount).toBe(1200);
+  });
+
+  it('omits keywords/articleSection/wordCount when absent or empty', () => {
+    const jsonld = blogPostingJsonLd({
+      title: 'T',
+      description: 'D',
+      slug: 'a',
+      locale: 'pl',
+      publishedAt: null,
+      updatedAt: null,
+      author: 'Zespół eKsięgowy AI',
+      keywords: [],
+    }) as Record<string, unknown>;
+    expect('keywords' in jsonld).toBe(false);
+    expect('articleSection' in jsonld).toBe(false);
+    expect('wordCount' in jsonld).toBe(false);
+  });
 });
 
 describe('faqPageJsonLd', () => {
