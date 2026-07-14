@@ -2,10 +2,29 @@ import {
   blogAlternatesFor,
   blogPostingJsonLd,
   faqPageJsonLd,
+  findLinkedIn,
   splitLocale,
   localizedPath,
   type Locale,
 } from './seo';
+
+describe('findLinkedIn', () => {
+  it('returns the LinkedIn URL from a sameAs list', () => {
+    expect(findLinkedIn(['http://mi-code.pl', 'https://www.linkedin.com/in/x/'])).toBe(
+      'https://www.linkedin.com/in/x/',
+    );
+  });
+
+  it('matches linkedin.com case-insensitively', () => {
+    expect(findLinkedIn(['https://LinkedIn.com/in/y'])).toBe('https://LinkedIn.com/in/y');
+  });
+
+  it('returns undefined when there is no LinkedIn profile, or the list is empty/undefined', () => {
+    expect(findLinkedIn(['http://mi-code.pl'])).toBeUndefined();
+    expect(findLinkedIn([])).toBeUndefined();
+    expect(findLinkedIn(undefined)).toBeUndefined();
+  });
+});
 
 describe('locale switch target (regression: prefixes must not stack)', () => {
   // Mirrors what useLocaleSwitcher computes: strip any existing locale prefix,
