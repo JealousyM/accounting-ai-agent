@@ -7,6 +7,7 @@ import {
   SITE_NAME,
   LOCALE_BCP47,
   ARTICLE_AUTHOR,
+  findLinkedIn,
   blogAlternatesFor,
   blogPostingJsonLd,
   faqPageJsonLd,
@@ -100,6 +101,7 @@ export default async function BlogArticlePage({ params }: Params) {
         year: 'numeric',
       })
     : null;
+  const authorLinkedIn = findLinkedIn(ARTICLE_AUTHOR.sameAs);
 
   return (
     <main className="max-w-3xl mx-auto px-4 py-10">
@@ -118,11 +120,35 @@ export default async function BlogArticlePage({ params }: Params) {
           {post.title}
         </h1>
         <p className="mt-3 text-sm text-gray-500 dark:text-gray-400">
-          {ARTICLE_AUTHOR.name}
+          {ARTICLE_AUTHOR.url ? (
+            <a
+              href={ARTICLE_AUTHOR.url}
+              rel="author noopener noreferrer"
+              target="_blank"
+              className="font-medium hover:text-gray-700 dark:hover:text-gray-200 hover:underline"
+            >
+              {ARTICLE_AUTHOR.name}
+            </a>
+          ) : (
+            ARTICLE_AUTHOR.name
+          )}
           {dateLabel && (
             <>
               {' · '}
               <time dateTime={post.publishedAt ?? undefined}>{dateLabel}</time>
+            </>
+          )}
+          {authorLinkedIn && (
+            <>
+              {' · '}
+              <a
+                href={authorLinkedIn}
+                rel="noopener noreferrer"
+                target="_blank"
+                className="hover:text-gray-700 dark:hover:text-gray-200 hover:underline"
+              >
+                LinkedIn
+              </a>
             </>
           )}
         </p>

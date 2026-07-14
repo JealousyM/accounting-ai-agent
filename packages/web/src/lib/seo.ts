@@ -288,6 +288,12 @@ export const ARTICLE_AUTHOR: {
   sameAs: ['http://mi-code.pl', 'https://www.linkedin.com/in/mikhailperaviortkin/'],
 };
 
+/** The LinkedIn profile URL within a `sameAs` list, if any — for a visible
+ *  byline link that corroborates the JSON-LD `sameAs` (stronger E-E-A-T). */
+export function findLinkedIn(sameAs: string[] | undefined): string | undefined {
+  return sameAs?.find((u) => /linkedin\.com/i.test(u));
+}
+
 /**
  * hreflang alternates for a blog article, built ONLY from the locales that
  * actually have a published translation. `x-default` points at the Polish
