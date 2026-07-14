@@ -6,6 +6,7 @@ import { getRequestLocale } from '@/lib/locale.server';
 import {
   SITE_NAME,
   LOCALE_BCP47,
+  ARTICLE_AUTHOR,
   blogAlternatesFor,
   blogPostingJsonLd,
   faqPageJsonLd,
@@ -66,6 +67,7 @@ export default async function BlogArticlePage({ params }: Params) {
 
   const isDraft = post.status === 'draft';
 
+  const wordCount = post.body.split(/\s+/).filter(Boolean).length;
   const jsonLd: Record<string, unknown>[] = isDraft
     ? []
     : [
@@ -76,8 +78,14 @@ export default async function BlogArticlePage({ params }: Params) {
           locale,
           publishedAt: post.publishedAt,
           updatedAt: post.updatedAt,
-          author: post.author,
+          author: ARTICLE_AUTHOR.name,
+          authorUrl: ARTICLE_AUTHOR.url,
+          authorSameAs: ARTICLE_AUTHOR.sameAs,
+          authorJobTitle: ARTICLE_AUTHOR.jobTitle,
           coverImage: post.coverImage,
+          keywords: post.tags,
+          section: post.category,
+          wordCount,
         }),
       ];
   if (!isDraft && post.faq && post.faq.length > 0) jsonLd.push(faqPageJsonLd(post.faq));
@@ -110,7 +118,7 @@ export default async function BlogArticlePage({ params }: Params) {
           {post.title}
         </h1>
         <p className="mt-3 text-sm text-gray-500 dark:text-gray-400">
-          {post.author}
+          {ARTICLE_AUTHOR.name}
           {dateLabel && (
             <>
               {' · '}

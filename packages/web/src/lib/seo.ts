@@ -229,6 +229,29 @@ export const SOFTWARE_APPLICATION_JSONLD = {
   publisher: { '@type': 'Organization', name: 'MICODE sp. z o.o.' },
 };
 
+/**
+ * HowTo structured data for a step-by-step guide. Generative engines and rich
+ * results surface procedural content from this — each step becomes a HowToStep.
+ */
+export function howToJsonLd(input: {
+  name: string;
+  description?: string;
+  steps: { name: string; text: string }[];
+}) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'HowTo',
+    name: input.name,
+    ...(input.description ? { description: input.description } : {}),
+    step: input.steps.map((s, index) => ({
+      '@type': 'HowToStep',
+      position: index + 1,
+      name: s.name,
+      text: s.text,
+    })),
+  };
+}
+
 /** Build a BreadcrumbList for a guide page. */
 export function breadcrumbJsonLd(items: Array<{ name: string; path: string }>) {
   return {
@@ -246,6 +269,24 @@ export function breadcrumbJsonLd(items: Array<{ name: string; path: string }>) {
 // ============================================
 // Blog helpers (per-post hreflang + JSON-LD)
 // ============================================
+
+/**
+ * The named person behind the articles (E-E-A-T: a real human author, not just
+ * the organization). Used for both the visible byline and the BlogPosting
+ * `author`. Add `url` (LinkedIn / personal / author page) to emit `sameAs` — the
+ * strongest authorship signal for AI answer engines and search — and `jobTitle`
+ * for the person's role.
+ */
+export const ARTICLE_AUTHOR: {
+  name: string;
+  url?: string;
+  sameAs?: string[];
+  jobTitle?: string;
+} = {
+  name: 'Mikhail Peraviortkin',
+  url: 'http://mi-code.pl',
+  sameAs: ['http://mi-code.pl', 'https://www.linkedin.com/in/mikhailperaviortkin/'],
+};
 
 /**
  * hreflang alternates for a blog article, built ONLY from the locales that
@@ -276,7 +317,19 @@ export function blogPostingJsonLd(input: {
   publishedAt: string | null;
   updatedAt: string | null;
   author: string;
+  /** Author homepage → Person `url`. */
+  authorUrl?: string;
+  /** Author's authoritative profiles → Person `sameAs` (strongest E-E-A-T signal). */
+  authorSameAs?: string[];
+  /** Author role → Person `jobTitle`. */
+  authorJobTitle?: string;
   coverImage?: string | null;
+  /** Article tags → schema `keywords` (topical signal for AI/search engines). */
+  keywords?: string[];
+  /** Article category → schema `articleSection`. */
+  section?: string;
+  /** Approximate body word count → schema `wordCount` (quality/depth signal). */
+  wordCount?: number;
 }) {
   return {
     '@context': 'https://schema.org',
@@ -286,10 +339,25 @@ export function blogPostingJsonLd(input: {
     inLanguage: LOCALE_BCP47[input.locale],
     datePublished: input.publishedAt ?? undefined,
     dateModified: input.updatedAt ?? input.publishedAt ?? undefined,
-    author: { '@type': 'Organization', name: input.author },
+    // A named Person author (not the org) is a stronger authorship/E-E-A-T
+    // signal for AI answer engines and search; the org remains the publisher.
+    author: {
+      '@type': 'Person',
+      name: input.author,
+      ...(input.authorUrl ? { url: input.authorUrl } : {}),
+      ...(input.authorSameAs && input.authorSameAs.length > 0
+        ? { sameAs: input.authorSameAs }
+        : {}),
+      ...(input.authorJobTitle ? { jobTitle: input.authorJobTitle } : {}),
+    },
     publisher: { '@type': 'Organization', name: 'MICODE sp. z o.o.' },
     mainEntityOfPage: absoluteUrl(localizedPath(`/blog/${input.slug}`, input.locale)),
     image: input.coverImage || undefined,
+    ...(input.keywords && input.keywords.length > 0
+      ? { keywords: input.keywords.join(', ') }
+      : {}),
+    ...(input.section ? { articleSection: input.section } : {}),
+    ...(input.wordCount && input.wordCount > 0 ? { wordCount: input.wordCount } : {}),
   };
 }
 
@@ -304,4 +372,65 @@ export function faqPageJsonLd(faq: { q: string; a: string }[]) {
       acceptedAnswer: { '@type': 'Answer', text: f.a },
     })),
   };
+}
+
+// ============================================
+// llms.txt (AI / LLM crawler guidance — llmstxt.org)
+// ============================================
+
+/** One article entry for the llms.txt "Articles" section. */
+export interface LlmsArticle {
+  title: string;
+  slug: string;
+  description: string;
+}
+
+/**
+ * Build the `/llms.txt` document: a concise, link-first Markdown overview that
+ * generative engines (ChatGPT, Perplexity, Gemini, Claude, AI Overviews) read
+ * to understand the site and find its most useful pages. Follows the
+ * llmstxt.org convention — H1 name, `>` summary, then `##` sections of links.
+ *
+ * Links point at the canonical (Polish) URLs; the English/Russian variants live
+ * under `/en` and `/ru`. `articles` is expected newest-first.
+ */
+export function buildLlmsTxt(articles: LlmsArticle[]): string {
+  const link = (label: string, path: string, desc?: string) =>
+    `- [${label}](${absoluteUrl(path)})${desc ? `: ${desc}` : ''}`;
+
+  const lines: string[] = [
+    `# ${SITE_NAME}`,
+    '',
+    '> AI-powered accounting assistant for Polish businesses — integrates with wFirma, ' +
+      'handles KSeF e-invoices, and answers VAT, PIT, CIT and ZUS questions in plain language.',
+    '',
+    `${SITE_NAME} (${SITE_URL}) is a product of MICODE sp. z o.o. It is available in Polish ` +
+      '(default, canonical), English (/en) and Russian (/ru). The links below point to the ' +
+      'canonical Polish URLs.',
+    '',
+    '## Product',
+    '',
+    `- [Home](${SITE_URL}): What ${SITE_NAME} is, its features and who it is for.`,
+    link('Pricing', '/pricing', 'Plans, including a free tier when you bring your own OpenAI key.'),
+    link('Blog', '/blog', 'Explainers and how-tos on Polish accounting, taxes and KSeF.'),
+    '',
+    '## Guides',
+    '',
+    link('KSeF setup', '/guide/ksef', "Connect and send e-invoices through Poland's National e-Invoice System (KSeF)."),
+    link('wFirma integration', '/guide/wfirma', 'Link your wFirma account and API credentials.'),
+    link('Telegram bot', '/guide/telegram', 'Book expenses from receipt photos via Telegram OCR.'),
+    '',
+    '## Articles',
+    '',
+    ...articles.map((a) => link(a.title, `/blog/${a.slug}`, a.description)),
+    '',
+    '## Company',
+    '',
+    link('Terms of Service', '/terms'),
+    link('Privacy Policy', '/privacy-policy'),
+    link('RODO / GDPR', '/rodo'),
+    '',
+  ];
+
+  return lines.join('\n');
 }

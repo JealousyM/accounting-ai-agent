@@ -48,10 +48,72 @@ function toIsoDate(value: unknown): string | null {
   return String(value);
 }
 
+/** Markdown → plain text for a FAQ answer: unwrap links to their text and
+ *  drop bold markers, then collapse whitespace. Keeps the answer clean enough
+ *  for schema.org `acceptedAnswer.text` and AI extraction. */
+function faqPlainText(md: string): string {
+  return md
+    .replace(/\[([^\]]+)\]\([^)]*\)/g, '$1') // [text](url) -> text
+    .replace(/\*\*(.+?)\*\*/g, '$1') // **bold** -> bold
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+/**
+ * Extract FAQ question/answer pairs from an article body.
+ *
+ * Finds the first `## …FAQ…` heading and reads the `**Question?**` /
+ * answer-paragraph pairs beneath it, stopping at the next heading or a thematic
+ * break (`---`, `***`, `___`) — which in our articles precedes the disclaimer.
+ * Returns [] when the article has no FAQ section. Lets us feed FAQPage
+ * structured data straight from the visible prose, with no frontmatter
+ * duplication and no risk of body/schema drift.
+ */
+export function parseFaqFromBody(body: string): BlogFaqItem[] {
+  const lines = body.split(/\r?\n/);
+  const start = lines.findIndex((l) => /^#{2,6}\s.*FAQ/i.test(l));
+  if (start === -1) return [];
+
+  const items: BlogFaqItem[] = [];
+  let q: string | null = null;
+  let answer: string[] = [];
+  const flush = () => {
+    if (q !== null) {
+      const a = faqPlainText(answer.join(' '));
+      if (a) items.push({ q, a });
+    }
+    q = null;
+    answer = [];
+  };
+
+  for (let i = start + 1; i < lines.length; i++) {
+    const line = lines[i];
+    if (/^#{1,6}\s/.test(line) || /^(---|\*\*\*|___)\s*$/.test(line)) break;
+    const question = line.match(/^\*\*(.+?)\*\*\s*$/);
+    if (question) {
+      flush();
+      q = question[1].trim();
+    } else if (line.trim()) {
+      answer.push(line.trim());
+    }
+  }
+  flush();
+  return items;
+}
+
 function parseFile(localeDir: string, locale: BlogLocale, file: string): Post {
   const raw = fs.readFileSync(path.join(localeDir, file), 'utf8');
   const { data, content } = matter(raw);
   const slug = (data.slug as string) ?? file.replace(/\.md$/, '');
+  const body = content.trim();
+  // Explicit frontmatter FAQ wins; otherwise derive it from the body prose so
+  // FAQPage structured data is emitted without duplicating the FAQ by hand.
+  const bodyFaq = parseFaqFromBody(body);
+  const faq = Array.isArray(data.faq)
+    ? (data.faq as BlogFaqItem[])
+    : bodyFaq.length > 0
+      ? bodyFaq
+      : undefined;
   return {
     slug,
     locale,
@@ -66,8 +128,8 @@ function parseFile(localeDir: string, locale: BlogLocale, file: string): Post {
     author: (data.author as string) ?? 'Zespół eKsięgowy AI',
     coverImage: (data.coverImage as string) || undefined,
     ogImage: (data.ogImage as string) || undefined,
-    faq: Array.isArray(data.faq) ? (data.faq as BlogFaqItem[]) : undefined,
-    body: content.trim(),
+    faq,
+    body,
   };
 }
 

@@ -28,6 +28,7 @@ export default function GetTokensPage() {
         { label: topic.title, href: '/guide/ksef' },
         { label: article.title },
       ]}
+      howToSteps={article.steps.map((s) => ({ name: s.title, text: s.body }))}
     >
       <p className="text-gray-700 dark:text-gray-300 leading-relaxed">{article.intro}</p>
 
