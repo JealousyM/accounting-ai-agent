@@ -69,6 +69,40 @@ describe('blogPostingJsonLd', () => {
     expect(String(jsonld.mainEntityOfPage)).toContain('/blog/a');
   });
 
+  it('emits a Person author, with url/sameAs/jobTitle when provided', () => {
+    const jsonld = blogPostingJsonLd({
+      title: 'T',
+      description: 'D',
+      slug: 'a',
+      locale: 'pl',
+      publishedAt: '2026-07-10',
+      updatedAt: null,
+      author: 'Mikhail Peraviortkin',
+      authorUrl: 'https://example.com/mikhail',
+      authorJobTitle: 'Founder',
+    }) as { author: Record<string, unknown> };
+    expect(jsonld.author['@type']).toBe('Person');
+    expect(jsonld.author.name).toBe('Mikhail Peraviortkin');
+    expect(jsonld.author.url).toBe('https://example.com/mikhail');
+    expect(jsonld.author.sameAs).toEqual(['https://example.com/mikhail']);
+    expect(jsonld.author.jobTitle).toBe('Founder');
+  });
+
+  it('emits a Person author without url/sameAs when no author URL is given', () => {
+    const jsonld = blogPostingJsonLd({
+      title: 'T',
+      description: 'D',
+      slug: 'a',
+      locale: 'pl',
+      publishedAt: null,
+      updatedAt: null,
+      author: 'Mikhail Peraviortkin',
+    }) as { author: Record<string, unknown> };
+    expect(jsonld.author['@type']).toBe('Person');
+    expect('url' in jsonld.author).toBe(false);
+    expect('sameAs' in jsonld.author).toBe(false);
+  });
+
   it('adds keywords, articleSection and wordCount when provided', () => {
     const jsonld = blogPostingJsonLd({
       title: 'T',
