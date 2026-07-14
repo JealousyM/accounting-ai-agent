@@ -153,7 +153,11 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script_stop: true
-          command_timeout: 10m
+          # The VPS builds the api + web Docker images on-server (scripts/deploy.sh);
+          # the web `next build` (compile + typecheck) alone can approach 10m on this
+          # budget box, so the combined build was overrunning the default and getting
+          # killed mid-typecheck. 20m gives on-server builds headroom.
+          command_timeout: 20m
           script: |
             cd /opt/accounting-ai-agent
             bash scripts/deploy.sh
