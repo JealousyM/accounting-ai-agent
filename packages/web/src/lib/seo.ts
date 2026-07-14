@@ -271,6 +271,17 @@ export function breadcrumbJsonLd(items: Array<{ name: string; path: string }>) {
 // ============================================
 
 /**
+ * The named person behind the articles (E-E-A-T: a real human author, not just
+ * the organization). Used for both the visible byline and the BlogPosting
+ * `author`. Add `url` (LinkedIn / personal / author page) to emit `sameAs` — the
+ * strongest authorship signal for AI answer engines and search — and `jobTitle`
+ * for the person's role.
+ */
+export const ARTICLE_AUTHOR: { name: string; url?: string; jobTitle?: string } = {
+  name: 'Mikhail Peraviortkin',
+};
+
+/**
  * hreflang alternates for a blog article, built ONLY from the locales that
  * actually have a published translation. `x-default` points at the Polish
  * variant if present, otherwise the active locale.
@@ -299,6 +310,10 @@ export function blogPostingJsonLd(input: {
   publishedAt: string | null;
   updatedAt: string | null;
   author: string;
+  /** Author profile URL → Person `url` + `sameAs` (strongest E-E-A-T signal). */
+  authorUrl?: string;
+  /** Author role → Person `jobTitle`. */
+  authorJobTitle?: string;
   coverImage?: string | null;
   /** Article tags → schema `keywords` (topical signal for AI/search engines). */
   keywords?: string[];
@@ -315,7 +330,14 @@ export function blogPostingJsonLd(input: {
     inLanguage: LOCALE_BCP47[input.locale],
     datePublished: input.publishedAt ?? undefined,
     dateModified: input.updatedAt ?? input.publishedAt ?? undefined,
-    author: { '@type': 'Organization', name: input.author },
+    // A named Person author (not the org) is a stronger authorship/E-E-A-T
+    // signal for AI answer engines and search; the org remains the publisher.
+    author: {
+      '@type': 'Person',
+      name: input.author,
+      ...(input.authorUrl ? { url: input.authorUrl, sameAs: [input.authorUrl] } : {}),
+      ...(input.authorJobTitle ? { jobTitle: input.authorJobTitle } : {}),
+    },
     publisher: { '@type': 'Organization', name: 'MICODE sp. z o.o.' },
     mainEntityOfPage: absoluteUrl(localizedPath(`/blog/${input.slug}`, input.locale)),
     image: input.coverImage || undefined,
