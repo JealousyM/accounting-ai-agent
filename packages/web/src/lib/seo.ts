@@ -229,6 +229,29 @@ export const SOFTWARE_APPLICATION_JSONLD = {
   publisher: { '@type': 'Organization', name: 'MICODE sp. z o.o.' },
 };
 
+/**
+ * HowTo structured data for a step-by-step guide. Generative engines and rich
+ * results surface procedural content from this — each step becomes a HowToStep.
+ */
+export function howToJsonLd(input: {
+  name: string;
+  description?: string;
+  steps: { name: string; text: string }[];
+}) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'HowTo',
+    name: input.name,
+    ...(input.description ? { description: input.description } : {}),
+    step: input.steps.map((s, index) => ({
+      '@type': 'HowToStep',
+      position: index + 1,
+      name: s.name,
+      text: s.text,
+    })),
+  };
+}
+
 /** Build a BreadcrumbList for a guide page. */
 export function breadcrumbJsonLd(items: Array<{ name: string; path: string }>) {
   return {
