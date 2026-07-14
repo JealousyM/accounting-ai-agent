@@ -300,6 +300,12 @@ export function blogPostingJsonLd(input: {
   updatedAt: string | null;
   author: string;
   coverImage?: string | null;
+  /** Article tags → schema `keywords` (topical signal for AI/search engines). */
+  keywords?: string[];
+  /** Article category → schema `articleSection`. */
+  section?: string;
+  /** Approximate body word count → schema `wordCount` (quality/depth signal). */
+  wordCount?: number;
 }) {
   return {
     '@context': 'https://schema.org',
@@ -313,6 +319,11 @@ export function blogPostingJsonLd(input: {
     publisher: { '@type': 'Organization', name: 'MICODE sp. z o.o.' },
     mainEntityOfPage: absoluteUrl(localizedPath(`/blog/${input.slug}`, input.locale)),
     image: input.coverImage || undefined,
+    ...(input.keywords && input.keywords.length > 0
+      ? { keywords: input.keywords.join(', ') }
+      : {}),
+    ...(input.section ? { articleSection: input.section } : {}),
+    ...(input.wordCount && input.wordCount > 0 ? { wordCount: input.wordCount } : {}),
   };
 }
 
