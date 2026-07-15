@@ -39,35 +39,36 @@ const html = `<!doctype html><html><head><meta charset="utf-8"><style>
   .glow-a{width:640px;height:640px;left:-180px;top:-160px;background:#10B981;opacity:.20;}
   .glow-b{width:720px;height:720px;right:-240px;bottom:-220px;background:#0EA5A5;opacity:.13;}
 
-  .app-badge{position:absolute;top:50px;right:56px;width:132px;height:132px;border-radius:50%;
+  /* Reels safe-zone: keep all content within y~150..1470 (IG overlays top + bottom) */
+  .app-badge{position:absolute;top:150px;right:52px;width:116px;height:116px;border-radius:50%;
     background:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 12px 30px rgba(0,0,0,.42);}
-  .app-badge img{width:86px;height:86px;object-fit:contain;display:block;}
+  .app-badge img{width:76px;height:76px;object-fit:contain;display:block;}
 
-  .eyebrow{position:absolute;top:104px;left:64px;color:#34D399;font-size:34px;font-weight:700;letter-spacing:9px;}
-  .eyebrow .u{display:block;width:120px;height:5px;border-radius:3px;background:linear-gradient(90deg,#34D399,#0EA5A5);margin:20px 0 0;}
+  .eyebrow{position:absolute;top:206px;left:64px;color:#34D399;font-size:33px;font-weight:700;letter-spacing:9px;}
+  .eyebrow .u{display:block;width:120px;height:5px;border-radius:3px;background:linear-gradient(90deg,#34D399,#0EA5A5);margin:18px 0 0;}
 
-  h1{position:absolute;top:262px;left:64px;right:64px;text-align:center;font-size:92px;line-height:1.03;font-weight:800;letter-spacing:-1.5px;}
+  h1{position:absolute;top:288px;left:64px;right:64px;text-align:center;font-size:80px;line-height:1.03;font-weight:800;letter-spacing:-1.5px;}
   h1 .g{background:linear-gradient(90deg,#34D399,#22D3EE);-webkit-background-clip:text;background-clip:text;color:transparent;}
 
-  .verified{position:absolute;top:520px;left:50%;transform:translateX(-50%);z-index:6;display:flex;align-items:center;gap:14px;
-    background:#10B981;color:#04241A;font-size:32px;font-weight:800;padding:16px 34px;border-radius:999px;box-shadow:0 14px 34px rgba(16,185,129,.42);}
-  .verified .tick{display:inline-flex;width:38px;height:38px;border-radius:50%;background:#04241A;color:#10B981;align-items:center;justify-content:center;font-size:26px;}
+  .verified{position:absolute;top:486px;left:50%;transform:translateX(-50%);z-index:6;display:flex;align-items:center;gap:14px;
+    background:#10B981;color:#04241A;font-size:31px;font-weight:800;padding:15px 32px;border-radius:999px;box-shadow:0 14px 34px rgba(16,185,129,.42);}
+  .verified .tick{display:inline-flex;width:36px;height:36px;border-radius:50%;background:#04241A;color:#10B981;align-items:center;justify-content:center;font-size:24px;}
 
-  .window{position:absolute;top:572px;left:32px;right:32px;border-radius:26px;overflow:hidden;background:#0d1b2e;box-shadow:0 44px 90px rgba(0,0,0,.6);border:1px solid rgba(255,255,255,.08);}
-  .bar{height:54px;background:#0f1c30;display:flex;align-items:center;gap:12px;padding:0 24px;border-bottom:1px solid rgba(255,255,255,.05);}
-  .dot{width:14px;height:14px;border-radius:50%;}
+  .window{position:absolute;top:530px;left:128px;right:128px;border-radius:24px;overflow:hidden;background:#0d1b2e;box-shadow:0 44px 90px rgba(0,0,0,.6);border:1px solid rgba(255,255,255,.08);}
+  .bar{height:50px;background:#0f1c30;display:flex;align-items:center;gap:11px;padding:0 22px;border-bottom:1px solid rgba(255,255,255,.05);}
+  .dot{width:13px;height:13px;border-radius:50%;}
   .shot{display:block;width:100%;transform-origin:50% 26%;}
 
-  .chips{position:absolute;top:1258px;left:0;right:0;display:flex;justify-content:center;gap:24px;}
-  .chip{border:2px solid rgba(52,211,153,.55);color:#D1FAE5;font-size:33px;font-weight:600;padding:16px 36px;border-radius:999px;background:rgba(16,185,129,.06);}
+  .chips{position:absolute;top:1088px;left:0;right:0;display:flex;justify-content:center;gap:20px;}
+  .chip{border:2px solid rgba(52,211,153,.55);color:#D1FAE5;font-size:30px;font-weight:600;padding:13px 30px;border-radius:999px;background:rgba(16,185,129,.06);}
 
-  .cta{position:absolute;top:1398px;left:80px;right:80px;text-align:center;}
-  .cta .big{font-size:50px;font-weight:800;line-height:1.12;letter-spacing:-.5px;}
-  .cta .sub{display:block;margin-top:22px;font-size:31px;font-weight:500;color:#9FB3C8;line-height:1.35;}
+  .cta{position:absolute;top:1176px;left:80px;right:80px;text-align:center;}
+  .cta .big{font-size:44px;font-weight:800;line-height:1.12;letter-spacing:-.5px;}
+  .cta .sub{display:block;margin-top:16px;font-size:29px;font-weight:500;color:#9FB3C8;line-height:1.3;}
 
-  .company{position:absolute;bottom:76px;left:0;right:0;display:flex;flex-direction:column;align-items:center;gap:20px;}
-  .company .disc{width:112px;height:112px;border-radius:50%;border:3px solid rgba(255,255,255,.85);box-shadow:0 10px 26px rgba(0,0,0,.45);display:block;}
-  .company .domain{color:#94A3B8;font-size:30px;font-weight:600;letter-spacing:4px;}
+  .company{position:absolute;bottom:452px;left:0;right:0;display:flex;flex-direction:column;align-items:center;gap:18px;}
+  .company .disc{width:96px;height:96px;border-radius:50%;border:3px solid rgba(255,255,255,.85);box-shadow:0 10px 26px rgba(0,0,0,.45);display:block;}
+  .company .domain{color:#94A3B8;font-size:28px;font-weight:600;letter-spacing:4px;}
 
   /* ---- animations ---- */
   @keyframes fadeUp{from{opacity:0;transform:translateY(42px)}to{opacity:1;transform:translateY(0)}}
@@ -101,7 +102,7 @@ const html = `<!doctype html><html><head><meta charset="utf-8"><style>
       <img class="shot" src="${shot}"/>
     </div>
     <div class="chips"><span class="chip">Rejestr MF</span><span class="chip">Ochrona KUP</span><span class="chip">Zero ryzyka VAT</span></div>
-    <div class="cta"><div class="big">Bezpieczna płatność w 3 sekundy</div><span class="sub">Zapytaj AI, zanim zrobisz przelew — bez wchodzenia na rządowe strony</span></div>
+    <div class="cta"><div class="big">Bezpieczna płatność w 3 sekundy</div><span class="sub">Zapytaj AI, zanim zrobisz przelew</span></div>
     <div class="company"><img class="disc" src="${coLogo}"/><div class="domain">eksiegowyai.pl</div></div>
   </div>
 </body></html>`;
