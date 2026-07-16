@@ -31,6 +31,7 @@ import taxCalendarRoutes from './routes/tax-calendar.routes';
 import promptShortcutRoutes from './routes/prompt-shortcut.routes';
 import orgPromptShortcutRoutes from './routes/org-prompt-shortcut.routes';
 import { telegramBotService, taxDeadlineReminderService } from './services/telegram-bot';
+import { mailboxPoller, edoreczeniaReminderService } from './services/edoreczenia';
 import { globalRateLimiter } from './middleware/rate-limiter.middleware';
 import { auditLogMiddleware } from './middleware/audit-log.middleware';
 import { errorHandler, notFoundHandler } from './middleware/error-handler.middleware';
@@ -176,6 +177,10 @@ const server = app.listen(PORT, async () => {
   // Start tax deadline reminder service (proactive Telegram notifications)
   taxDeadlineReminderService.start();
 
+  // Start e-Doręczenia mailbox poller + escalating deadline reminders
+  mailboxPoller.start();
+  edoreczeniaReminderService.start();
+
   // Start Telegram chatbot
   if (telegramBotService.isInitialized()) {
     const webhookUrl = process.env.TELEGRAM_WEBHOOK_URL;
@@ -203,6 +208,8 @@ const shutdown = () => {
   ksefStatusPoller.stop();
   healthMonitorService.stop();
   taxDeadlineReminderService.stop();
+  mailboxPoller.stop();
+  edoreczeniaReminderService.stop();
   telegramBotService.stop();
   server.close(() => {
     logger.info('Server closed');
