@@ -30,6 +30,7 @@ import telegramBotRoutes from './routes/telegram-bot.routes';
 import taxCalendarRoutes from './routes/tax-calendar.routes';
 import promptShortcutRoutes from './routes/prompt-shortcut.routes';
 import orgPromptShortcutRoutes from './routes/org-prompt-shortcut.routes';
+import edoreczeniaRoutes from './routes/edoreczenia.routes';
 import { telegramBotService, taxDeadlineReminderService } from './services/telegram-bot';
 import { mailboxPoller, edoreczeniaReminderService } from './services/edoreczenia';
 import { globalRateLimiter } from './middleware/rate-limiter.middleware';
@@ -149,6 +150,9 @@ app.use('/api/ai/shortcuts', promptShortcutRoutes);
 
 // Org shared prompt shortcuts (org admin manages, all members read)
 app.use('/api/organization/shortcuts', orgPromptShortcutRoutes);
+
+// E-Doręczenia (government e-Delivery mailbox: letters, deadlines, onboarding)
+app.use('/api/edoreczenia', edoreczeniaRoutes);
 
 // 404 handler
 app.use(notFoundHandler);
