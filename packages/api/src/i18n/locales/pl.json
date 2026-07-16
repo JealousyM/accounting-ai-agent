@@ -638,6 +638,22 @@
     "requiredFields": "Wymagane pola",
     "tryAgain": "Spróbuj ponownie z poprawnymi danymi."
   },
+  "edelivery": {
+    "alertTitle": "📬 Nowe pismo urzędowe",
+    "newLetterFrom": "Nowe pismo od",
+    "deadlineIn": "Termin za",
+    "severityHigh": "🔴 Wymaga działania",
+    "severityMedium": "🟡 Do wiadomości",
+    "severityLow": "🟢 Informacja",
+    "requiredAction": "Co zrobić",
+    "noLetters": "Brak pism urzędowych.",
+    "lettersListTitle": "Pisma urzędowe",
+    "errorFetch": "Nie udało się pobrać pism urzędowych.",
+    "markedDone": "Pismo oznaczone jako załatwione.",
+    "showAnalysis": "Pokaż analizę",
+    "done": "Załatwione",
+    "remindTomorrow": "Przypomnij jutro"
+  },
   "ksef": {
     "sendSuccess": "Faktura wysłana do KSeF",
     "sendFailed": "Nie udało się wysłać faktury do KSeF",

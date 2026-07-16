@@ -638,6 +638,22 @@
     "requiredFields": "Обязательные поля",
     "tryAgain": "Попробуйте снова с правильными данными."
   },
+  "edelivery": {
+    "alertTitle": "📬 Новое официальное письмо",
+    "newLetterFrom": "Новое письмо от",
+    "deadlineIn": "Срок через",
+    "severityHigh": "🔴 Требует действия",
+    "severityMedium": "🟡 К сведению",
+    "severityLow": "🟢 Информация",
+    "requiredAction": "Что делать",
+    "noLetters": "Официальных писем нет.",
+    "lettersListTitle": "Официальные письма",
+    "errorFetch": "Не удалось получить официальные письма.",
+    "markedDone": "Письмо отмечено как обработанное.",
+    "showAnalysis": "Показать анализ",
+    "done": "Обработано",
+    "remindTomorrow": "Напомнить завтра"
+  },
   "ksef": {
     "sendSuccess": "Счёт-фактура отправлена в KSeF",
     "sendFailed": "Не удалось отправить счёт-фактуру в KSeF",

@@ -20,6 +20,7 @@ export type DocumentTranslations = typeof plTranslations['document'];
 export type LedgerTranslations = typeof plTranslations['ledger'];
 export type HRTranslations = typeof plTranslations['hr'];
 export type KSeFTranslations = typeof plTranslations['ksef'];
+export type EDeliveryTranslations = typeof plTranslations['edelivery'];
 export type BialaListaTranslations = typeof plTranslations['bialaLista'];
 export type TaxCalendarTranslations = typeof plTranslations['taxCalendar'];
 export type TaxRegisterTranslations = typeof plTranslations['taxRegister'];
@@ -84,6 +85,10 @@ export function getHRTranslations(locale: Locale = 'pl'): HRTranslations {
 
 export function getKSeFTranslations(locale: Locale = 'pl'): KSeFTranslations {
   return getTranslations(locale).ksef;
+}
+
+export function getEDeliveryTranslations(locale: Locale = 'pl'): EDeliveryTranslations {
+  return getTranslations(locale).edelivery;
 }
 
 export function getBialaListaTranslations(locale: Locale = 'pl'): BialaListaTranslations {

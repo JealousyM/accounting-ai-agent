@@ -638,6 +638,22 @@
     "requiredFields": "Required fields",
     "tryAgain": "Please try again with correct data."
   },
+  "edelivery": {
+    "alertTitle": "📬 New official letter",
+    "newLetterFrom": "New letter from",
+    "deadlineIn": "Deadline in",
+    "severityHigh": "🔴 Action required",
+    "severityMedium": "🟡 For your information",
+    "severityLow": "🟢 Informational",
+    "requiredAction": "What to do",
+    "noLetters": "No official letters.",
+    "lettersListTitle": "Official letters",
+    "errorFetch": "Failed to fetch official letters.",
+    "markedDone": "Letter marked as handled.",
+    "showAnalysis": "Show analysis",
+    "done": "Handled",
+    "remindTomorrow": "Remind me tomorrow"
+  },
   "ksef": {
     "sendSuccess": "Invoice sent to KSeF",
     "sendFailed": "Failed to send invoice to KSeF",
