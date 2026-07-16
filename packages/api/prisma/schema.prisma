@@ -206,6 +206,9 @@ model User {
   referredBy        Referral?  @relation("referred_by")
   promptShortcuts      UserPromptShortcut[]
   createdOrgShortcuts  OrgPromptShortcut[] @relation("OrgShortcutCreator")
+  edoreczeniaConfig    EDoreczeniaConfig?
+  edoreczeniaLetters   EDoreczeniaLetter[]
+  edoreczeniaDeadlines EDoreczeniaDeadline[]
 
   @@index([email])
   @@index([googleId])
@@ -630,6 +633,125 @@ model KSeFContractor {
   @@index([userId])
   @@index([userId, source])
   @@map("ksef_contractors")
+}
+
+// ============================================
+// E-DORĘCZENIA (Government e-Delivery mailbox)
+// ============================================
+
+enum EDoreczeniaStatus {
+  pending_csr
+  pending_cert
+  active
+  degraded
+  cert_expiring
+  cert_expired
+}
+
+enum EDoreczeniaLetterStatus {
+  new
+  needs_action
+  done
+}
+
+enum EDoreczeniaAnalysisStatus {
+  pending
+  done
+  failed
+  unavailable
+}
+
+enum EDoreczeniaSenderType {
+  us
+  zus
+  court
+  other
+  unknown
+}
+
+enum EDoreczeniaDeadlineType {
+  response_deadline
+  fikcja_doreczenia
+  custom
+}
+
+enum EDoreczeniaDeadlineStatus {
+  active
+  met
+  missed
+  dismissed
+}
+
+model EDoreczeniaConfig {
+  id                  String            @id @default(uuid()) @db.Uuid
+  userId              String            @unique @db.Uuid
+  adeAddress          String?
+  status              EDoreczeniaStatus @default(pending_csr)
+  privateKeyEnc       String?           @db.Text
+  certificateEnc      String?           @db.Text
+  certExpiresAt       DateTime?
+  autoReceive         Boolean           @default(false)
+  notifyEnabled       Boolean           @default(true)
+  notifyLeadDays      Int               @default(3)
+  environment         String            @default("int")
+  provider            String            @default("poczta_polska")
+  lastPolledAt        DateTime?
+  lastPollError       String?           @db.Text
+  consecutiveFailures Int               @default(0)
+  createdAt           DateTime          @default(now())
+  updatedAt           DateTime          @updatedAt
+  user                User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  letters             EDoreczeniaLetter[]
+
+  @@map("edoreczenia_config")
+}
+
+model EDoreczeniaLetter {
+  id             String                    @id @default(uuid()) @db.Uuid
+  userId         String                    @db.Uuid
+  configId       String                    @db.Uuid
+  messageId      String
+  senderName     String?
+  senderType     EDoreczeniaSenderType     @default(unknown)
+  subject        String?
+  receivedAt     DateTime
+  bodyText       String?                   @db.Text
+  attachmentsMeta Json?
+  analysis       Json?
+  status         EDoreczeniaLetterStatus   @default(new)
+  analysisStatus EDoreczeniaAnalysisStatus @default(pending)
+  createdAt      DateTime                  @default(now())
+  updatedAt      DateTime                  @updatedAt
+  user           User                      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  config         EDoreczeniaConfig         @relation(fields: [configId], references: [id], onDelete: Cascade)
+  deadlines      EDoreczeniaDeadline[]
+
+  @@unique([userId, messageId])
+  @@index([userId])
+  @@index([userId, status])
+  @@index([configId])
+  @@map("edoreczenia_letters")
+}
+
+model EDoreczeniaDeadline {
+  id            String                    @id @default(uuid()) @db.Uuid
+  letterId      String                    @db.Uuid
+  userId        String                    @db.Uuid
+  type          EDoreczeniaDeadlineType
+  dueDate       DateTime
+  description   String?
+  status        EDoreczeniaDeadlineStatus @default(active)
+  remindersSent Int                       @default(0)
+  lastRemindedAt DateTime?
+  createdAt     DateTime                  @default(now())
+  updatedAt     DateTime                  @updatedAt
+  letter        EDoreczeniaLetter         @relation(fields: [letterId], references: [id], onDelete: Cascade)
+  user          User                      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([status, dueDate])
+  @@index([letterId])
+  @@map("edoreczenia_deadlines")
 }
 
 // ============================================
