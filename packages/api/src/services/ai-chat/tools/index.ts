@@ -125,6 +125,12 @@ import {
   createMatchIncomingInvoiceTool,
   createDirectSendToKSeFTool,
 } from './ksef.tools';
+import {
+  createGetOfficialLettersTool,
+  createExplainOfficialLetterTool,
+  createGetLetterDeadlinesTool,
+  createMarkLetterDoneTool,
+} from './edelivery.tools';
 import { createVerifyBankAccountTool } from './biala-lista.tools';
 
 // Re-export individual tool creators
@@ -237,6 +243,12 @@ export {
   createMatchIncomingInvoiceTool,
   createDirectSendToKSeFTool,
 } from './ksef.tools';
+export {
+  createGetOfficialLettersTool,
+  createExplainOfficialLetterTool,
+  createGetLetterDeadlinesTool,
+  createMarkLetterDoneTool,
+} from './edelivery.tools';
 export { createVerifyBankAccountTool } from './biala-lista.tools';
 
 /**
@@ -253,6 +265,7 @@ export function createAllTools(
   hrService?: HRService,
   ksefService?: KSeFService,
   ksefContractorService?: KSeFContractorService,
+  edoreczeniaService?: import('../../edoreczenia/edoreczenia.service').EDoreczeniaService,
 ): StructuredToolInterface[] {
   return [
     // Company tools
@@ -375,6 +388,14 @@ export function createAllTools(
       createBulkSendToKSeFTool(ksefService, locale, userId, subscriptionService),
       createGetIncomingKSeFInvoicesTool(ksefService, locale, userId, subscriptionService),
       createMatchIncomingInvoiceTool(ksefService, locale, userId, subscriptionService),
+    ] : []),
+
+    // E-Doręczenia tools (if edoreczeniaService is available)
+    ...(edoreczeniaService ? [
+      createGetOfficialLettersTool(edoreczeniaService, userId, locale),
+      createExplainOfficialLetterTool(edoreczeniaService, userId, locale),
+      createGetLetterDeadlinesTool(edoreczeniaService, userId, locale),
+      createMarkLetterDoneTool(edoreczeniaService, userId, locale),
     ] : []),
   ];
 }

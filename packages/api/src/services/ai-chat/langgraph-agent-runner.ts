@@ -77,6 +77,10 @@ export class LangGraphAgentRunner {
     }
 
     const systemPrompt = getSystemPrompt(locale, memoryContext);
+    // Resolve the e-Doręczenia singleton at call time (dynamic import) to avoid
+    // the load-time cycle runner → edoreczenia.instance → telegram-bot.instance
+    // → ai-chat.instance → runner.
+    const { edoreczeniaService } = await import('../edoreczenia');
     const tools = createAllTools(
       wfirmaService,
       this.cacheService,
@@ -87,7 +91,8 @@ export class LangGraphAgentRunner {
       subscriptionService,
       hrService,
       ksefService,
-      ksefContractorService
+      ksefContractorService,
+      edoreczeniaService
     );
 
     logger.info('Created tools for agent', {
