@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import Script from 'next/script';
 import { usePathname } from 'next/navigation';
 import { useCookieConsent } from '@/contexts/CookieConsentContext';
@@ -12,8 +12,17 @@ export function GoogleAnalytics() {
 
   const analyticsConsented = state.hasConsented && state.preferences.analytics;
 
+  // The gtag init snippet below reports the page it mounts on (send_page_view),
+  // so the first run here would count that view a second time. Report only the
+  // client-side navigations that follow.
+  const reportedInitialView = useRef(false);
+
   useEffect(() => {
     if (!analyticsConsented || !GA_MEASUREMENT_ID) return;
+    if (!reportedInitialView.current) {
+      reportedInitialView.current = true;
+      return;
+    }
     pageview(pathname);
   }, [pathname, analyticsConsented]);
 

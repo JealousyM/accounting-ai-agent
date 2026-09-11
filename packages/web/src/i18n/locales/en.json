@@ -1447,6 +1447,25 @@
       "noActivity": "No KSeF activity yet"
     }
   },
+"productsPage": {
+  "title": "MICODE products",
+  "subtitle": "We build AI tools that keep finances in order — at work and at home.",
+  "visit": "Open site",
+  "items": {
+    "eksiegowy": {
+      "name": "eKsięgowy AI",
+      "description": "An AI accounting assistant for Polish businesses: wFirma integration, KSeF e-invoices, and answers about VAT, PIT, CIT and ZUS."
+    },
+    "micode": {
+      "name": "MICODE",
+      "description": "The home page of MICODE sp. z o.o. — the studio behind every product listed here."
+    },
+    "aiBudget": {
+      "name": "AI Budget",
+      "description": "AI-powered household budgeting: expenses, savings and shared family finances in one place. Available in the browser and on Android."
+    }
+  }
+},
   "landing": {
     "nav": {
       "features": "Features",
@@ -1525,6 +1544,14 @@
         "privacy": "Privacy Policy",
         "cookies": "Cookie Policy",
         "rodo": "GDPR"
+      },
+      "products": {
+        "title": "Our products",
+        "allProducts": "All products",
+        "micode": "MICODE — main site",
+        "aiBudget": "AI Budget — personal finance",
+        "aiBudgetApp": "AI Budget — web app",
+        "aiBudgetPlay": "AI Budget on Google Play"
       },
       "allRightsReserved": "All rights reserved"
     }
