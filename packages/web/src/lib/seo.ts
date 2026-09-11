@@ -7,6 +7,8 @@
  * every public page advertises the full hreflang trio so all three are indexable.
  */
 
+import { MICODE_SAME_AS, micodeLink } from './external-links';
+
 export const SITE_URL = (
   process.env.NEXT_PUBLIC_SITE_URL || 'https://eksiegowyai.pl'
 ).replace(/\/$/, '');
@@ -106,6 +108,7 @@ export const PRIVATE_PATHS = [
 export const PUBLIC_PATHS = [
   '/',
   '/pricing',
+  '/products',
   '/blog',
   '/guide',
   '/guide/ksef',
@@ -183,6 +186,8 @@ export const ORGANIZATION_JSONLD = {
   legalName: 'MICODE SPÓŁKA Z OGRANICZONĄ ODPOWIEDZIALNOŚCIĄ',
   url: SITE_URL,
   logo: `${SITE_URL}/logo.svg`,
+  // Our other web properties, so search engines resolve them to one entity.
+  sameAs: [...MICODE_SAME_AS],
   taxID: '5833510147',
   vatID: 'PL5833510147',
   address: {
@@ -192,6 +197,30 @@ export const ORGANIZATION_JSONLD = {
     addressLocality: 'Gdańsk',
     addressCountry: 'PL',
   },
+};
+
+// ============================================
+// ItemList of MICODE products (/products)
+// ============================================
+
+/**
+ * The catalogue behind /products: this site plus our other properties, in the
+ * order the page renders them. Names stay untranslated brand names.
+ */
+export const PRODUCTS_ITEMLIST_JSONLD = {
+  '@context': 'https://schema.org',
+  '@type': 'ItemList',
+  name: 'MICODE products',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: SITE_NAME, url: SITE_URL },
+    { '@type': 'ListItem', position: 2, name: micodeLink('micode').name, url: micodeLink('micode').url },
+    {
+      '@type': 'ListItem',
+      position: 3,
+      name: micodeLink('aiBudget').name,
+      url: micodeLink('aiBudget').url,
+    },
+  ],
 };
 
 // ============================================
